@@ -40,3 +40,33 @@ O código está em uma branch de desenvolvimento e em um pull request. Ainda nã
 - Os insights atuais são regras e cálculos locais com base nos dados cadastrados. Não são uma IA generativa e não usam API paga.
 - Um painel administrativo exclusivo exige autorização verificada no servidor/banco; não deve ser protegido apenas escondendo um botão no navegador.
 - Nunca coloque a chave `service_role` no frontend. Use somente a chave pública e mantenha RLS ativo.
+
+
+## Painel ADM — publicação segura (etapa nova)
+
+O painel administrativo usa a Edge Function `admin-panel`; a validação de administrador acontece no servidor, não apenas na interface. A conta autorizada é comparada com o secret `ADMIN_EMAIL`.
+
+### Configuração necessária no Supabase
+
+1. No projeto Supabase, abra **Edge Functions** e publique a função `admin-panel` a partir de `supabase/functions/admin-panel/index.ts` (ou publique pelo Supabase CLI).
+2. Em **Edge Functions → Secrets**, configure:
+   - `ADMIN_EMAIL` = o e-mail da conta administradora autorizada.
+   - `APP_URL` = endereço público do Meu Financeiro, para o link de recuperação de senha.
+3. O Supabase fornece `SUPABASE_URL` e `SUPABASE_SERVICE_ROLE_KEY` no ambiente da função. Não copie a service role para o frontend, GitHub ou variáveis `VITE_*`.
+4. Mantenha a verificação JWT da função habilitada.
+5. Faça deploy do frontend desta branch após o build passar.
+
+### O que o painel permite
+
+- Consultar contas cadastradas (primeiras 100 por enquanto).
+- Bloquear e desbloquear contas.
+- Gerar link seguro de redefinição de senha para outra conta.
+- A conta administradora não pode ser bloqueada por essa interface e o painel nunca mostra senhas.
+
+A interface só exibe o menu para o e-mail administrativo configurado no código, mas isso não é a proteção real: toda chamada também é autenticada e autorizada pela Edge Function usando o token da sessão e o secret `ADMIN_EMAIL`. Se os dois e-mails não coincidirem, o painel não funciona.
+
+### Limitações atuais
+
+- Listagem paginada além das primeiras 100 contas ainda será adicionada.
+- Alteração de dados de perfil, modo manutenção e relatórios agregados estão planejados para uma próxima etapa.
+- O deploy da Edge Function exige configuração no projeto Supabase; criar o arquivo no GitHub não a publica automaticamente.
