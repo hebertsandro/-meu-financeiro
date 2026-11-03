@@ -53,7 +53,8 @@ function App(){
   const [busy,setBusy]=useState(false);
   const [adminUsers,setAdminUsers]=useState([]),[adminBusy,setAdminBusy]=useState(false),[adminError,setAdminError]=useState(''),[adminMessage,setAdminMessage]=useState(''),[maintenance,setMaintenance]=useState(false),[maintenanceMessage,setMaintenanceMessage]=useState('Estamos realizando uma manutenção. Voltaremos em breve.');
   const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);
-  const [assistantOpen,setAssistantOpen]=useState(false);\n  const [assistantInput,setAssistantInput]=useState('');
+  const [assistantOpen,setAssistantOpen]=useState(false);
+  const [assistantInput,setAssistantInput]=useState('');
   const [assistantMessages,setAssistantMessages]=useState([{role:'assistant',text:'Oi! Posso analisar seus gastos, cartões, dívidas, parcelas e metas usando os dados cadastrados neste site. O que você quer entender?'}]);
   const isAdmin=session?.user?.email?.toLowerCase()===ADMIN_EMAIL;
 
