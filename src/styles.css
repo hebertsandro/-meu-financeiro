@@ -55,3 +55,13 @@
 .notification-row.read{opacity:.66}
 .notification-row .row-main small{display:block;margin-top:4px;color:#75849b;font-size:9px}
 @media(max-width:760px){.notification-bell{width:33px;height:33px}}
+
+
+/* Correções do painel ADM em telas pequenas */
+.history-box .field-label{display:block;margin:14px 0 8px;color:#c2ccdc;font-size:12px;font-weight:600}
+.history-box>input{display:block;width:100%;max-width:100%;min-width:0;background:#0d1524;border:1px solid #2b374c;border-radius:11px;padding:13px 14px;color:#f4f7ff;font:inherit;font-size:13px;outline:none}
+.history-box>input:focus{border-color:#719bff;box-shadow:0 0 0 3px #719bff1a}
+.history-box>.item-actions{display:flex;align-items:center;justify-content:flex-start;gap:12px;flex-wrap:wrap;margin-top:12px}
+.history-box>.item-actions .primary{white-space:normal;max-width:100%}
+.history-box>.item-actions b{font-size:12px;color:#35d39a;white-space:normal}
+@media(max-width:760px){.history-box{min-width:0}.history-box>.item-actions{align-items:flex-start;flex-direction:column;gap:9px}.history-box>.item-actions .primary{width:100%;min-height:48px}.history-box>.item-actions b{padding:2px 0}.panel-head{align-items:flex-start;flex-direction:column}.panel-head>.item-actions{width:100%;justify-content:flex-start}.panel-head>.item-actions .primary{min-height:40px}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
