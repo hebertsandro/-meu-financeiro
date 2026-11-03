@@ -52,7 +52,9 @@ function App(){
   const [email,setEmail]=useState(''), [password,setPassword]=useState(''), [authError,setAuthError]=useState(''), [authMode,setAuthMode]=useState('login'), [authNotice,setAuthNotice]=useState('');
   const [busy,setBusy]=useState(false);
   const [adminUsers,setAdminUsers]=useState([]),[adminBusy,setAdminBusy]=useState(false),[adminError,setAdminError]=useState(''),[adminMessage,setAdminMessage]=useState(''),[maintenance,setMaintenance]=useState(false),[maintenanceMessage,setMaintenanceMessage]=useState('Estamos realizando uma manutenção. Voltaremos em breve.');
-  const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);\n  const [assistantInput,setAssistantInput]=useState('');\n  const [assistantMessages,setAssistantMessages]=useState([{role:'assistant',text:'Oi! Posso analisar seus gastos, cartões, dívidas, parcelas e metas usando os dados cadastrados neste site. O que você quer entender?'}]);
+  const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);
+  const [assistantInput,setAssistantInput]=useState('');
+  const [assistantMessages,setAssistantMessages]=useState([{role:'assistant',text:'Oi! Posso analisar seus gastos, cartões, dívidas, parcelas e metas usando os dados cadastrados neste site. O que você quer entender?'}]);
   const isAdmin=session?.user?.email?.toLowerCase()===ADMIN_EMAIL;
 
   useEffect(()=>{
@@ -159,7 +161,9 @@ function App(){
     await loadData();notify('Registro excluído.');
   }
 
-  function sendAssistantMessage(value=assistantInput){const question=value.trim();if(!question)return;const reply=answerFinancialQuestion(question,data);setAssistantMessages(old=>[...old,{role:'user',text:question},{role:'assistant',text:reply}]);setAssistantInput('');}\n\n  const currentMonth=monthStart();
+  function sendAssistantMessage(value=assistantInput){const question=value.trim();if(!question)return;const reply=answerFinancialQuestion(question,data);setAssistantMessages(old=>[...old,{role:'user',text:question},{role:'assistant',text:reply}]);setAssistantInput('');}
+
+  const currentMonth=monthStart();
   const income=data.transactions.filter(t=>t.type==='entrada'&&t.date>=currentMonth).reduce((a,t)=>a+Number(t.amount),0);
   const expenses=data.transactions.filter(t=>t.type==='gasto'&&t.date>=currentMonth).reduce((a,t)=>a+Number(t.amount),0);
   const paidIn=data.transactions.filter(t=>t.type==='entrada').reduce((a,t)=>a+Number(t.amount),0);
@@ -207,7 +211,8 @@ function App(){
           <p className="assistant-disclaimer"><Sparkles size={13}/> Primeira versão sem API paga: análise local baseada nos seus registros. Ainda não é um modelo generativo.</p>
         </div>
       </section>}
-\n      {page==='admin'&&isAdmin&&<section className="panel admin-panel">
+
+      {page==='admin'&&isAdmin&&<section className="panel admin-panel">
         <div className="panel-head"><div><h3>Administração de contas</h3><p>Área exclusiva do administrador · ações verificadas pela Edge Function</p></div><div className="item-actions"><button className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('get_maintenance')}>Consultar manutenção</button><button className="primary" disabled={adminBusy} onClick={()=>adminAction('list_users')}><RefreshCw size={16}/> Atualizar contas</button></div></div>
         <div className="stat-grid"><Stat icon={Users} label="Contas carregadas" value={String(adminUsers.length)} tone="blue" detail="Lista retornada pelo Supabase Auth"/><Stat icon={ShieldCheck} label="Acesso" value="Protegido" tone="green" detail="Validação também no servidor"/></div>
         <div className="history-box maintenance-card"><div className="maintenance-heading"><span className="maintenance-symbol"><ShieldCheck size={20}/></span><div><h3>Disponibilidade do site</h3><p>Controle quando o Meu Financeiro ficará acessível aos usuários.</p></div><span className={`maintenance-badge ${maintenance?'is-on':'is-off'}`}>{maintenance?'Em manutenção':'Site liberado'}</span></div><label className="field-label" htmlFor="maintenance-message">Mensagem para os usuários</label><textarea id="maintenance-message" value={maintenanceMessage} maxLength={240} onChange={e=>setMaintenanceMessage(e.target.value)} placeholder="Ex.: Estamos realizando uma manutenção. Voltaremos em breve."/><div className="maintenance-footer"><span>{maintenanceMessage.length}/240 caracteres</span><button className={`primary maintenance-toggle ${maintenance?'danger-action':''}`} disabled={adminBusy} onClick={()=>adminAction('set_maintenance',null,{enabled:!maintenance,message:maintenanceMessage})}>{maintenance?'Desativar manutenção':'Ativar manutenção'}</button></div></div>
