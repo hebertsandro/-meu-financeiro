@@ -35,6 +35,20 @@ Deno.serve(async (req) => {
   let body: { action?: string; user_id?: string };
   try { body = await req.json(); } catch { return respond({ error: "Corpo da solicitação inválido." }, 400); }
 
+  if (body.action === "get_maintenance") {
+    const { data, error } = await admin.from("app_settings").select("maintenance_mode,maintenance_message,updated_at").eq("id", true).single();
+    if (error) return respond({ error: "Não foi possível consultar o modo de manutenção. Execute a migração administrativa." }, 500);
+    return respond({ settings: data });
+  }
+
+  if (body.action === "set_maintenance") {
+    const enabled = body.enabled === true;
+    const message = typeof body.message === "string" ? body.message.slice(0, 240) : "Estamos realizando uma manutenção. Voltaremos em breve.";
+    const { error } = await admin.from("app_settings").upsert({ id: true, maintenance_mode: enabled, maintenance_message: message, updated_at: new Date().toISOString() });
+    if (error) return respond({ error: "Não foi possível atualizar o modo de manutenção." }, 500);
+    return respond({ success: true, maintenance_mode: enabled });
+  }
+
   if (body.action === "list_users") {
     const { data, error } = await admin.auth.admin.listUsers({ page: 1, perPage: 100 });
     if (error) return respond({ error: "Não foi possível listar as contas." }, 500);
@@ -56,6 +70,15 @@ Deno.serve(async (req) => {
     });
     if (error) return respond({ error: "Não foi possível alterar o acesso desta conta." }, 500);
     return respond({ success: true });
+  }
+
+  if (body.action === "delete_user") {
+    const { data: target, error: targetError } = await admin.auth.admin.getUserById(body.user_id);
+    if (targetError || !target.user) return respond({ error: "Conta não encontrada." }, 404);
+    if (target.user.email?.toLowerCase() === adminEmail) return respond({ error: "A conta administradora não pode ser excluída." }, 403);
+    const { error } = await admin.auth.admin.deleteUser(body.user_id);
+    if (error) return respond({ error: "Não foi possível excluir a conta definitivamente." }, 500);
+    return respond({ success: true, deleted: true });
   }
 
   if (body.action === "reset_password") {
