@@ -45,3 +45,7 @@
 .history-row b{color:#dce8ff}
 .history-row small{color:#75849b}
 @media(max-width:760px){.item-actions{gap:0}.history-row{gap:7px;font-size:9px}.history-row small{font-size:8px}}
+
+.goal-history{display:grid;gap:6px;margin-top:13px;padding-top:11px;border-top:1px solid #26344a}
+.goal-history b{font-size:9px;color:#a9b8cf}
+.goal-history span{font-size:9px;color:#7f91aa}
