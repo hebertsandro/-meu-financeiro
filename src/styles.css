@@ -65,3 +65,52 @@
 .history-box>.item-actions .primary{white-space:normal;max-width:100%}
 .history-box>.item-actions b{font-size:12px;color:#35d39a;white-space:normal}
 @media(max-width:760px){.history-box{min-width:0}.history-box>.item-actions{align-items:flex-start;flex-direction:column;gap:9px}.history-box>.item-actions .primary{width:100%;min-height:48px}.history-box>.item-actions b{padding:2px 0}.panel-head{align-items:flex-start;flex-direction:column}.panel-head>.item-actions{width:100%;justify-content:flex-start}.panel-head>.item-actions .primary{min-height:40px}.stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+/* Redesign do Painel ADM: layout responsivo e ações legíveis */
+.admin-panel .panel-head{gap:18px}
+.admin-panel .panel-head>.item-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.admin-panel .panel-head>.item-actions .delete-btn{border:1px solid #2b3a53;border-radius:10px;padding:10px 13px;color:#9ebaff;background:#121e30}
+.admin-panel .panel-head>.item-actions .primary{min-height:42px}
+.admin-panel .maintenance-card{margin-top:24px;padding:22px;border:1px solid #2a3850;border-radius:16px;background:linear-gradient(145deg,#142137,#101a2a)}
+.admin-panel .maintenance-heading{display:flex;align-items:center;gap:13px;flex-wrap:wrap}
+.admin-panel .maintenance-symbol{display:grid;place-items:center;width:42px;height:42px;border-radius:13px;background:#1c3151;color:#8eb2ff;flex:none}
+.admin-panel .maintenance-heading>div{flex:1;min-width:150px}
+.admin-panel .maintenance-heading h3{margin:0 0 5px}
+.admin-panel .maintenance-heading p{margin:0;color:#8292aa;font-size:12px;line-height:1.5}
+.admin-panel .maintenance-badge{font-size:11px;font-weight:700;border-radius:999px;padding:8px 11px}
+.admin-panel .maintenance-badge.is-off{background:#12362f;color:#70dfb5}
+.admin-panel .maintenance-badge.is-on{background:#40232c;color:#ff9baa}
+.admin-panel .field-label{display:block;margin:20px 0 8px;color:#b9c7dc;font-size:12px;font-weight:700}
+.admin-panel textarea{display:block;width:100%;min-height:82px;resize:vertical;box-sizing:border-box;padding:13px 14px;border:1px solid #30415c;border-radius:12px;background:#0b1422;color:#edf3ff;font:inherit;font-size:13px;line-height:1.5;outline:none}
+.admin-panel textarea:focus{border-color:#7097ff;box-shadow:0 0 0 3px #7097ff20}
+.admin-panel .maintenance-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:14px}
+.admin-panel .maintenance-footer>span{font-size:10px;color:#74849c}
+.admin-panel .maintenance-toggle{min-height:44px;padding:11px 18px}
+.admin-panel .maintenance-toggle.danger-action{background:linear-gradient(110deg,#d45d70,#a83d57)}
+.admin-panel .admin-user-row{display:grid;grid-template-columns:42px minmax(0,1fr) repeat(3,auto);align-items:center;gap:12px;padding:17px 0}
+.admin-panel .admin-user-row .row-main{min-width:0}
+.admin-panel .admin-user-row .row-main span{overflow-wrap:anywhere}
+.admin-panel .admin-user-row .delete-btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;border:1px solid #2b3a53;border-radius:9px;padding:9px 10px;background:#142035;color:#a9c1ef;white-space:nowrap}
+.admin-panel .admin-user-row .delete-btn:last-child{color:#ff9baa}
+.admin-panel .auth-notice,.admin-panel .error{margin-top:16px}
+@media(max-width:760px){
+ .admin-panel .panel-head{display:flex;flex-direction:column;align-items:stretch;gap:14px}
+ .admin-panel .panel-head>.item-actions{display:grid;grid-template-columns:1fr 1fr;width:100%;gap:8px}
+ .admin-panel .panel-head>.item-actions button{min-width:0;min-height:44px;font-size:11px;justify-content:center}
+ .admin-panel .maintenance-card{padding:16px;margin-top:19px}
+ .admin-panel .maintenance-heading{align-items:flex-start}
+ .admin-panel .maintenance-heading>div{min-width:calc(100% - 60px)}
+ .admin-panel .maintenance-badge{margin-left:55px}
+ .admin-panel .maintenance-footer{align-items:stretch;flex-direction:column}
+ .admin-panel .maintenance-toggle{width:100%;min-height:48px}
+ .admin-panel .admin-user-row{grid-template-columns:38px minmax(0,1fr);gap:9px;padding:16px 0}
+ .admin-panel .admin-user-row .row-main{grid-column:2;grid-row:1}
+ .admin-panel .admin-user-row .delete-btn{grid-column:span 1;min-height:39px;font-size:10px;white-space:normal}
+ .admin-panel .admin-user-row .delete-btn:nth-of-type(1){grid-column:1}
+ .admin-panel .admin-user-row .delete-btn:nth-of-type(2){grid-column:2}
+ .admin-panel .admin-user-row .delete-btn:nth-of-type(3){grid-column:1 / -1}
+ .admin-panel .admin-user-row .delete-btn svg{width:14px;height:14px;flex:none}
+ .admin-panel .admin-user-row .row-icon{grid-column:1;grid-row:1}
+ .admin-panel .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
