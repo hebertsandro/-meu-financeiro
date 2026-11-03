@@ -140,3 +140,28 @@
 .assistant-popover-compose{display:flex;gap:8px;padding:11px;border-top:1px solid #29364d;background:#0d1726}.assistant-popover-compose input{flex:1;min-width:0;border:1px solid #34445e;border-radius:11px;background:#091321;color:#eef3ff;padding:11px 12px;font:inherit;font-size:11px;outline:none}.assistant-popover-compose .primary{width:42px;height:42px;padding:0;display:grid;place-items:center;flex:none}.assistant-popover-note{margin:0;padding:0 12px 11px;color:#71829b;font-size:8px;line-height:1.5}
 @media(max-width:900px){.home-tools{grid-template-columns:1fr}.home-goal-list{grid-template-columns:1fr 1fr}}
 @media(max-width:760px){.home-tools{gap:12px;margin-bottom:12px}.quick-actions{gap:8px}.quick-actions button{padding:10px;grid-template-columns:32px 1fr;column-gap:8px}.quick-action-icon{width:31px;height:31px}.quick-actions b{font-size:9px}.quick-actions small{font-size:7px}.home-goal-list{grid-template-columns:1fr}.home-goal{padding:12px}.assistant-fab{width:56px;height:56px;right:16px;bottom:18px}.assistant-popover{right:12px;bottom:84px;width:calc(100vw - 24px);max-height:calc(100dvh - 110px)}.assistant-popover-messages{max-height:45vh}.top-actions{gap:8px}}
+
+/* Panorama financeiro da página inicial */
+.financial-overview{margin:18px 0 20px;padding:20px}
+.overview-tiles{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px}
+.overview-tile{min-width:0;text-align:left;display:flex;flex-direction:column;gap:9px;padding:15px;border:1px solid #2a3a55;border-radius:15px;background:linear-gradient(145deg,#17243a,#111c2d);color:#eaf0fc;cursor:pointer;transition:border-color .2s,transform .2s}
+.overview-tile:hover{border-color:#718fca;transform:translateY(-2px)}
+.overview-tile-top{display:flex;align-items:center;justify-content:space-between;gap:6px}
+.overview-icon{width:36px;height:36px;display:grid;place-items:center;border-radius:11px;flex:none}
+.overview-icon.violet{background:#30274d;color:#b9a5ff}.overview-icon.blue{background:#1e3557;color:#8db6ff}.overview-icon.coral{background:#462a38;color:#ff9aab}.overview-icon.green{background:#1d3d37;color:#63dfb3}
+.overview-link{display:flex;align-items:center;gap:2px;color:#8fa6c9;font-size:9px;white-space:nowrap}
+.overview-tile>small{font-size:10px;color:#8fa0b9;margin-top:3px}
+.overview-tile>strong{font:800 clamp(16px,2vw,22px) Manrope,sans-serif;letter-spacing:-.6px;color:#f3f6fd;overflow-wrap:anywhere}
+.overview-tile-foot{display:flex;justify-content:space-between;align-items:center;gap:5px;color:#8394ae;font-size:8px;flex-wrap:wrap}
+.overview-tile-foot b{color:#dce7fb;font-size:10px}
+.overview-progress{height:5px;border-radius:20px;background:#29364b;overflow:hidden;margin-top:2px}
+.overview-progress i{height:100%;display:block;border-radius:20px;background:linear-gradient(90deg,#748fff,#9b85f5)}
+.overview-tile:nth-child(2) .overview-progress i{background:linear-gradient(90deg,#4b8ff5,#7ab7ff)}
+.overview-tile:nth-child(3) .overview-progress i{background:linear-gradient(90deg,#e97991,#ffad9d)}
+.overview-tile:nth-child(4) .overview-progress i{background:linear-gradient(90deg,#37bd91,#78e0b4)}
+.overview-bottomline{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:10px;margin-top:15px;padding-top:14px;border-top:1px solid #28364d}
+.overview-bottomline>div{display:flex;align-items:center;gap:7px;min-width:0;color:#8b9bb3;font-size:9px}
+.overview-bottomline b{margin-left:auto;color:#e4ebf8;font-size:10px;white-space:nowrap}
+.overview-dot{width:7px;height:7px;border-radius:50%;flex:none}.blue-dot{background:#78aaff}
+@media(max-width:1000px){.overview-tiles{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:600px){.financial-overview{padding:14px;margin:14px 0 16px}.overview-tiles{gap:9px}.overview-tile{padding:12px;border-radius:13px;gap:8px}.overview-tile>strong{font-size:17px}.overview-tile-foot{font-size:7px}.overview-link{font-size:8px}.overview-bottomline{grid-template-columns:1fr;gap:9px}.overview-bottomline>div{font-size:9px}.overview-bottomline b{font-size:10px}}
