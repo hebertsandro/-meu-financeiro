@@ -32,3 +32,26 @@
   line-height: 1.45;
   margin: 2px 0 12px;
 }
+
+
+/* Recursos adicionados: ações, histórico de limites e parcelas */
+.item-actions{display:flex;align-items:center;gap:4px;flex-wrap:wrap;justify-content:flex-end}
+.item-actions .delete-btn{color:#8fb0ff}
+.item-actions .delete-btn:last-child{color:#65758d}
+.history-box{margin-top:24px;padding-top:19px;border-top:1px solid #253148}
+.history-box h3{font:700 13px Manrope;margin:0 0 12px}
+.history-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:1px solid #222d40;font-size:10px;color:#aebbd0}
+.history-row span:first-child{flex:1;min-width:0}
+.history-row b{color:#dce8ff}
+.history-row small{color:#75849b}
+@media(max-width:760px){.item-actions{gap:0}.history-row{gap:7px;font-size:9px}.history-row small{font-size:8px}}
+
+.goal-history{display:grid;gap:6px;margin-top:13px;padding-top:11px;border-top:1px solid #26344a}
+.goal-history b{font-size:9px;color:#a9b8cf}
+.goal-history span{font-size:9px;color:#7f91aa}
+
+.notification-bell{position:relative;display:grid;place-items:center;width:36px;height:36px;border:1px solid #29364b;border-radius:11px;background:#111a2a;color:#b8c8df;cursor:pointer}
+.notification-bell i{position:absolute;right:-5px;top:-5px;min-width:16px;height:16px;padding:0 4px;border-radius:99px;background:#ff7085;color:#fff;font:700 9px/16px Manrope;text-align:center;font-style:normal}
+.notification-row.read{opacity:.66}
+.notification-row .row-main small{display:block;margin-top:4px;color:#75849b;font-size:9px}
+@media(max-width:760px){.notification-bell{width:33px;height:33px}}
