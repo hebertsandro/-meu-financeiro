@@ -37,7 +37,7 @@ Deno.serve(async (req) => {
 
   if (body.action === "get_maintenance") {
     const { data, error } = await admin.from("app_settings").select("maintenance_mode,maintenance_message,updated_at").eq("id", true).single();
-    if (error) return respond({ error: "Não foi possível consultar o modo de manutenção. Execute a migração administrativa." }, 500);
+    if (error) return respond({ error: "Falha ao consultar manutenção: " + error.message }, 500);
     return respond({ settings: data });
   }
 
@@ -45,7 +45,7 @@ Deno.serve(async (req) => {
     const enabled = body.enabled === true;
     const message = typeof body.message === "string" ? body.message.slice(0, 240) : "Estamos realizando uma manutenção. Voltaremos em breve.";
     const { error } = await admin.from("app_settings").upsert({ id: true, maintenance_mode: enabled, maintenance_message: message, updated_at: new Date().toISOString() });
-    if (error) return respond({ error: "Não foi possível atualizar o modo de manutenção." }, 500);
+    if (error) return respond({ error: "Falha ao salvar manutenção: " + error.message }, 500);
     return respond({ success: true, maintenance_mode: enabled });
   }
 
