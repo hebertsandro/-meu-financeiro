@@ -59,7 +59,7 @@ function App(){
   }
   async function loadData(){
     const tables=['transactions','cards','debts','goals','installments','card_limit_history','goal_movements'];
-    const results=await Promise.all(tables.map(t=>supabase.from(t).select('*').order('created_at',{ascending:false})));
+    const results=await Promise.all(tables.map(t=>supabase.from(t).select('*').order(t==='card_limit_history'?'changed_at':'created_at',{ascending:false})));
     const next={};
     results.forEach((r,i)=>{next[tables[i]]=r.data||[]});
     setData(next);
