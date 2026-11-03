@@ -13,7 +13,9 @@ import {
 const brl = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0);
 const today = () => new Date().toISOString().slice(0,10);
 const monthStart = () => new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().slice(0,10);
-const ADMIN_EMAIL = 'hebertsandro877@gmail.com'; // Apenas controla a exibição; a Edge Function valida o acesso no servidor.\nconst menu = [\n  ['Visão geral',LayoutDashboard,'overview'],['Movimentações',Activity,'transactions'],
+const ADMIN_EMAIL = 'hebertsandro877@gmail.com'; // Apenas controla a exibição; a Edge Function valida o acesso no servidor.
+const menu = [
+  ['Visão geral',LayoutDashboard,'overview'],['Movimentações',Activity,'transactions'],
   ['Cartões',CreditCard,'cards'],['Contas e dívidas',ReceiptText,'debts'],
   ['Metas',Target,'goals'],['Parcelas',CalendarClock,'installments'],['Notificações',Bell,'notifications'],['Relatórios',ChartNoAxesCombined,'reports']
 ];
@@ -24,7 +26,9 @@ function App(){
   const [data,setData]=useState({transactions:[],cards:[],debts:[],goals:[],installments:[],card_limit_history:[],goal_movements:[],notifications:[]});
   const [modal,setModal]=useState(null), [toast,setToast]=useState('');
   const [email,setEmail]=useState(''), [password,setPassword]=useState(''), [authError,setAuthError]=useState(''), [authMode,setAuthMode]=useState('login'), [authNotice,setAuthNotice]=useState('');
-  const [busy,setBusy]=useState(false);\n  const [adminUsers,setAdminUsers]=useState([]),[adminBusy,setAdminBusy]=useState(false),[adminError,setAdminError]=useState(''),[adminMessage,setAdminMessage]=useState('');\n  const isAdmin=session?.user?.email?.toLowerCase()===ADMIN_EMAIL;
+  const [busy,setBusy]=useState(false);
+  const [adminUsers,setAdminUsers]=useState([]),[adminBusy,setAdminBusy]=useState(false),[adminError,setAdminError]=useState(''),[adminMessage,setAdminMessage]=useState('');
+  const isAdmin=session?.user?.email?.toLowerCase()===ADMIN_EMAIL;
 
   useEffect(()=>{
     if(!isConfigured){setLoading(false);return}
