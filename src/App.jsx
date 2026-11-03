@@ -16,13 +16,13 @@ const monthStart = () => new Date(new Date().getFullYear(),new Date().getMonth()
 const menu = [
   ['Visão geral',LayoutDashboard,'overview'],['Movimentações',Activity,'transactions'],
   ['Cartões',CreditCard,'cards'],['Contas e dívidas',ReceiptText,'debts'],
-  ['Metas',Target,'goals'],['Parcelas',CalendarClock,'installments'],['Relatórios',ChartNoAxesCombined,'reports']
+  ['Metas',Target,'goals'],['Parcelas',CalendarClock,'installments'],['Notificações',Bell,'notifications'],['Relatórios',ChartNoAxesCombined,'reports']
 ];
 
 function App(){
   const [session,setSession]=useState(null), [loading,setLoading]=useState(true);
   const [page,setPage]=useState('overview'), [mobileMenu,setMobileMenu]=useState(false);
-  const [data,setData]=useState({transactions:[],cards:[],debts:[],goals:[],installments:[],card_limit_history:[],goal_movements:[]});
+  const [data,setData]=useState({transactions:[],cards:[],debts:[],goals:[],installments:[],card_limit_history:[],goal_movements:[],notifications:[]});
   const [modal,setModal]=useState(null), [toast,setToast]=useState('');
   const [email,setEmail]=useState(''), [password,setPassword]=useState(''), [authError,setAuthError]=useState(''), [authMode,setAuthMode]=useState('login'), [authNotice,setAuthNotice]=useState('');
   const [busy,setBusy]=useState(false);
@@ -35,6 +35,10 @@ function App(){
   },[]);
   useEffect(()=>{if(session) loadData()},[session]);
   const notify=(s)=>{setToast(s);setTimeout(()=>setToast(''),3200)};
+  const unreadCount=data.notifications.filter(n=>!n.is_read).length;
+  async function addNotification(title,message,category='geral'){if(!session?.user?.id)return;const {error}=await supabase.from('notifications').insert({user_id:session.user.id,title,message,category});if(!error)await loadData()}
+  async function markNotificationRead(id){const {error}=await supabase.from('notifications').update({is_read:true}).eq('id',id);if(!error)await loadData()}
+  async function markAllNotificationsRead(){const {error}=await supabase.from('notifications').update({is_read:true}).eq('is_read',false);if(!error){await loadData();notify('Todas as notificações foram marcadas como lidas.')}}
   async function handleAuth(e){
     e.preventDefault();setBusy(true);setAuthError('');setAuthNotice('');
     const cleanEmail=email.trim();
@@ -58,7 +62,7 @@ function App(){
     setBusy(false);
   }
   async function loadData(){
-    const tables=['transactions','cards','debts','goals','installments','card_limit_history','goal_movements'];
+    const tables=['transactions','cards','debts','goals','installments','card_limit_history','goal_movements','notifications'];
     const results=await Promise.all(tables.map(t=>supabase.from(t).select('*').order(t==='card_limit_history'?'changed_at':'created_at',{ascending:false})));
     const next={};
     results.forEach((r,i)=>{next[tables[i]]=r.data||[]});
