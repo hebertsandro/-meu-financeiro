@@ -2,7 +2,7 @@ import React, { useEffect, useMemo, useState } from 'react';
 import { supabase, isConfigured } from './supabase';
 import {
   Activity, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined,
-  Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock,
+  Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock, Bot, Sparkles, Send,
   LogOut, Menu, Plus, ReceiptText, ShieldCheck, Target, TrendingUp, Wallet, X, Users, Ban, UserCheck, KeyRound, RefreshCw
 } from 'lucide-react';
 import {
@@ -17,9 +17,33 @@ const ADMIN_EMAIL = 'hebertsandro877@gmail.com'; // Apenas controla a exibição
 const menu = [
   ['Visão geral',LayoutDashboard,'overview'],['Movimentações',Activity,'transactions'],
   ['Cartões',CreditCard,'cards'],['Contas e dívidas',ReceiptText,'debts'],
-  ['Metas',Target,'goals'],['Parcelas',CalendarClock,'installments'],['Notificações',Bell,'notifications'],['Relatórios',ChartNoAxesCombined,'reports']
+  ['Metas',Target,'goals'],['Parcelas',CalendarClock,'installments'],['Notificações',Bell,'notifications'],['Assistente IA',Bot,'assistant'],['Relatórios',ChartNoAxesCombined,'reports']
 ];
 
+
+function answerFinancialQuestion(question, finance) {
+ const q=question.toLowerCase(), money=brl, tx=finance.transactions||[], now=new Date();
+ const key=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+ const mt=tx.filter(t=>String(t.date||'').slice(0,7)===key);
+ const inc=mt.filter(t=>t.type==='entrada').reduce((s,t)=>s+Number(t.amount||0),0);
+ const out=mt.filter(t=>t.type==='gasto').reduce((s,t)=>s+Number(t.amount||0),0);
+ const allIn=tx.filter(t=>t.type==='entrada').reduce((s,t)=>s+Number(t.amount||0),0);
+ const allOut=tx.filter(t=>t.type==='gasto').reduce((s,t)=>s+Number(t.amount||0),0);
+ const debts=(finance.debts||[]).filter(d=>d.status!=='Pago'), debt=debts.reduce((s,d)=>s+Number(d.amount||0),0);
+ const cards=finance.cards||[], limit=cards.reduce((s,c)=>s+Number(c.limit_amount||0),0), used=cards.reduce((s,c)=>s+Number(c.used||0),0);
+ const parts=(finance.installments||[]).filter(i=>Number(i.paid_count||0)<Number(i.installment_count||0));
+ const monthly=parts.reduce((s,i)=>s+Number(i.total_amount||0)/Math.max(1,Number(i.installment_count||1)),0);
+ const goals=finance.goals||[];
+ const cats=mt.filter(t=>t.type==='gasto').reduce((a,t)=>{const k=t.category||'Outros';a[k]=(a[k]||0)+Number(t.amount||0);return a;},{});
+ const top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
+ if(/saldo|sobrou|disponível|disponivel|quanto tenho/.test(q)) return 'Seu saldo registrado no período completo é '+money(allIn-allOut)+'. Neste mês, entraram '+money(inc)+' e saíram '+money(out)+'. Considero somente os registros cadastrados no site.';
+ if(/gasto|despesa|categoria|economizar|economia/.test(q)) return 'Neste mês você registrou '+money(out)+' em gastos e '+money(inc)+' em entradas.'+(top?' Sua categoria com maior gasto é '+top[0]+' ('+money(top[1])+').':'')+(inc>0?' Isso representa '+(out/inc*100).toFixed(0)+'% das entradas.':' Ainda não há entradas registradas para comparar.')+(inc>0&&out/inc>.8?' Atenção: mais de 80% das entradas já foram comprometidas.':'');
+ if(/cartão|cartões|cartao|cartoes|limite|crédito|credito|fatura/.test(q)) return cards.length?'Você tem '+cards.length+' cartão(ões), limite total de '+money(limit)+', uso registrado de '+money(used)+' e disponível estimado de '+money(limit-used)+'. Confira os valores com o aplicativo do banco.':'Você ainda não cadastrou cartões.';
+ if(/dívida|divida|conta|vencimento/.test(q)) return debts.length?'Você tem '+debts.length+' conta(s) pendente(s), somando '+money(debt)+'. Priorize as essenciais e as que vencem primeiro.':'Não há contas em aberto cadastradas no momento.';
+ if(/parcela|prestação|prestacao/.test(q)) return parts.length?'Há '+parts.length+' compra(s) parcelada(s) em andamento, com cerca de '+money(monthly)+' por mês em parcelas. É uma estimativa com base nos valores cadastrados.':'Não encontrei compras parceladas em aberto.';
+ if(/meta|objetivo|guardar|juntar|poupar/.test(q)) return goals.length?'Suas metas: '+goals.map(g=>g.name+': '+money(g.saved)+' de '+money(g.target)+'; faltam '+money(Math.max(0,Number(g.target)-Number(g.saved||0)))).join(' | '):'Você ainda não criou metas. Cadastre um objetivo para eu acompanhar seu progresso.';
+ return 'Resumo dos seus registros: neste mês entraram '+money(inc)+' e saíram '+money(out)+'. Saldo total registrado: '+money(allIn-allOut)+'. '+(debt?'Contas pendentes: '+money(debt)+'. ':'')+(monthly?'Parcelas estimadas por mês: '+money(monthly)+'. ':'')+'Pergunte sobre saldo, gastos, cartões, dívidas, parcelas ou metas.';
+}
 function App(){
   const [session,setSession]=useState(null), [loading,setLoading]=useState(true);
   const [page,setPage]=useState('overview'), [mobileMenu,setMobileMenu]=useState(false);
@@ -29,6 +53,8 @@ function App(){
   const [busy,setBusy]=useState(false);
   const [adminUsers,setAdminUsers]=useState([]),[adminBusy,setAdminBusy]=useState(false),[adminError,setAdminError]=useState(''),[adminMessage,setAdminMessage]=useState(''),[maintenance,setMaintenance]=useState(false),[maintenanceMessage,setMaintenanceMessage]=useState('Estamos realizando uma manutenção. Voltaremos em breve.');
   const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);
+  const [assistantInput,setAssistantInput]=useState('');
+  const [assistantMessages,setAssistantMessages]=useState([{role:'assistant',text:'Oi! Posso analisar seus gastos, cartões, dívidas, parcelas e metas usando os dados cadastrados neste site. O que você quer entender?'}]);
   const isAdmin=session?.user?.email?.toLowerCase()===ADMIN_EMAIL;
 
   useEffect(()=>{
@@ -135,6 +161,8 @@ function App(){
     await loadData();notify('Registro excluído.');
   }
 
+  function sendAssistantMessage(value=assistantInput){const question=value.trim();if(!question)return;const reply=answerFinancialQuestion(question,data);setAssistantMessages(old=>[...old,{role:'user',text:question},{role:'assistant',text:reply}]);setAssistantInput('');}
+
   const currentMonth=monthStart();
   const income=data.transactions.filter(t=>t.type==='entrada'&&t.date>=currentMonth).reduce((a,t)=>a+Number(t.amount),0);
   const expenses=data.transactions.filter(t=>t.type==='gasto'&&t.date>=currentMonth).reduce((a,t)=>a+Number(t.amount),0);
@@ -171,7 +199,19 @@ function App(){
     {mobileMenu&&<div className="scrim" onClick={()=>setMobileMenu(false)}/>}
     <main className="main-area"><header className="topbar"><button className="icon-btn menu-toggle" onClick={()=>setMobileMenu(true)}><Menu size={22}/></button><div className="crumb">Meu espaço <ChevronRight size={14}/><b>{[...menu,...(isAdmin?[['Painel ADM',ShieldCheck,'admin']]:[])].find(x=>x[2]===page)?.[0]||'Visão geral'}</b></div><div className="top-actions"><button className="notification-bell" aria-label="Abrir notificações" onClick={()=>setPage("notifications")}><Bell size={18}/>{unreadCount>0&&<i>{unreadCount>9?"9+":unreadCount}</i>}</button><span className="today"><CalendarDays size={15}/>{new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})}</span><div className="avatar">EU</div></div></header>
     <div className="content">
-      <div className="page-heading"><div><div className="eyebrow">SEU DINHEIRO, MAIS CLARO</div><h1>{page==='overview'?'Visão geral':page==='admin'?'Painel administrativo':menu.find(x=>x[2]===page)?.[0]}</h1><p>{page==='admin'?'Gerencie contas com acesso administrativo protegido no servidor.':page==='overview'?'Aqui está um resumo da sua vida financeira.':page==='transactions'?'Registre o que entra e o que sai.':page==='cards'?'Acompanhe os limites e o uso dos seus cartões.':page==='debts'?'Organize contas, parcelas e dívidas.':page==='goals'?'Transforme planos em metas possíveis.':page==='installments'?'Acompanhe compras parceladas e quando cada uma termina.':'Entenda seus hábitos financeiros.'}</p></div>{['transactions','cards','debts','goals','installments'].includes(page)&&<button className="primary" onClick={()=>setModal(page)}><Plus size={18}/> Adicionar</button>}</div>
+      <div className="page-heading"><div><div className="eyebrow">SEU DINHEIRO, MAIS CLARO</div><h1>{page==='overview'?'Visão geral':page==='admin'?'Painel administrativo':page==='assistant'?'Assistente IA':menu.find(x=>x[2]===page)?.[0]}</h1><p>{page==='admin'?'Gerencie contas com acesso administrativo protegido no servidor.':page==='assistant'?'Converse com sua assistente e receba análises dos seus registros.':page==='overview'?'Aqui está um resumo da sua vida financeira.':page==='transactions'?'Registre o que entra e o que sai.':page==='cards'?'Acompanhe os limites e o uso dos seus cartões.':page==='debts'?'Organize contas, parcelas e dívidas.':page==='goals'?'Transforme planos em metas possíveis.':page==='installments'?'Acompanhe compras parceladas e quando cada uma termina.':'Entenda seus hábitos financeiros.'}</p></div>{['transactions','cards','debts','goals','installments'].includes(page)&&<button className="primary" onClick={()=>setModal(page)}><Plus size={18}/> Adicionar</button>}</div>
+
+      {page==='assistant'&&<section className="assistant-layout">
+        <div className="assistant-welcome"><div className="assistant-orb"><Bot size={29}/><Sparkles size={14}/></div><div><div className="eyebrow">SUA INTELIGÊNCIA FINANCEIRA</div><h2>Vamos cuidar melhor do seu dinheiro?</h2><p>Eu analiso seus registros e transformo números em orientações práticas.</p></div></div>
+        <div className="assistant-summary"><div><span>Entradas deste mês</span><b>{brl(income)}</b></div><div><span>Gastos deste mês</span><b>{brl(expenses)}</b></div><div><span>Contas em aberto</span><b>{brl(openDebts)}</b></div></div>
+        <div className="panel assistant-chat"><div className="assistant-chat-head"><span className="assistant-status"><i/> Assistente disponível</span><span className="assistant-powered">ANÁLISE DOS SEUS DADOS</span></div>
+          <div className="assistant-messages">{assistantMessages.map((m,i)=><div className={'assistant-message '+m.role} key={i}><div className="assistant-message-icon">{m.role==='assistant'?<Bot size={17}/>:<Users size={16}/>}</div><div className="assistant-bubble">{m.text}</div></div>)}</div>
+          <div className="assistant-quick"><span>Experimente perguntar:</span><div>{['Como estão meus gastos?','Analise meus cartões','Quais dívidas devo priorizar?','Como estão minhas metas?'].map(q=><button type="button" key={q} onClick={()=>sendAssistantMessage(q)}>{q}</button>)}</div></div>
+          <form className="assistant-compose" onSubmit={e=>{e.preventDefault();sendAssistantMessage()}}><input value={assistantInput} onChange={e=>setAssistantInput(e.target.value)} placeholder="Pergunte sobre suas finanças…" aria-label="Digite sua pergunta"/><button className="primary" type="submit" disabled={!assistantInput.trim()} aria-label="Enviar pergunta"><Send size={18}/></button></form>
+          <p className="assistant-disclaimer"><Sparkles size={13}/> Primeira versão sem API paga: análise local baseada nos seus registros. Ainda não é um modelo generativo.</p>
+        </div>
+      </section>}
+
       {page==='admin'&&isAdmin&&<section className="panel admin-panel">
         <div className="panel-head"><div><h3>Administração de contas</h3><p>Área exclusiva do administrador · ações verificadas pela Edge Function</p></div><div className="item-actions"><button className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('get_maintenance')}>Consultar manutenção</button><button className="primary" disabled={adminBusy} onClick={()=>adminAction('list_users')}><RefreshCw size={16}/> Atualizar contas</button></div></div>
         <div className="stat-grid"><Stat icon={Users} label="Contas carregadas" value={String(adminUsers.length)} tone="blue" detail="Lista retornada pelo Supabase Auth"/><Stat icon={ShieldCheck} label="Acesso" value="Protegido" tone="green" detail="Validação também no servidor"/></div>
