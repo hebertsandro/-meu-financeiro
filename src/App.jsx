@@ -119,7 +119,7 @@ function App(){
     setAdminBusy(true);setAdminError('');setAdminMessage('');
     const {data:result,error}=await supabase.functions.invoke('admin-panel',{body:{action,user_id:userId,...extra}});
     setAdminBusy(false);
-    if(error||result?.error){setAdminError(result?.error||'Não foi possível concluir a ação. Verifique se a função administrativa foi publicada e configurada.');return}
+    if(error||result?.error){let detail=result?.error||error?.message||'Falha sem detalhes retornados.';try{const ctx=error?.context;if(ctx&&typeof ctx.clone==='function'){const payload=await ctx.clone().json();detail=payload?.error||payload?.message||detail}}catch{}setAdminError(detail);return}
     if(action==='list_users'){setAdminUsers(result.users||[]);setAdminMessage('Lista de contas atualizada.');return}
     if(action==='get_maintenance'){setMaintenance(!!result.settings?.maintenance_mode);setMaintenanceMessage(result.settings?.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.');return}
     if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
