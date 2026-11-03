@@ -84,7 +84,7 @@ function App(){
     const {error}=await supabase.from(table).insert({...values,user_id:session.user.id});
     setBusy(false);
     if(error){notify('Não foi possível salvar. Confira se o banco foi configurado.');return false}
-    await loadData();setModal(null);notify('Salvo com sucesso!');return true;
+    await loadData();setModal(null);notify('Salvo com sucesso!');const messages={transactions:values.type==='entrada'?['Entrada registrada',(values.description||'Sua entrada')+': '+brl(values.amount)+' registrada.','entradas']:['Gasto registrado',(values.description||'Novo gasto')+': '+brl(values.amount)+' registrado.','gastos'],debts:['Conta adicionada',values.title+': '+brl(values.amount)+' cadastrada.','contas'],installments:['Compra parcelada adicionada',values.description+': '+values.installment_count+' parcelas de aproximadamente '+brl(Number(values.total_amount)/Number(values.installment_count))+'.','parcelas'],goals:['Nova meta criada','A meta '+values.name+' foi adicionada.','metas']};if(messages[table])await addNotification(...messages[table]);return true;
   }
   async function changeCardLimit(card){
     const raw=window.prompt(`Novo limite total para ${card.name} (R$):`,String(card.limit_amount));
@@ -97,7 +97,7 @@ function App(){
     const update=await supabase.from('cards').update({limit_amount:next}).eq('id',card.id);
     setBusy(false);
     if(update.error){notify('O histórico foi salvo, mas não foi possível atualizar o cartão.');return}
-    await loadData();notify('Limite atualizado e histórico registrado!');
+    await loadData();notify('Limite atualizado e histórico registrado!');await addNotification('Limite do cartão alterado',card.name+': '+brl(card.limit_amount)+' → '+brl(next)+'.','cartoes');
   }
   async function deleteItem(table,id){
     const {error}=await supabase.from(table).delete().eq('id',id);
