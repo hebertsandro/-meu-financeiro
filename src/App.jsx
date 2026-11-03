@@ -79,7 +79,7 @@ function App(){
       if(movement.error||!movement.data){setBusy(false);notify('Não foi possível registrar a movimentação.');return false}
       const update=await supabase.from('goals').update({saved:nextSaved}).eq('id',goal.id);
       if(update.error){await supabase.from('goal_movements').delete().eq('id',movement.data.id);setBusy(false);notify('Não foi possível atualizar a meta.');return false}
-      setBusy(false);await loadData();setModal(null);notify('Movimentação da meta registrada!');return true;
+      setBusy(false);await loadData();setModal(null);notify('Movimentação da meta registrada!');await addNotification(values.movement_type==='deposito'?'Depósito na meta':'Retirada da meta',(values.movement_type==='deposito'?'Você adicionou ':'Você retirou ')+brl(values.amount)+' da meta.','metas');return true;
     }
     const {error}=await supabase.from(table).insert({...values,user_id:session.user.id});
     setBusy(false);
