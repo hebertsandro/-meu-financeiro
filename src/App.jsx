@@ -173,6 +173,14 @@ function App(){
   const openDebts=data.debts.filter(d=>d.status!=='Pago').reduce((a,d)=>a+Number(d.amount),0);
   const cardUsed=data.cards.reduce((a,c)=>a+Number(c.used||0),0);
   const goalTotal=data.goals.reduce((a,g)=>a+Math.max(0,Number(g.target)-Number(g.saved)),0);
+  const activeInstallments=data.installments.filter(i=>Number(i.paid_count||0)<Number(i.installment_count||0));
+  const openInstallmentCount=activeInstallments.reduce((sum,i)=>sum+Math.max(0,Number(i.installment_count||0)-Number(i.paid_count||0)),0);
+  const installmentMonthly=activeInstallments.reduce((sum,i)=>sum+Number(i.total_amount||0)/Math.max(1,Number(i.installment_count||1)),0);
+  const installmentRemaining=activeInstallments.reduce((sum,i)=>sum+(Number(i.total_amount||0)/Math.max(1,Number(i.installment_count||1)))*Math.max(0,Number(i.installment_count||0)-Number(i.paid_count||0)),0);
+  const cardLimit=data.cards.reduce((sum,c)=>sum+Number(c.limit_amount||0),0);
+  const cardAvailable=Math.max(0,cardLimit-cardUsed);
+  const pendingDebtCount=data.debts.filter(d=>d.status!=='Pago').length;
+  const goalSaved=data.goals.reduce((sum,g)=>sum+Number(g.saved||0),0);
   const chartData=useMemo(()=>{
     const months=[];
     for(let i=5;i>=0;i--){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);const key=d.toISOString().slice(0,7);
@@ -204,7 +212,37 @@ function App(){
 
       {page==='admin'&&isAdmin&&<section className="panel admin-panel">
         <div className="panel-head"><div><h3>Administração de contas</h3><p>Área exclusiva do administrador · ações verificadas pela Edge Function</p></div><div className="item-actions"><button className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('get_maintenance')}>Consultar manutenção</button><button className="primary" disabled={adminBusy} onClick={()=>adminAction('list_users')}><RefreshCw size={16}/> Atualizar contas</button></div></div>
-        <div className="stat-grid"><Stat icon={Users} label="Contas carregadas" value={String(adminUsers.length)} tone="blue" detail="Lista retornada pelo Supabase Auth"/><Stat icon={ShieldCheck} label="Acesso" value="Protegido" tone="green" detail="Validação também no servidor"/></div>
+        <div className="stat-grid"><Stat icon={ArrowDownLeft} label="Entradas do mês" value={brl(income)} tone="green" detail="Recebimentos registrados"/><Stat icon={ArrowUpRight} label="Gastos do mês" value={brl(expenses)} tone="red" detail="Despesas registradas"/><Stat icon={CreditCard} label="Uso dos cartões" value={brl(cardUsed)} tone="blue" detail={data.cards.length+" cartão(ões) cadastrado(s)"}/><Stat icon={ReceiptText} label="Contas em aberto" value={brl(openDebts)} tone="purple" detail={pendingDebtCount+" registro(s) pendente(s)"}/></div>
+      <section className="panel financial-overview">
+        <div className="panel-head"><div><h3>Seu panorama financeiro</h3><p>Compromissos, limites e objetivos em um só lugar</p></div><span className="panel-icon"><ChartNoAxesCombined size={18}/></span></div>
+        <div className="overview-tiles">
+          <button className="overview-tile installment-tile" onClick={()=>setPage('installments')}>
+            <div className="overview-tile-top"><span className="overview-icon violet"><CalendarClock size={19}/></span><span className="overview-link">Ver parcelas <ChevronRight size={14}/></span></div>
+            <small>Falta pagar em parcelas</small><strong>{brl(installmentRemaining)}</strong>
+            <div className="overview-tile-foot"><span><b>{openInstallmentCount}</b> parcelas em aberto</span><span>{brl(installmentMonthly)}/mês</span></div>
+            <div className="overview-progress"><i style={{width:(data.installments.length?Math.min(100,activeInstallments.reduce((sum,i)=>sum+Number(i.paid_count||0),0)/Math.max(1,data.installments.reduce((sum,i)=>sum+Number(i.installment_count||0),0))*100):0)+'%'}}/></div>
+          </button>
+          <button className="overview-tile" onClick={()=>setPage('cards')}>
+            <div className="overview-tile-top"><span className="overview-icon blue"><CreditCard size={19}/></span><span className="overview-link">Ver cartões <ChevronRight size={14}/></span></div>
+            <small>Limite disponível</small><strong>{brl(cardAvailable)}</strong>
+            <div className="overview-tile-foot"><span><b>{data.cards.length}</b> cartões cadastrados</span><span>{brl(cardUsed)} usados</span></div>
+            <div className="overview-progress"><i style={{width:(cardLimit?Math.min(100,cardUsed/cardLimit*100):0)+'%'}}/></div>
+          </button>
+          <button className="overview-tile" onClick={()=>setPage('debts')}>
+            <div className="overview-tile-top"><span className="overview-icon coral"><ReceiptText size={19}/></span><span className="overview-link">Ver contas <ChevronRight size={14}/></span></div>
+            <small>Total de contas pendentes</small><strong>{brl(openDebts)}</strong>
+            <div className="overview-tile-foot"><span><b>{pendingDebtCount}</b> contas em aberto</span><span>Não pagas</span></div>
+            <div className="overview-progress"><i style={{width:(openDebts?100:0)+'%'}}/></div>
+          </button>
+          <button className="overview-tile" onClick={()=>setPage('goals')}>
+            <div className="overview-tile-top"><span className="overview-icon green"><Target size={19}/></span><span className="overview-link">Ver metas <ChevronRight size={14}/></span></div>
+            <small>Dinheiro guardado nas metas</small><strong>{brl(goalSaved)}</strong>
+            <div className="overview-tile-foot"><span><b>{data.goals.length}</b> metas ativas</span><span>{brl(goalTotal)} para alcançar</span></div>
+            <div className="overview-progress"><i style={{width:(goalSaved+goalTotal?Math.min(100,goalSaved/(goalSaved+goalTotal)*100):0)+'%'}}/></div>
+          </button>
+        </div>
+        <div className="overview-bottomline"><div><span className="overview-dot green-dot"/><span>Entradas neste mês</span><b>{brl(income)}</b></div><div><span className="overview-dot red-dot"/><span>Gastos neste mês</span><b>{brl(expenses)}</b></div><div><span className="overview-dot blue-dot"/><span>Saldo registrado</span><b>{brl(balance)}</b></div></div>
+      </section>
         <div className="history-box maintenance-card"><div className="maintenance-heading"><span className="maintenance-symbol"><ShieldCheck size={20}/></span><div><h3>Disponibilidade do site</h3><p>Controle quando o Meu Financeiro ficará acessível aos usuários.</p></div><span className={`maintenance-badge ${maintenance?'is-on':'is-off'}`}>{maintenance?'Em manutenção':'Site liberado'}</span></div><label className="field-label" htmlFor="maintenance-message">Mensagem para os usuários</label><textarea id="maintenance-message" value={maintenanceMessage} maxLength={240} onChange={e=>setMaintenanceMessage(e.target.value)} placeholder="Ex.: Estamos realizando uma manutenção. Voltaremos em breve."/><div className="maintenance-footer"><span>{maintenanceMessage.length}/240 caracteres</span><button className={`primary maintenance-toggle ${maintenance?'danger-action':''}`} disabled={adminBusy} onClick={()=>adminAction('set_maintenance',null,{enabled:!maintenance,message:maintenanceMessage})}>{maintenance?'Desativar manutenção':'Ativar manutenção'}</button></div></div>
         {adminError&&<div className="error">{adminError}</div>}{adminMessage&&<div className="auth-notice">{adminMessage}</div>}
         {!adminUsers.length?<Empty icon={Users} title="Carregue as contas cadastradas" text="Toque em Atualizar contas para consultar os usuários do Supabase."/>:<div className="simple-list">{adminUsers.map(u=><div className="simple-row admin-user-row" key={u.id}><div className="row-icon"><Users size={18}/></div><div className="row-main"><b>{u.email||'Sem e-mail'}</b><span>{u.id} · Criada em {u.created_at?new Date(u.created_at).toLocaleDateString('pt-BR'):'—'}</span><span>{u.banned_until&&new Date(u.banned_until)>new Date()?'Bloqueada':'Ativa'} · Último acesso: {u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString('pt-BR'):'Nunca'}</span></div><button className="delete-btn" disabled={adminBusy||u.email?.toLowerCase()===ADMIN_EMAIL} onClick={()=>adminAction(u.banned_until&&new Date(u.banned_until)>new Date()?'unban_user':'ban_user',u.id)}>{u.banned_until&&new Date(u.banned_until)>new Date()?<><UserCheck size={15}/> Desbloquear</>:<><Ban size={15}/> Bloquear</>}</button><button className="delete-btn" disabled={adminBusy||!u.email||u.email.toLowerCase()===ADMIN_EMAIL} onClick={()=>adminAction('reset_password',u.id)}><KeyRound size={15}/> Redefinir senha</button><button className="delete-btn" disabled={adminBusy||!u.email||u.email.toLowerCase()===ADMIN_EMAIL} onClick={()=>adminAction('delete_user',u.id)}><X size={15}/> Excluir conta</button></div>)}</div>}
