@@ -200,3 +200,34 @@
   .overview-stats .stat-value{font-size:17px;margin-top:12px}
   .overview-stats .stat-detail{font-size:8px;white-space:normal;line-height:1.45}
 }
+
+
+/* Painel financeiro unificado: menos blocos, mais leitura */
+.overview-unified{overflow:hidden;margin:0 0 22px;border:1px solid #30415e;border-radius:21px;background:linear-gradient(155deg,#14243b 0%,#101b2c 60%,#101827 100%);box-shadow:0 16px 42px #02081430}
+.unified-balance{padding:22px 22px 16px;background:radial-gradient(ellipse at 85% 0%,#547bd63b,transparent 55%)}
+.unified-balance-top{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:22px}
+.unified-balance-top>span:first-child{display:flex;align-items:center;gap:8px;color:#abc2eb;font-size:10px;font-weight:800;letter-spacing:1.4px}
+.unified-live-dot{color:#6bdcb2;font-size:8px;font-weight:800;letter-spacing:1px}
+.unified-balance>small{display:block;color:#9aabc4;font-size:12px;margin-bottom:5px}
+.unified-balance>strong{display:block;color:#f2f6ff;font:800 clamp(30px,6vw,42px) Manrope,sans-serif;letter-spacing:-1.5px;overflow-wrap:anywhere}
+.unified-month-flow{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:20px}
+.unified-month-flow>div{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:11px 12px;border:1px solid #ffffff12;border-radius:12px;background:#ffffff06}
+.unified-month-flow span{display:flex;align-items:center;gap:7px;color:#9aabc4;font-size:10px}
+.unified-month-flow b{color:#edf3ff;font:700 12px Manrope;white-space:nowrap}
+.unified-dot{width:7px;height:7px;border-radius:50%;display:inline-block;flex:none}
+.income-dot{background:#45d7a5}.expense-dot{background:#ff8297}
+.unified-details{padding:0 18px}
+.unified-details>button{width:100%;display:flex;align-items:center;gap:12px;padding:13px 3px;border:0;border-top:1px solid #2a3950;background:transparent;color:#eaf0fc;text-align:left;cursor:pointer}
+.unified-details>button>strong{margin-left:auto;color:#e8effc;font:800 13px Manrope;white-space:nowrap}
+.unified-details>button>strong small{font:500 9px Manrope;color:#8394ae}
+.unified-details>button>svg:last-child{color:#8298bb;flex:none}
+.unified-icon{width:37px;height:37px;display:grid;place-items:center;flex:none;border-radius:12px}
+.unified-icon.violet{background:#30274d;color:#b9a5ff}.unified-icon.blue{background:#1e3557;color:#8db6ff}.unified-icon.coral{background:#462a38;color:#ff9aab}.unified-icon.green{background:#1d3d37;color:#63dfb3}
+.unified-label{display:grid;gap:4px;min-width:0}
+.unified-label b{font-size:11px}
+.unified-label small{font-size:9px;color:#8496b0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.unified-footer{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:14px 20px;border-top:1px solid #2a3950}
+.unified-footer>span{color:#7f91ac;font-size:9px}
+.unified-footer button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:36px;padding:0 12px;border:1px solid #3b5276;border-radius:10px;background:#1b2d48;color:#c5d7f5;font-size:10px;font-weight:700;white-space:nowrap;cursor:pointer}
+.unified-details>button:hover,.unified-footer button:hover{background:#1b2d48}
+@media(max-width:600px){.overview-unified{border-radius:18px;margin-bottom:16px}.unified-balance{padding:18px 16px 14px}.unified-balance-top{margin-bottom:18px}.unified-month-flow{gap:7px;margin-top:16px}.unified-month-flow>div{align-items:flex-start;flex-direction:column;padding:9px}.unified-month-flow span{font-size:9px}.unified-month-flow b{font-size:12px}.unified-details{padding:0 12px}.unified-details>button{gap:9px;padding:12px 1px}.unified-icon{width:34px;height:34px}.unified-label b{font-size:10px}.unified-label small{font-size:8px}.unified-details>button>strong{font-size:11px}.unified-footer{padding:12px;gap:8px}.unified-footer>span{font-size:8px}.unified-footer button{font-size:9px;padding:0 9px}}
