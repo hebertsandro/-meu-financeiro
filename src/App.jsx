@@ -173,6 +173,14 @@ function App(){
   const openDebts=data.debts.filter(d=>d.status!=='Pago').reduce((a,d)=>a+Number(d.amount),0);
   const cardUsed=data.cards.reduce((a,c)=>a+Number(c.used||0),0);
   const goalTotal=data.goals.reduce((a,g)=>a+Math.max(0,Number(g.target)-Number(g.saved)),0);
+  const activeInstallments=data.installments.filter(i=>Number(i.paid_count||0)<Number(i.installment_count||0));
+  const openInstallmentCount=activeInstallments.reduce((sum,i)=>sum+Math.max(0,Number(i.installment_count||0)-Number(i.paid_count||0)),0);
+  const installmentMonthly=activeInstallments.reduce((sum,i)=>sum+Number(i.total_amount||0)/Math.max(1,Number(i.installment_count||1)),0);
+  const installmentRemaining=activeInstallments.reduce((sum,i)=>sum+(Number(i.total_amount||0)/Math.max(1,Number(i.installment_count||1)))*Math.max(0,Number(i.installment_count||0)-Number(i.paid_count||0)),0);
+  const cardLimit=data.cards.reduce((sum,c)=>sum+Number(c.limit_amount||0),0);
+  const cardAvailable=Math.max(0,cardLimit-cardUsed);
+  const pendingDebtCount=data.debts.filter(d=>d.status!=='Pago').length;
+  const goalSaved=data.goals.reduce((sum,g)=>sum+Number(g.saved||0),0);
   const chartData=useMemo(()=>{
     const months=[];
     for(let i=5;i>=0;i--){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);const key=d.toISOString().slice(0,7);
@@ -211,7 +219,37 @@ function App(){
         <p className="muted">A exclusão de contas é definitiva e não pode ser desfeita. Por segurança, o painel nunca exibe senhas. A redefinição gera um link seguro do Supabase. A conta administradora não pode ser bloqueada por esta tela.</p>
       </section>}
       {page==='overview'&&<><div className="hero-card"><div className="hero-copy"><div className="hero-label"><CircleDollarSign size={16}/> RESUMO GERAL</div><div className="hero-title">Seu saldo registrado</div><div className="hero-balance">{brl(balance)}</div><div className="hero-note"><span className="status-dot"/>Calculado com as movimentações que você registrou</div></div><div className="hero-art"><div className="orbit orbit-one"/><div className="orbit orbit-two"/><div className="hero-coin"><Wallet size={39}/></div><div className="floating-chip"><TrendingUp size={16}/><span>Controle em dia</span></div></div></div>
-      <div className="stat-grid"><Stat icon={ArrowDownLeft} label="Entradas do mês" value={brl(income)} tone="green" detail="Recebimentos registrados"/><Stat icon={ArrowUpRight} label="Gastos do mês" value={brl(expenses)} tone="red" detail="Despesas registradas"/><Stat icon={CreditCard} label="Uso dos cartões" value={brl(cardUsed)} tone="blue" detail={`${data.cards.length} cartão(ões) cadastrado(s)`}/><Stat icon={ReceiptText} label="Contas em aberto" value={brl(openDebts)} tone="purple" detail={`${data.debts.filter(d=>d.status!=='Pago').length} registro(s) pendente(s)`}/></div>
+      <div className="stat-grid"><Stat icon={ArrowDownLeft} label="Entradas do mês" value={brl(income)} tone="green" detail="Recebimentos registrados"/><Stat icon={ArrowUpRight} label="Gastos do mês" value={brl(expenses)} tone="red" detail="Despesas registradas"/><Stat icon={CreditCard} label="Uso dos cartões" value={brl(cardUsed)} tone="blue" detail={data.cards.length+" cartão(ões) cadastrado(s)"}/><Stat icon={ReceiptText} label="Contas em aberto" value={brl(openDebts)} tone="purple" detail={pendingDebtCount+" registro(s) pendente(s)"}/></div>
+      <section className="panel financial-overview">
+        <div className="panel-head"><div><h3>Seu panorama financeiro</h3><p>Compromissos, limites e objetivos em um só lugar</p></div><span className="panel-icon"><ChartNoAxesCombined size={18}/></span></div>
+        <div className="overview-tiles">
+          <button className="overview-tile installment-tile" onClick={()=>setPage('installments')}>
+            <div className="overview-tile-top"><span className="overview-icon violet"><CalendarClock size={19}/></span><span className="overview-link">Ver parcelas <ChevronRight size={14}/></span></div>
+            <small>Falta pagar em parcelas</small><strong>{brl(installmentRemaining)}</strong>
+            <div className="overview-tile-foot"><span><b>{openInstallmentCount}</b> parcelas em aberto</span><span>{brl(installmentMonthly)}/mês</span></div>
+            <div className="overview-progress"><i style={{width:(data.installments.length?Math.min(100,activeInstallments.reduce((sum,i)=>sum+Number(i.paid_count||0),0)/Math.max(1,data.installments.reduce((sum,i)=>sum+Number(i.installment_count||0),0))*100):0)+'%'}}/></div>
+          </button>
+          <button className="overview-tile" onClick={()=>setPage('cards')}>
+            <div className="overview-tile-top"><span className="overview-icon blue"><CreditCard size={19}/></span><span className="overview-link">Ver cartões <ChevronRight size={14}/></span></div>
+            <small>Limite disponível</small><strong>{brl(cardAvailable)}</strong>
+            <div className="overview-tile-foot"><span><b>{data.cards.length}</b> cartões cadastrados</span><span>{brl(cardUsed)} usados</span></div>
+            <div className="overview-progress"><i style={{width:(cardLimit?Math.min(100,cardUsed/cardLimit*100):0)+'%'}}/></div>
+          </button>
+          <button className="overview-tile" onClick={()=>setPage('debts')}>
+            <div className="overview-tile-top"><span className="overview-icon coral"><ReceiptText size={19}/></span><span className="overview-link">Ver contas <ChevronRight size={14}/></span></div>
+            <small>Total de contas pendentes</small><strong>{brl(openDebts)}</strong>
+            <div className="overview-tile-foot"><span><b>{pendingDebtCount}</b> contas em aberto</span><span>Não pagas</span></div>
+            <div className="overview-progress"><i style={{width:(openDebts?100:0)+'%'}}/></div>
+          </button>
+          <button className="overview-tile" onClick={()=>setPage('goals')}>
+            <div className="overview-tile-top"><span className="overview-icon green"><Target size={19}/></span><span className="overview-link">Ver metas <ChevronRight size={14}/></span></div>
+            <small>Dinheiro guardado nas metas</small><strong>{brl(goalSaved)}</strong>
+            <div className="overview-tile-foot"><span><b>{data.goals.length}</b> metas ativas</span><span>{brl(goalTotal)} para alcançar</span></div>
+            <div className="overview-progress"><i style={{width:(goalSaved+goalTotal?Math.min(100,goalSaved/(goalSaved+goalTotal)*100):0)+'%'}}/></div>
+          </button>
+        </div>
+        <div className="overview-bottomline"><div><span className="overview-dot green-dot"/><span>Entradas neste mês</span><b>{brl(income)}</b></div><div><span className="overview-dot red-dot"/><span>Gastos neste mês</span><b>{brl(expenses)}</b></div><div><span className="overview-dot blue-dot"/><span>Saldo registrado</span><b>{brl(balance)}</b></div></div>
+      </section>
       <div className="two-col"><section className="panel"><div className="panel-head"><div><h3>Fluxo financeiro</h3><p>Entradas e gastos dos últimos 6 meses</p></div><span className="panel-icon"><TrendingUp size={18}/></span></div><div className="chart-wrap">{chartData.some(d=>d.Entradas||d.Gastos)?<ResponsiveContainer width="100%" height={220}><AreaChart data={chartData} margin={{top:10,right:8,left:-20,bottom:0}}><defs><linearGradient id="incomeFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#35d39a" stopOpacity={.22}/><stop offset="95%" stopColor="#35d39a" stopOpacity={0}/></linearGradient><linearGradient id="expenseFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#ff7085" stopOpacity={.2}/><stop offset="95%" stopColor="#ff7085" stopOpacity={0}/></linearGradient></defs><CartesianGrid stroke="#263044" strokeDasharray="4 4" vertical={false}/><XAxis dataKey="month" tick={{fill:'#8290a8',fontSize:11}} axisLine={false} tickLine={false}/><YAxis tick={{fill:'#8290a8',fontSize:10}} axisLine={false} tickLine={false} tickFormatter={v=>v>=1000?`${(v/1000).toFixed(1)}k`:v}/><Tooltip contentStyle={{background:'#111a2a',border:'1px solid #2b3850',borderRadius:12,color:'#f4f7fc'}} formatter={v=>brl(v)}/><Area type="monotone" dataKey="Entradas" stroke="#35d39a" strokeWidth={2.5} fill="url(#incomeFill)"/><Area type="monotone" dataKey="Gastos" stroke="#ff7085" strokeWidth={2.5} fill="url(#expenseFill)"/></AreaChart></ResponsiveContainer>:<Empty icon={ChartNoAxesCombined} title="Seu gráfico começa aqui" text="Registre entradas e gastos para ver sua evolução."/>}</div><div className="legend"><span><i className="green-dot"/> Entradas</span><span><i className="red-dot"/> Gastos</span></div></section>
       <section className="panel"><div className="panel-head"><div><h3>Insights para você</h3><p>Sugestões com base nos registros</p></div><span className="panel-icon insight"><Activity size={18}/></span></div><div className="insights">{suggestions.map((s,i)=><div className="insight-row" key={i}><div className="insight-mark">{i===0?<TrendingUp size={17}/>:i===1?<Bell size={17}/>:<Check size={17}/>}</div><p>{s}</p></div>)}</div><div className="insight-disclaimer">Dicas informativas baseadas nos dados registrados, não aconselhamento financeiro profissional.</div></section></div>
       <section className="home-tools">
