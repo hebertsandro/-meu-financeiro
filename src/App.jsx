@@ -127,6 +127,8 @@ function App(){
     setAdminMessage(action==='ban_user'?'Conta bloqueada.':action==='unban_user'?'Conta desbloqueada.':'Conta excluída definitivamente.');
     await adminAction('list_users');
   }
+  useEffect(()=>{if(session&&isAdmin&&page==='admin'&&!adminUsers.length&&!adminBusy&&!adminError)adminAction('list_users')},[session,page]);
+
   async function deleteItem(table,id){
     const {error}=await supabase.from(table).delete().eq('id',id);
     if(error){notify('Não foi possível excluir.');return}
