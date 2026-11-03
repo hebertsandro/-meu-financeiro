@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
   if (authData.user.email?.toLowerCase() !== adminEmail) return respond({ error: "Acesso restrito ao administrador autorizado." }, 403);
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  let body: { action?: string; user_id?: string };
+  let body: { action?: string; user_id?: string; enabled?: boolean; message?: string };
   try { body = await req.json(); } catch { return respond({ error: "Corpo da solicitação inválido." }, 400); }
 
   if (body.action === "get_maintenance") {
