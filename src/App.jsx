@@ -363,10 +363,10 @@ function EntryModal({type,extra,onClose,onSave,busy}){
  async function submit(e){e.preventDefault();let table=type,values;
  if(type==='transactions')values={date:f.date,type:f.type,category:f.category,description:f.description,amount:Number(f.amount)};
  if(type==='cards')values={name:f.name,limit_amount:Number(f.limit_amount),used:Number(f.used||0),due_day:f.due_day?Number(f.due_day):null};
- if(type==='debts')values={title:f.title,amount:Number(f.amount),due_date:f.due_date||null,status:f.subscriptionStatus};
+ if(type==='debts')values={title:f.title,amount:Number(f.amount),due_date:f.due_date||null,status:f.status};
  if(type==='goals')values={name:f.name,target:Number(f.target),saved:Number(f.saved||0),deadline:f.deadline||null};
  if(type==='installments')values={description:f.description,total_amount:Number(f.amount),installment_count:Number(f.installment_count),first_due_date:f.first_due_date,card_id:f.card_id||null,paid_count:Number(f.paid_count||0)};
- if(type==='subscriptions')values={name:f.name,amount:Number(f.amount),frequency:f.frequency,next_charge_date:f.next_charge_date,card_id:f.card_id||null,status:f.status};
+ if(type==='subscriptions')values={name:f.name,amount:Number(f.amount),frequency:f.frequency,next_charge_date:f.next_charge_date,card_id:f.card_id||null,status:f.subscriptionStatus};
  if(type==='goalMovement')values={goal_id:extra.goal.id,movement_type:extra.movement_type,amount:Number(f.amount),note:f.note||null};
  await onSave(table,values,extra?.item||null);
  }
