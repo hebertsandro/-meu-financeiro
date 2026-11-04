@@ -436,3 +436,17 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
  .panel{padding:16px;border-radius:15px}
  .finance-item{padding:14px}
 }
+
+
+/* Correção: manter a navegação móvel sobreposta à página, sem deslocar o conteúdo */
+.sidebar{position:fixed!important;inset:0 auto 0 0;top:0;bottom:0;height:100vh;height:100dvh;align-self:initial}
+.sidebar.open{transform:translateX(0)}
+.main-area{position:relative}
+.topbar{position:sticky;top:0}
+@media(max-width:760px){
+ .sidebar{position:fixed!important;inset:0 auto 0 0;width:min(275px,86vw);height:100vh;height:100dvh;max-height:100dvh;overflow-y:auto;overscroll-behavior:contain;z-index:30}
+ .sidebar:not(.open){transform:translateX(-105%)}
+ .sidebar.open{transform:translateX(0)}
+ .scrim{position:fixed;inset:0;z-index:29}
+ .main-area{margin-left:0;min-width:0}
+}
