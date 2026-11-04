@@ -278,7 +278,7 @@ function App(){
         <div className="unified-balance">
           <div className="unified-balance-top"><span><Wallet size={16}/> RESUMO FINANCEIRO</span><span className="unified-live-dot">ATUALIZADO</span></div>
           <small>Saldo disponível após compromissos</small>
-          <strong>{brl(balance-openDebts-installmentRemaining)}</strong>
+          <strong>{brl(balance-openDebts-installmentMonthly)}</strong>
           <span className="muted">Saldo registrado: {brl(balance)}</span>
           <div className="unified-month-flow">
             <div><span><i className="unified-dot income-dot"/>Entradas do mês</span><b>{brl(income)}</b></div>
