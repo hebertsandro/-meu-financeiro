@@ -169,7 +169,7 @@ function App(){
     let completed=0;
     for(const item of selected){
       const amount=item.kind==='installment'?Number(item.record.total_amount||0)/Math.max(1,Number(item.record.installment_count||1)):Number(item.record.amount||0);
-      const transaction=await supabase.from('transactions').insert({user_id:session.user.id,date:today(),type:'gasto',category:'Contas',description:item.kind==='installment'?'Parcela: '+item.record.description:'Pagamento: '+item.record.title,amount});
+      const transaction=await supabase.from('transactions').insert({user_id:session.user.id,date:today(),type:'gasto',category:'Contas',description:item.kind==='installment'?'Parcela: '+item.record.description:'Pagamento: '+item.record.title,amount}).select('id').single();
       if(transaction.error){console.error(transaction.error);notify('Não foi possível registrar um dos pagamentos.');break}
       let update;
       if(item.kind==='installment'){
@@ -179,7 +179,7 @@ function App(){
       }else{
         update=await supabase.from('debts').update({status:'Pago'}).eq('id',item.record.id).eq('user_id',session.user.id);
       }
-      if(update.error){await supabase.from('transactions').delete().eq('id',transaction.data?.[0]?.id);console.error(update.error);notify('Um pagamento não pôde ser concluído.');break}
+      if(update.error){await supabase.from('transactions').delete().eq('id',transaction.data.id);console.error(update.error);notify('Um pagamento não pôde ser concluído.');break}
       completed++;
     }
     setPayBusy(false);
