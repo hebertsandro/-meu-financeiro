@@ -379,3 +379,60 @@ body{background:radial-gradient(ellipse at 75% -12%,#25205255,transparent 42%),#
 .unified-footer{border-top-color:#303958}
 @media(max-width:760px){.journey-banner{min-height:0;padding:19px 16px}.journey-copy{max-width:100%;padding-right:5px}.journey-copy h2{max-width:290px;font-size:22px}.journey-copy p{max-width:285px}.journey-art{right:-48px;top:4px;opacity:.26}.overview-player-progress{max-width:100%;margin-top:14px}.overview-unified{box-shadow:0 12px 28px #02061544}}
 @media(max-width:390px){.overview-player-progress{gap:7px;padding:8px}.overview-player-progress>small{font-size:6px}.overview-player-copy b{font-size:7px}}
+
+
+/* Tema gamer global: iluminação ambiente e identidade consistente entre módulos */
+body{background:#080e1b}
+body:before,body:after{content:"";position:fixed;inset:0;pointer-events:none;z-index:0}
+body:before{background:radial-gradient(ellipse 42% 34% at 12% 8%,#2878e817,transparent 75%),radial-gradient(ellipse 38% 32% at 88% 22%,#18b8b01a,transparent 75%),radial-gradient(ellipse 45% 38% at 72% 92%,#7551d51a,transparent 75%);animation:ambient-drift 18s ease-in-out infinite alternate}
+body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparent .7px);background-size:34px 34px;mask-image:linear-gradient(to bottom,black,transparent 78%)}
+@keyframes ambient-drift{from{transform:translate3d(-1%,0,0) scale(1)}to{transform:translate3d(1%,1%,0) scale(1.04)}}
+.app-shell,.main-area,.sidebar,.topbar{position:relative}
+.app-shell{z-index:1;background:transparent}
+.sidebar{background:linear-gradient(180deg,#0c1424f5,#0a1220f5);backdrop-filter:blur(18px);box-shadow:8px 0 34px #02081735}
+.topbar{background:#0a1120df;backdrop-filter:blur(18px);border-bottom-color:#293854}
+.content{position:relative;z-index:1}
+.page-heading h1{text-shadow:0 5px 24px #4f7fff1c}
+.page-heading .eyebrow{color:#8eaeff;letter-spacing:2px}
+.panel{position:relative;overflow:hidden;background:linear-gradient(145deg,#141f34ed,#101a2bed 62%,#111a2aed);border-color:#2b3a59;box-shadow:0 13px 34px #0208174d,inset 0 1px #ffffff08}
+.panel:before{content:"";position:absolute;left:18px;right:18px;top:0;height:1px;background:linear-gradient(90deg,transparent,#70a8ff65,#8c74ff55,transparent);pointer-events:none}
+.panel-head h3{color:#f0f4ff}
+.panel-head p{color:#98a8c3}
+.finance-item{background:linear-gradient(145deg,#1a2941,#131f34 68%,#151d34);border-color:#344665;box-shadow:0 10px 26px #0208173d,inset 0 1px #ffffff08;transition:transform .18s,border-color .18s,box-shadow .18s}
+.finance-item:hover{transform:translateY(-2px);border-color:#637fc0;box-shadow:0 14px 30px #02081766,0 0 22px #568bff12}
+.finance-item:nth-child(3n+1) .panel-icon{background:#193a55;border-color:#28618a;color:#79d6ff}
+.finance-item:nth-child(3n+2) .panel-icon{background:#30264f;border-color:#59458b;color:#c3a7ff}
+.finance-item:nth-child(3n) .panel-icon{background:#21433e;border-color:#397b6d;color:#82e4c1}
+.finance-item .progress{background:#293a55}
+.finance-item .progress i{background:linear-gradient(90deg,#39c5d8,#6f9cff)}
+.finance-item .goal-progress i{background:linear-gradient(90deg,#34d6a1,#b3e96f)}
+.stat-card{background:linear-gradient(145deg,#192943,#121e32);border-color:#344563;box-shadow:0 10px 28px #02081740}
+.simple-row{background:linear-gradient(100deg,#17253b,#121d30);border-color:#2c3d5b}
+.simple-row:hover{border-color:#526d9f}
+.history-box,.goal-history,.subscription-summary{background:#121e32;border-color:#2e405f}
+.row-icon{background:#1c3652;color:#8dcaff}
+.primary{box-shadow:0 7px 20px #477bdf28}
+.delete-btn{border-color:#344663;background:#17243a;color:#b7c8e3}
+.delete-btn:hover{border-color:#6684ba;background:#20324e}
+.progress{background:#293a55}
+.category-row .progress i{background:linear-gradient(90deg,#39c5d8,#8b83ff)}
+/* Resumo financeiro em identidade própria: verde-petróleo e ciano, sem repetir o roxo de Oportunidades */
+.unified-balance{background:radial-gradient(ellipse at 90% 0%,#20c7b34a,transparent 48%),radial-gradient(ellipse at 0% 100%,#248bd638,transparent 52%),linear-gradient(125deg,#103b46 0%,#12404a 48%,#172d49 100%);border:1px solid #347e83;box-shadow:inset 0 1px #c0fff01a,0 12px 30px #02191d66}
+.unified-balance-top>span:first-child{color:#a4f1e5}
+.unified-live-dot{border-color:#397f70!important;background:#123d38!important;color:#8ff0c8!important}
+.unified-balance strong{color:#f2fffc;text-shadow:0 0 22px #3be0c044}
+.unified-month-flow>div:first-child b{color:#8af0c7}
+.unified-month-flow>div:last-child b{color:#ffadbd}
+.unified-details button{background:linear-gradient(110deg,#192b40,#14283a);border-color:#315168}
+.unified-details button:hover{border-color:#3d9b9b;background:linear-gradient(110deg,#1b3b4a,#183447)}
+.unified-icon.violet{background:#263b59;color:#8dd7ff}
+.unified-icon.blue{background:#1c4654;color:#7fe5dd}
+.unified-icon.coral{background:#4b2b3c;color:#ff9fbd}
+.unified-icon.green{background:#1d443c;color:#7fe0bd}
+.unified-footer{border-top-color:#315267}
+.unified-footer button{background:#173f48;border-color:#397f83;color:#aaf5e9}
+@media(max-width:760px){
+ body:before{background:radial-gradient(ellipse 70% 25% at 5% 4%,#2878e81b,transparent 75%),radial-gradient(ellipse 70% 25% at 95% 35%,#18b8b018,transparent 75%),radial-gradient(ellipse 75% 30% at 70% 95%,#7551d51b,transparent 75%)}
+ .panel{padding:16px;border-radius:15px}
+ .finance-item{padding:14px}
+}
