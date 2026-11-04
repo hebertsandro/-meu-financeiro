@@ -330,9 +330,9 @@ function App(){
             <strong>{brl(goalSaved)} <small>guardados</small></strong><ChevronRight size={17}/>
           </button>
         </div>
-        <div className="unified-footer">
+        <div className="unified-footer" style={{display:'flex',alignItems:'center',justifyContent:'space-between',width:'100%',gap:12}}>
           <span>Seu panorama financeiro em um só lugar</span>
-          <div style={{display:'flex',alignItems:'center',gap:14,flexWrap:'wrap'}}>
+          <div style={{display:'flex',alignItems:'center',justifyContent:'flex-end',gap:14,flexWrap:'wrap',marginLeft:'auto'}}>
             <button className="text-button" onClick={()=>setPayModal(true)}><Check size={15}/> Registrar pagamento</button>
             <button onClick={()=>setModal('transactions')}><Plus size={16}/> Nova movimentação</button>
           </div>
