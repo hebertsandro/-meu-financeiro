@@ -222,7 +222,7 @@ function App(){
   const paidIn=data.transactions.filter(t=>t.type==='entrada').reduce((a,t)=>a+Number(t.amount),0);
   const paidOut=data.transactions.filter(t=>t.type==='gasto').reduce((a,t)=>a+Number(t.amount),0);
   const balance=paidIn-paidOut;
-  const openDebts=data.debts.filter(d=>d.status!=='Pago').reduce((a,d)=>a+Number(d.amount),0);
+  const openDebts=data.debts.filter(d=>d.is_continuous?d.paid_month!==currentMonthKey:d.status!=='Pago').reduce((a,d)=>a+Number(d.amount),0);
   const cardUsed=data.cards.reduce((a,c)=>a+Number(c.used||0),0);
   const goalTotal=data.goals.reduce((a,g)=>a+Math.max(0,Number(g.target)-Number(g.saved)),0);
   const activeInstallments=data.installments.filter(i=>Number(i.paid_count||0)<Number(i.installment_count||0));
@@ -231,7 +231,7 @@ function App(){
   const installmentRemaining=activeInstallments.reduce((sum,i)=>sum+(Number(i.total_amount||0)/Math.max(1,Number(i.installment_count||1)))*Math.max(0,Number(i.installment_count||0)-Number(i.paid_count||0)),0);
   const cardLimit=data.cards.reduce((sum,c)=>sum+Number(c.limit_amount||0),0);
   const cardAvailable=Math.max(0,cardLimit-cardUsed);
-  const pendingDebtCount=data.debts.filter(d=>d.status!=='Pago').length;
+  const pendingDebtCount=data.debts.filter(x=>x.is_continuous?x.paid_month!==currentMonthKey:x.status!=='Pago').length;
   const goalSaved=data.goals.reduce((sum,g)=>sum+Number(g.saved||0),0);
   const activeSubscriptions=data.subscriptions.filter(s=>s.status==='Ativa');
   const subscriptionsMonthly=activeSubscriptions.reduce((sum,s)=>sum+Number(s.amount||0)/(s.frequency==='anual'?12:1),0);
