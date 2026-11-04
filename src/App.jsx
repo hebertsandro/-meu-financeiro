@@ -205,8 +205,20 @@ function App(){
   function sendAssistantMessage(value=assistantInput){const question=value.trim();if(!question)return;const reply=answerFinancialQuestion(question,data);setAssistantMessages(old=>[...old,{role:'user',text:question},{role:'assistant',text:reply}]);setAssistantInput('');}
 
   const currentMonth=monthStart();
+  const currentMonthKey=currentMonth.slice(0,7);
   const income=data.transactions.filter(t=>t.type==='entrada'&&t.date>=currentMonth).reduce((a,t)=>a+Number(t.amount),0);
-  const expenses=data.transactions.filter(t=>t.type==='gasto'&&t.date>=currentMonth).reduce((a,t)=>a+Number(t.amount),0);
+  const recordedExpenses=data.transactions.filter(t=>t.type==='gasto'&&t.date>=currentMonth).reduce((a,t)=>a+Number(t.amount),0);
+  const monthDebts=data.debts.filter(d=>d.status!=='Pago'&&d.due_date&&String(d.due_date).slice(0,7)<=currentMonthKey);
+  const monthDebtOutflow=monthDebts.reduce((sum,d)=>sum+Number(d.amount||0),0);
+  const monthInstallments= data.installments.filter(i=>{
+    const remaining=Number(i.installment_count||0)-Number(i.paid_count||0);
+    if(remaining<=0||!i.first_due_date)return false;
+    const due=new Date(String(i.first_due_date).slice(0,10)+'T12:00:00');
+    due.setMonth(due.getMonth()+Number(i.paid_count||0));
+    return due.toISOString().slice(0,7)<=currentMonthKey;
+  });
+  const monthInstallmentOutflow=monthInstallments.reduce((sum,i)=>sum+Number(i.total_amount||0)/Math.max(1,Number(i.installment_count||1)),0);
+  const expenses=recordedExpenses+monthDebtOutflow+monthInstallmentOutflow;
   const paidIn=data.transactions.filter(t=>t.type==='entrada').reduce((a,t)=>a+Number(t.amount),0);
   const paidOut=data.transactions.filter(t=>t.type==='gasto').reduce((a,t)=>a+Number(t.amount),0);
   const balance=paidIn-paidOut;
@@ -227,9 +239,11 @@ function App(){
     const months=[];
     for(let i=5;i>=0;i--){const d=new Date();d.setDate(1);d.setMonth(d.getMonth()-i);const key=d.toISOString().slice(0,7);
       const tx=data.transactions.filter(t=>String(t.date).slice(0,7)===key);
-      months.push({month:d.toLocaleDateString('pt-BR',{month:'short'}),Entradas:tx.filter(t=>t.type==='entrada').reduce((a,t)=>a+Number(t.amount),0),Gastos:tx.filter(t=>t.type==='gasto').reduce((a,t)=>a+Number(t.amount),0)});
+      const recorded=tx.filter(t=>t.type==='gasto').reduce((a,t)=>a+Number(t.amount),0);
+      const commitments=key===currentMonthKey?monthDebtOutflow+monthInstallmentOutflow:0;
+      months.push({month:d.toLocaleDateString('pt-BR',{month:'short'}),Entradas:tx.filter(t=>t.type==='entrada').reduce((a,t)=>a+Number(t.amount),0),Gastos:recorded+commitments});
     }return months;
-  },[data.transactions]);
+  },[data.transactions,data.debts,data.installments,currentMonthKey,monthDebtOutflow,monthInstallmentOutflow]);
   const categories=useMemo(()=>{
     const map={};data.transactions.filter(t=>t.type==='gasto').forEach(t=>map[t.category||'Outros']=(map[t.category||'Outros']||0)+Number(t.amount));
     return Object.entries(map).map(([name,value])=>({name,value})).sort((a,b)=>b.value-a.value).slice(0,5);
