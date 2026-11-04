@@ -257,3 +257,9 @@
  .commitment-row>strong{grid-column:2;grid-row:2;padding:0}
  .commitment-row .row-actions{grid-column:2;grid-row:3}
 }
+
+
+/* Assinaturas recorrentes */
+.subscription-summary{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:15px 17px;margin:0 0 14px;border:1px solid #30415e;border-radius:14px;background:linear-gradient(120deg,#192b45,#172238)}
+.subscription-summary>div{display:grid;gap:5px}.subscription-summary span{font-size:10px;color:#91a3bf}.subscription-summary strong{font:800 22px Manrope,sans-serif;color:#f0f5ff}.subscription-summary>small{font-size:9px;color:#8496b0;text-align:right}
+@media(max-width:600px){.subscription-summary{align-items:flex-start;flex-direction:column;gap:7px;padding:13px}.subscription-summary>small{text-align:left}}
