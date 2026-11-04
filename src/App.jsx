@@ -3,7 +3,7 @@ import { supabase, isConfigured } from './supabase';
 import {
   Activity, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined,
   Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock, Bot, Sparkles, Send,
-  Gamepad2, Trophy, Coins, Brain, Gift, ClipboardList, Star, Zap,
+  Gamepad2, Trophy, Coins, Brain, Gift, ClipboardList, Star, Zap, Flame,
   LogOut, Menu, Plus, ReceiptText, ShieldCheck, Target, TrendingUp, Wallet, X, Users, Ban, UserCheck, KeyRound, RefreshCw
 } from 'lucide-react';
 import {
@@ -286,9 +286,9 @@ function App(){
         </div>
         <div className="gamer-section-heading"><div><span>SEU PRÓXIMO PASSO</span><h3>Missões de hoje</h3><p>Pequenas atitudes que fortalecem sua vida financeira.</p></div><span className="quest-reset">RENOVAÇÃO DIÁRIA</span></div>
         <div className="daily-quests">
-          <article className="quest-card"><div className="quest-icon quest-blue"><ReceiptText size={20}/></div><div className="quest-copy"><b>Registre uma movimentação</b><p>Não deixe seu dinheiro passar despercebido.</p><span>RECOMPENSA · +30 XP</span></div><button onClick={()=>setPage('transactions')}>Começar <ChevronRight size={15}/></button></article>
+          <article className="quest-card"><div className="quest-icon quest-blue"><ReceiptText size={20}/></div><div className="quest-copy"><b>Registre uma movimentação</b><p>Não deixe seu dinheiro passar despercebido.</p><span>MISSÃO · ORGANIZAÇÃO</span></div><button onClick={()=>setPage('transactions')}>Começar <ChevronRight size={15}/></button></article>
           <article className="quest-card"><div className="quest-icon quest-purple"><Target size={20}/></div><div className="quest-copy"><b>Crie uma meta financeira</b><p>Defina algo que você quer conquistar.</p><span>RECOMPENSA · +30 XP</span></div><button onClick={()=>setPage('planning')}>Começar <ChevronRight size={15}/></button></article>
-          <article className="quest-card"><div className="quest-icon quest-gold"><Brain size={20}/></div><div className="quest-copy"><b>Complete o desafio relâmpago</b><p>Responda ao quiz e aprenda algo novo.</p><span>RECOMPENSA · ATÉ +20 XP</span></div><button onClick={()=>setPage('opportunities')}>Jogar <ChevronRight size={15}/></button></article>
+          <article className="quest-card"><div className="quest-icon quest-gold"><Brain size={20}/></div><div className="quest-copy"><b>Complete o desafio relâmpago</b><p>Responda ao quiz e aprenda algo novo.</p><span>MISSÃO · APRENDIZADO</span></div><button onClick={()=>setPage('opportunities')}>Jogar <ChevronRight size={15}/></button></article>
         </div>
         <div className="gamer-section-heading"><div><span>ARCADE FINANCEIRO</span><h3>Desafio relâmpago</h3><p>Acertou? Você ganha experiência para subir de nível.</p></div><div className="arcade-chip"><Gamepad2 size={14}/> +20 XP</div></div>
         <section className="arcade-game">
