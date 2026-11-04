@@ -485,3 +485,26 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .game-world-hero.level-elite .player-avatar{border-color:#f4ce76;background:linear-gradient(145deg,#a66c2d,#6947a5);box-shadow:0 0 0 6px #f4ce7622,0 0 32px #f4ce7655}
 .game-world-hero.level-legendary{border-color:#e5bd69;box-shadow:0 0 0 1px #e5bd6933,0 0 36px #b58cff2b,0 18px 42px #02081766}
 .game-world-hero.level-legendary .player-avatar{border-color:#ffe4a0;background:linear-gradient(145deg,#a77a35,#7650bd);box-shadow:0 0 0 7px #f4ce7630,0 0 38px #f4ce7680}
+
+/* Corrige o preenchimento das barras de XP em telas estreitas */
+.player-identity{min-width:0;max-width:100%}
+.player-info{min-width:0;max-width:100%;overflow:hidden}
+.player-xp-track,.overview-xp-track{display:block;width:100%;min-width:0;max-width:100%;box-sizing:border-box;overflow:hidden}
+.player-xp-track i,.overview-xp-track i{max-width:100%;box-sizing:border-box}
+.player-xp-total{flex:none;min-width:78px}
+@media(max-width:560px){
+ .game-world-hero{padding:18px 16px}
+ .player-identity{display:grid;grid-template-columns:56px minmax(0,1fr) auto;align-items:center;gap:10px}
+ .player-avatar{width:54px;height:54px;border-radius:17px}
+ .player-info{width:100%;min-width:0}
+ .player-info h2{font-size:clamp(13px,4vw,17px);overflow-wrap:anywhere}
+ .player-level-line{min-width:0}
+ .player-level-line span{font-size:8px;white-space:normal}
+ .player-xp-total{min-width:68px;padding:8px 9px}
+ .player-xp-total strong{font-size:19px}
+}
+@media(max-width:380px){
+ .player-identity{grid-template-columns:46px minmax(0,1fr)}
+ .player-avatar{width:44px;height:44px}
+ .player-xp-total{grid-column:2;justify-self:start;display:flex;align-items:baseline;gap:5px;padding:4px 8px}
+}
