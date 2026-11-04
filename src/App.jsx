@@ -387,8 +387,8 @@ function FinanceFlapGame({onReward}){
  function flap(){if(status==='ready'||status==='over'){begin();return}if(status==='playing')stateRef.current.velocity=-6.2}
  useEffect(()=>{if(status!=='playing')return;const canvas=canvasRef.current,ctx=canvas.getContext('2d');let raf;const W=320,H=420;
  const loop=()=>{const s=stateRef.current;s.frame++;s.velocity+=.34;s.birdY+=s.velocity;
- const speed=Math.min(5.2,2.8+s.score*.12);
- const spawnEvery=Math.max(76,105-Math.floor(s.score/4)*5);
+ const speed=Math.min(28,2.8+s.score*.20);
+ const spawnEvery=Math.max(28,Math.round(105/(speed/2.8)));
  s.spawnTimer++;if(s.spawnTimer>=spawnEvery){s.spawnTimer=0;s.pipes.push({x:W+10,gapY:85+Math.random()*190,passed:false})}
  s.pipes.forEach(p=>{p.x-=speed;if(!p.passed&&p.x+48<66){p.passed=true;s.score+=2;setScore(s.score)}});
  s.pipes=s.pipes.filter(p=>p.x>-55);
