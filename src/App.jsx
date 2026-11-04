@@ -347,7 +347,6 @@ function App(){
   <FinanceFlapGame onReward={awardFlapXp}/>
 </section>}
 {page==='profile'&&<section className="opportunities-page gamer-world player-profile-page">
-{page==='opportunities'&&<section className="opportunities-page gamer-world">
         <div className={`game-world-hero ${gameXp>=4500?"level-legendary":gameXp>=2000?"level-elite":gameXp>=1000?"level-avatar":gameXp>=500?"level-neon":""}`}>
           <div className="game-world-top"><span className="world-label"><span className="live-pulse"/> CENTRAL DO JOGADOR</span><span className="season-pill">TEMPORADA 01 · SUA EVOLUÇÃO</span></div>
           <div className="player-identity"><div className={`player-avatar profile-big-avatar frame-${playerProfile.frame}`}><span>{playerProfile.avatar}</span><i><Zap size={12}/></i></div><div className="player-info"><span>{gameXp>=4500?"LENDÁRIO":gameXp>=2000?"ELITE":gameXp>=1000?"VETERANO":gameXp>=500?"EXPLORADOR":"JOGADOR"}</span><h2>{playerProfile.name||"Sua jornada começa aqui"}</h2><div className="player-level-line"><b>NÍVEL {Math.floor(gameXp/500)+1}</b><span>{gameXp%500}/500 XP para o próximo nível</span></div><div className="player-xp-track"><i style={{width:((gameXp%500)/500*100)+'%'}}/></div></div><div className="player-xp-total"><strong>{gameXp}</strong><small>XP TOTAL</small></div></div>
