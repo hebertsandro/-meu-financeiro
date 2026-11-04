@@ -30,6 +30,8 @@ create table if not exists public.debts (
   amount numeric(12,2) not null check (amount >= 0),
   due_date date,
   status text not null default 'Pendente' check (status in ('Pendente','Pago')),
+  is_continuous boolean not null default false,
+  paid_month text,
   created_at timestamptz not null default now()
 );
 
