@@ -580,3 +580,20 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .profile-frame-option.frame-violet i{border:2px solid #ad83ff!important;box-shadow:0 0 16px #ad83ff77!important}
 .profile-choice-group>b small{font-size:10px;color:#8ea5c8;font-weight:500}
 @media(max-width:640px){.assistant-popover{width:calc(100vw - 24px)!important;right:12px!important;bottom:88px!important}.profile-avatar-choices{grid-template-columns:repeat(4,minmax(0,1fr))!important}.profile-frame-choices{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+
+
+/* Aplicação real das molduras escolhidas nos avatares */
+.player-avatar.frame-violet,.profile-avatar-button.frame-violet{border:2px solid #b78aff!important;box-shadow:0 0 0 4px #a879ff24,0 0 22px #a879ff75,0 8px 26px #050816a8!important}
+.player-avatar.frame-cyan,.profile-avatar-button.frame-cyan{border:2px solid #55e5f5!important;box-shadow:0 0 0 4px #55e5f526,0 0 24px #35d9f58a,0 8px 26px #050816a8!important}
+.player-avatar.frame-gold,.profile-avatar-button.frame-gold{border:2px solid #f5cc75!important;box-shadow:0 0 0 4px #f5cc7526,0 0 25px #eab85d88,0 8px 26px #050816a8!important}
+.player-avatar.frame-ruby,.profile-avatar-button.frame-ruby{border:2px solid #ff789e!important;box-shadow:0 0 0 4px #ff789e26,0 0 26px #f04d7b88,0 8px 26px #050816a8!important}
+.player-avatar.frame-chrome,.profile-avatar-button.frame-chrome{border:3px solid transparent!important;background:linear-gradient(145deg,#242c47,#171c36) padding-box,linear-gradient(130deg,#fff 0%,#8796b5 13%,#f8fcff 25%,#626f89 39%,#fff 52%,#aab8d0 65%,#596780 79%,#fff 91%,#7887a2 100%) border-box!important;box-shadow:0 0 0 3px #dce8ff22,0 0 14px #d9e6ffb0,0 0 30px #a9c5ff80,0 8px 26px #050816a8!important}
+.profile-avatar-button{position:relative;overflow:visible!important;display:grid;place-items:center}
+.profile-avatar-button:after{content:"";position:absolute;inset:3px;border:1px solid #ffffff38;border-radius:inherit;pointer-events:none}
+.profile-avatar-button.frame-chrome:before{content:"";position:absolute;inset:-3px;border-radius:inherit;background:linear-gradient(110deg,transparent 15%,#fff9 32%,transparent 48%,#fff6 67%,transparent 82%);filter:blur(2px);pointer-events:none}
+.profile-big-avatar.frame-chrome{transform:none!important}
+.player-card-frame.frame-violet{border:1px solid #a879ff!important;box-shadow:0 0 0 2px #a879ff22,0 0 28px #a879ff35,0 18px 50px #0006!important}
+.player-card-frame.frame-cyan{border:1px solid #55e5f5!important;box-shadow:0 0 0 2px #55e5f522,0 0 28px #35d9f535,0 18px 50px #0006!important}
+.player-card-frame.frame-gold{border:1px solid #f5cc75!important;box-shadow:0 0 0 2px #f5cc7522,0 0 28px #eab85d40,0 18px 50px #0006!important}
+.player-card-frame.frame-ruby{border:1px solid #ff789e!important;box-shadow:0 0 0 2px #ff789e22,0 0 28px #f04d7b40,0 18px 50px #0006!important}
+.player-card-frame.frame-chrome{border:2px solid transparent!important;background:linear-gradient(135deg,#242c47,#171c36) padding-box,linear-gradient(125deg,#fff,#8c9bbd 13%,#f7fbff 24%,#67748d 37%,#fff 49%,#8999b8 63%,#fff 76%,#59657f 90%,#f9fdff) border-box!important;box-shadow:0 0 14px #d9e6ff90,0 0 38px #b7caff66,0 18px 55px #0008!important}
