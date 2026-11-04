@@ -159,7 +159,7 @@ function App(){
       : supabase.from(table).insert({...values,user_id:session.user.id});
     const {error}=await request;
     setBusy(false);
-    if(error){notify(item?'Não foi possível atualizar. Confira os dados e tente novamente.':'Não foi possível salvar. Confira se o banco foi configurado.');return false}
+    if(error){console.error('Supabase save error:',{table,code:error.code,message:error.message,details:error.details,hint:error.hint});const reason=error.code==='42P01'?'Tabela não encontrada no Supabase.':error.code==='42501'?'Permissão negada pelo RLS do Supabase.':error.code==='23502'?'Há um campo obrigatório sem valor.':error.code==='42703'?'Coluna não encontrada na tabela.':(error.message||'Erro desconhecido');notify((item?'Não foi possível atualizar: ':'Não foi possível salvar: ')+reason);return false}
     await loadData();setModal(null);notify(item?'Atualizado com sucesso!':'Salvo com sucesso!');const messages={transactions:values.type==='entrada'?['Entrada registrada',(values.description||'Sua entrada')+': '+brl(values.amount)+' registrada.','entradas']:['Gasto registrado',(values.description||'Novo gasto')+': '+brl(values.amount)+' registrado.','gastos'],debts:['Conta adicionada',values.title+': '+brl(values.amount)+' cadastrada.','contas'],installments:['Compra parcelada adicionada',values.description+': '+values.installment_count+' parcelas de aproximadamente '+brl(Number(values.total_amount)/Number(values.installment_count))+'.','parcelas'],subscriptions:['Assinatura adicionada',values.name+': '+brl(values.amount)+' cadastrada.','assinaturas'],goals:['Nova meta criada','A meta '+values.name+' foi adicionada.','metas']};if(messages[table]&&!item)await addNotification(...messages[table]);return true;
   }
   async function changeCardLimit(card){
@@ -263,8 +263,9 @@ function App(){
       {page==='overview'&&<><section className="journey-banner"><div className="journey-copy"><span className="journey-kicker"><Zap size={13}/> SUA JORNADA FINANCEIRA</span><h2>Seu dinheiro. Seus planos. Sua evolução.</h2><p>Organize sua vida financeira, aprenda no seu ritmo e descubra novas oportunidades.</p><button className="journey-cta" onClick={()=>setPage('opportunities')}>Explorar oportunidades <ChevronRight size={16}/></button><div className="overview-player-progress"><span className="overview-player-icon"><Gamepad2 size={16}/></span><div className="overview-player-copy"><div><b>NÍVEL {Math.floor(gameXp/500)+1}</b><span>{gameXp} XP TOTAL</span></div><div className="overview-xp-track"><i style={{width:`${(gameXp%500)/500*100}%`}}/></div></div><small>{gameXp%500}/500 XP</small></div></div><div className="journey-art"><div className="journey-orbit"/><div className="journey-emblem"><Gamepad2 size={38}/></div><span className="journey-chip"><Star size={12}/> Evolua a cada passo</span></div></section><section className="overview-unified">
         <div className="unified-balance">
           <div className="unified-balance-top"><span><Wallet size={16}/> RESUMO FINANCEIRO</span><span className="unified-live-dot">ATUALIZADO</span></div>
-          <small>Saldo registrado</small>
-          <strong>{brl(balance)}</strong>
+          <small>Saldo disponível após compromissos</small>
+          <strong>{brl(balance-openDebts-installmentRemaining)}</strong>
+          <span className="muted">Saldo registrado: {brl(balance)}</span>
           <div className="unified-month-flow">
             <div><span><i className="unified-dot income-dot"/>Entradas do mês</span><b>{brl(income)}</b></div>
             <div><span><i className="unified-dot expense-dot"/>Saídas do mês</span><b>{brl(expenses)}</b></div>
