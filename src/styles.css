@@ -450,3 +450,31 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
  .scrim{position:fixed;inset:0;z-index:29}
  .main-area{margin-left:0;min-width:0}
 }
+
+/* Quiz com intervalo e minigame Flappy Financeiro */
+.quiz-gate{min-height:265px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px}
+.quiz-gate-icon{width:64px;height:64px;display:grid;place-items:center;border:1px solid #7966ad;border-radius:20px;background:linear-gradient(145deg,#44316f,#234b73);color:#d9c8ff;box-shadow:0 0 28px #8c70d52b}
+.quiz-gate h4{margin:14px 0 6px;color:#f1efff;font:800 17px Manrope}
+.quiz-gate p{max-width:390px;color:#9ca9c4;font-size:12px;line-height:1.6}
+.quiz-gate .primary{margin-top:9px}
+.quiz-countdown{padding:9px 13px;border:1px solid #574a7d;border-radius:9px;background:#211b39;color:#d4c3ff;font-size:11px;font-weight:800}
+.flap-game{display:grid;grid-template-columns:minmax(0,320px) 1fr;gap:18px;align-items:center;padding:16px;border:1px solid #3d5478;border-radius:17px;background:linear-gradient(130deg,#121d35,#151932);box-shadow:0 14px 35px #02081755}
+.flap-game-stage{position:relative;width:100%;max-width:320px;margin:auto;overflow:hidden;border:1px solid #53659a;border-radius:14px;background:#0c1428;touch-action: manipulation}
+.flap-game-stage canvas{display:block;width:100%;height:auto;touch-action:manipulation;cursor:pointer}
+.flap-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:20px;background:#080e1bcc;text-align:center;backdrop-filter:blur(3px)}
+.flap-overlay b{color:#fff;font:800 20px Manrope}
+.flap-overlay span{color:#c1cbe0;font-size:11px;line-height:1.5}
+.flap-game-info{display:grid;gap:12px;color:#9eacc7;font-size:12px}
+.flap-game-info span{display:flex;align-items:center;gap:8px;color:#a9e9df}
+.flap-game-info b{color:#f5d68c;font:800 25px Manrope}
+.level-reward-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.level-reward{display:flex;align-items:center;gap:11px;padding:13px;border:1px solid #34415f;border-radius:13px;background:linear-gradient(135deg,#171f35,#11182a);opacity:.7}
+.level-reward-icon{width:39px;height:39px;display:grid;place-items:center;flex:none;border-radius:12px;background:#292441;color:#bba5ed}
+.level-reward>div{display:grid;gap:4px;flex:1;min-width:0}
+.level-reward b{color:#e8eaff;font-size:11px}
+.level-reward small{color:#929db7;font-size:8px}
+.level-reward strong{color:#b7a4e9;font-size:8px;white-space:nowrap}
+.level-reward.unlocked{opacity:1;border-color:#6b8d79;background:linear-gradient(120deg,#183a39,#172a36);box-shadow:0 0 20px #4ad4a316}
+.level-reward.unlocked .level-reward-icon{background:#1d574d;color:#8ff0c8}
+.level-reward.unlocked strong{color:#8ff0c8}
+@media(max-width:650px){.flap-game{grid-template-columns:1fr}.flap-game-stage{max-width:290px}.flap-game-info{grid-template-columns:1fr auto;align-items:center}.level-reward-grid{grid-template-columns:1fr}.level-reward{padding:11px}}
