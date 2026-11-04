@@ -381,22 +381,25 @@ function EntryModal({type,extra,onClose,onSave,busy}){
 }
 
 function FinanceFlapGame({onReward}){
- const canvasRef=React.useRef(null),stateRef=React.useRef({birdY:190,velocity:0,pipes:[],frame:0,score:0,active:false,over:false,rewarded:false});
+ const canvasRef=React.useRef(null),stateRef=React.useRef({birdY:190,velocity:0,pipes:[],frame:0,score:0,active:false,over:false,rewarded:false,spawnTimer:0});
  const [status,setStatus]=useState('ready'),[score,setScore]=useState(0);
- function begin(){const s=stateRef.current;s.birdY=190;s.velocity=0;s.pipes=[{x:360,gapY:145,passed:false}];s.frame=0;s.score=0;s.active=true;s.over=false;s.rewarded=false;setScore(0);setStatus('playing')}
+ function begin(){const s=stateRef.current;s.birdY=190;s.velocity=0;s.pipes=[{x:360,gapY:145,passed:false}];s.frame=0;s.spawnTimer=0;s.score=0;s.active=true;s.over=false;s.rewarded=false;setScore(0);setStatus('playing')}
  function flap(){if(status==='ready'||status==='over'){begin();return}if(status==='playing')stateRef.current.velocity=-6.2}
  useEffect(()=>{if(status!=='playing')return;const canvas=canvasRef.current,ctx=canvas.getContext('2d');let raf;const W=320,H=420;
  const loop=()=>{const s=stateRef.current;s.frame++;s.velocity+=.34;s.birdY+=s.velocity;
- if(s.frame%105===0)s.pipes.push({x:W+10,gapY:85+Math.random()*190,passed:false});
- s.pipes.forEach(p=>{p.x-=2.25;if(!p.passed&&p.x+48<66){p.passed=true;s.score++;setScore(s.score)}});
+ const speed=Math.min(5.2,2.8+s.score*.12);
+ const spawnEvery=Math.max(76,105-Math.floor(s.score/4)*5);
+ s.spawnTimer++;if(s.spawnTimer>=spawnEvery){s.spawnTimer=0;s.pipes.push({x:W+10,gapY:85+Math.random()*190,passed:false})}
+ s.pipes.forEach(p=>{p.x-=speed;if(!p.passed&&p.x+48<66){p.passed=true;s.score++;setScore(s.score)}});
  s.pipes=s.pipes.filter(p=>p.x>-55);
  let hit=s.birdY<8||s.birdY>H-24;
  s.pipes.forEach(p=>{const overlap=66+14>p.x&&66-14<p.x+48;if(overlap&&(s.birdY-12<p.gapY-66||s.birdY+12>p.gapY+66))hit=true});
  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#111a38');bg.addColorStop(1,'#091426');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
- ctx.fillStyle='#8ba9ff22';for(let i=0;i<22;i++){const x=(i*53+s.frame*.22)%W,y=(i*79)%H;ctx.fillRect(x,y,2,2)}
+ ctx.fillStyle='#8ba9ff22';for(let i=0;i<22;i++){const x=(i*53+s.frame*(speed*.11))%W,y=(i*79)%H;ctx.fillRect(x,y,2,2)}
  s.pipes.forEach(p=>{const grad=ctx.createLinearGradient(p.x,0,p.x+48,0);grad.addColorStop(0,'#256e83');grad.addColorStop(.5,'#36c6b2');grad.addColorStop(1,'#1c526b');ctx.fillStyle=grad;ctx.fillRect(p.x,0,48,p.gapY-66);ctx.fillRect(p.x,p.gapY+66,48,H);ctx.fillStyle='#8fffe0';ctx.fillRect(p.x-4,p.gapY-78,56,12);ctx.fillRect(p.x-4,p.gapY+66,56,12)});
  ctx.save();ctx.translate(66,s.birdY);ctx.rotate(Math.max(-.45,Math.min(.7,s.velocity*.055)));ctx.fillStyle='#f5cf73';ctx.shadowColor='#f5cf73';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(5,-4,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17213c';ctx.beginPath();ctx.arc(6,-4,2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ff9b72';ctx.beginPath();ctx.moveTo(12,1);ctx.lineTo(22,5);ctx.lineTo(12,8);ctx.fill();ctx.restore();
  ctx.fillStyle='#fff';ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.fillText(String(s.score),W/2,38);
+ ctx.fillStyle='#a9c6ff';ctx.font='bold 9px sans-serif';ctx.fillText('VELOCIDADE x'+(speed/2.8).toFixed(1),W/2,55);
  if(hit){s.active=false;s.over=true;if(!s.rewarded){s.rewarded=true;onReward(s.score)}setStatus('over');return}
  raf=requestAnimationFrame(loop)};
  raf=requestAnimationFrame(loop);return()=>cancelAnimationFrame(raf)},[status]);
