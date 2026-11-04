@@ -544,3 +544,39 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .profile-choice-group{display:grid;gap:10px;margin-top:17px}.profile-choice-group>b{color:#e8eaff;font-size:12px}.profile-avatar-choices{display:flex;flex-wrap:wrap;gap:9px}.profile-avatar-choices button{width:48px;height:48px;border:1px solid #394866;border-radius:13px;background:#18233a;font-size:25px;cursor:pointer}.profile-avatar-choices button.selected{border-color:#b59aff;background:#302653;box-shadow:0 0 0 3px #9b7cff25}
 .profile-frame-choices{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:9px}.profile-frame-option{display:grid;justify-items:center;gap:7px;padding:12px 8px;border:1px solid #394866;border-radius:12px;background:#141f34;color:#dce5fa;cursor:pointer}.profile-frame-option i{width:30px;height:30px;border:3px solid #b59aff;border-radius:10px;box-shadow:0 0 12px #9b7cff55}.profile-frame-option.frame-cyan i{border-color:#62e8e0;box-shadow:0 0 12px #62e8e055}.profile-frame-option.frame-gold i{border-color:#f3ca70;box-shadow:0 0 12px #f3ca7055}.profile-frame-option.frame-legendary i{border-color:#f3a8ff;box-shadow:0 0 14px #bc7dff88}.profile-frame-option span{font-size:10px;font-weight:800}.profile-frame-option small{color:#a99bd0;font-size:8px}.profile-frame-option.selected{border-color:#aa91f1;background:#282044}.profile-frame-option:disabled{opacity:.42;cursor:not-allowed}
 @media(max-width:650px){.profile-frame-choices{grid-template-columns:repeat(2,minmax(0,1fr))}.games-welcome{align-items:flex-start;padding:16px}.games-welcome h2{font-size:19px}.games-welcome p{font-size:10px}.games-welcome-xp{min-width:72px;padding:9px}}
+
+
+/* NEXUS AI — arcade assistant refresh */
+.assistant-fab{width:64px;height:64px;border-radius:22px!important;background:linear-gradient(145deg,#8b5cf6,#426dff 58%,#20d5d2)!important;border:1px solid #b8a6ff!important;color:#fff!important;box-shadow:0 0 0 5px #795bff18,0 10px 36px #526dff75, inset 0 1px 0 #ffffff80!important;position:fixed;overflow:visible;transition:transform .2s,box-shadow .2s}
+.assistant-fab:hover{transform:translateY(-4px) rotate(-4deg);box-shadow:0 0 0 7px #795bff22,0 14px 42px #526dff99!important}
+.assistant-fab>span{position:absolute;right:-3px;top:-5px;width:23px;height:23px;border-radius:8px;background:linear-gradient(135deg,#fff,#a9f6ff);color:#6251dc;display:grid;place-items:center;border:2px solid #111a36;box-shadow:0 0 15px #8ceeff}
+.assistant-popover{border:1px solid #6c65d9!important;background:linear-gradient(155deg,#151a3c,#10172c 55%,#101f37)!important;box-shadow:0 24px 80px #000a,0 0 34px #695bff38!important}
+.assistant-popover-head{background:linear-gradient(100deg,#28245a,#18375a)!important;border-bottom:1px solid #5e61b5!important}
+.assistant-popover-icon{width:39px!important;height:39px!important;border-radius:13px!important;background:linear-gradient(135deg,#a78bfa,#5d7cff,#48d8d0)!important;color:white!important;display:flex!important;align-items:center;justify-content:center;position:relative;box-shadow:0 0 22px #7b72ff75}
+.assistant-popover-icon svg+svg{position:absolute;right:-4px;top:-4px;color:#c8fbff}
+.assistant-popover-title b{font:800 14px Manrope,sans-serif;letter-spacing:1px}
+.assistant-popover-title b em{font-style:normal;color:#8ceaff;font-size:10px}
+.assistant-popover-title small{letter-spacing:1px;font-size:8px}
+.assistant-message.assistant .assistant-bubble{background:linear-gradient(135deg,#20284c,#1b3450)!important;border:1px solid #3c5280!important}
+.assistant-popover-suggestions button{border:1px solid #4c55a1!important;background:#252752!important;color:#cbd6ff!important}
+.assistant-popover-compose input{border-color:#4d5592!important;background:#0b1228!important}
+.player-card-frame{position:relative;isolation:isolate;border:1px solid #5269a5!important;box-shadow:0 18px 50px #0005,0 0 26px #6c74ff25}
+.player-card-frame:before{content:"";position:absolute;inset:8px;border:1px solid #ffffff20;border-radius:inherit;pointer-events:none;z-index:-1}
+.player-card-frame.frame-gold{border-color:#eab85d!important;box-shadow:0 0 28px #eab85d30,0 18px 50px #0006}
+.player-card-frame.frame-ruby{border-color:#ef668e!important;box-shadow:0 0 30px #f04d7b30,0 18px 50px #0006}
+.player-card-frame.frame-chrome{border:2px solid transparent!important;background:linear-gradient(135deg,#242c47,#171c36) padding-box,linear-gradient(125deg,#fff,#8c9bbd 13%,#f7fbff 24%,#67748d 37%,#fff 49%,#8999b8 63%,#fff 76%,#59657f 90%,#f9fdff) border-box!important;box-shadow:0 0 12px #d9e6ff80,0 0 36px #b7caff55,0 18px 55px #0008!important}
+.player-card-frame.frame-chrome:after{content:"";position:absolute;inset:0;border-radius:inherit;background:linear-gradient(115deg,transparent 12%,#ffffff1b 28%,transparent 43%,#ffffff12 66%,transparent 82%);pointer-events:none}
+.profile-avatar-choices button{position:relative;min-width:58px;min-height:62px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
+.profile-avatar-choices button span{font-size:25px;filter:drop-shadow(0 3px 5px #0007)}
+.profile-avatar-choices button.avatar-locked{background:#111a2b!important;border:1px dashed #45516c!important;opacity:.75}
+.profile-avatar-choices button.avatar-locked span{font-size:17px;filter:none}
+.profile-avatar-choices button small{font-size:8px;color:#9eafd0}
+.profile-frame-option{min-height:76px;position:relative;overflow:hidden}
+.profile-frame-option:disabled{opacity:.55;filter:saturate(.5)}
+.profile-frame-option.frame-chrome i{border:3px solid transparent!important;background:linear-gradient(#121a30,#121a30) padding-box,linear-gradient(125deg,#fff,#7888a7,#fff,#64718a,#fff) border-box!important;box-shadow:0 0 12px #d9e6ff90!important}
+.profile-frame-option.frame-ruby i{border:2px solid #ff7099!important;box-shadow:0 0 16px #ff527a88!important}
+.profile-frame-option.frame-gold i{border:2px solid #f6c66d!important;box-shadow:0 0 16px #f6c66d77!important}
+.profile-frame-option.frame-cyan i{border:2px solid #55e5f5!important;box-shadow:0 0 16px #55e5f577!important}
+.profile-frame-option.frame-violet i{border:2px solid #ad83ff!important;box-shadow:0 0 16px #ad83ff77!important}
+.profile-choice-group>b small{font-size:10px;color:#8ea5c8;font-weight:500}
+@media(max-width:640px){.assistant-popover{width:calc(100vw - 24px)!important;right:12px!important;bottom:88px!important}.profile-avatar-choices{grid-template-columns:repeat(4,minmax(0,1fr))!important}.profile-frame-choices{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
