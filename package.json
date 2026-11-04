@@ -18,5 +18,10 @@
   "devDependencies": {
     "@vitejs/plugin-react": "^4.3.4",
     "vite": "^6.0.7"
+  },
+  "overrides": {
+    "@babel/parser": "7.29.12",
+    "@babel/helpers": "7.29.12",
+    "@babel/helper-module-transforms": "7.29.12"
   }
 }
