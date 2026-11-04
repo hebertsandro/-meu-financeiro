@@ -478,3 +478,10 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .level-reward.unlocked .level-reward-icon{background:#1d574d;color:#8ff0c8}
 .level-reward.unlocked strong{color:#8ff0c8}
 @media(max-width:650px){.flap-game{grid-template-columns:1fr}.flap-game-stage{max-width:290px}.flap-game-info{grid-template-columns:1fr auto;align-items:center}.level-reward-grid{grid-template-columns:1fr}.level-reward{padding:11px}}
+
+/* Benefícios visuais aplicados automaticamente ao alcançar cada nível */
+.game-world-hero.level-neon{border-color:#43d8d0;background:radial-gradient(ellipse at 85% 12%,#22d3ee40,transparent 34%),radial-gradient(ellipse at 12% 90%,#a855f740,transparent 45%),linear-gradient(120deg,#101d3b,#17264b 55%,#123b4a);box-shadow:0 0 28px #32d5ce20,0 18px 42px #02081766}
+.game-world-hero.level-avatar .player-avatar{border-radius:50%;transform:none;background:linear-gradient(145deg,#257c91,#6651b9);box-shadow:0 0 0 6px #55d9d526,0 0 28px #55d9d54a}
+.game-world-hero.level-elite .player-avatar{border-color:#f4ce76;background:linear-gradient(145deg,#a66c2d,#6947a5);box-shadow:0 0 0 6px #f4ce7622,0 0 32px #f4ce7655}
+.game-world-hero.level-legendary{border-color:#e5bd69;box-shadow:0 0 0 1px #e5bd6933,0 0 36px #b58cff2b,0 18px 42px #02081766}
+.game-world-hero.level-legendary .player-avatar{border-color:#ffe4a0;background:linear-gradient(145deg,#a77a35,#7650bd);box-shadow:0 0 0 7px #f4ce7630,0 0 38px #f4ce7680}
