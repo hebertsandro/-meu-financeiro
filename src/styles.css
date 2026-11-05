@@ -643,3 +643,29 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .flap-mode-top{display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;width:100%;margin-bottom:8px}.flap-mode-top>b{font-size:12px;color:#e8edff}.flap-mode-top>span{font-size:9px;color:#9baccb}
 .flap-progress-track{height:5px;width:100%;overflow:hidden;border-radius:8px;background:#293650;margin-top:8px}.flap-progress-track i{display:block;height:100%;border-radius:8px;background:linear-gradient(90deg,#55d9bd,#8c83ff);transition:width .2s}
 @media(max-width:520px){.flap-mode-grid{gap:8px}.flap-mode-card{padding:11px;border-radius:12px}.flap-mode-card strong{font-size:12px}.flap-mode-card small{font-size:9px}.flap-mode-card em{font-size:8px}.flap-mode-reward{font-size:7px}}
+
+
+/* Joias equipáveis na moldura do cartão de perfil */
+.player-card-frame{overflow:hidden}
+.profile-card-gems{position:absolute;z-index:4;top:13px;right:16px;display:flex;gap:7px;pointer-events:none}
+.profile-gem{width:19px;height:19px;display:grid;place-items:center;transform:rotate(45deg);border:1px solid #ffffff9c;border-radius:5px 5px 3px 3px;box-shadow:0 0 9px currentColor,inset 0 0 5px #fff9}
+.profile-gem:after{content:"";width:6px;height:6px;border-radius:50%;background:#fff;opacity:.8}
+.gem-ruby{color:#ff4779;background:linear-gradient(135deg,#ffb0c5,#c90042 55%,#67001e)}
+.gem-sapphire{color:#4fc8ff;background:linear-gradient(135deg,#b6efff,#087bdc 55%,#102d86)}
+.gem-emerald{color:#49f0a5;background:linear-gradient(135deg,#b4ffd9,#08a968 55%,#075438)}
+.gem-amethyst{color:#c28aff;background:linear-gradient(135deg,#efd0ff,#8d36d6 55%,#431078)}
+.gem-diamond{color:#e8f8ff;background:linear-gradient(135deg,#fff,#8bdfff 45%,#7186d9 75%,#fff)}
+.profile-gem-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:9px}
+.profile-gem-option{display:grid;justify-items:center;gap:6px;min-height:82px;padding:10px 7px;border:1px solid #394866;border-radius:12px;background:#141f34;color:#dce5fa;cursor:pointer}
+.profile-gem-option i{width:28px;height:28px;display:grid;place-items:center;transform:rotate(45deg);border:1px solid #ffffff9c;border-radius:6px;color:white;font-size:17px;font-style:normal;box-shadow:0 0 13px currentColor}
+.profile-gem-option.gem-ruby i{background:linear-gradient(135deg,#ffb0c5,#c90042 65%,#67001e);color:#ff4779}
+.profile-gem-option.gem-sapphire i{background:linear-gradient(135deg,#b6efff,#087bdc 65%,#102d86);color:#4fc8ff}
+.profile-gem-option.gem-emerald i{background:linear-gradient(135deg,#b4ffd9,#08a968 65%,#075438);color:#49f0a5}
+.profile-gem-option.gem-amethyst i{background:linear-gradient(135deg,#efd0ff,#8d36d6 65%,#431078);color:#c28aff}
+.profile-gem-option.gem-diamond i{background:linear-gradient(135deg,#fff,#8bdfff 45%,#7186d9);color:#e8f8ff}
+.profile-gem-option span{font-size:10px;font-weight:800}
+.profile-gem-option small,.profile-gem-count{font-size:8px;color:#a99bd0}
+.profile-gem-option.selected{border-color:#b99aff;background:#282044;box-shadow:0 0 14px #a879ff30}
+.profile-gem-option:disabled{opacity:.45;cursor:not-allowed}
+.profile-gem-count{display:block;margin-top:9px}
+@media(max-width:520px){.profile-card-gems{top:10px;right:12px;gap:5px}.profile-gem{width:15px;height:15px}.profile-gem-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
