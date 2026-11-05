@@ -986,3 +986,53 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
   background:linear-gradient(145deg,#fff,#ffd6f4 24%,#ff72cf 62%,#8539bd)!important;
   box-shadow:0 0 7px #ff72cf,0 0 13px #d86bff!important;
 }
+
+
+/* FIX DEFINITIVO DAS MINIATURAS — sobrescreve regras antigas */
+.profile-frame-choices .profile-frame-option.frame-violet i:before,
+.profile-frame-choices .profile-frame-option.frame-violet i:after,
+.profile-frame-choices .profile-frame-option.frame-violet:before,
+.profile-frame-choices .profile-frame-option.frame-violet:after{
+  content:none!important;display:none!important;opacity:0!important;box-shadow:none!important
+}
+
+/* Miniatura cromática: três gemas prismáticas em vez da coroa */
+.profile-frame-choices .profile-frame-option.frame-chromatic i{
+  position:relative!important;overflow:visible!important
+}
+.profile-frame-choices .profile-frame-option.frame-chromatic i:before{
+  content:""!important;display:block!important;position:absolute!important;
+  left:50%!important;top:-12px!important;width:8px!important;height:11px!important;
+  transform:translateX(-50%)!important;
+  clip-path:polygon(50% 0,100% 72%,50% 100%,0 72%)!important;
+  border:0!important;border-radius:0!important;
+  background:linear-gradient(145deg,#fff,#fff3a8 18%,#ff78d5 38%,#a875ff 58%,#5beaff 78%,#baff9a)!important;
+  box-shadow:-8px 2px 0 -1px #48dfff,8px 2px 0 -1px #ff78d5,
+    0 0 7px #fff,0 0 13px #d66bff!important;
+  z-index:6!important;pointer-events:none!important
+}
+.profile-frame-choices .profile-frame-option.frame-chromatic i:after{
+  content:none!important;display:none!important
+}
+/* A cromática da prévia do cartão usa o mesmo trio de pedras */
+.profile-frame-choices.card-frame-previews .chromatic-frame-preview i:before{
+  content:""!important;display:block!important;position:absolute!important;
+  left:50%!important;top:-12px!important;width:8px!important;height:11px!important;
+  transform:translateX(-50%)!important;
+  clip-path:polygon(50% 0,100% 72%,50% 100%,0 72%)!important;
+  border:0!important;border-radius:0!important;
+  background:linear-gradient(145deg,#fff,#fff3a8 18%,#ff78d5 38%,#a875ff 58%,#5beaff 78%,#baff9a)!important;
+  box-shadow:-8px 2px 0 -1px #48dfff,8px 2px 0 -1px #ff78d5,
+    0 0 7px #fff,0 0 13px #d66bff!important;
+  z-index:6!important;pointer-events:none!important
+}
+.profile-frame-choices.card-frame-previews .chromatic-frame-preview i:after{
+  content:none!important;display:none!important
+}
+/* Miniaturas comuns: corte de joia triangular consistente */
+.profile-frame-choices .profile-frame-option:not(.frame-violet):not(.frame-chromatic) i:before{
+  width:11px!important;height:13px!important;top:-12px!important;
+  transform:translateX(-50%)!important;
+  clip-path:polygon(50% 0,100% 72%,50% 100%,0 72%)!important;
+  border:0!important;border-radius:0!important
+}
