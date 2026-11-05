@@ -645,27 +645,21 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 @media(max-width:520px){.flap-mode-grid{gap:8px}.flap-mode-card{padding:11px;border-radius:12px}.flap-mode-card strong{font-size:12px}.flap-mode-card small{font-size:9px}.flap-mode-card em{font-size:8px}.flap-mode-reward{font-size:7px}}
 
 
-/* Joias equipáveis na moldura do cartão de perfil */
+
+/* Joias integradas ao desenho de cada moldura do cartão do jogador */
 .player-card-frame{overflow:hidden}
-.profile-card-gems{position:absolute;z-index:4;top:13px;right:16px;display:flex;gap:7px;pointer-events:none}
-.profile-gem{width:19px;height:19px;display:grid;place-items:center;transform:rotate(45deg);border:1px solid #ffffff9c;border-radius:5px 5px 3px 3px;box-shadow:0 0 9px currentColor,inset 0 0 5px #fff9}
-.profile-gem:after{content:"";width:6px;height:6px;border-radius:50%;background:#fff;opacity:.8}
-.gem-ruby{color:#ff4779;background:linear-gradient(135deg,#ffb0c5,#c90042 55%,#67001e)}
-.gem-sapphire{color:#4fc8ff;background:linear-gradient(135deg,#b6efff,#087bdc 55%,#102d86)}
-.gem-emerald{color:#49f0a5;background:linear-gradient(135deg,#b4ffd9,#08a968 55%,#075438)}
-.gem-amethyst{color:#c28aff;background:linear-gradient(135deg,#efd0ff,#8d36d6 55%,#431078)}
-.gem-diamond{color:#e8f8ff;background:linear-gradient(135deg,#fff,#8bdfff 45%,#7186d9 75%,#fff)}
-.profile-gem-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(100px,1fr));gap:9px}
-.profile-gem-option{display:grid;justify-items:center;gap:6px;min-height:82px;padding:10px 7px;border:1px solid #394866;border-radius:12px;background:#141f34;color:#dce5fa;cursor:pointer}
-.profile-gem-option i{width:28px;height:28px;display:grid;place-items:center;transform:rotate(45deg);border:1px solid #ffffff9c;border-radius:6px;color:white;font-size:17px;font-style:normal;box-shadow:0 0 13px currentColor}
-.profile-gem-option.gem-ruby i{background:linear-gradient(135deg,#ffb0c5,#c90042 65%,#67001e);color:#ff4779}
-.profile-gem-option.gem-sapphire i{background:linear-gradient(135deg,#b6efff,#087bdc 65%,#102d86);color:#4fc8ff}
-.profile-gem-option.gem-emerald i{background:linear-gradient(135deg,#b4ffd9,#08a968 65%,#075438);color:#49f0a5}
-.profile-gem-option.gem-amethyst i{background:linear-gradient(135deg,#efd0ff,#8d36d6 65%,#431078);color:#c28aff}
-.profile-gem-option.gem-diamond i{background:linear-gradient(135deg,#fff,#8bdfff 45%,#7186d9);color:#e8f8ff}
-.profile-gem-option span{font-size:10px;font-weight:800}
-.profile-gem-option small,.profile-gem-count{font-size:8px;color:#a99bd0}
-.profile-gem-option.selected{border-color:#b99aff;background:#282044;box-shadow:0 0 14px #a879ff30}
-.profile-gem-option:disabled{opacity:.45;cursor:not-allowed}
-.profile-gem-count{display:block;margin-top:9px}
-@media(max-width:520px){.profile-card-gems{top:10px;right:12px;gap:5px}.profile-gem{width:15px;height:15px}.profile-gem-choices{grid-template-columns:repeat(2,minmax(0,1fr))}}
+.frame-gem-ornament{position:absolute;z-index:5;top:7px;left:50%;display:flex;align-items:center;gap:5px;transform:translateX(-50%);pointer-events:none}
+.frame-gem-ornament i{display:block;width:9px;height:9px;transform:rotate(45deg);border:1px solid #ffffffb8;border-radius:2px;box-shadow:0 0 9px currentColor,inset 0 0 3px #fff}
+.frame-gem-ornament i:nth-child(2){width:15px;height:15px;border-radius:3px}
+.ornament-violet i{color:#c89bff;background:linear-gradient(135deg,#f2d9ff,#873ce0 55%,#35116d)}
+.ornament-cyan i{color:#72f4ff;background:linear-gradient(135deg,#e0ffff,#13a9d2 55%,#124b91)}
+.ornament-gold i{color:#ffe19a;background:linear-gradient(135deg,#fff4c9,#e6a52e 55%,#805016)}
+.ornament-ruby i{color:#ff9ab8;background:linear-gradient(135deg,#ffd5e2,#dc285d 55%,#710b32)}
+.ornament-chrome i{color:#f1f7ff;background:linear-gradient(135deg,#fff,#91a7ca 50%,#4c5d80)}
+.profile-frame-option i{position:relative}
+.profile-frame-option i:before{content:"";position:absolute;width:7px;height:7px;left:50%;top:-7px;transform:translateX(-50%) rotate(45deg);border:1px solid #fff9;border-radius:2px;background:linear-gradient(135deg,#fff,#8d70d9 55%,#453071);box-shadow:0 0 7px currentColor}
+.profile-frame-option.frame-cyan i:before{background:linear-gradient(135deg,#e0ffff,#13a9d2 55%,#124b91)}
+.profile-frame-option.frame-gold i:before{background:linear-gradient(135deg,#fff4c9,#e6a52e 55%,#805016)}
+.profile-frame-option.frame-ruby i:before{background:linear-gradient(135deg,#ffd5e2,#dc285d 55%,#710b32)}
+.profile-frame-option.frame-chrome i:before{background:linear-gradient(135deg,#fff,#91a7ca 50%,#4c5d80)}
+@media(max-width:520px){.frame-gem-ornament{top:6px;gap:4px}.frame-gem-ornament i{width:7px;height:7px}.frame-gem-ornament i:nth-child(2){width:12px;height:12px}}
