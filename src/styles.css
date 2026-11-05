@@ -858,3 +858,45 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
   animation:chromaticFrameGlow 3s linear infinite!important;
   pointer-events:none;z-index:8
 }
+
+
+/* Ajustes finais das joias das molduras de avatar */
+.player-avatar.frame-violet:after,.profile-avatar-button.frame-violet:after{content:none!important;display:none!important}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:before,
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:after{content:none!important;display:none!important}
+
+/* Corte clássico padronizado para todas as pedras restantes */
+.player-avatar.frame-cyan:after,.profile-avatar-button.frame-cyan:after,
+.player-avatar.frame-gold:after,.profile-avatar-button.frame-gold:after,
+.player-avatar.frame-ruby:after,.profile-avatar-button.frame-ruby:after,
+.player-avatar.frame-chrome:after,.profile-avatar-button.frame-chrome:after{
+ width:15px!important;height:15px!important;top:-10px!important;left:50%!important;right:auto!important;bottom:auto!important;
+ transform:translateX(-50%) rotate(45deg)!important;border-radius:2px!important;
+ clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option:not(.frame-violet):not(.frame-chromatic) i:before{
+ width:13px!important;height:13px!important;top:-11px!important;
+ transform:translateX(-50%) rotate(45deg)!important;border-radius:2px!important;
+ clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important
+}
+
+/* A joia cromática tem formato de coroa */
+.player-avatar.frame-chromatic:after,.profile-avatar-button.frame-chromatic:after{
+ content:""!important;position:absolute!important;left:50%!important;top:-15px!important;right:auto!important;bottom:auto!important;
+ width:25px!important;height:19px!important;transform:translateX(-50%)!important;
+ border:1px solid #fff4c7!important;border-radius:2px 2px 4px 4px!important;
+ background:linear-gradient(180deg,#fff 0%,#fff2a8 13%,#ffcf4d 32%,#ff72cf 52%,#8e6bff 72%,#53eaff 100%)!important;
+ clip-path:polygon(0 18%,20% 48%,28% 0,50% 39%,72% 0,80% 48%,100% 18%,88% 100%,12% 100%)!important;
+ box-shadow:0 0 9px #fff,0 0 17px #ffd66b,0 0 27px #d86bff,0 0 36px #65eaffaa,inset 0 0 5px #fff!important;
+ animation:chromaticFrameGlow 3s linear infinite!important;pointer-events:none;z-index:8
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chromatic i:before{
+ content:""!important;display:block!important;position:absolute!important;left:50%!important;top:-14px!important;
+ width:23px!important;height:17px!important;transform:translateX(-50%)!important;border:1px solid #fff4c7!important;
+ border-radius:2px 2px 4px 4px!important;
+ background:linear-gradient(180deg,#fff 0%,#fff2a8 13%,#ffcf4d 32%,#ff72cf 52%,#8e6bff 72%,#53eaff 100%)!important;
+ clip-path:polygon(0 18%,20% 48%,28% 0,50% 39%,72% 0,80% 48%,100% 18%,88% 100%,12% 100%)!important;
+ box-shadow:0 0 8px #fff,0 0 16px #ffd66b,0 0 23px #d86bff,0 0 30px #65eaffaa!important;
+ z-index:5!important;pointer-events:none!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chromatic i:after{content:none!important;display:none!important}
