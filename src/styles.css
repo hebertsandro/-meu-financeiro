@@ -720,3 +720,60 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
   box-shadow:0 0 8px #65efff,0 0 16px #19b9e488, inset 0 0 3px #fff;
   pointer-events:none;z-index:4
 }
+
+
+/* Pedras exclusivas nas molduras equipadas dos avatares */
+.player-avatar.frame-violet:after,.profile-avatar-button.frame-violet:after{
+  content:""!important;position:absolute;top:-9px;left:50%;right:auto;bottom:auto;
+  width:13px;height:13px;transform:translateX(-50%) rotate(45deg);
+  border:1px solid #f2ddff;border-radius:3px 1px 3px 1px;
+  background:linear-gradient(135deg,#fff2ff 0%,#d8a7ff 25%,#a34cff 58%,#51209a 82%,#260b50);
+  box-shadow:0 0 7px #c18aff,0 0 17px #9d54ff99,inset 0 0 3px #fff;
+  animation:frameGemPulse 2s ease-in-out infinite;pointer-events:none;z-index:5
+}
+.player-avatar.frame-cyan:after,.profile-avatar-button.frame-cyan:after{
+  content:""!important;position:absolute;top:-9px;left:50%;right:auto;bottom:auto;
+  width:14px;height:14px;transform:translateX(-50%) rotate(45deg);
+  border:1px solid #eaffff;border-radius:3px 3px 5px 3px;
+  background:linear-gradient(135deg,#fff 0%,#b8ffff 20%,#55edff 42%,#10a9dc 68%,#064477);
+  box-shadow:0 0 8px #65efff,0 0 18px #19b9e499,inset 0 0 4px #fff;
+  animation:frameGemPulse 1.8s ease-in-out infinite;pointer-events:none;z-index:5
+}
+.player-avatar.frame-gold:after,.profile-avatar-button.frame-gold:after{
+  content:""!important;position:absolute;top:-10px;left:50%;right:auto;bottom:auto;
+  width:16px;height:16px;transform:translateX(-50%) rotate(45deg);
+  border:1px solid #fff1bd;border-radius:2px;
+  background:linear-gradient(135deg,#fffde2 0%,#ffe18a 24%,#f5b52e 55%,#b76a0b 82%,#6e3900);
+  box-shadow:0 0 8px #ffd76b,0 0 19px #e9a82d99,inset 0 0 4px #fff;
+  clip-path:polygon(50% 0,100% 28%,82% 100%,18% 100%,0 28%);
+  animation:frameGemPulse 2.1s ease-in-out infinite;pointer-events:none;z-index:5
+}
+.player-avatar.frame-ruby:after,.profile-avatar-button.frame-ruby:after{
+  content:""!important;position:absolute;top:-9px;left:50%;right:auto;bottom:auto;
+  width:15px;height:18px;transform:translateX(-50%) rotate(0deg);
+  border:1px solid #ffd4e0;border-radius:50% 50% 48% 48%;
+  background:linear-gradient(145deg,#fff0f5 0%,#ff9ab8 22%,#f12c69 52%,#a4083c 78%,#4b0625);
+  box-shadow:0 0 8px #ff5b91,0 0 19px #f02c6988,inset 0 0 4px #fff;
+  clip-path:polygon(50% 0,90% 25%,100% 60%,50% 100%,0 60%,10% 25%);
+  animation:frameGemPulse 1.9s ease-in-out infinite;pointer-events:none;z-index:5
+}
+.player-avatar.frame-chrome:after,.profile-avatar-button.frame-chrome:after{
+  content:""!important;position:absolute;top:-11px;left:50%;right:auto;bottom:auto;
+  width:19px;height:19px;transform:translateX(-50%) rotate(45deg);
+  border:1px solid #fff;border-radius:3px;
+  background:linear-gradient(135deg,#fff 0%,#eaf6ff 16%,#91a9d1 31%,#fff 44%,#60779f 58%,#e9f4ff 73%,#7188b1 88%,#fff);
+  box-shadow:0 0 9px #e8f4ff,0 0 22px #b6d4ffcc,0 0 34px #fff8,inset 0 0 5px #fff;
+  clip-path:polygon(50% 0,88% 18%,100% 50%,82% 88%,50% 100%,12% 82%,0 50%,18% 12%);
+  animation:frameShimmer 2.8s linear infinite;pointer-events:none;z-index:6
+}
+/* Cromática: joia prismática lendária, com brilho multicolorido */
+.player-avatar.frame-chromatic:after,.profile-avatar-button.frame-chromatic:after{
+  content:""!important;position:absolute;top:-12px;left:50%;right:auto;bottom:auto;
+  width:21px;height:21px;transform:translateX(-50%) rotate(45deg);
+  border:1px solid #fff;border-radius:4px;
+  background:linear-gradient(135deg,#fff 0%,#ff8ce8 15%,#a66bff 30%,#63eaff 46%,#9dffb0 60%,#fff08a 74%,#ff82c9 88%,#fff);
+  box-shadow:0 0 9px #fff,0 0 18px #77eaff,0 0 30px #d56bff,0 0 42px #70e9ff99,inset 0 0 6px #fff;
+  clip-path:polygon(50% 0,82% 12%,100% 42%,88% 78%,50% 100%,12% 78%,0 42%,18% 12%);
+  animation:chromaticFrameGlow 3s linear infinite,frameGemPulse 2s ease-in-out infinite;
+  pointer-events:none;z-index:8
+}
