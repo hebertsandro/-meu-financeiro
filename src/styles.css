@@ -901,15 +901,3 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 }
 .profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chromatic i:after{content:none!important;display:none!important}
 
-
-/* Cromática do AVATAR: manter o efeito colorido, sem coroa */
-.player-avatar.frame-chromatic:after,
-.profile-avatar-button.frame-chromatic:after{
-  content:none!important;
-  display:none!important;
-}
-.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chromatic i:before,
-.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chromatic i:after{
-  content:none!important;
-  display:none!important;
-}
