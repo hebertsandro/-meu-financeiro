@@ -710,6 +710,13 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .card-frame-previews .chromatic-frame-preview:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent,#ffffff14,transparent);pointer-events:none}
 
 
-/* Miniaturas: Neon violeta é clean; Cyber ciano recebe sua pedra */
-.card-frame-previews .profile-frame-option.frame-violet i:before{display:none!important;content:none!important}
-.card-frame-previews .profile-frame-option.frame-cyan i:before{display:block!important;content:""!important;position:absolute;left:50%;top:-7px;width:7px;height:7px;transform:translateX(-50%) rotate(45deg);border:1px solid #e8ffff;border-radius:2px;background:linear-gradient(135deg,#f3ffff 5%,#65f4ff 35%,#12a9d2 70%,#124b91)!important;box-shadow:0 0 9px #63efff,0 0 15px #12a9d288}
+
+/* Joia do Cyber Ciano aplicada no avatar equipado (não na Central do Jogador) */
+.player-avatar.frame-cyan:after,
+.profile-avatar-button.frame-cyan:after{
+  content:""!important;position:absolute;left:50%;top:-8px;width:10px;height:10px;
+  transform:translateX(-50%) rotate(45deg);border:1px solid #eaffff;
+  border-radius:2px;background:linear-gradient(135deg,#f4ffff 5%,#7df7ff 32%,#19b9e4 68%,#124b91);
+  box-shadow:0 0 8px #65efff,0 0 16px #19b9e488, inset 0 0 3px #fff;
+  pointer-events:none;z-index:4
+}
