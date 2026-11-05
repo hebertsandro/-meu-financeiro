@@ -938,3 +938,10 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .frame-gem-ornament .gem-ruby{background:linear-gradient(145deg,#fff,#ffd5e2 22%,#ed315f 58%,#78102e)!important}
 .frame-gem-ornament .gem-prism{background:linear-gradient(145deg,#fff,#64eaff 22%,#d58aff 48%,#ffe16b 72%,#fff)!important}
 @keyframes frameGemSparkle{0%,100%{filter:brightness(1);opacity:1}50%{filter:brightness(1.25);opacity:.88}}
+
+/* Reativa a joia violeta na miniatura com o novo corte triangular */
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:before{
+ content:""!important;display:block!important;position:absolute!important;left:50%!important;top:-12px!important;width:11px!important;height:13px!important;
+ transform:translateX(-50%)!important;clip-path:polygon(50% 0,100% 72%,50% 100%,0 72%)!important;border:0!important;border-radius:0!important;
+ background:linear-gradient(145deg,#fff,#edcaff 28%,#9d63e8 68%,#45206e)!important;box-shadow:0 0 8px #bd8aff!important
+}
