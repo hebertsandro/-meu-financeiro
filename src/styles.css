@@ -708,3 +708,8 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .card-frame-previews .chromatic-frame-preview i{border-color:transparent;background:linear-gradient(115deg,#ff5cda,#69e9ff,#b8ff8b,#ffe16a,#ff6ad5)!important;box-shadow:0 0 13px #7beaffaa!important}
 .card-frame-previews .chromatic-frame-preview i:before{display:block!important;content:""!important;position:absolute;left:50%;top:-7px;width:7px;height:7px;transform:translateX(-50%) rotate(45deg);border:1px solid #fff;border-radius:2px;background:linear-gradient(135deg,#fff,#65eaff 30%,#bd76ff 65%,#ffe16a)!important;box-shadow:0 0 8px #b7eaff}
 .card-frame-previews .chromatic-frame-preview:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent,#ffffff14,transparent);pointer-events:none}
+
+
+/* Miniaturas: Neon violeta é clean; Cyber ciano recebe sua pedra */
+.card-frame-previews .profile-frame-option.frame-violet i:before{display:none!important;content:none!important}
+.card-frame-previews .profile-frame-option.frame-cyan i:before{display:block!important;content:""!important;position:absolute;left:50%;top:-7px;width:7px;height:7px;transform:translateX(-50%) rotate(45deg);border:1px solid #e8ffff;border-radius:2px;background:linear-gradient(135deg,#f3ffff 5%,#65f4ff 35%,#12a9d2 70%,#124b91)!important;box-shadow:0 0 9px #63efff,0 0 15px #12a9d288}
