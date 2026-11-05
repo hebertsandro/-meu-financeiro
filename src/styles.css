@@ -597,3 +597,15 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .player-card-frame.frame-gold{border:1px solid #f5cc75!important;box-shadow:0 0 0 2px #f5cc7522,0 0 28px #eab85d40,0 18px 50px #0006!important}
 .player-card-frame.frame-ruby{border:1px solid #ff789e!important;box-shadow:0 0 0 2px #ff789e22,0 0 28px #f04d7b40,0 18px 50px #0006!important}
 .player-card-frame.frame-chrome{border:2px solid transparent!important;background:linear-gradient(135deg,#242c47,#171c36) padding-box,linear-gradient(125deg,#fff,#8c9bbd 13%,#f7fbff 24%,#67748d 37%,#fff 49%,#8999b8 63%,#fff 76%,#59657f 90%,#f9fdff) border-box!important;box-shadow:0 0 14px #d9e6ff90,0 0 38px #b7caff66,0 18px 55px #0008!important}
+
+/* Central de pagamentos: linhas compactas e valores sem sobreposição */
+.modal .pay-item-check{appearance:auto;-webkit-appearance:checkbox;width:18px!important;height:18px!important;min-width:18px;padding:0!important;margin:0;flex:0 0 18px;accent-color:#719bff;border-radius:4px}
+.modal .pay-item-info{display:flex;flex:1 1 auto;flex-direction:column;gap:5px;min-width:0;margin:0;color:#eef3fb;font-size:12px;font-weight:500}
+.modal .pay-item-info b{display:block;overflow-wrap:anywhere;line-height:1.35;font-size:12px}
+.modal .pay-item-info small{display:block;line-height:1.4;font-size:10px;overflow-wrap:anywhere}
+.modal .pay-item-amount{display:flex;flex:0 0 auto;flex-direction:column;align-items:flex-end;gap:4px;white-space:nowrap;font:700 13px Manrope,sans-serif;color:#f3f6ff;line-height:1.25}
+.modal .pay-item-amount small{font:500 9px 'DM Sans',sans-serif;color:#8997ad}
+.pay-bills-list{display:grid;gap:8px}
+.pay-bills-list>label{display:flex!important;align-items:center;gap:12px;padding:12px;margin:0!important;min-width:0}
+.pay-bills-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+@media(max-width:520px){.modal-backdrop{padding:10px}.modal.pay-bills-modal{padding:17px;width:100%;max-height:92vh}.pay-bills-actions{align-items:stretch;flex-direction:column}.pay-bills-actions .primary{width:100%}.pay-bills-actions>.muted{font-size:11px}}
