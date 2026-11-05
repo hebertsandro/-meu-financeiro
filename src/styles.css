@@ -700,3 +700,11 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .gem-equipped-count>b{color:#fff;font-size:14px}
 .gem-equipped-count>strong{margin-left:auto;color:#9feeff;font-size:9px;letter-spacing:.8px;text-shadow:0 0 12px #5bdcff}
 @media(max-width:520px){.gem-mission-grid{grid-template-columns:1fr}.gem-mission-card>p{min-height:0}.frame-gem-ornament{bottom:8px!important;gap:7px}.frame-gem-ornament i{width:10px;height:10px}.frame-gem-ornament i:nth-child(2n){width:13px;height:13px}}
+
+
+/* As miniaturas mostram pedras somente quando a moldura cromática é conquistada */
+.card-frame-previews .profile-frame-option i:before{display:none!important;content:none!important}
+.card-frame-previews .chromatic-frame-preview{position:relative;overflow:hidden;border-color:#8feaff;background:linear-gradient(145deg,#18213b,#211b3c)}
+.card-frame-previews .chromatic-frame-preview i{border-color:transparent;background:linear-gradient(115deg,#ff5cda,#69e9ff,#b8ff8b,#ffe16a,#ff6ad5)!important;box-shadow:0 0 13px #7beaffaa!important}
+.card-frame-previews .chromatic-frame-preview i:before{display:block!important;content:""!important;position:absolute;left:50%;top:-7px;width:7px;height:7px;transform:translateX(-50%) rotate(45deg);border:1px solid #fff;border-radius:2px;background:linear-gradient(135deg,#fff,#65eaff 30%,#bd76ff 65%,#ffe16a)!important;box-shadow:0 0 8px #b7eaff}
+.card-frame-previews .chromatic-frame-preview:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent,#ffffff14,transparent);pointer-events:none}
