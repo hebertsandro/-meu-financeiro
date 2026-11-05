@@ -77,6 +77,7 @@ function App(){
   const [email,setEmail]=useState(''), [password,setPassword]=useState(''), [authError,setAuthError]=useState(''), [authMode,setAuthMode]=useState('login'), [authNotice,setAuthNotice]=useState('');
   const [busy,setBusy]=useState(false);
   const [adminUsers,setAdminUsers]=useState([]),[adminBusy,setAdminBusy]=useState(false),[adminError,setAdminError]=useState(''),[adminMessage,setAdminMessage]=useState(''),[maintenance,setMaintenance]=useState(false),[maintenanceMessage,setMaintenanceMessage]=useState('Estamos realizando uma manutenção. Voltaremos em breve.');
+  const [adminTestMode,setAdminTestMode]=useState(()=>window.localStorage.getItem('mf_admin_test_mode')==='true');
   const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);
   const [assistantOpen,setAssistantOpen]=useState(false);
   const [assistantInput,setAssistantInput]=useState('');
@@ -198,6 +199,41 @@ function App(){
     if(update.error){notify('O histórico foi salvo, mas não foi possível atualizar o cartão.');return}
     await loadData();notify('Limite atualizado e histórico registrado!');await addNotification('Limite do cartão alterado',card.name+': '+brl(card.limit_amount)+' → '+brl(next)+'.','cartoes');
   }
+  function toggleAdminTestMode(){
+    if(!isAdmin)return;
+    const keys=['mf_game_xp','mf_game_correct','mf_quiz_last','mf_flap_daily','mf_flap_best','mf_flap_best_infinite','mf_flap_bird','mf_flap_pipe','mf_flap_story_unlocks','mf_player_profile'];
+    if(!adminTestMode){
+      const backup={};keys.forEach(key=>{backup[key]=window.localStorage.getItem(key)});
+      window.localStorage.setItem('mf_admin_test_backup',JSON.stringify(backup));
+      window.localStorage.setItem('mf_game_xp','10000');
+      window.localStorage.setItem('mf_game_correct','100');
+      window.localStorage.setItem('mf_quiz_last','0');
+      window.localStorage.setItem('mf_flap_daily',JSON.stringify({day:new Date().toLocaleDateString('en-CA'),xp:0}));
+      window.localStorage.setItem('mf_flap_best','100');
+      window.localStorage.setItem('mf_flap_best_infinite','100');
+      window.localStorage.setItem('mf_flap_bird','galaxy');
+      window.localStorage.setItem('mf_flap_pipe','crystal');
+      window.localStorage.setItem('mf_flap_story_unlocks',JSON.stringify({easy:true,normal:true,hard:true}));
+      const profile={...playerProfile,frame:'chrome',cardFrame:'chrome'};
+      window.localStorage.setItem('mf_player_profile',JSON.stringify(profile));
+      window.localStorage.setItem('mf_admin_test_mode','true');
+      setGameXp(10000);setGameCorrect(100);setQuizLastPlayed(0);setDailyGameXp(0);
+      setPlayerProfile(profile);setAdminTestMode(true);
+      notify('Modo de testes ativado! XP, níveis, roupas, canos e molduras liberados.');
+    }else{
+      let backup={};try{backup=JSON.parse(window.localStorage.getItem('mf_admin_test_backup')||'{}')}catch{}
+      keys.forEach(key=>{if(backup[key]===null||backup[key]===undefined)window.localStorage.removeItem(key);else window.localStorage.setItem(key,backup[key])});
+      window.localStorage.removeItem('mf_admin_test_backup');
+      window.localStorage.removeItem('mf_admin_test_mode');
+      setGameXp(Number(backup.mf_game_xp||0));setGameCorrect(Number(backup.mf_game_correct||0));
+      setQuizLastPlayed(Number(backup.mf_quiz_last||0));
+      try{const daily=JSON.parse(backup.mf_flap_daily||'{}');setDailyGameXp(daily.day===new Date().toLocaleDateString('en-CA')?Number(daily.xp||0):0)}catch{setDailyGameXp(0)}
+      try{setPlayerProfile(JSON.parse(backup.mf_player_profile||'{"name":"Meu jogador","avatar":"👾","frame":"violet","cardFrame":"cyan"}'))}catch{}
+      setAdminTestMode(false);
+      notify('Progresso original restaurado.');
+    }
+  }
+
   async function adminAction(action,userId,extra={}){
     if(action==='delete_user'&&!window.confirm('ATENÇÃO: excluir esta conta é definitivo. Os dados vinculados também poderão ser removidos. Deseja continuar?'))return;
     setAdminBusy(true);setAdminError('');setAdminMessage('');
@@ -292,6 +328,7 @@ function App(){
       {page==='admin'&&isAdmin&&<section className="panel admin-panel">
         <div className="panel-head"><div><h3>Administração de contas</h3><p>Área exclusiva do administrador · ações verificadas pela Edge Function</p></div><div className="item-actions"><button className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('get_maintenance')}>Consultar manutenção</button><button className="primary" disabled={adminBusy} onClick={()=>adminAction('list_users')}><RefreshCw size={16}/> Atualizar contas</button></div></div>
         <div className="stat-grid"><Stat icon={Users} label="Contas carregadas" value={String(adminUsers.length)} tone="blue" detail="Lista retornada pelo Supabase Auth"/><Stat icon={ShieldCheck} label="Acesso" value="Protegido" tone="green" detail="Validação também no servidor"/></div>
+        <div className="history-box admin-test-card"><div className="maintenance-heading"><span className="maintenance-symbol"><Gamepad2 size={20}/></span><div><h3>Modo de testes do administrador</h3><p>Libera temporariamente os recursos de jogador neste navegador, sem alterar saldos, contas ou dados financeiros do banco.</p></div><span className={`maintenance-badge ${adminTestMode?'is-on':'is-off'}`}>{adminTestMode?'Ativado':'Desativado'}</span></div><div className="maintenance-footer"><span>{adminTestMode?'XP, níveis, conquistas e itens liberados.':'Ative para testar todas as personalizações e recompensas.'}</span><button className={`primary maintenance-toggle ${adminTestMode?'danger-action':''}`} onClick={toggleAdminTestMode}>{adminTestMode?'Restaurar progresso original':'Desbloquear tudo para testes'}</button></div></div>
         <div className="history-box maintenance-card"><div className="maintenance-heading"><span className="maintenance-symbol"><ShieldCheck size={20}/></span><div><h3>Disponibilidade do site</h3><p>Controle quando o Meu Financeiro ficará acessível aos usuários.</p></div><span className={`maintenance-badge ${maintenance?'is-on':'is-off'}`}>{maintenance?'Em manutenção':'Site liberado'}</span></div><label className="field-label" htmlFor="maintenance-message">Mensagem para os usuários</label><textarea id="maintenance-message" value={maintenanceMessage} maxLength={240} onChange={e=>setMaintenanceMessage(e.target.value)} placeholder="Ex.: Estamos realizando uma manutenção. Voltaremos em breve."/><div className="maintenance-footer"><span>{maintenanceMessage.length}/240 caracteres</span><button className={`primary maintenance-toggle ${maintenance?'danger-action':''}`} disabled={adminBusy} onClick={()=>adminAction('set_maintenance',null,{enabled:!maintenance,message:maintenanceMessage})}>{maintenance?'Desativar manutenção':'Ativar manutenção'}</button></div></div>
         {adminError&&<div className="error">{adminError}</div>}{adminMessage&&<div className="auth-notice">{adminMessage}</div>}
         {!adminUsers.length?<Empty icon={Users} title="Carregue as contas cadastradas" text="Toque em Atualizar contas para consultar os usuários do Supabase."/>:<div className="simple-list">{adminUsers.map(u=><div className="simple-row admin-user-row" key={u.id}><div className="row-icon"><Users size={18}/></div><div className="row-main"><b>{u.email||'Sem e-mail'}</b><span>{u.id} · Criada em {u.created_at?new Date(u.created_at).toLocaleDateString('pt-BR'):'—'}</span><span>{u.banned_until&&new Date(u.banned_until)>new Date()?'Bloqueada':'Ativa'} · Último acesso: {u.last_sign_in_at?new Date(u.last_sign_in_at).toLocaleString('pt-BR'):'Nunca'}</span></div><button className="delete-btn" disabled={adminBusy||u.email?.toLowerCase()===ADMIN_EMAIL} onClick={()=>adminAction(u.banned_until&&new Date(u.banned_until)>new Date()?'unban_user':'ban_user',u.id)}>{u.banned_until&&new Date(u.banned_until)>new Date()?<><UserCheck size={15}/> Desbloquear</>:<><Ban size={15}/> Bloquear</>}</button><button className="delete-btn" disabled={adminBusy||!u.email||u.email.toLowerCase()===ADMIN_EMAIL} onClick={()=>adminAction('reset_password',u.id)}><KeyRound size={15}/> Redefinir senha</button><button className="delete-btn" disabled={adminBusy||!u.email||u.email.toLowerCase()===ADMIN_EMAIL} onClick={()=>adminAction('delete_user',u.id)}><X size={15}/> Excluir conta</button></div>)}</div>}
