@@ -1128,3 +1128,43 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome i:before{
   background:linear-gradient(135deg,#fff 0%,#f1f6ff 25%,#9db7df 58%,#4c5d80 100%)!important
 }
+
+
+/* PREVIA DO AVATAR = JOIA DO AVATAR EQUIPADO
+   Uma unica pedra central, com a mesma lapidacao, proporcao e cores do avatar real. */
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i{
+  position:relative!important;overflow:visible!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i:before{
+  content:""!important;display:block!important;position:absolute!important;
+  left:50%!important;top:-11px!important;right:auto!important;bottom:auto!important;
+  width:16px!important;height:19px!important;
+  transform:translateX(-50%)!important;
+  clip-path:polygon(50% 0,100% 72%,50% 100%,0 72%)!important;
+  border:0!important;border-radius:0!important;
+  animation:frameGemSparkle 2.8s ease-in-out infinite!important;
+  z-index:8!important;pointer-events:none!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i:after{
+  content:none!important;display:none!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:before{
+  background:linear-gradient(145deg,#fff,#edcaff 20%,#b66cff 48%,#7130c9 76%,#351064)!important;
+  box-shadow:0 0 7px #d3a0ff,0 0 17px #9e55ff99!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-cyan i:before{
+  background:linear-gradient(145deg,#fff,#d7ffff 20%,#5ceaff 48%,#168fc8 76%,#073b79)!important;
+  box-shadow:0 0 7px #8cf7ff,0 0 17px #25c9ff99!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-gold i:before{
+  background:linear-gradient(145deg,#fff,#fff4c5 20%,#ffd36b 48%,#d58a20 76%,#70400a)!important;
+  box-shadow:0 0 7px #ffe7a0,0 0 17px #e5a52b99!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-ruby i:before{
+  background:linear-gradient(145deg,#fff,#ffd9e6 20%,#ff709a 48%,#c51e56 76%,#650d31)!important;
+  box-shadow:0 0 7px #ff9ab8,0 0 17px #f0447999!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome i:before{
+  background:linear-gradient(145deg,#fff,#f4f8ff 20%,#b9c9e5 48%,#7186aa 76%,#34415f)!important;
+  box-shadow:0 0 7px #e5efff,0 0 17px #a9c5ff99!important
+}
