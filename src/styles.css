@@ -1092,3 +1092,39 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome i:before{
  background:linear-gradient(135deg,#fff,#e6efff 35%,#91a7ca 70%,#4c5d80)!important
 }
+
+
+/* CORRECAO FINAL: separar as miniaturas do avatar das miniaturas da Central */
+.profile-frame-choices.card-frame-previews .profile-frame-option:not(.chromatic-frame-preview) i:before,
+.profile-frame-choices.card-frame-previews .profile-frame-option:not(.chromatic-frame-preview) i:after{
+  content:none!important;display:none!important;opacity:0!important;box-shadow:none!important
+}
+/* Na Central, somente a prévia cromática mantém o trio especial */
+.profile-frame-choices.card-frame-previews .chromatic-frame-preview i:before{content:""!important;display:block!important}
+
+/* Avatar: pedras em corte de diamante, substituindo os formatos antigos */
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option:not(.frame-violet) i:before{
+  content:""!important;display:block!important;position:absolute!important;
+  left:50%!important;top:-12px!important;width:12px!important;height:12px!important;
+  transform:translateX(-50%)!important;
+  clip-path:polygon(50% 0,100% 50%,50% 100%,0 50%)!important;
+  border:0!important;border-radius:0!important;
+  box-shadow:0 0 9px currentColor,inset 0 0 3px #fff!important;
+  z-index:5!important;pointer-events:none!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:before,
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:after{
+  content:none!important;display:none!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-cyan i:before{
+  background:linear-gradient(135deg,#fff 0%,#c9ffff 25%,#38d9f2 58%,#07527e 100%)!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-gold i:before{
+  background:linear-gradient(135deg,#fff 0%,#fff4bf 25%,#f2bd43 58%,#805016 100%)!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-ruby i:before{
+  background:linear-gradient(135deg,#fff 0%,#ffd1e0 25%,#ec477b 58%,#78102e 100%)!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome i:before{
+  background:linear-gradient(135deg,#fff 0%,#f1f6ff 25%,#9db7df 58%,#4c5d80 100%)!important
+}
