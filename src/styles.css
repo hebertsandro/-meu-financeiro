@@ -777,3 +777,48 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
   animation:chromaticFrameGlow 3s linear infinite,frameGemPulse 2s ease-in-out infinite;
   pointer-events:none;z-index:8
 }
+
+
+/* Pedras refinadas nas miniaturas das molduras DO AVATAR (sem alterar a Central do Jogador) */
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option{overflow:visible}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i{position:relative;isolation:isolate}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i:before{
+  content:""!important;display:block!important;position:absolute;left:50%;top:-11px;
+  width:13px;height:13px;transform:translateX(-50%) rotate(45deg);
+  border:1px solid #fff;border-radius:3px;
+  box-shadow:0 0 9px currentColor,inset 0 0 4px #fff;
+  z-index:3;pointer-events:none
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i:after{
+  content:"";position:absolute;left:50%;top:-9px;width:4px;height:4px;
+  transform:translateX(-50%);border-radius:50%;background:#fff;
+  filter:blur(1px);opacity:.9;z-index:4;pointer-events:none
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:before{
+  color:#c99aff;background:linear-gradient(135deg,#fff 0%,#f0d9ff 18%,#bd75ff 43%,#8436d4 68%,#35105f 100%);
+  clip-path:polygon(50% 0,91% 20%,100% 63%,50% 100%,0 63%,9% 20%);
+  box-shadow:0 0 8px #c99aff,0 0 17px #9b55ed,inset 0 0 4px #fff
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-cyan i:before{
+  color:#78efff;background:linear-gradient(135deg,#fff 0%,#d9ffff 17%,#72f4ff 39%,#10a9d2 67%,#073e79 100%);
+  clip-path:polygon(50% 0,88% 15%,100% 55%,72% 100%,28% 100%,0 55%,12% 15%);
+  box-shadow:0 0 9px #78efff,0 0 18px #16c8ed,inset 0 0 4px #fff
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-gold i:before{
+  color:#ffdc82;background:linear-gradient(135deg,#fff 0%,#fff2bd 18%,#ffd15c 42%,#d78b16 70%,#75400a 100%);
+  clip-path:polygon(18% 0,82% 0,100% 38%,50% 100%,0 38%);
+  box-shadow:0 0 9px #ffd15c,0 0 18px #e8a52d,inset 0 0 4px #fff
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-ruby i:before{
+  color:#ff789e;background:linear-gradient(135deg,#fff 0%,#ffd9e5 17%,#ff719c 39%,#d20d50 68%,#590522 100%);
+  clip-path:polygon(50% 0,88% 22%,100% 58%,50% 100%,0 58%,12% 22%);
+  box-shadow:0 0 9px #ff719c,0 0 18px #e51b5b,inset 0 0 4px #fff
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome i:before{
+  color:#eaf4ff;background:linear-gradient(135deg,#fff 0%,#fff 18%,#9fb8df 34%,#fff 48%,#61799f 66%,#eaf4ff 82%,#536987 100%);
+  clip-path:polygon(50% 0,83% 12%,100% 50%,83% 88%,50% 100%,17% 88%,0 50%,17% 12%);
+  box-shadow:0 0 9px #d9eaff,0 0 20px #9bbce9,inset 0 0 4px #fff
+}
+@media(max-width:520px){
+  .profile-frame-choices:not(.card-frame-previews) .profile-frame-option i:before{width:12px;height:12px;top:-10px}
+}
