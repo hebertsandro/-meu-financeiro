@@ -1223,3 +1223,28 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .profile-frame-choices.card-frame-previews .profile-frame-option:not(.chromatic-frame-preview) i:after{
   content:none!important;display:none!important;
 }
+
+
+/* Miniaturas do seletor: usam o mesmo componente e os mesmos detalhes do avatar equipado */
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option .frame-thumbnail-avatar{
+  width:31px!important;height:31px!important;min-width:31px!important;
+  margin:0 0 2px!important;flex:none!important;transform:none!important;
+  box-sizing:border-box!important;display:grid!important;place-items:center!important;
+  overflow:visible!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option .frame-thumbnail-avatar:before{
+  inset:3px!important;border-radius:inherit!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option .frame-thumbnail-avatar span{
+  position:relative!important;z-index:1!important;font-size:16px!important;line-height:1!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option .frame-thumbnail-avatar:after{
+  width:9px!important;height:9px!important;top:-5px!important;right:-5px!important;
+  border-radius:2px!important;box-shadow:0 0 7px currentColor!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-ruby .frame-thumbnail-avatar:after{
+  top:auto!important;right:auto!important;bottom:-5px!important;left:-5px!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome .frame-thumbnail-avatar:after{
+  top:-5px!important;right:calc(50% - 4px)!important;width:8px!important;height:8px!important;
+}
