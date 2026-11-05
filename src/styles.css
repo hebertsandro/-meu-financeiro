@@ -1263,3 +1263,11 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
   width:9px!important;height:9px!important;
   transform:translateX(-50%) rotate(45deg)!important;
 }
+
+
+/* Rubi: manter a joia centralizada, mas sem inclinação */
+.player-avatar.frame-ruby:after,
+.profile-avatar-button.frame-ruby:after{transform:rotate(0deg)!important}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-ruby .frame-thumbnail-avatar:after{
+  transform:translateX(-50%) rotate(0deg)!important;
+}
