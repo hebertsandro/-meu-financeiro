@@ -1248,3 +1248,18 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome .frame-thumbnail-avatar:after{
   top:-5px!important;right:calc(50% - 4px)!important;width:8px!important;height:8px!important;
 }
+
+
+/* Rubi: joia única, centralizada no topo, igual ao padrão das demais molduras */
+.player-avatar.frame-ruby:after,
+.profile-avatar-button.frame-ruby:after{
+  top:-7px!important;right:calc(50% - 8px)!important;
+  bottom:auto!important;left:auto!important;
+  width:15px!important;height:15px!important;
+  transform:rotate(45deg)!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-ruby .frame-thumbnail-avatar:after{
+  top:-5px!important;left:50%!important;right:auto!important;bottom:auto!important;
+  width:9px!important;height:9px!important;
+  transform:translateX(-50%) rotate(45deg)!important;
+}
