@@ -1168,3 +1168,58 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
   background:linear-gradient(145deg,#fff,#f4f8ff 20%,#b9c9e5 48%,#7186aa 76%,#34415f)!important;
   box-shadow:0 0 7px #e5efff,0 0 17px #a9c5ff99!important
 }
+
+
+/* CORRECAO DEFINITIVA: as miniaturas do seletor de AVATAR replicam
+   exatamente a joia usada no avatar equipado. Central do Jogador fica sem joias. */
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i{
+  position:relative!important;overflow:visible!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i:before{
+  content:""!important;display:block!important;position:absolute!important;
+  top:-11px!important;left:50%!important;right:auto!important;bottom:auto!important;
+  width:13px!important;height:13px!important;transform:translateX(-50%) rotate(45deg)!important;
+  border:1px solid #f2ddff!important;border-radius:3px 1px 3px 1px!important;
+  background:linear-gradient(135deg,#fff2ff 0%,#d8a7ff 25%,#a34cff 58%,#51209a 82%,#260b50)!important;
+  clip-path:none!important;box-shadow:0 0 7px #c18aff,0 0 17px #9d54ff99,inset 0 0 3px #fff!important;
+  animation:frameGemPulse 2s ease-in-out infinite!important;z-index:8!important;pointer-events:none!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-cyan i:before{
+  width:14px!important;height:14px!important;border:1px solid #eaffff!important;
+  border-radius:3px 3px 5px 3px!important;
+  background:linear-gradient(135deg,#fff 0%,#b8ffff 20%,#55edff 42%,#10a9dc 68%,#064477)!important;
+  box-shadow:0 0 8px #65efff,0 0 18px #19b9e499,inset 0 0 4px #fff!important;
+  animation:frameGemPulse 1.8s ease-in-out infinite!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-gold i:before{
+  top:-10px!important;width:16px!important;height:16px!important;border:1px solid #fff1bd!important;
+  border-radius:2px!important;
+  background:linear-gradient(135deg,#fffde2 0%,#ffe18a 24%,#f5b52e 55%,#b76a0b 82%,#6e3900)!important;
+  clip-path:polygon(50% 0,100% 28%,82% 100%,18% 100%,0 28%)!important;
+  box-shadow:0 0 8px #ffd76b,0 0 19px #e9a82d99,inset 0 0 4px #fff!important;
+  animation:frameGemPulse 2.1s ease-in-out infinite!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-ruby i:before{
+  top:-9px!important;width:15px!important;height:18px!important;transform:translateX(-50%)!important;
+  border:1px solid #ffd4e0!important;border-radius:50% 50% 48% 48%!important;
+  background:linear-gradient(145deg,#fff0f5 0%,#ff9ab8 22%,#f12c69 52%,#a4083c 78%,#4b0625)!important;
+  clip-path:polygon(50% 0,90% 25%,100% 60%,50% 100%,0 60%,10% 25%)!important;
+  box-shadow:0 0 8px #ff5b91,0 0 19px #f02c6988,inset 0 0 4px #fff!important;
+  animation:frameGemPulse 1.9s ease-in-out infinite!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome i:before{
+  top:-11px!important;width:19px!important;height:19px!important;border:1px solid #fff!important;
+  border-radius:3px!important;
+  background:linear-gradient(135deg,#fff 0%,#eaf6ff 16%,#91a9d1 31%,#fff 44%,#60779f 58%,#e9f4ff 73%,#7188b1 88%,#fff)!important;
+  clip-path:polygon(50% 0,88% 18%,100% 50%,82% 88%,50% 100%,12% 82%,0 50%,18% 12%)!important;
+  box-shadow:0 0 9px #e8f4ff,0 0 22px #b6d4ffcc,0 0 34px #fff8,inset 0 0 5px #fff!important;
+  animation:frameShimmer 2.8s linear infinite!important;
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i:after{
+  content:none!important;display:none!important;
+}
+/* A prévia da Central do Jogador não recebe as joias das molduras de avatar. */
+.profile-frame-choices.card-frame-previews .profile-frame-option:not(.chromatic-frame-preview) i:before,
+.profile-frame-choices.card-frame-previews .profile-frame-option:not(.chromatic-frame-preview) i:after{
+  content:none!important;display:none!important;
+}
