@@ -1063,3 +1063,32 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 }
 .profile-frame-choices .profile-frame-option.frame-chromatic i:after,
 .profile-frame-choices.card-frame-previews .chromatic-frame-preview i:after{content:none!important;display:none!important}
+
+
+/* AJUSTE EXCLUSIVO DAS MINIATURAS DE MOLDURAS DO AVATAR */
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option i{
+ position:relative!important;overflow:visible!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option:not(.frame-violet) i:before{
+ content:""!important;display:block!important;position:absolute!important;
+ left:50%!important;top:-13px!important;width:10px!important;height:10px!important;
+ transform:translateX(-50%) rotate(45deg)!important;clip-path:none!important;
+ border:1px solid #ffffffdd!important;border-radius:2px!important;
+ box-shadow:0 0 8px currentColor,inset 0 0 3px #fff!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:before,
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-violet i:after{
+ content:none!important;display:none!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-cyan i:before{
+ background:linear-gradient(135deg,#fff,#aafaff 35%,#26b9e8 70%,#07527e)!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-gold i:before{
+ background:linear-gradient(135deg,#fff,#fff0b0 35%,#e9ad3c 70%,#805016)!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-ruby i:before{
+ background:linear-gradient(135deg,#fff,#ffc4d8 35%,#e33c70 70%,#78102e)!important
+}
+.profile-frame-choices:not(.card-frame-previews) .profile-frame-option.frame-chrome i:before{
+ background:linear-gradient(135deg,#fff,#e6efff 35%,#91a7ca 70%,#4c5d80)!important
+}
