@@ -214,7 +214,7 @@ function App(){
       window.localStorage.setItem('mf_flap_bird','galaxy');
       window.localStorage.setItem('mf_flap_pipe','crystal');
       window.localStorage.setItem('mf_flap_story_unlocks',JSON.stringify({easy:true,normal:true,hard:true}));
-      const profile={...playerProfile,frame:'chrome',cardFrame:'chrome'};
+      const profile={...playerProfile,frame:'chrome',cardFrame:'chrome',gems:['sapphire','amethyst','ruby','prism']};
       window.localStorage.setItem('mf_player_profile',JSON.stringify(profile));
       window.localStorage.setItem('mf_admin_test_mode','true');
       setGameXp(10000);setGameCorrect(100);setQuizLastPlayed(0);setDailyGameXp(0);
@@ -263,6 +263,14 @@ function App(){
 
   function sendAssistantMessage(value=assistantInput){const question=value.trim();if(!question)return;const reply=answerFinancialQuestion(question,data);setAssistantMessages(old=>[...old,{role:'user',text:question},{role:'assistant',text:reply}]);setAssistantInput('');}
 
+  const flapBestForGems=Math.max(Number(window.localStorage.getItem('mf_flap_best')||0),Number(window.localStorage.getItem('mf_flap_best_infinite')||0));
+  let flapStoryForGems={};try{flapStoryForGems=JSON.parse(window.localStorage.getItem('mf_flap_story_unlocks')||'{}')}catch{}
+  const gemMissions=[
+    {id:'sapphire',name:'Safira da sabedoria',symbol:'💠',rarity:'common',rarityLabel:'COMUM',description:'Acerte sua primeira pergunta no Quiz.',progress:Math.min(1,gameCorrect),target:1,done:gameCorrect>=1},
+    {id:'amethyst',name:'Ametista estrategista',symbol:'🔮',rarity:'rare',rarityLabel:'RARO',description:'Acumule 10 respostas corretas no Quiz.',progress:Math.min(10,gameCorrect),target:10,done:gameCorrect>=10},
+    {id:'ruby',name:'Rubi do arcade',symbol:'♦️',rarity:'epic',rarityLabel:'ÉPICO',description:'Alcance 30 pontos em uma partida do Flappy.',progress:Math.min(30,flapBestForGems),target:30,done:flapBestForGems>=30},
+    {id:'prism',name:'Prisma lendário',symbol:'🌈',rarity:'legendary',rarityLabel:'LENDÁRIO',description:'Conclua o modo História na dificuldade Difícil.',progress:flapStoryForGems.hard?1:0,target:1,done:!!flapStoryForGems.hard}
+  ];
   const currentMonth=monthStart();
   const currentMonthKey=currentMonth.slice(0,7);
   const income=data.transactions.filter(t=>t.type==='entrada'&&t.date>=currentMonth).reduce((a,t)=>a+Number(t.amount),0);
@@ -396,8 +404,8 @@ function App(){
   <FinanceFlapGame onReward={awardFlapXp}/>
 </section>}
 {page==='profile'&&<section className="opportunities-page gamer-world player-profile-page">
-        <div className={`game-world-hero player-card-frame frame-${playerProfile.cardFrame||"cyan"} ${gameXp>=4500?"level-legendary":gameXp>=2000?"level-elite":gameXp>=1000?"level-avatar":gameXp>=500?"level-neon":""}`}>
-          <div className={`frame-gem-ornament ornament-${playerProfile.cardFrame||"cyan"}`} aria-hidden="true"><i/><i/><i/></div>
+        <div className={`game-world-hero player-card-frame frame-${playerProfile.cardFrame||"cyan"} ${playerProfile.gems?.length===4?"frame-chromatic":""} ${gameXp>=4500?"level-legendary":gameXp>=2000?"level-elite":gameXp>=1000?"level-avatar":gameXp>=500?"level-neon":""}`}>
+          <div className={`frame-gem-ornament ornament-${playerProfile.cardFrame||"cyan"}`} aria-hidden="true">{(playerProfile.gems||[]).map(id=><i key={id} className={`gemstone gem-${id}`}/>)}</div>
           <div className="game-world-top"><span className="world-label"><span className="live-pulse"/> CENTRAL DO JOGADOR</span><span className="season-pill">TEMPORADA 01 · SUA EVOLUÇÃO</span></div>
           <div className="player-identity"><div className={`player-avatar profile-big-avatar frame-${playerProfile.frame}`}><span>{playerProfile.avatar}</span><i><Zap size={12}/></i></div><div className="player-info"><span>{gameXp>=4500?"LENDÁRIO":gameXp>=2000?"ELITE":gameXp>=1000?"VETERANO":gameXp>=500?"EXPLORADOR":"JOGADOR"}</span><h2>{playerProfile.name||"Sua jornada começa aqui"}</h2><div className="player-level-line"><b>NÍVEL {Math.floor(gameXp/500)+1}</b><span>{gameXp%500}/500 XP para o próximo nível</span></div><div className="player-xp-track"><i style={{width:((gameXp%500)/500*100)+'%'}}/></div></div><div className="player-xp-total"><strong>{gameXp}</strong><small>XP TOTAL</small></div></div>
           <div className="world-stats"><div><Flame size={17}/><span><b>{gameCorrect}</b> desafios concluídos</span></div><div><Trophy size={17}/><span><b>{Math.floor(gameXp/500)}</b> níveis conquistados</span></div><div><Coins size={17}/><span><b>R$ 0,00</b> em recompensas reais</span></div></div>
@@ -408,6 +416,7 @@ function App(){
 <div className="profile-choice-group"><b>Avatar <small> · desbloqueie jogando</small></b><div className="profile-avatar-choices">{[{v:'👾',xp:0},{v:'🎮',xp:0},{v:'🦊',xp:100},{v:'🐱',xp:150},{v:'🐼',xp:250},{v:'🐸',xp:350},{v:'🐲',xp:500},{v:'🤖',xp:750},{v:'🦁',xp:1000},{v:'🐯',xp:1250},{v:'🐧',xp:1500},{v:'🐙',xp:2000}].map(a=><button key={a.v} disabled={gameXp<a.xp} title={gameXp<a.xp?'Desbloqueia com '+a.xp+' XP':'Avatar disponível'} className={(playerProfile.avatar===a.v?'selected ':'')+(gameXp<a.xp?'avatar-locked':'')} onClick={()=>setPlayerProfile(p=>({...p,avatar:a.v}))}><span>{gameXp>=a.xp?a.v:'🔒'}</span>{gameXp<a.xp&&<small>{a.xp} XP</small>}</button>)}</div></div>
 <div className="profile-choice-group"><b>Molduras do avatar</b><div className="profile-frame-choices">{[{id:'violet',label:'Neon violeta',unlock:0},{id:'cyan',label:'Cyber ciano',unlock:150},{id:'gold',label:'Elite dourada',unlock:500},{id:'ruby',label:'Rubí arcano',unlock:1000},{id:'chrome',label:'Chrome cósmico',unlock:4500}].map(fr=><button key={fr.id} disabled={gameXp<fr.unlock} className={'profile-frame-option frame-'+fr.id+(playerProfile.frame===fr.id?' selected':'')} onClick={()=>setPlayerProfile(p=>({...p,frame:fr.id}))}><i/><span>{fr.label}</span><small>{gameXp>=fr.unlock?'DESBLOQUEADA':fr.unlock+' XP'}</small></button>)}</div></div>
 <div className="profile-choice-group"><b>Moldura da Central do Jogador</b><p className="muted">Personalize também o cartão grande do seu perfil.</p><div className="profile-frame-choices">{[{id:'violet',label:'Portal violeta',unlock:0},{id:'cyan',label:'Circuito azul',unlock:250},{id:'gold',label:'Coroa dourada',unlock:750},{id:'ruby',label:'Rubí real',unlock:1500},{id:'chrome',label:'Chrome lendário',unlock:4500}].map(fr=><button key={fr.id} disabled={gameXp<fr.unlock} className={'profile-frame-option frame-'+fr.id+(playerProfile.cardFrame===fr.id?' selected':'')} onClick={()=>setPlayerProfile(p=>({...p,cardFrame:fr.id}))}><i/><span>{fr.label}</span><small>{gameXp>=fr.unlock?'DESBLOQUEADA':fr.unlock+' XP'}</small></button>)}</div></div>
+<div className="profile-choice-group gem-missions-group"><b>Missões de joias <small> · conquiste e equipe até 4 pedras</small></b><p className="muted">Cada desafio libera uma joia exclusiva. Quanto maior a dificuldade, mais rara a pedra.</p><div className="gem-mission-grid">{gemMissions.map(m=>{const equipped=(playerProfile.gems||[]).includes(m.id);return <article key={m.id} className={'gem-mission-card rarity-'+m.rarity+(m.done?' completed':'')}><div className="gem-mission-top"><span className={'mission-gem gem-'+m.id}>{m.symbol}</span><span className="gem-rarity">{m.rarityLabel}</span></div><b>{m.name}</b><p>{m.description}</p><div className="gem-mission-progress"><i style={{width:Math.min(100,m.progress/m.target*100)+'%'}}/></div><small>{m.done?'MISSÃO CONCLUÍDA':m.progress+'/'+m.target}</small><button disabled={!m.done||(!equipped&&(playerProfile.gems||[]).length>=4)} className={equipped?'equipped':''} onClick={()=>setPlayerProfile(p=>({...p,gems:equipped?(p.gems||[]).filter(x=>x!==m.id):[...(p.gems||[]),m.id]}))}>{equipped?'Equipado · remover':m.done?'Equipar joia':(playerProfile.gems||[]).length>=4?'4 espaços ocupados':'Bloqueada'}</button></article>})}</div><div className="gem-equipped-count"><span>JOIAS EQUIPADAS</span><b>{(playerProfile.gems||[]).length}/4</b>{(playerProfile.gems||[]).length===4&&<strong>✦ MOLDURA CROMÁTICA ATIVADA ✦</strong>}</div></div>
 </div>
 <div className="gamer-section-heading"><div><span>SEU PROGRESSO</span><h3>Conquistas</h3><p>Medalhas que você desbloqueou ao longo da jornada.</p></div></div>
         <div className="achievement-grid">
