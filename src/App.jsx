@@ -487,32 +487,55 @@ function EntryModal({type,extra,onClose,onSave,busy}){
 
 
 function SpaceNexusGame({onReward}){
- const [running,setRunning]=useState(false),[ended,setEnded]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState(50),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[tick,setTick]=useState(0),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('A galáxia precisa de você!'),[shieldActive,setShieldActive]=useState(false);
- const start=()=>{setScore(0);setLives(3);setShip(50);setShots([]);setFoes([]);setEnemyShots([]);setBoss(null);setWave(1);setTick(0);setShieldActive(false);setEnded(false);setMessage('O esquadrão alienígena está chegando!');setRunning(true)};
- const moveTo=(clientX,arena)=>{const r=arena.getBoundingClientRect();setShip(Math.max(6,Math.min(94,(clientX-r.left)/r.width*100)))};
- const activateShield=()=>{if(running&&!shieldActive){setShieldActive(true);setMessage('🛡️ ESCUDO ATIVADO! O próximo impacto será bloqueado.')}};
- useEffect(()=>{if(!running)return;const id=setInterval(()=>{setTick(t=>{const n=t+1;
-  if(n%5===0)setShots(v=>[...v,{id:Date.now()+Math.random(),x:ship,y:78}]);
-  if(n%13===0)setFoes(v=>[...v,{id:Date.now()+Math.random(),x:12+Math.random()*76,y:4,hp:n%52===0?3:1,type:n%52===0?'brute':n%39===0?'scout':'drone',fire:n%52===0||Math.random()>.48}]);
-  if(n%180===0){setWave(w=>w+1);setMessage('ONDA '+(wave+1)+' — novos invasores detectados!')}
-  setFoes(v=>v.map(f=>({...f,y:f.y+ (f.type==='scout'?1.05:0.65)+(wave*.08)})).filter(f=>f.y<91));
-  setShots(v=>v.map(b=>({...b,y:b.y-4})).filter(b=>b.y>0));
-  setEnemyShots(v=>v.map(b=>({...b,y:b.y+2.2})).filter(b=>b.y<100));
-  if(n%26===0)setFoes(v=>{const target=v.filter(f=>f.fire).slice(-2);if(target.length)setEnemyShots(q=>[...q,...target.map(f=>({id:Math.random(),x:f.x,y:f.y+3,kind:'minion'}))]);return v});
-  if(boss&&n%18===0){const phase=boss.hp<=boss.max*.5?2:1;const spread=boss.style==='spread'?[0,-10,10,-20,20]:boss.style==='cross'?[0,-14,14]:[0,-8,8];setEnemyShots(q=>[...q,...spread.map(dx=>({id:Math.random(),x:Math.max(3,Math.min(97,boss.x+dx)),y:boss.y+8,kind:'boss',phase}))])}
-  if(n%360===0){const bosses=[{name:'DEVORADOR ESTELAR',emoji:'🐲',style:'spread'},{name:'GENERAL VORTEX',emoji:'👾',style:'cross'},{name:'TITÃ NEBULAR',emoji:'🛸',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];setBoss({hp:12+wave*3,max:12+wave*3,x:50,y:8,...chosen});setMessage('⚠ CHEFÃO DETECTADO! Prepare-se para o ataque!')}
-  return n;
- });},85);return()=>clearInterval(id)},[running,ship,wave,boss]);
- useEffect(()=>{if(!running)return;
-  setEnemyShots(v=>{const hit=v.some(b=>Math.abs(b.x-ship)<6&&b.y>76&&b.y<88);if(hit){if(shieldActive){setShieldActive(false);setMessage('🛡️ Escudo absorveu o disparo!')}else{setLives(l=>Math.max(0,l-1));setMessage('A nave foi atingida! Cuidado!')}}return hit?v.filter(b=>!(Math.abs(b.x-ship)<6&&b.y>76&&b.y<88)):v});
-  setFoes(v=>{const hit=v.some(f=>Math.abs(f.x-ship)<7&&f.y>76&&f.y<90);if(hit){if(shieldActive){setShieldActive(false);setMessage('🛡️ Escudo bloqueou a colisão!')}else{setLives(l=>Math.max(0,l-1));setMessage('Colisão! Desvie dos invasores!')}}return hit?v.filter(f=>!(Math.abs(f.x-ship)<7&&f.y>76&&f.y<90)):v});
- },[tick,shieldActive]);
- useEffect(()=>{if(!running)return;const id=setInterval(()=>{setBoss(b=>{if(!b)return b;const hit=shots.filter(s=>Math.abs(s.x-b.x)<18&&s.y<25&&s.y>5).length;if(hit){setShots(v=>v.filter(s=>!(Math.abs(s.x-b.x)<18&&s.y<25&&s.y>5)));const hp=b.hp-hit;if(hp<=0){setScore(v=>v+250);setMessage('CHEFÃO DERROTADO! +250 pontos');return null}if(hp<=b.max*.5&&b.hp>b.max*.5)setMessage('⚠ FASE 2! O chefão ficou mais agressivo!');return {...b,hp}}return {...b,x:Math.max(22,Math.min(78,b.x+(Math.random()-.5)*8))}})},120);return()=>clearInterval(id)},[running,shots]);
- useEffect(()=>{if(lives<=0&&running){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(v=>{const b=Math.max(v,score);localStorage.setItem('mf_space_best',String(b));return b});onReward(Math.floor(score/25))}},[lives,running,score,onReward]);
- const finish=()=>{setRunning(false);setEnded(true);setBest(v=>{const b=Math.max(v,score);localStorage.setItem('mf_space_best',String(b));return b});onReward(Math.floor(score/25))};
+ const [running,setRunning]=useState(false),[ended,setEnded]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState(50),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('A galáxia precisa de você!'),[shieldActive,setShieldActive]=useState(false);
+ const game=React.useRef({tick:0,ship:50,score:0,lives:3,wave:1,shots:[],foes:[],enemyShots:[],boss:null,shield:false});
+ const moveTo=(clientX,arena)=>{const r=arena.getBoundingClientRect();const x=Math.max(5,Math.min(95,(clientX-r.left)/r.width*100));game.current.ship=x;setShip(x)};
+ const start=()=>{game.current={tick:0,ship:50,score:0,lives:3,wave:1,shots:[],foes:[],enemyShots:[],boss:null,shield:false};setScore(0);setLives(3);setShip(50);setShots([]);setFoes([]);setEnemyShots([]);setBoss(null);setWave(1);setShieldActive(false);setEnded(false);setMessage('O esquadrão alienígena está chegando!');setRunning(true)};
+ const activateShield=()=>{if(running&&!game.current.shield){game.current.shield=true;setShieldActive(true);setMessage('ESCUDO ATIVADO! O próximo impacto será bloqueado.')}};
+ useEffect(()=>{
+  if(!running)return;
+  const id=setInterval(()=>{
+   const g=game.current;g.tick++;
+   const n=g.tick;
+   if(n%5===0)g.shots.push({id:n+'p',x:g.ship,y:79});
+   if(n%13===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%52===0?3:1,type:n%52===0?'brute':n%39===0?'scout':'drone',fire:n%52===0||Math.random()>.48});
+   if(n%180===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
+   g.foes.forEach(f=>{f.y+=(f.type==='scout'?1.05:.65)+(g.wave*.08)});
+   g.shots.forEach(b=>{b.y-=4});
+   g.enemyShots.forEach(b=>{b.y+=2.2});
+   if(n%26===0){g.foes.filter(f=>f.fire).slice(-2).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
+   if(g.boss&&n%18===0){const spread=g.boss.style==='spread'?[0,-10,10,-20,20]:g.boss.style==='cross'?[0,-14,14]:[0,-8,8];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}))}
+   if(n%360===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:8,...chosen};setMessage('CHEFÃO DETECTADO! Prepare-se para o ataque!')}
+   if(g.boss){g.boss.x=Math.max(22,Math.min(78,g.boss.x+(Math.random()-.5)*3));}
+   // Colisão tiro da nave x inimigo: só remove o projétil quando realmente acerta.
+   const remainingShots=[];
+   for(const shot of g.shots){
+    let hit=false;
+    for(const foe of g.foes){
+     const hitX=Math.abs(shot.x-foe.x)<(foe.type==='brute'?7:5.5);
+     const hitY=shot.y>=foe.y-4&&shot.y<=foe.y+5;
+     if(hitX&&hitY){foe.hp-=1;hit=true;if(foe.hp<=0){g.score+=foe.type==='brute'?35:foe.type==='scout'?20:10;}break;}
+    }
+    if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){g.boss.hp--;hit=true;if(g.boss.hp<=0){g.score+=250;g.boss=null;setMessage('CHEFÃO DERROTADO! +250 pontos')}else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão ficou mais agressivo!')}
+    if(!hit&&shot.y>0)remainingShots.push(shot);
+   }
+   g.shots=remainingShots;g.foes=g.foes.filter(f=>f.hp>0&&f.y<96);
+   let tookHit=false;
+   const enemyRemaining=[];
+   for(const shot of g.enemyShots){if(Math.abs(shot.x-g.ship)<6&&shot.y>=76&&shot.y<=89){tookHit=true}else if(shot.y<100)enemyRemaining.push(shot)}
+   g.enemyShots=enemyRemaining;
+   const foeRemaining=[];
+   for(const foe of g.foes){if(Math.abs(foe.x-g.ship)<7&&foe.y>=76&&foe.y<=90){tookHit=true}else foeRemaining.push(foe)}
+   g.foes=foeRemaining;
+   if(tookHit){if(g.shield){g.shield=false;setShieldActive(false);setMessage('Escudo absorveu o impacto!')}else{g.lives=Math.max(0,g.lives-1);setMessage('A nave foi atingida! Desvie dos disparos!')}}
+   setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setBoss(g.boss?{...g.boss}:null);
+   if(g.lives<=0){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});onReward(Math.floor(g.score/25))}
+  },60);
+  return()=>clearInterval(id);
+ },[running,onReward]);
  return <section className="space-nexus-card">
-  <div className="space-nexus-hud"><span>🚀 ONDA {wave}</span><b>⭐ {score}</b><span>{'❤️'.repeat(lives)}{'🖤'.repeat(3-lives)}</span></div>
-  <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.currentTarget)}} onPointerMove={e=>{if(!running||e.buttons!==1)return;moveTo(e.clientX,e.currentTarget)}}>
+  <div className="space-nexus-hud"><span>ONDA {wave}</span><b>{score}</b><span>{'❤️'.repeat(lives)}{'🖤'.repeat(3-lives)}</span></div>
+  <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.currentTarget)}} onPointerMove={e=>{if(!running)return;if(e.pointerType==='touch'||(e.buttons&1))moveTo(e.clientX,e.currentTarget)}}>
    <div className="space-stars"/><div className="space-nebula"/>
    {foes.map(f=><div key={f.id} className={'space-enemy '+(f.type==='brute'?'brute':f.type==='scout'?'scout':'')} style={{left:f.x+'%',top:f.y+'%'}}><span className="space-enemy-core"/></div>)}
    {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}
@@ -522,10 +545,9 @@ function SpaceNexusGame({onReward}){
    {!running&&<div className="space-overlay"><div className="space-overlay-icon"><span className="space-overlay-orbit"/></div><h3>{ended?'MISSÃO ENCERRADA':'SPACE NEXUS'}</h3><p>{ended?'Pontuação: '+score+' · Recorde: '+best:message}</p><button className="primary" onClick={start}>{ended?'Jogar novamente':'Iniciar missão'} <ChevronRight size={17}/></button></div>}
   </div>
   <div className="space-nexus-controls"><span>ARRASTE O DEDO NA ARENA PARA PILOTAR</span><button className="space-shield-button" onClick={activateShield} disabled={!running||shieldActive}>ATIVAR ESCUDO</button></div>
-  <div className="space-nexus-footer"><span>🏆 Recorde: {best}</span><span>⚡ Disparo automático</span><span>🛡️ Escudo: {shieldActive?'ativo':'pronto'}</span><span>Chefões com evolução de combate</span></div>
+  <div className="space-nexus-footer"><span>Recorde: {best}</span><span>Disparo automático</span><span>Escudo: {shieldActive?'ativo':'pronto'}</span><span>Chefões com evolução de combate</span></div>
  </section>
 }
-
 function FinanceFlapGame({onReward}){
  const modes=[{id:'easy',name:'Fácil',speed:2,desc:'Para aprender a voar',skin:'explorer',color:'#54d6b0'},{id:'normal',name:'Médio',speed:4,desc:'Um desafio equilibrado',skin:'guardian',color:'#8c83ff'},{id:'hard',name:'Difícil',speed:8,desc:'Só para os mais habilidosos',skin:'legend',color:'#ff8a9e'},{id:'infinite',name:'Infinito',speed:2,desc:'A velocidade aumenta com os pontos',skin:null,color:'#f3cb75'}];
  const birdItems=[{id:'classic',name:'Padrão',icon:'🐤',unlock:0},{id:'hoodie',name:'Moletom',icon:'🧥',unlock:5},{id:'crown',name:'Coroa',icon:'👑',unlock:10},{id:'ninja',name:'Ninja',icon:'🥷',unlock:20},{id:'galaxy',name:'Galáxia',icon:'🌌',unlock:30},{id:'explorer',name:'Explorador',icon:'🧭',story:'easy'},{id:'guardian',name:'Guardião',icon:'🛡️',story:'normal'},{id:'legend',name:'Lendário',icon:'🐉',story:'hard'}];
