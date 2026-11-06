@@ -398,6 +398,8 @@ function App(){
 </section>}
 {page==='games'&&<section className="opportunities-page gamer-world">
   <div className="games-welcome"><div><span>ARCADE · CENTRAL DE JOGOS</span><h2>Escolha seu próximo desafio</h2><p>Jogue, aprenda e acumule XP para evoluir seu perfil.</p></div><div className="games-welcome-xp"><Zap size={20}/><b>{gameXp} XP</b><small>NÍVEL {Math.floor(gameXp/500)+1}</small></div></div>
+  <div className="gamer-section-heading"><div><span>PRIMEIRO LANÇAMENTO · SPACE NEXUS</span><h3>Defenda a galáxia</h3><p>Enfrente esquadrões alienígenas, mini-chefes e chefões que revidam.</p></div><div className="arcade-chip"><Gamepad2 size={14}/> AÇÃO ESPACIAL</div></div>
+  <SpaceNexusGame onReward={awardFlapXp}/>
   <div className="gamer-section-heading"><div><span>QUIZ FINANCEIRO</span><h3>Desafio relâmpago</h3><p>Responda perguntas e aprenda enquanto joga.</p></div><div className="arcade-chip"><Gamepad2 size={14}/> XP por acerto</div></div>
   <section className="arcade-game"><div className="arcade-game-side"><div className="arcade-orb"><Brain size={32}/></div><span>QUIZ FINANCEIRO</span><b>Teste seus conhecimentos</b><small>Uma rodada com perguntas de educação financeira.</small></div><div className="arcade-game-main">{quizActive?<><div className="arcade-progress-head"><span>FASE {gameQuestionIndex+1} / 5</span><span>{gameCorrect} ACERTOS</span></div><h4>{roundQuestions[gameQuestionIndex]?.question}</h4><div className="game-options">{(roundQuestions[gameQuestionIndex]?.options||[]).map((option,index)=><button key={option} className={'game-option '+(gameAnswer===index?(index===roundQuestions[gameQuestionIndex].correct?'correct':'wrong'):'')} disabled={gameAnswer!==null} onClick={()=>answerGame(index)}><span>{String.fromCharCode(65+index)}</span>{option}</button>)}</div>{gameFeedback&&<div className="game-feedback">{gameFeedback}</div>}<button className="primary game-next" disabled={gameAnswer===null} onClick={nextGameQuestion}>{gameQuestionIndex===4?'Concluir rodada':'Próxima pergunta'} <ChevronRight size={17}/></button></>:<div className="quiz-gate"><div className="quiz-gate-icon"><Brain size={30}/></div><h4>{quizAvailable?'Novo desafio disponível!':'Próxima rodada em breve'}</h4><p>5 perguntas para testar seu conhecimento.</p>{quizAvailable?<button className="primary" onClick={startQuiz}>Iniciar desafio <ChevronRight size={17}/></button>:<span className="quiz-countdown">Aguarde para jogar novamente</span>}</div>}</div></section>
   <div className="gamer-section-heading"><div><span>ARCADE EXTRA</span><h3>Flappy Financeiro</h3><p>Toque para manter o mascote no ar e desviar dos obstáculos.</p></div><div className="arcade-chip"><Gamepad2 size={14}/> {dailyGameXp}/100 XP hoje</div></div>
@@ -475,6 +477,45 @@ function EntryModal({type,extra,onClose,onSave,busy}){
  {type==='goalMovement'&&<><p className="muted">Meta: {extra?.goal?.name} · Saldo atual: {brl(extra?.goal?.saved)}</p><label>Valor (R$)<input required type="number" min="0.01" step=".01" value={f.amount} onChange={e=>set('amount',e.target.value)} placeholder="0,00"/></label><label>Observação (opcional)<input value={f.note} onChange={e=>set('note',e.target.value)} placeholder="Ex.: dinheiro separado do salário"/></label></>}
  {type==='goals'&&<><label>Nome da meta<input required value={f.name} onChange={e=>set('name',e.target.value)} placeholder="Ex.: reserva de emergência"/></label><div className="form-row"><label>Quanto quero juntar (R$)<input required type="number" min=".01" step=".01" value={f.target} onChange={e=>set('target',e.target.value)} placeholder="1000,00"/></label><label>Já tenho (R$)<input type="number" min="0" step=".01" value={f.saved} onChange={e=>set('saved',e.target.value)}/></label></div><label>Prazo (opcional)<input type="date" value={f.deadline} onChange={e=>set('deadline',e.target.value)}/></label></>}
  <div className="modal-actions"><button type="button" className="secondary" onClick={onClose}>Cancelar</button><button className="primary" disabled={busy}><Plus size={17}/>{busy?'Salvando…':'Salvar registro'}</button></div></form></div>
+}
+
+
+function SpaceNexusGame({onReward}){
+ const [running,setRunning]=useState(false),[ended,setEnded]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState(50),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[tick,setTick]=useState(0),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('A galáxia precisa de você!');
+ const start=()=>{setScore(0);setLives(3);setShip(50);setShots([]);setFoes([]);setEnemyShots([]);setBoss(null);setWave(1);setTick(0);setEnded(false);setMessage('O esquadrão alienígena está chegando!');setRunning(true)};
+ const move=d=>setShip(v=>Math.max(7,Math.min(93,v+d)));
+ useEffect(()=>{if(!running)return;const id=setInterval(()=>{
+  setTick(t=>{const n=t+1;if(n%5===0)setShots(v=>[...v,{id:Date.now()+Math.random(),x:ship,y:78}]);if(n%13===0)setFoes(v=>[...v,{id:Date.now()+Math.random(),x:12+Math.random()*76,y:4,hp:n%52===0?3:1,type:n%52===0?'brute':'drone',fire:n%52===0?true:Math.random()>.55}]);if(n%180===0){setWave(w=>w+1);setMessage('ONDA '+(wave+1)+' — eles estão ficando mais fortes!')}
+  setFoes(v=>v.map(f=>({...f,y:f.y+0.65+(wave*.08)})).filter(f=>f.y<91));
+  setShots(v=>v.map(b=>({...b,y:b.y-4})).filter(b=>b.y>0));
+  setEnemyShots(v=>v.map(b=>({...b,y:b.y+2.2})).filter(b=>b.y<100));
+  if(n%26===0)setFoes(v=>{const target=v.filter(f=>f.fire).slice(-2);if(target.length)setEnemyShots(q=>[...q,...target.map(f=>({id:Math.random(),x:f.x,y:f.y+3}))]);return v});
+  if(n%360===0)setBoss({hp:12+wave*3,max:12+wave*3,x:50,y:8,name:['DEVORADOR ESTELAR','GENERAL VORTEX','TITÃ NEBULAR'][Math.floor(n/360-1)%3]});
+  if(n%360===0)setMessage('⚠ CHEFÃO DETECTADO! Desvie dos disparos!');
+  return n;
+ });},85);return()=>clearInterval(id)},[running,ship,wave]);
+ useEffect(()=>{if(!running)return;
+  setShots(current=>{let next=current;setFoes(enemies=>{let remaining=[...enemies];next=next.filter(b=>{const i=remaining.findIndex(f=>Math.abs(f.x-b.x)<7&&Math.abs(f.y-b.y)<8);if(i>=0){remaining[i].hp-=1;if(remaining[i].hp<=0)setScore(s=>s+10);return false}return true});return remaining.filter(f=>f.hp>0)});if(boss){next=next.filter(b=>{if(Math.abs(b.x-b.x)<0)return true;return true});}return next});
+  setEnemyShots(v=>{const hit=v.some(b=>Math.abs(b.x-ship)<6&&b.y>76&&b.y<88);if(hit){setLives(l=>Math.max(0,l-1));setMessage('A nave foi atingida! Cuidado!')}return hit?v.filter(b=>!(Math.abs(b.x-ship)<6&&b.y>76&&b.y<88)):v});
+  setFoes(v=>{const hit=v.some(f=>Math.abs(f.x-ship)<7&&f.y>76&&f.y<90);if(hit){setLives(l=>Math.max(0,l-1));setMessage('Colisão! Desvie dos invasores!')}return hit?v.filter(f=>!(Math.abs(f.x-ship)<7&&f.y>76&&f.y<90)):v});
+ },[tick]);
+ useEffect(()=>{if(lives<=0&&running){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(v=>{const b=Math.max(v,score);localStorage.setItem('mf_space_best',String(b));return b})}},[lives,running,score]);
+ useEffect(()=>{if(!running)return;const id=setInterval(()=>{setBoss(b=>{if(!b)return b;const hit=shots.filter(s=>Math.abs(s.x-b.x)<18&&s.y<25&&s.y>5).length;if(hit){setShots(v=>v.filter(s=>!(Math.abs(s.x-b.x)<18&&s.y<25&&s.y>5)));const hp=b.hp-hit;if(hp<=0){setScore(v=>v+250);setMessage('CHEFÃO DERROTADO! +250 pontos');return null}return {...b,hp}}return {...b,x:Math.max(22,Math.min(78,b.x+(Math.random()-.5)*8))}})},120);return()=>clearInterval(id)},[running,shots]);
+ const finish=()=>{setRunning(false);setEnded(true);setBest(v=>{const b=Math.max(v,score);localStorage.setItem('mf_space_best',String(b));return b});onReward(Math.floor(score/25))};
+ return <section className="space-nexus-card">
+  <div className="space-nexus-hud"><span>🚀 ONDA {wave}</span><b>⭐ {score}</b><span>{'❤️'.repeat(lives)}{'🖤'.repeat(3-lives)}</span></div>
+  <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;const r=e.currentTarget.getBoundingClientRect();setShip(Math.max(7,Math.min(93,(e.clientX-r.left)/r.width*100)))}}>
+   <div className="space-stars"/><div className="space-nebula"/>
+   {foes.map(f=><div key={f.id} className={'space-enemy '+(f.type==='brute'?'brute':'') } style={{left:f.x+'%',top:f.y+'%'}}>{f.type==='brute'?'👾':'🛸'}</div>)}
+   {enemyShots.map(b=><i key={b.id} className="space-enemy-shot" style={{left:b.x+'%',top:b.y+'%'}}/>)}
+   {shots.map(b=><i key={b.id} className="space-player-shot" style={{left:b.x+'%',top:b.y+'%'}}/>)}
+   {boss&&<div className="space-boss" style={{left:boss.x+'%',top:boss.y+'%'}}><span>👹</span><b>{boss.name}</b><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
+   <div className="space-player-ship" style={{left:ship+'%'}}>🚀</div>
+   {!running&&<div className="space-overlay"><div className="space-overlay-icon">{ended?'💥':'🌌'}</div><h3>{ended?'MISSÃO ENCERRADA':'SPACE NEXUS'}</h3><p>{ended?'Pontuação: '+score+' · Recorde: '+best:message}</p><button className="primary" onClick={start}>{ended?'Jogar novamente':'Iniciar missão'} <ChevronRight size={17}/></button></div>}
+  </div>
+  <div className="space-nexus-controls"><button onClick={()=>move(-9)} disabled={!running}>◀</button><span>TOQUE NA ARENA OU USE AS SETAS PARA MOVER</span><button onClick={()=>move(9)} disabled={!running}>▶</button></div>
+  <div className="space-nexus-footer"><span>🏆 Recorde: {best}</span><span>⚡ Disparo automático</span><span>👾 Inimigos e chefões</span></div>
+ </section>
 }
 
 function FinanceFlapGame({onReward}){
