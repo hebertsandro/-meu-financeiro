@@ -103,3 +103,15 @@ test('identifica afirmações opostas e pede esclarecimento', () => {
   assert.equal(result.contradictions.length, 1);
   assert.equal(result.requiresClarification, true);
 });
+
+
+test('integra a saudação informal no fluxo completo usado pelo aplicativo', () => {
+  const reply = improveNexusFallback(
+    'Oii nexus tudo bem ?',
+    [{role:'user',content:'Oii nexus tudo bem ?'}],
+    'Quero entender exatamente o que você quis comunicar.'
+  );
+  assert.match(reply, /Tudo bem por aqui/);
+  assert.match(reply, /E você, como está hoje/);
+  assert.doesNotMatch(reply, /base suficiente|dar um exemplo/);
+});
