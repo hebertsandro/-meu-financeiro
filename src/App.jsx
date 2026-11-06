@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase, isConfigured } from './supabase';
+import { improveNexusFallback } from './nexus-cognition';
 import {
   Activity, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined,
   Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock, Bot, Sparkles, Send,
@@ -763,7 +764,10 @@ function App(){
       // atualizações de estado e o indicador desaparecer antes de chegar à tela.
       await new Promise(resolve=>window.setTimeout(resolve,750));
       // Execução inteiramente local no navegador: nenhum texto ou dado financeiro é enviado a uma IA externa.
-      const reply=generateNexusReply(question,financeContext,nextHistory);
+      const legacyReply=generateNexusReply(question,financeContext,nextHistory);
+      // A camada composicional revisa apenas respostas genéricas ou pouco contextualizadas.
+      // Todo o processamento permanece no navegador; nenhum modelo/API externo é chamado.
+      const reply=improveNexusFallback(question,nextHistory,legacyReply);
       setAssistantMessages(old=>[...old,{role:'assistant',text:reply}]);
     }catch(error){
       console.error('NEXUS CORE:',error);
