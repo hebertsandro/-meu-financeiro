@@ -1401,3 +1401,13 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .space-overlay-orbit:after{content:"";position:absolute;right:-5px;top:12px;width:8px;height:8px;border-radius:50%;background:#fff;box-shadow:0 0 12px #78eaff}
 @keyframes shipFlame{from{transform:scaleY(.72);opacity:.7}to{transform:scaleY(1.15);opacity:1}}
 @media(max-width:600px){.space-nexus-arena{touch-action:none}.space-nexus-controls>span{font-size:.58rem}}
+
+
+/* SPACE NEXUS — itens e habilidades coletáveis */
+.space-drop{position:absolute;z-index:4;width:25px;height:25px;display:grid;place-items:center;transform:translate(-50%,-50%);border-radius:8px;border:1px solid #fff9;background:linear-gradient(145deg,#fff,#9eeaff 38%,#2879bd);box-shadow:0 0 10px #63eaff,0 0 22px #45cfff88;animation:dropFloat .55s ease-in-out infinite alternate}
+.space-drop span{font-size:12px;font-weight:1000;color:#102b52;text-shadow:0 1px #fff}
+.space-drop-shield{background:linear-gradient(145deg,#e7ffff,#58e8ff 45%,#1479bb);box-shadow:0 0 12px #62efff,0 0 25px #37cfff99}
+.space-drop-rapid{background:linear-gradient(145deg,#fff5a6,#ffbd38 50%,#d65a16);box-shadow:0 0 12px #ffd15e,0 0 25px #ff9e2f99}
+.space-drop-double{background:linear-gradient(145deg,#f4d7ff,#c16bff 50%,#6b2cc0);box-shadow:0 0 12px #d08aff,0 0 25px #a64cff99}
+.space-drop-repair{background:linear-gradient(145deg,#eaffdf,#79e77a 50%,#218a50);box-shadow:0 0 12px #91ff9c,0 0 25px #4ddd7199}
+@keyframes dropFloat{from{margin-top:-2px}to{margin-top:3px}}
