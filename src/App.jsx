@@ -535,7 +535,7 @@ function SpaceNexusGame({onReward}){
  },[running,onReward]);
  return <section className="space-nexus-card">
   <div className="space-nexus-hud"><span>ONDA {wave}</span><b>{score}</b><span>{'❤️'.repeat(lives)}{'🖤'.repeat(3-lives)}</span></div>
-  <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.clientY,e.currentTarget)}} onPointerMove={e=>{if(!running)return;if(e.pointerType==='touch'||(e.buttons&1))moveTo(e.clientX,e.currentTarget)}}>
+  <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.clientY,e.currentTarget)}} onPointerMove={e=>{if(!running)return;if(e.pointerType==='touch'||(e.buttons&1))moveTo(e.clientX,e.clientY,e.currentTarget)}}>
    <div className="space-stars"/><div className="space-nebula"/>
    {foes.map(f=><div key={f.id} className={'space-enemy '+(f.type==='brute'?'brute':f.type==='scout'?'scout':'')} style={{left:f.x+'%',top:f.y+'%'}}><span className="space-enemy-core"/></div>)}
    {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}
