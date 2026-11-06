@@ -439,8 +439,25 @@ function composeReply(text, frame, references) {
   if (references?.ambiguous) return 'Quero acompanhar a conversa sem confundir as pessoas. Quando você diz “' + clean + '”, está falando de qual delas?';
   if (references?.hasReference && references.likelyTopic) return 'Estou relacionando isso ao assunto de ' + references.likelyTopic + ' que apareceu antes. Para responder sem inventar detalhes, qual parte desse assunto você está retomando?';
   if (topic && intent === 'question') return 'Sua pergunta parece estar relacionada a ' + topic + '. Para responder diretamente, preciso identificar exatamente o ponto que você quer esclarecer. Pode reformular a pergunta em uma frase ou dar um exemplo?';
-  if (topic) return 'Entendi que sua mensagem envolve ' + topic + '. ' + (emotion ? 'Também percebi sinais de ' + (emotion.emotion === 'sadness' ? 'tristeza' : emotion.emotion === 'anxiety' ? 'preocupação' : emotion.emotion === 'anger' ? 'irritação' : emotion.emotion === 'joy' ? 'alegria' : 'dúvida') + ', mas posso estar interpretando errado. ' : '') + 'Você quer uma explicação, uma orientação prática ou está contando o que aconteceu?';
-  return 'Quero entender exatamente o que você quis comunicar. Consigo identificar a estrutura da frase, mas ainda não tenho base suficiente para afirmar o significado sem arriscar uma resposta fora do assunto. Você pode dar um exemplo ou explicar o que espera de mim?';
+  if (topic) {
+    const topicName = topic;
+    const emotionText = emotion
+      ? ({ sadness: 'Parece que isso veio acompanhado de tristeza.', anxiety: 'Parece que isso está trazendo preocupação.', anger: 'Dá para perceber que isso mexeu com você.', joy: 'Dá para perceber sua alegria.', confusion: 'Parece que você está tentando organizar algumas dúvidas.' }[emotion.emotion] || '')
+      : '';
+    if (speechAct === 'personal_disclosure' || speechAct === 'statement') {
+      return 'Entendi. Você está trazendo algo sobre ' + topicName + '. ' + emotionText + ' Me conta um pouco mais do que aconteceu — quero acompanhar seu raciocínio e conversar sobre isso com você.';
+    }
+    return 'Entendi, vamos falar sobre ' + topicName + '. ' + emotionText + ' Vou começar pelo ponto principal e a gente aprofunda conforme a conversa avançar. O que você considera mais importante nessa situação?';
+  }
+  // Resposta aberta: a NEXUS assume uma primeira interpretação plausível em vez de
+  // transferir todo o esforço para a pessoa ou declarar que não entendeu a frase.
+  if (intent === 'question') {
+    return 'Boa pergunta. Vou tentar construir uma resposta com o que já temos, em vez de pedir que você reformule tudo. O que eu consigo inferir até aqui é que você quer entender melhor esse assunto. Me dá só um pouco do contexto e eu sigo com você.';
+  }
+  if (speechAct === 'personal_disclosure' || speechAct === 'statement') {
+    return 'Entendi o que você está compartilhando. Não precisa explicar tudo perfeitamente: podemos organizar as ideias juntos. O que aconteceu depois disso?';
+  }
+  return 'Tô acompanhando. Pode falar do seu jeito, até se a ideia estiver incompleta ou meio confusa. Vou tentar entender pelo contexto e conversar com você; se faltar uma peça importante, pergunto só o necessário.';
 }
 
 // Retorna um quadro semântico que pode ser usado por outras partes do núcleo.
