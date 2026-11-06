@@ -281,6 +281,81 @@ function summarizeLogicalStructure(structure) {
   return null;
 }
 
+// Respostas sociais têm prioridade sobre referências vagas e classificações de tópico.
+function composeConversationalReply(message) {
+  const social = normalizeNexusText(message).replace(/[,.!?]/g, ' ').replace(/\\s+/g, ' ').trim();
+  if (/^(estou|to) bem e voce$/.test(social)) {
+    return 'Que bom saber que você está bem! 😊 Eu não tenho sentimentos como uma pessoa, mas estou funcionando direitinho e pronta para conversar com você. Como está sendo seu dia?';
+  }
+  if (/^(estou|to) (bem|legal|otimo|otima|tranquilo|tranquila|mais ou menos) e voce$/.test(social)) {
+    return 'Obrigado por perguntar! 😊 Eu não tenho um estado emocional como uma pessoa, mas estou aqui e pronta para conversar. Quer me contar mais sobre seu dia?';
+  }
+  if (/^(e voce|como voce esta|tudo bem com voce)$/.test(social)) {
+    return 'Estou funcionando direitinho e pronta para conversar! 😊 E você, como está?';
+  }
+  if (/^(estou|to) bem$/.test(social)) {
+    return 'Que bom! 😊 Como está sendo seu dia?';
+  }
+  return null;
+}
+
+// Organiza relações causais como hipóteses, sem converter relato em prova.
+export function analyzeHypotheses(message, history = []) {
+  const structure = parseLogicalStructure(message);
+  const hypotheses = (structure.causalChains || []).map((edge, index) => ({
+    id: index + 1,
+    cause: structure.clauses[edge.causeClause]?.text || '',
+    effect: structure.clauses[edge.effectClause]?.text || '',
+    status: 'user_reported_hypothesis',
+    certainty: 'unconfirmed'
+  })).filter(item => item.cause && item.effect);
+
+  const statements = [
+    ...structure.clauses.map(clause => clause.text),
+    ...(Array.isArray(history) ? history.filter(turn => turn?.role === 'user').slice(-5).map(turn => normalizeNexusText(turn.content || turn.text || '')) : [])
+  ].filter(Boolean);
+  const polarity = statement => {
+    const normalized = normalizeNexusText(statement);
+    const negated = /\\b(nao|nunca|jamais)\\b/.test(normalized);
+    const core = normalized.replace(/\\b(nao|nunca|jamais)\\b/g, '').replace(/[,.!?]/g, ' ').replace(/\\s+/g, ' ').trim();
+    return { core, negated };
+  };
+  const contradictions = [];
+  for (let i = 0; i < statements.length; i++) {
+    for (let j = i + 1; j < statements.length; j++) {
+      const left = polarity(statements[i]);
+      const right = polarity(statements[j]);
+      if (left.core.length >= 8 && left.core === right.core && left.negated !== right.negated) {
+        if (!contradictions.some(item => item.core === left.core)) {
+          contradictions.push({ core: left.core, statements: [statements[i], statements[j]], status: 'needs_clarification' });
+        }
+      }
+    }
+  }
+  return {
+    hypotheses,
+    contradictions,
+    missingInformation: hypotheses.length
+      ? 'Ainda falta verificar se a causa relatada explica o resultado e se existem outros fatores.'
+      : null,
+    requiresClarification: hypotheses.length > 0 || contradictions.length > 0
+  };
+}
+
+function composeHypothesisReply(result) {
+  if (result.contradictions.length) {
+    const item = result.contradictions[0];
+    return 'Percebi duas afirmações que parecem entrar em conflito: “' + item.statements[0] + '” e “' + item.statements[1] + '”. Pode me ajudar a entender se você está falando de momentos diferentes ou se uma delas precisa ser corrigida?';
+  }
+  if (!result.hypotheses.length) return null;
+  const lines = result.hypotheses.map((item, index) =>
+    (index + 1) + '. Talvez “' + item.cause + '” esteja relacionado a “' + item.effect + '”, como você relatou.'
+  );
+  return 'Vou separar o que foi relatado do que ainda precisamos verificar. Estas são hipóteses, não conclusões comprovadas:\\n' +
+    lines.join('\\n') +
+    '\\n\\nPara avaliar melhor, precisamos conferir se essa relação realmente explica o resultado e se houve outros fatores envolvidos. O que mais aconteceu nesse período?';
+}
+
 function composeReply(text, frame, references) {
   const clean = text.trim();
   const { topic, intent, emotion, speechAct, discourseRelations = [], logicalStructure } = frame;
@@ -349,10 +424,15 @@ export function analyzeNexusMessage(message, history = []) {
 // Só intervém quando a resposta antiga seria o fallback genérico, evitando sobrescrever
 // respostas específicas já existentes (cálculos, finanças e conhecimento curado).
 export function improveNexusFallback(message, history, legacyReply) {
+  // Primeiro resolve a intenção social explícita, antes de tentar inferir tópicos ou referências.
+  const socialReply = composeConversationalReply(message);
+  if (socialReply) return socialReply;
+
   const analysis = analyzeNexusMessage(message, history);
   const generic = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem/i.test(String(legacyReply || ''));
   if (generic || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
-    return analysis.fallbackReply;
+    const hypothesisReply = composeHypothesisReply(analyzeHypotheses(message, history));
+    return hypothesisReply || analysis.fallbackReply;
   }
   return legacyReply;
 }
