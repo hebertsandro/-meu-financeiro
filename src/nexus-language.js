@@ -145,7 +145,7 @@ function getConversationContext(history=[]) {
   const userTurns=turns.filter(turn=>turn?.role==='user');
   const previousUser=userTurns.length>1?historyText(userTurns[userTurns.length-2]):'';
   const lastQuestion=historyText(lastAssistant);
-  const questionType=/como voce esta( hoje)?|como esta se sentindo/.test(fold(lastQuestion))
+  const questionType=/como voce esta( hoje)?|como esta se sentindo|como voce se sente/.test(fold(lastQuestion))
     ? 'wellbeing'
     : /como esta sendo seu dia|como foi seu dia|como esta seu dia/.test(fold(lastQuestion))
       ? 'day'
@@ -198,7 +198,7 @@ export function analyzeLanguage(message, history=[]) {
   const repeatedTerms=[...tokenSet(normalized)].filter(token=>token.length>3&&prior.slice(0,-1).some(turn=>contains(turn,token)));
   const followUp=normalized.split(' ').length<=10&&(references||/^(e|mas|entao|por que|como assim|e agora|e depois|isso|ela|ele|tambem|ai)\b/.test(normalized));
   const answerKind=/^(eu )?(estou |to |tou )?(bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|animado|animada)$/.test(normalized.replace(/m{2,}$/,'m'))?'positive'
-    :/^(eu )?(estou|to|tou )?(mal|ruim|triste|cansado|cansada|ansioso|ansiosa|preocupado|preocupada)$/.test(normalized)?'negative'
+    :/^(eu )?(estou |to |tou )?(mal|ruim|triste|cansado|cansada|ansioso|ansiosa|preocupado|preocupada)$/.test(normalized)?'negative'
     :/^(mais ou menos|assim assim|normal|nada demais|nao sei)$/.test(normalized)?'neutral'
     :/^(sim|nao|claro|com certeza|acho que sim|acho que nao)$/.test(normalized)?'yes_no'
     :null;
@@ -219,7 +219,7 @@ export function getLanguageResponse(message,history=[]) {
   const t=a.normalized;
   const prev=fold(a.previousAssistant);
   const askedDay=/como esta sendo seu dia|como foi seu dia|como esta seu dia/.test(prev);
-  const askedHow=/como voce esta( hoje)?|como esta se sentindo|como voce ta( hoje)?/.test(prev);
+  const askedHow=/como voce esta( hoje)?|como esta se sentindo|como voce se sente|como voce ta( hoje)?/.test(prev);
   // Respostas espontâneas podem vir com "estou", abreviações e letras repetidas
   // ("bemmm", "bemm"). Removemos o prefixo antes de interpretar o estado.
   const answer= t.replace(/^(eu )?(estou|to|tou) /,'').replace(/m{2,}$/,'m');
