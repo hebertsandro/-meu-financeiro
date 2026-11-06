@@ -502,15 +502,17 @@ function SpaceNexusGame({onReward}){
    const g=game.current;g.tick++;
    const n=g.tick;
    if(n%(n<g.rapidUntil?9:19)===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
-   if(n%49===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%195===0?3:1,type:n%156===0?'brute':n%146===0?'scout':'drone',fire:n%65===0||Math.random()>.48});
+   // Limita inimigos simultâneos para reduzir carga de colisão e renderização.
+   if(!g.boss&&n%68===0&&g.foes.length<5)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%195===0?3:1,type:n%156===0?'brute':n%146===0?'scout':'drone',fire:n%65===0||Math.random()>.48});
    if(n%675===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
    g.foes.forEach(f=>{f.y+=((f.type==='scout'?.35:.2167)+(g.wave*.0267))*.8});
    g.shots.forEach(b=>{b.y-=1.0664});
    g.enemyShots.forEach(b=>{b.y+=.58664});g.drops.forEach(d=>{d.y+=.176});
-   if(n%98===0){g.foes.filter(f=>f.fire).slice(-2).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
-   if(g.boss&&n%68===0){const spread=g.boss.style==='spread'?[0,-10,10,-20,20]:g.boss.style==='cross'?[0,-14,14]:[0,-8,8];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}))}
-   if(n%1350===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:8,...chosen};setMessage('CHEFÃO DETECTADO! Prepare-se para o ataque!')}
-   if(g.boss){g.boss.x=Math.max(22,Math.min(78,g.boss.x+(Math.random()-.5)*.8));}
+   // Sem disparos de inimigos comuns durante a batalha de chefão.
+   if(!g.boss&&n%98===0){g.foes.filter(f=>f.fire).slice(-1).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
+   if(g.boss&&n%82===0){const spread=g.boss.style==='spread'?[0,-12,12]:g.boss.style==='cross'?[0,-15,15]:[0,-9,9];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}));if(g.enemyShots.length>18)g.enemyShots=g.enemyShots.slice(-18)}
+   if(n%1350===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.foes=[];g.enemyShots=[];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:9,direction:1,...chosen};setMessage('CHEFÃO DETECTADO! Arena de chefão iniciada!')}
+   if(g.boss){g.boss.x+=g.boss.direction*.34;if(g.boss.x>=77){g.boss.x=77;g.boss.direction=-1}else if(g.boss.x<=23){g.boss.x=23;g.boss.direction=1}}
    // Colisão tiro da nave x inimigo: só remove o projétil quando realmente acerta.
    const remainingShots=[];
    for(const shot of g.shots){
@@ -520,7 +522,7 @@ function SpaceNexusGame({onReward}){
      const hitY=shot.y>=foe.y-4&&shot.y<=foe.y+5;
      if(hitX&&hitY){foe.hp-=1;hit=true;if(foe.hp<=0){g.score+=foe.type==='brute'?35:foe.type==='scout'?20:10;if(Math.random()<.24){const types=['shield','rapid','double','repair'];const type=types[Math.floor(Math.random()*types.length)];g.drops.push({id:'drop-'+n+'-'+foe.id,type,x:foe.x,y:foe.y})}}break;}
     }
-    if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){g.boss.hp--;hit=true;if(g.boss.hp<=0){g.score+=250;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;setMessage('CHEFÃO DERROTADO! +250 pontos — recompensa liberada!')}else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão ficou mais agressivo!')}
+    if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){g.boss.hp--;hit=true;if(g.boss.hp<=0){g.score+=250;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');setMessage('CHEFÃO DERROTADO! +250 pontos — recompensa liberada!')}else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão ficou mais agressivo!')}
     if(!hit&&shot.y>0)remainingShots.push(shot);
    }
    g.shots=remainingShots;g.foes=g.foes.filter(f=>f.hp>0&&f.y<96);
