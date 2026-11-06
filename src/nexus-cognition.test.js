@@ -115,3 +115,27 @@ test('integra a saudação informal no fluxo completo usado pelo aplicativo', ()
   assert.match(reply, /E você, como está hoje/);
   assert.doesNotMatch(reply, /base suficiente|dar um exemplo/);
 });
+
+
+test('fluxo real chamado pelo App responde a "Oii nexus tudo bem ?" como saudação', () => {
+  const reply = improveNexusFallback(
+    'Oii nexus tudo bem ?',
+    [{role:'user',content:'Oii nexus tudo bem ?'}],
+    'Quero entender exatamente o que você quis comunicar.'
+  );
+  assert.match(reply, /Tudo bem por aqui/);
+  assert.match(reply, /E você, como está hoje/);
+  assert.doesNotMatch(reply, /base suficiente|dar um exemplo|explicar o que espera/);
+});
+
+test('fluxo principal reconhece saudação mesmo com pontuação e vocativo', () => {
+  for (const message of ['Oi, Nexus!','Oiii Nexus, tudo bom?','Bom dia, Nexus','E aí Nexus!']) {
+    const reply = improveNexusFallback(message,[{role:'user',content:message}],'fallback genérico');
+    assert.match(reply,/Tudo bem por aqui/);
+  }
+});
+
+test('fluxo principal responde pergunta social curta', () => {
+  const reply = improveNexusFallback('E vc?',[{role:'user',content:'E vc?'}],'fallback genérico');
+  assert.match(reply,/pronta para conversar/);
+});
