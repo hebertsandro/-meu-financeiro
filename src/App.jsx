@@ -600,7 +600,7 @@ function FinanceFlapGame({onReward}){
   const glow=ctx.createRadialGradient(245,82,8,245,82,190);glow.addColorStop(0,'#6256a855');glow.addColorStop(1,'#6256a800');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
   for(let i=0;i<34;i++){const x=(i*47+s.frame*(speed*.09*(i%2?1:.45)))%W,y=(i*73)%H;const twinkle=.55+Math.sin(s.frame*.07+i)*.35;ctx.globalAlpha=twinkle;ctx.fillStyle=i%3===0?'#d6caff':'#9deaff';ctx.beginPath();ctx.arc(x,y,i%5===0?1.8:1,0,Math.PI*2);ctx.fill();if(i%8===0){ctx.strokeStyle='#d6caff';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(x-4,y);ctx.lineTo(x+4,y);ctx.moveTo(x,y-4);ctx.lineTo(x,y+4);ctx.stroke()}}ctx.globalAlpha=1;
   ctx.save();ctx.globalAlpha=.13;ctx.fillStyle='#8e9eff';for(let i=0;i<4;i++){const x=(i*105-s.frame*.25+W*2)%W;ctx.beginPath();ctx.ellipse(x,75+i*87,34,9,0,0,Math.PI*2);ctx.fill()}ctx.restore();
-  // cofres dourados com moldura, rebites e placas ornamentais
+  // cofres dourados com moldura, rebites e placas ornamentais — versão corrigida
   s.obstacles.forEach(o=>{
     const drawVault=(x,y,h,top)=>{
       if(h<=0)return;
