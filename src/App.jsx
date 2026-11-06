@@ -601,35 +601,30 @@ function FinanceFlapGame({onReward}){
   for(let i=0;i<34;i++){const x=(i*47+s.frame*(speed*.09*(i%2?1:.45)))%W,y=(i*73)%H;const twinkle=.55+Math.sin(s.frame*.07+i)*.35;ctx.globalAlpha=twinkle;ctx.fillStyle=i%3===0?'#d6caff':'#9deaff';ctx.beginPath();ctx.arc(x,y,i%5===0?1.8:1,0,Math.PI*2);ctx.fill();if(i%8===0){ctx.strokeStyle='#d6caff';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(x-4,y);ctx.lineTo(x+4,y);ctx.moveTo(x,y-4);ctx.lineTo(x,y+4);ctx.stroke()}}ctx.globalAlpha=1;
   ctx.save();ctx.globalAlpha=.13;ctx.fillStyle='#8e9eff';for(let i=0;i<4;i++){const x=(i*105-s.frame*.25+W*2)%W;ctx.beginPath();ctx.ellipse(x,75+i*87,34,9,0,0,Math.PI*2);ctx.fill()}ctx.restore();
   // cofres dourados com moldura, rebites e placas ornamentais
-  s.obstacles.forEach(o=>{const drawVault=(x,y,h,top)=>{if(h<=0)return;ctx.save();ctx.shadowColor='#f6bf5b55';ctx.shadowBlur=10;const g=ctx.createLinearGradient(x,0,x+48,0);g.addColorStop(0,'#684326');g.addColorStop(.18,'#b87935');g.addColorStop(.38,'#f4cf79');g.addColorStop(.62,'#d99b45');g.addColorStop(.84,'#f6d98c');g.addColorStop(1,'#684326');ctx.fillStyle=g;roundRect(x,y,48,h,7);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#ffe7ad';ctx.lineWidth=1.6;ctx.stroke();ctx.strokeStyle='#8d5b2c';ctx.lineWidth=1;roundRect(x+5,y+5,38,Math.max(0,h-10),4);if(h>12)ctx.stroke();ctx.fillStyle='#8b5b2e';for(let yy=y+13;yy<y+h-7;yy+=30){ctx.beginPath();ctx.arc(x+7,yy,1.7,0,Math.PI*2);ctx.arc(x+41,yy,1.7,0,Math.PI*2);ctx.fill()}if(h>36){ctx.fillStyle='#9b672e';ctx.globalAlpha=.72;for(let yy=y+23;yy<y+h-12;yy+=38){ctx.beginPath();ctx.arc(x+24,yy,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffdf87';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText('
-  // Itens especiais flutuando entre os cofres
-  s.items.forEach(item=>{const bob=Math.sin(item.pulse)*4;ctx.save();ctx.shadowBlur=13;ctx.shadowColor=item.type==='coin'?'#ffd76a':item.type==='shield'?'#62d9ff':'#b69aff';ctx.fillStyle=item.type==='coin'?'#f6c957':item.type==='shield'?'#39bde9':'#9a78ed';ctx.beginPath();ctx.arc(item.x,item.y+bob,10,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff4';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#18213b';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(item.type==='coin'?'+':item.type==='shield'?'S':'↘',item.x,item.y+bob);ctx.restore()});
-  // partículas de vento e rastro cintilante do mascote
-  ctx.save();for(let i=0;i<5;i++){ctx.globalAlpha=.22-i*.03;ctx.fillStyle=i%2?'#a9dfff':'#ff9fc6';ctx.beginPath();ctx.arc(39-i*7,s.pigY+Math.sin(s.frame*.18+i)*5,3-i*.35,0,Math.PI*2);ctx.fill()}ctx.restore();drawPig(s.pigY,s.velocity,s.frame);
-  if(s.shield>0){ctx.save();ctx.strokeStyle='#70ddff';ctx.lineWidth=3;ctx.shadowColor='#58d9ff';ctx.shadowBlur=14;ctx.beginPath();ctx.arc(67,s.pigY,27,0,Math.PI*2);ctx.stroke();ctx.restore()}if(s.slow>0){ctx.save();ctx.fillStyle='#c8b5ff';ctx.font='bold 9px sans-serif';ctx.textAlign='left';roundRect(8,9,91,17,8);ctx.fillStyle='#342d65cc';ctx.fill();ctx.fillStyle='#e3d9ff';ctx.fillText('✦ TEMPO LENTO',14,21);ctx.restore()}
-  // painel flutuante de pontuação com brilho e hierarquia visual
-  ctx.save();ctx.shadowColor='#8b7bff66';ctx.shadowBlur=14;const panel=ctx.createLinearGradient(105,7,215,58);panel.addColorStop(0,'#28396dcc');panel.addColorStop(1,'#171d42dd');ctx.fillStyle=panel;roundRect(112,7,96,48,13);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#c4b8ff66';ctx.lineWidth=1;ctx.stroke();ctx.fillStyle='#fff';ctx.font='bold 23px sans-serif';ctx.textAlign='center';ctx.fillText(String(s.score),160,34);ctx.fillStyle='#d7ceff';ctx.font='bold 8px sans-serif';ctx.fillText('PONTUAÇÃO',160,46);ctx.restore();
-  ctx.save();ctx.fillStyle='#ffffff12';roundRect(9,H-24,W-18,13,7);ctx.fill();ctx.fillStyle='#9fdcff';ctx.globalAlpha=.5;ctx.fillRect(13,H-20,W-26,1);ctx.restore();
-  ctx.fillStyle='#c5b8ff';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText(mode.id==='infinite'?'MODO INFINITO · x'+multiplier.toFixed(1):mode.name.toUpperCase()+' · x'+multiplier,W/2,72);
-  if(mode.id!=='infinite'&&s.score>=100){s.rewarded=true;setBestScore(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best',String(value));return value});onReward(s.score);setStatus('won');return}
-  if(hit){setBestScore(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best',String(value));return value});if(mode.id==='infinite')setInfiniteBest(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best_infinite',String(value));return value});if(!s.rewarded){s.rewarded=true;onReward(s.score)}setStatus('over');return}
-  raf=requestAnimationFrame(loop)};
- raf=requestAnimationFrame(loop);return()=>cancelAnimationFrame(raf)},[status,mode]);
- return <div className="flap-game">
- {status==='choose'?<div className="flap-mode-select"><div className="flap-mode-heading"><b>ESCOLHA SEU MODO</b><span>Supere os obstáculos e leve o Cofrinho Voador até 100 pontos</span></div><div className="flap-mode-grid">{modes.map(item=><button key={item.id} className={'flap-mode-card mode-'+item.id} onClick={()=>{setMode(item);setStatus('ready')}}><span className="flap-mode-icon">{item.id==='infinite'?'∞':item.id==='easy'?'🪽':item.id==='normal'?'⚡':item.id==='medium'?'🎯':'🔥'}</span><strong>{item.name}</strong><small>{item.id==='infinite'?'Recorde: '+infiniteBest+' pontos':'Velocidade: '+item.speed+'x'}</small><em>{item.desc}</em>{item.id!=='infinite'&&<span className="flap-mode-reward">🏆 Complete 100 pontos</span>}</button>)}</div></div>:<>
- <div className="flap-mode-top"><button className="text-button" onClick={backToModes}>← Modos</button><b>{mode?.name} {mode?.id==='infinite'?'∞':'· '+mode?.speed+'x'}</b><span>{mode?.id==='infinite'?'Recorde: '+infiniteBest:'Meta: 100 pontos'}</span></div>
- <div className="flap-game-stage"><canvas ref={canvasRef} width="320" height="420" onPointerDown={flap} aria-label="Asas da Fortuna: toque para fazer o porquinho-cofrinho voar."/>
- {status!=='playing'&&<div className="flap-overlay"><b>{status==='ready'?'Prepare o voo!':status==='won'?'COFRINHO LENDÁRIO! 🏆':'Ops! O porquinho bateu!'}</b><span>{status==='ready'?'Toque para começar e mantenha o porquinho no ar.':status==='won'?'Você alcançou 100 pontos e completou o desafio!':'Pontuação: '+score+' · Toque para tentar novamente.'}</span>{status==='won'?<button className="primary" onClick={backToModes}>Escolher outro modo <ChevronRight size={16}/></button>:<button className="primary" onClick={begin}>{status==='ready'?'Começar voo':'Tentar novamente'} <ChevronRight size={16}/></button>}</div>}
- </div>
- <div className="flap-game-info"><span><Zap size={15}/> 1 ponto por obstáculo · 2 XP por ponto</span><b>{score}{mode?.id==='infinite'?' pontos':' / 100'}</b></div>
- <div className="flap-progress-track"><i style={{width:(mode?.id==='infinite'?Math.min(100,score):Math.min(100,score))+'%'}}/></div>
- <div className="flap-best-score"><Trophy size={14}/> {mode?.id==='infinite'?'Recorde infinito: '+infiniteBest:'Melhor pontuação: '+bestScore}</div>
- </>}
- </div>
-}
-
-function SetupScreen(){return <div className="setup-shell"><div className="setup-card"><div className="brand"><div className="brand-icon"><Wallet size={22}/></div><span>meu<span className="brand-accent">financeiro</span></span></div><div className="setup-symbol"><LockKeyhole size={28}/></div><h1>Vamos conectar seu espaço privado</h1><p>O visual do site está pronto. Para ativar o login e salvar seus dados com segurança, configure seu projeto Supabase e as variáveis de ambiente.</p><ol><li>Crie um projeto no Supabase.</li><li>Execute o arquivo <code>supabase/schema.sql</code> no SQL Editor.</li><li>Copie a URL do projeto e a chave pública (anon/publishable) para um arquivo <code>.env</code>.</li><li>Ative o cadastro por e-mail em Authentication → Sign In / Providers. Assim, as pessoas poderão criar uma conta pela tela inicial.</li><li>Reinicie o site.</li></ol><div className="setup-warning"><ShieldCheck size={18}/><span>Nunca coloque a chave <b>service_role</b> no site. Use apenas a chave pública e mantenha o Row Level Security (RLS) ativo.</span></div></div></div>}
-export default App;,x+24,yy+3);ctx.fillStyle='#9b672e'}ctx.globalAlpha=1}ctx.fillStyle='#ffdf87';roundRect(x-4,top?y+h-14:y,56,14,4);ctx.fill();ctx.strokeStyle='#a87332';ctx.stroke();ctx.fillStyle='#fff0bd';ctx.fillRect(x+5,top?y+h-11:y+3,2,5);ctx.restore()};drawVault(o.x,0,o.gapY-68,true);drawVault(o.x,o.gapY+68,H-o.gapY-68,false)});
+  s.obstacles.forEach(o=>{
+    const drawVault=(x,y,h,top)=>{
+      if(h<=0)return;
+      ctx.save();
+      ctx.shadowColor='#f6bf5b55';ctx.shadowBlur=10;
+      const g=ctx.createLinearGradient(x,0,x+48,0);
+      g.addColorStop(0,'#684326');g.addColorStop(.18,'#b87935');g.addColorStop(.38,'#f4cf79');g.addColorStop(.62,'#d99b45');g.addColorStop(.84,'#f6d98c');g.addColorStop(1,'#684326');
+      ctx.fillStyle=g;roundRect(x,y,48,h,7);ctx.fill();
+      ctx.shadowBlur=0;ctx.strokeStyle='#ffe7ad';ctx.lineWidth=1.6;ctx.stroke();
+      ctx.strokeStyle='#8d5b2c';ctx.lineWidth=1;roundRect(x+5,y+5,38,Math.max(0,h-10),4);if(h>12)ctx.stroke();
+      ctx.fillStyle='#8b5b2e';
+      for(let yy=y+13;yy<y+h-7;yy+=30){ctx.beginPath();ctx.arc(x+7,yy,1.7,0,Math.PI*2);ctx.arc(x+41,yy,1.7,0,Math.PI*2);ctx.fill()}
+      if(h>36){
+        ctx.fillStyle='#9b672e';ctx.globalAlpha=.72;
+        for(let yy=y+23;yy<y+h-12;yy+=38){ctx.beginPath();ctx.arc(x+24,yy,7,0,Math.PI*2);ctx.fill()}
+        ctx.globalAlpha=1;ctx.fillStyle='#ffdf87';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText('✦',x+24,Math.min(y+h-8,y+27));
+      }
+      ctx.fillStyle='#ffdf87';roundRect(x-4,top?y+h-14:y,56,14,4);ctx.fill();
+      ctx.strokeStyle='#a87332';ctx.stroke();ctx.fillStyle='#fff0bd';ctx.fillRect(x+5,top?y+h-11:y+3,2,5);
+      ctx.restore();
+    };
+    drawVault(o.x,0,o.gapY-68,true);
+    drawVault(o.x,o.gapY+68,H-o.gapY-68,false);
+  });
   // Itens especiais flutuando entre os cofres
   s.items.forEach(item=>{const bob=Math.sin(item.pulse)*4;ctx.save();ctx.shadowBlur=13;ctx.shadowColor=item.type==='coin'?'#ffd76a':item.type==='shield'?'#62d9ff':'#b69aff';ctx.fillStyle=item.type==='coin'?'#f6c957':item.type==='shield'?'#39bde9':'#9a78ed';ctx.beginPath();ctx.arc(item.x,item.y+bob,10,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;ctx.strokeStyle='#fff4';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#18213b';ctx.font='bold 11px sans-serif';ctx.textAlign='center';ctx.textBaseline='middle';ctx.fillText(item.type==='coin'?'+':item.type==='shield'?'S':'↘',item.x,item.y+bob);ctx.restore()});
   // rastro de brilho do porquinho
