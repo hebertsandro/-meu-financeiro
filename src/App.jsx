@@ -150,7 +150,7 @@ function generateNexusReply(question, finance={}, history=[]) {
       const expression = () => { let v=term(); while(tokens[index]==='+'||tokens[index]==='-'){const op=tokens[index++],n=term();v=op==='+'?v+n:v-n;} return v; };
       try {
         const answer=expression();
-        if(index===tokens.length&&Number.isFinite(answer)) return 'Vamos calcular! 😊\n\n**'+expr+' = '+Number(answer.toFixed(8)).toLocaleString('pt-BR')+'**\n\nQuer que eu mostre o passo a passo?';
+        if(index===tokens.length&&Number.isFinite(answer)) return 'Vamos calcular! 😊\n\n'+expr+' = '+Number(answer.toFixed(8)).toLocaleString('pt-BR')+'\n\nSe quiser, posso mostrar o passo a passo.';
       } catch {}
     }
   }
@@ -247,6 +247,19 @@ function generateNexusReply(question, finance={}, history=[]) {
   // É um sistema determinístico: amplia a cobertura e a qualidade das perguntas, mas não
   // aprende sozinho nem substitui a capacidade generativa de um modelo de linguagem.
   const containsAny = (list) => list.some(term => has(term));
+  // Continuação contextual: quando a pessoa pede o passo a passo do cálculo anterior.
+  if (containsAny(['mostre passo a passo','mostra passo a passo','passo a passo','como chegou nesse resultado','como fez essa conta'])) {
+    const previousMath = String(lastUser || '').match(/(?:quanto\\s+(?:e|é)\\s+|calcule\\s+|resolva\\s+)?([\\d.]+)\\s*([+*/-])\\s*([\\d.]+)/i);
+    if (previousMath) {
+      const a=Number(previousMath[1].replace(/\\./g,'')), b=Number(previousMath[3].replace(/\\./g,''));
+      const op=previousMath[2];
+      const result=op==='+'?a+b:op==='-'?a-b:op==='*'?a*b:b!==0?a/b:NaN;
+      if (Number.isFinite(result)) {
+        const names={'+':'somamos','-':'subtraímos','*':'multiplicamos','/':'dividimos'};
+        return 'Claro! Vamos por partes. 😊\\n\\n1. Primeiro, identificamos os números: '+a.toLocaleString('pt-BR')+' e '+b.toLocaleString('pt-BR')+'.\\n2. A operação é '+(op==='+'?'adição':op==='-'?'subtração':op==='*'?'multiplicação':'divisão')+'.\\n3. Então, '+names[op]+' os valores.\\n\\nResultado: '+result.toLocaleString('pt-BR')+'.';
+      }
+    }
+  }
   const asksForAdvice = containsAny(['o que eu faço','o que devo fazer','me aconselha','preciso de um conselho','qual atitude','como devo agir','como lidar']);
   const asksForExplanation = containsAny(['me explica','explique','por que isso','como isso funciona','qual a diferenca','o que significa','nao entendi','não entendi']);
   const asksForPlan = containsAny(['me ajuda a planejar','monta um plano','por onde começo','por onde comeco','quero melhorar','quero mudar','como posso começar','passo a passo']);
