@@ -187,8 +187,21 @@ export function parseLogicalStructure(text) {
   const addClause = raw => {
     const value = raw.replace(/^[,;.\s]+|[,;.\s]+$/g, '').trim();
     if (!value) return null;
+    const canonical = normalizeNexusText(value);
+    const duplicate = clauses.find(clause => normalizeNexusText(clause.text) === canonical);
+    if (duplicate) return duplicate.index;
     const index = clauses.length;
-    clauses.push({ index, text: value, negated: /\b(nao|nunca|jamais|nem)\b/.test(value), question: /[?]$/.test(value) });
+    const demonstrative = /\b(esse|essa|esses|essas|aquele|aquela|aquilo)\b/.test(value);
+    const ignored = new Set(['essa','esse','esses','essas','aquele','aquela','aquilo','isso','esta','este','para','porque','quando','muito','muita','mesmo','minha','minhas','meu','meus','voce','tirei','ficou','ficaram','estava','estavam','consegui','conseguia','fiquei','ficou']);
+    const terms = tokenize(canonical).filter(word => word.length >= 4 && !ignored.has(word));
+    let referenceTo = null;
+    if (demonstrative) {
+      for (let i = clauses.length - 1; i >= 0; i--) {
+        const earlierTerms = new Set(tokenize(normalizeNexusText(clauses[i].text)).filter(word => word.length >= 4 && !ignored.has(word)));
+        if (terms.some(word => earlierTerms.has(word))) { referenceTo = clauses[i].referenceTo ?? clauses[i].index; break; }
+      }
+    }
+    clauses.push({ index, text: value, negated: /\b(nao|nunca|jamais|nem)\b/.test(value), question: /[?]$/.test(value), referenceTo });
     return index;
   };
   for (const marker of selected) {
@@ -217,7 +230,8 @@ export function parseLogicalStructure(text) {
     const afterIndex = addClause(source.slice(cursor, clauseEnd));
     if (previous !== null && afterIndex !== null) {
       let fromClause = previous, toClause = afterIndex, direction = 'left_to_right';
-      if (marker.type === 'cause') { fromClause = afterIndex; toClause = previous; direction = 'cause_to_effect'; }
+      toClause = clauses[toClause]?.referenceTo ?? toClause;
+      if (marker.type === 'cause') { fromClause = clauses[afterIndex]?.referenceTo ?? afterIndex; toClause = clauses[previous]?.referenceTo ?? previous; direction = 'cause_to_effect'; }
       if (marker.type === 'consequence') direction = 'cause_to_effect';
       if (marker.type === 'condition') direction = 'condition_to_result';
       relations.push({ type: marker.type, connector: marker.connector, fromClause, toClause, direction });
