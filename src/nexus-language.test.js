@@ -100,9 +100,9 @@ test('identifica possíveis indiretas sem inventar destinatário', () => {
 
 test('detecta mudança de assunto e libera o motor especializado', () => {
   const history = [{role:'user',content:'Minha namorada está distante'}];
-  const result = analyzeLanguage('Como funciona a fotossíntese?', history);
+  const result = analyzeLanguage('Como organizo meu orçamento?', history);
   assert.equal(result.changedTopic, true);
-  assert.equal(getLanguageResponse('Como funciona a fotossíntese?', history), null);
+  assert.equal(getLanguageResponse('Como organizo meu orçamento?', history), null);
 });
 
 test('reconhece vocabulário de relacionamento sem concluir o que a outra pessoa sente', () => {
