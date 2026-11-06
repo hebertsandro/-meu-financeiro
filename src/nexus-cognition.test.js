@@ -57,8 +57,11 @@ test('reconstrói várias relações causais numa mensagem com várias frases', 
   const message = 'Minha mãe ficou brava porque tirei uma nota baixa. Eu tirei essa nota porque não consegui estudar. Não consegui estudar porque estava trabalhando.';
   const result = parseLogicalStructure(message);
   assert.equal(result.causalChains.length, 3);
-  assert.equal(result.clauses.length, 6);
+  assert.equal(result.clauses.length, 5);
   assert.ok(result.causalChains.every(edge => edge.causeClause !== edge.effectClause));
+  assert.equal(result.clauses[2].referenceTo, 1);
+  assert.ok(result.causalChains.some(edge => edge.causeClause === 3 && edge.effectClause === 1));
+  assert.ok(result.causalChains.some(edge => edge.causeClause === 4 && edge.effectClause === 3));
 });
 
 test('a resposta reconhece uma cadeia sem afirmar que a causa está comprovada', () => {
