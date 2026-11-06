@@ -52,7 +52,41 @@ function generateNexusReply(question, finance={}, history=[]) {
   const normalize = value => String(value || '').toLocaleLowerCase('pt-BR')
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}\s?.,!]/gu,' ')
     .replace(/\s+/g,' ').trim();
-  const q = normalize(raw);
+  // Tradutor de linguagem informal: expande abreviações comuns antes da interpretação.
+  // Mantém a mensagem original em "raw" para exibição; só a versão interna é normalizada.
+  const expandInformal = value => {
+    const dictionary = {
+      'vc':'voce','vcs':'voces','cê':'voce','ce':'voce',' vcs':' voces',
+      'pq':'porque','pqq':'porque','porq':'porque','pk':'porque',
+      'q':'que','oq':'o que','oql':'o que','qq':'que que',
+      'tb':'tambem','tbm':'tambem','tmb':'tambem','tamb':'tambem',
+      'nn':'nao','n':'nao','naum':'nao','num':'nao',
+      'hj':'hoje','hje':'hoje','hr':'hora','hrs':'horas',
+      'dps':'depois','dp':'depois','agr':'agora','ag':'agora',
+      'cmg':'comigo','ctg':'contigo','c/':'com','p/':'para',
+      ' obg ':' obrigado ','obgd':'obrigado','obgda':'obrigada','vlw':'valeu',
+      'blz':'beleza','bjs':'beijos','bj':'beijo','flw':'falou',
+      'msg':'mensagem','msgs':'mensagens','qnd':'quando','qd':'quando',
+      'qto':'quanto','qta':'quanta','qts':'quantos','qtas':'quantas',
+      'msm':'mesmo','msm':'mesma','mt':'muito','mto':'muito','mta':'muita','mtooo':'muito',
+      'td':'tudo','tds':'todos','pprt':' papo reto ','sdds':'saudades',
+      'fds':'fim de semana','mds':'meu deus','slk':'cê é louco',
+      'pqpp':'caramba','pfv':'por favor','pf':'por favor',
+      'nd':'nada','ngm':'ninguem','nmg':'ninguem','alguem':'alguem',
+      'tb':'tambem','eh':'e','ehh':'e'
+    };
+    return String(value || '').toLocaleLowerCase('pt-BR')
+      .replace(/(^|[^\\p{L}\\p{N}])([\\p{L}\\p{N}]+)(?=$|[^\\p{L}\\p{N}])/gu,
+        (full,before,word) => before + (dictionary[word] || word))
+      .replace(/\\b(to|tô|tou)\\b/giu,'estou')
+      .replace(/\\b(ta|tá)\\b/giu,'esta')
+      .replace(/\\b(pro|pra)\\b/giu,'para')
+      .replace(/\\b(p vcs|pra vcs)\\b/giu,'para voces')
+      .replace(/\\b(nao|n)\\s+([aeiou])\\b/giu,'nao $2')
+      .replace(/([!?])\\1{1,}/g,'$1')
+      .replace(/\\s+/g,' ').trim();
+  };
+  const q = normalize(expandInformal(raw));
   const words = q.split(/\s+/).filter(Boolean);
   const has = (...terms) => terms.some(term => q.includes(normalize(term)));
   const match = regex => regex.test(q);
