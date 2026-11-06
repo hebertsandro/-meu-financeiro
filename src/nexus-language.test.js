@@ -273,3 +273,28 @@ test('responde pergunta social simples sem exigir histórico', () => {
   const reply = getLanguageResponse('Tudo bem?', []);
   assert.match(reply, /Estou aqui|Tudo bem por aqui/);
 });
+
+
+test('saudação é reconhecida antes de qualquer fallback', () => {
+  const reply = getLanguageResponse('Oii nexus tudo bem ?', []);
+  assert.equal(reply, 'Oii! 😊 Tudo bem por aqui, obrigada por perguntar! E você, como está hoje?');
+});
+
+test('reconhece saudações com pontuação, vocativo e variações', () => {
+  for (const message of ['Oi, Nexus!','Oiii Nexus, tudo bom?','E aí Nexus!','Bom dia, Nexus','Hey Nexus, tudo certo?']) {
+    assert.match(getLanguageResponse(message, []), /Tudo bem por aqui/);
+  }
+});
+
+test('saudação não vira pedido de esclarecimento por falta de contexto', () => {
+  const reply = getLanguageResponse('Oi nexus tudo bem ?', [
+    {role:'assistant',content:'Olá! Pode falar naturalmente.'}
+  ]);
+  assert.doesNotMatch(reply, /base suficiente|dar um exemplo|explicar o que espera/);
+});
+
+test('perguntas sociais curtas recebem respostas sociais diretas', () => {
+  for (const message of ['Tudo bem?','Tudo bom?','E vc?','Como vai você?']) {
+    assert.match(getLanguageResponse(message, []), /Estou aqui|pronta para conversar/);
+  }
+});
