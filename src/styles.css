@@ -1294,3 +1294,35 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .topbar .profile-avatar-button.frame-chromatic>span:after{
   width:7px!important;height:9px!important;top:-4px!important;
 }
+
+
+/* SPACE NEXUS — arcade espacial */
+.space-nexus-card{background:linear-gradient(145deg,#101a35,#0a1022 70%);border:1px solid #5368a455;border-radius:22px;padding:16px;margin-bottom:26px;box-shadow:0 18px 55px #02061766;overflow:hidden}
+.space-nexus-hud,.space-nexus-footer{display:flex;align-items:center;justify-content:space-between;gap:10px;color:#c8d7ff;font-size:.78rem;font-weight:800;letter-spacing:.05em;padding:4px 2px 13px}
+.space-nexus-hud b{font-size:1.05rem;color:#fff}
+.space-nexus-arena{height:430px;max-height:65vh;min-height:340px;position:relative;overflow:hidden;border-radius:17px;border:1px solid #6d83df66;background:radial-gradient(ellipse at 50% 80%,#263c72 0%,#111a3d 38%,#070d20 100%);touch-action:pan-y;cursor:crosshair}
+.space-stars{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 15% 20%,#fff 50%,transparent 70%),radial-gradient(1px 1px at 70% 15%,#b7d8ff 50%,transparent 70%),radial-gradient(2px 2px at 82% 58%,#fff 50%,transparent 70%),radial-gradient(1px 1px at 35% 75%,#a5b8ff 50%,transparent 70%),radial-gradient(1px 1px at 55% 42%,#fff 50%,transparent 70%);background-size:190px 170px;opacity:.8;animation:spaceDrift 18s linear infinite}
+.space-nebula{position:absolute;width:55%;height:50%;left:20%;top:25%;background:radial-gradient(ellipse,#7548d633,transparent 68%);filter:blur(18px);pointer-events:none}
+.space-player-ship{position:absolute;bottom:8%;transform:translateX(-50%);font-size:38px;filter:drop-shadow(0 0 12px #68eaff);z-index:4;transition:left .08s linear}
+.space-enemy{position:absolute;transform:translate(-50%,-50%);font-size:25px;filter:drop-shadow(0 0 9px #f46cff);z-index:3}
+.space-enemy.brute{font-size:36px;filter:drop-shadow(0 0 13px #ff667f)}
+.space-player-shot,.space-enemy-shot{position:absolute;width:4px;height:15px;border-radius:8px;transform:translateX(-50%);z-index:2}
+.space-player-shot{background:#7df7ff;box-shadow:0 0 10px 3px #42dfff}
+.space-enemy-shot{background:#ff668c;box-shadow:0 0 10px 3px #ff3f75}
+.space-boss{position:absolute;transform:translateX(-50%);z-index:5;display:flex;flex-direction:column;align-items:center;gap:3px;color:#ffe3ec;text-align:center;font-size:.58rem;font-weight:900;white-space:nowrap;text-shadow:0 2px 8px #000}
+.space-boss span{font-size:54px;filter:drop-shadow(0 0 15px #ff547b);animation:bossPulse .8s ease-in-out infinite alternate}
+.space-boss i{display:block;width:130px;height:7px;background:#471b35;border:1px solid #ff9ab5;border-radius:10px;overflow:hidden}
+.space-boss em{display:block;height:100%;background:linear-gradient(90deg,#ff456d,#ffc06a)}
+.space-overlay{position:absolute;inset:0;z-index:8;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;padding:24px;background:#060b1dcc;backdrop-filter:blur(5px);color:white}
+.space-overlay-icon{font-size:48px;filter:drop-shadow(0 0 15px #70dfff)}
+.space-overlay h3{font-size:1.55rem;letter-spacing:.12em;margin:8px 0;color:#d9e8ff}
+.space-overlay p{font-size:.9rem;color:#b9c8e8;max-width:320px;margin:0 0 18px}
+.space-overlay .primary{display:flex;align-items:center;gap:8px}
+.space-nexus-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:13px 2px}
+.space-nexus-controls button{width:54px;height:44px;border:1px solid #7189dc88;border-radius:13px;background:#25345d;color:white;font-size:1.2rem;font-weight:900}
+.space-nexus-controls button:disabled{opacity:.4}
+.space-nexus-controls span{font-size:.61rem;color:#9baed6;text-align:center;font-weight:800;letter-spacing:.06em}
+.space-nexus-footer{padding:7px 2px 0;color:#91a8d9;font-size:.66rem;flex-wrap:wrap}
+@keyframes spaceDrift{from{background-position:0 0}to{background-position:190px 340px}}
+@keyframes bossPulse{from{transform:scale(.96)}to{transform:scale(1.06)}}
+@media(max-width:600px){.space-nexus-card{padding:10px;border-radius:17px}.space-nexus-arena{height:390px;min-height:330px}.space-nexus-footer{font-size:.59rem}.space-nexus-controls span{font-size:.52rem}}
