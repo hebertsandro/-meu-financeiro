@@ -284,7 +284,7 @@ function summarizeLogicalStructure(structure) {
 
 // Respostas sociais têm prioridade sobre referências vagas e classificações de tópico.
 function composeConversationalReply(message) {
-  const languageReply = getLanguageResponse(message);
+  const languageReply = getLanguageResponse(message, history);
   if (languageReply) return languageReply;
   const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' ')).replace(/\s+/g, ' ').trim();
   if (/^(estou|to) bem e voce$/.test(social)) {
