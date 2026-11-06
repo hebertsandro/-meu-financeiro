@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { NEXUS_LEXICON, normalizeLanguageText, analyzeLanguage, getLanguageResponse, buildConversationMemory, analyzeSituation } from './nexus-language.js';
+import { NEXUS_LEXICON, normalizeLanguageText, analyzeLanguage, getLanguageResponse, buildConversationMemory, analyzeSituation, analyzeContextualReasoning } from './nexus-language.js';
 
 test('normaliza abreviações comuns sem alterar a mensagem original', () => {
   assert.equal(normalizeLanguageText('vc tá bem hj?'), 'voce esta bem hoje');
@@ -222,3 +222,37 @@ test('não inventa pessoa nem acontecimento quando não foram mencionados', () =
 test('registra correções explícitas na situação', () => { const s=analyzeSituation([{role:'user',content:'Minha amiga mudou de escola'},{role:'user',content:'Na verdade, me confundi'}]); assert.equal(s.corrections.length,1); assert.equal(s.corrections[0].status,'user_correction'); });
 
 test('responde a correção sem insistir no dado anterior', () => { const h=[{role:'user',content:'Minha amiga mudou de escola'},{role:'assistant',content:'Entendi.'}]; const r=getLanguageResponse('Na verdade, me confundi',h); assert.match(r,/corrigir/); assert.match(r,/versão correta/); });
+
+
+test('analisa pergunta causal usando evidências relatadas sem afirmar certeza', () => {
+  const history = [
+    { role:'user', content:'Minha namorada está distante' },
+    { role:'user', content:'Ela quase não conversa comigo' },
+    { role:'user', content:'Isso começou depois que ela mudou de escola' }
+  ];
+  const reasoning = analyzeContextualReasoning('Por que ela está assim?', history);
+  assert.equal(reasoning.reasoningType, 'cause');
+  assert.ok(reasoning.possibleExplanations.some(item => item.includes('mudança de rotina')));
+  assert.equal(reasoning.avoidCertainty, true);
+});
+
+test('gera orientação cuidadosa quando a pessoa pergunta o que fazer', () => {
+  const history = [
+    { role:'user', content:'Minha namorada está distante' },
+    { role:'user', content:'Ela quase não conversa comigo' }
+  ];
+  const reply = getLanguageResponse('O que eu faço?', history);
+  assert.match(reply, /conversar com calma/);
+  assert.match(reply, /sem acusar/);
+});
+
+test('não inventa causa quando não existem evidências suficientes', () => {
+  const reasoning = analyzeContextualReasoning('Por que isso aconteceu?', []);
+  assert.equal(reasoning.avoidCertainty, true);
+  assert.ok(reasoning.unknowns.length > 0);
+});
+
+test('diferencia previsão de explicação causal', () => {
+  const reasoning = analyzeContextualReasoning('Será que vai dar certo?', []);
+  assert.equal(reasoning.reasoningType, 'prediction');
+});
