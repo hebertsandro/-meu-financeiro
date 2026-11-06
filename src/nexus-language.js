@@ -305,7 +305,7 @@ function composeCorrectionReply(message, situation) {
   if(previous){
     return 'Entendi, obrigado por corrigir. Vou atualizar minha interpretação e considerar o que você acabou de esclarecer, em vez de continuar usando a informação anterior. Só para confirmar: a versão correta é “' + String(message).trim().replace(/[.!?]+$/,'') + '”, certo?';
   }
-  return 'Entendi que você está corrigindo uma informação anterior. Vou dar prioridade ao que acabou de esclarecer. Qual é a versão correta que devo considerar?';
+  return 'Entendi que você está corrigindo uma informação anterior. Vou corrigir minha interpretação e dar prioridade ao que acabou de esclarecer. Qual é a versão correta que devo considerar?';
 }
 
 // Motor de raciocínio contextual: separa pergunta, evidências, lacunas e próximos passos.
@@ -379,7 +379,7 @@ export function analyzeLanguage(message, history=[]) {
   const previousTopic=previousTopics[0]?.topic||context.activeTopic;
   const changedTopic=Boolean(currentTopic&&previousTopic&&currentTopic!==previousTopic&&currentTopics[0].score>=1);
   const acts=ACTS.filter(([,re])=>re.test(normalized)).map(([act])=>act);
-  const laughter=/\b(kkkk+|kakaka+|hahaha+|haha+|rsrs+)\b/.test(normalized);
+  const laughter=/\b(kkk+|kakak+|hahaha+|haha+|rsrs+)\b/.test(normalized);
   const ambiguousPhrases=[];
   for(const item of ['faz o que quiser','tanto faz','ta bom entao','deixa pra la','esquece','imagina','beleza']){
     if(contains(normalized,item)) ambiguousPhrases.push({phrase:item,needsContext:true});
@@ -437,7 +437,7 @@ export function getLanguageResponse(message,history=[]) {
   // no fallback genérico nem ser confundida com uma pergunta sem contexto.
   const directGreeting=/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( nexus)?( tudo bem| tudo bom| tudo certo| como voce esta| como esta| como vai)?$/.test(t);
   const directSocialQuestion=/^(e voce|e contigo|e com voce|como voce esta|tudo bem com voce|tudo bem|tudo bom|como vai voce)$/.test(t);
-  if(directGreeting) return 'Oii! 😊 Tudo bem por aqui, obrigada por perguntar! E você, como está hoje?';
+  if(directGreeting) return 'Oii! 😊 Tudo bem por aqui, obrigada por perguntar! Como você está hoje? E me conta: o que gostaria de conversar?';
   if(directSocialQuestion) return 'Estou aqui, funcionando e pronta para conversar com você! 😊 E como está sendo seu dia?';
   if(askedDay){
     if(/^(esta sendo bom|esta bom|esta otimo|esta legal|foi bom|foi legal)$/.test(t)) return 'Que bom saber disso! 😊 O que aconteceu de bom hoje?';
