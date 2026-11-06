@@ -59,7 +59,7 @@ export const NEXUS_LEXICON = [
     ['rsrs','risada escrita'],['emoji','sinal expressivo digital'],['story','publicação temporária'],
     ['direct','mensagem privada em rede social'],['status','publicação ou estado'],['print','captura de tela'],
     ['trend','tendência digital'],['viralizar','espalhar-se amplamente'],['cancelar','reprovar publicamente'],
-    ['ranço','antipatia'],['sdds','saudades'],['mds','surpresa ou ênfase'],['pprt','sinceridade']
+    ['ranço','antipatia'],['sdds','saudades'],['mds','surpresa ou ênfase'],['pprt','sinceridade'],['parabens','reconhecimento positivo'],['ansied','abreviação informal de ansiedade']
   ].map(([canonical, meaning])=>({canonical,variants:[],meanings:[meaning],acts:[],tone:'contextual',ambiguity:'medium'}))
 ];
 
@@ -79,7 +79,7 @@ const TOPIC_TERMS = {
   lazer:['musica','filme','serie','anime','livro','jogo','futebol']
 };
 const ACTS = [
-  ['greeting',/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( tudo bem| tudo bom| como voce esta)?$/],
+  ['greeting',/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( tudo bem| tudo bom| como voce esta| como esta)?$/],
   ['reciprocal_question',/^(e voce|e contigo|e com voce|como voce esta|tudo bem com voce)$/],
   ['gratitude',/^(obrigado|obrigada|valeu|muito obrigado|agradeco)( demais)?$/],
   ['apology',/^(desculpa|foi mal|perdao|me perdoa)$/],
