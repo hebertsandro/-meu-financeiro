@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { NEXUS_LEXICON, normalizeLanguageText, analyzeLanguage, getLanguageResponse, buildConversationMemory } from './nexus-language.js';
+import { NEXUS_LEXICON, normalizeLanguageText, analyzeLanguage, getLanguageResponse, buildConversationMemory, analyzeSituation } from './nexus-language.js';
 
 test('normaliza abreviações comuns sem alterar a mensagem original', () => {
   assert.equal(normalizeLanguageText('vc tá bem hj?'), 'voce esta bem hoje');
@@ -217,3 +217,8 @@ test('não inventa pessoa nem acontecimento quando não foram mencionados', () =
   assert.deepEqual(memory.people, []);
   assert.deepEqual(memory.events, []);
 });
+
+
+test('registra correções explícitas na situação', () => { const s=analyzeSituation([{role:'user',content:'Minha amiga mudou de escola'},{role:'user',content:'Na verdade, me confundi'}]); assert.equal(s.corrections.length,1); assert.equal(s.corrections[0].status,'user_correction'); });
+
+test('responde a correção sem insistir no dado anterior', () => { const h=[{role:'user',content:'Minha amiga mudou de escola'},{role:'assistant',content:'Entendi.'}]; const r=getLanguageResponse('Na verdade, me confundi',h); assert.match(r,/corrigir/); assert.match(r,/versão correta/); });
