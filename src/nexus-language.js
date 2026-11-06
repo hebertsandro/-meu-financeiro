@@ -18,7 +18,7 @@ const VARIANTS = {
   nada:['nd'], demais:['dms'], saudades:['sdds'], mensagem:['msg','msgs'],
   meu deus:['mds'], papo reto:['pprt'], sei la:['sla'], relaxa:['rlx'],
   tamo junto:['tmj'], pode crer:['pdc'], demorou:['dmr'], brincadeira:['brinks'],
-  zoeira:['zuera'], parceiro:['parça'], fim de semana:['fds']
+  zoeira:['zuera'], parceiro:['parça'], fim de semana:['fds'], parabens:['parabens'], ansiedade:['ansied']
 };
 const VARIANT_MAP = new Map(Object.entries(VARIANTS).flatMap(([canonical, variants]) =>
   variants.map(variant => [fold(variant), canonical])
