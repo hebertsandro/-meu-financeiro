@@ -427,6 +427,12 @@ export function getLanguageResponse(message,history=[]) {
   const a=analyzeLanguage(message,history);
   const t=a.normalized;
   const prev=fold(a.previousAssistant);
+  // Um cumprimento no início não deve esconder um pedido ou pergunta que vem depois.
+  // A camada social só assume a mensagem quando o restante também é uma saudação.
+  const greetingPrefix=/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)(?: nexus)?\\s*/;
+  const greetingRemainder=t.replace(greetingPrefix,'').trim();
+  const onlySocialGreeting=!greetingRemainder || /^(tudo bem|tudo bom|tudo certo|como voce esta|como esta|como vai)$/.test(greetingRemainder);
+  if(greetingPrefix.test(t) && !onlySocialGreeting) return null;
   const askedDay=/como esta sendo seu dia|como foi seu dia|como esta seu dia/.test(prev);
   const askedHow=/como voce esta( hoje)?|como esta se sentindo|como voce se sente|como voce ta( hoje)?/.test(prev);
   // Respostas espontâneas podem vir com "estou", abreviações e letras repetidas
