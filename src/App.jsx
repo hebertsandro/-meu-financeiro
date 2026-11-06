@@ -312,24 +312,35 @@ function App(){
     const question=String(value||'').trim();
     if(!question||assistantBusy)return;
     const previous=assistantMessages.filter(m=>m.role==='user'||m.role==='assistant').slice(-10);
+    const nextHistory=[...previous.map(m=>({role:m.role,content:m.text})),{role:'user',content:question}];
     setAssistantMessages(old=>[...old,{role:'user',text:question}]);
     setAssistantInput('');
     setAssistantBusy(true);
     setAssistantError('');
     try{
-      // O núcleo local interpreta a intenção e calcula respostas usando os dados já carregados no Meu Financeiro.
-      await new Promise(resolve=>window.setTimeout(resolve,650));
-      const reply=generateNexusReply(question,{
+      const supabaseUrl=import.meta.env.VITE_SUPABASE_URL;
+      const anonKey=import.meta.env.VITE_SUPABASE_ANON_KEY;
+      const accessToken=session?.access_token;
+      if(!supabaseUrl||!anonKey||!accessToken) throw new Error('Entre na sua conta para conversar com a NEXUS.');
+      const financeContext={
         transactions:(data.transactions||[]).map(t=>({date:t.date,type:t.type,category:t.category,description:t.description,amount:t.amount})),
         cards:(data.cards||[]).map(c=>({name:c.name,limit:c.limit_amount,used:c.used,dueDay:c.due_day})),
         debts:(data.debts||[]).map(d=>({title:d.title,amount:d.amount,dueDate:d.due_date,status:d.status})),
         goals:(data.goals||[]).map(g=>({name:g.name,target:g.target,saved:g.saved,deadline:g.deadline})),
         installments:(data.installments||[]).map(i=>({description:i.description,amount:i.total_amount,count:i.installment_count,paid:i.paid_count}))
-      },previous);
-      setAssistantMessages(old=>[...old,{role:'assistant',text:reply}]);
+      };
+      const response=await fetch('/api/nexus',{
+        method:'POST',
+        headers:{'Content-Type':'application/json'},
+        body:JSON.stringify({messages:nextHistory,supabaseUrl,anonKey,accessToken,financeContext})
+      });
+      const result=await response.json().catch(()=>({}));
+      if(!response.ok) throw new Error(result.error||'A NEXUS não conseguiu responder agora.');
+      if(typeof result.reply!=='string'||!result.reply.trim()) throw new Error('O modelo não retornou uma resposta válida.');
+      setAssistantMessages(old=>[...old,{role:'assistant',text:result.reply.trim()}]);
     }catch(error){
-      console.error('NEXUS local:',error);
-      setAssistantError('Tive um pequeno problema ao analisar sua mensagem. Pode tentar novamente?');
+      console.error('NEXUS AI:',error);
+      setAssistantError(error.message||'Não foi possível conectar ao núcleo inteligente da NEXUS. Tente novamente.');
     }finally{setAssistantBusy(false);}
   }
 
