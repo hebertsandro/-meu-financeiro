@@ -17,6 +17,9 @@ const INFORMAL = {
   msm: 'mesmo', mt: 'muito', mto: 'muito', mta: 'muita', td: 'tudo',
   tds: 'todos', ngm: 'ninguem', ninguem: 'ninguem', obg: 'obrigado',
   vlw: 'valeu', blz: 'beleza', pfv: 'por favor', pf: 'por favor',
+  qria: 'queria', queria: 'queria', to: 'estou', ta: 'esta', tava: 'estava',
+  vcs: 'voces', ctz: 'certeza', pq: 'porque', pprt: 'papo reto', nd: 'nada',
+  cm: 'com', tb: 'tambem', dms: 'demais', tipo: 'tipo', vdd: 'verdade',
   sdds: 'saudades', mds: 'meu deus', msg: 'mensagem', fds: 'fim de semana',
   ta: 'esta', to: 'estou', tou: 'estou', num: 'nao'
 };
@@ -25,7 +28,6 @@ export function normalizeNexusText(value = '') {
   return fold(value).split(' ').map((word, index) => {
     if (word === 'pra') return 'para';
     if (word === 'pro') return 'para o';
-    if (word === 'ta' || word === 'tá') return 'esta';
     return INFORMAL[word] || word;
   }).join(' ').replace(/\s+/g, ' ').trim();
 }
@@ -62,7 +64,49 @@ const INTENTS = [
 ];
 
 const tokenize = text => text.match(/[\p{L}\p{N}]+/gu) || [];
-const countHits = (text, terms) => terms.reduce((n, term) => n + (text.includes(term) ? 1 : 0), 0);
+const hasTerm = (text, term) => new RegExp('(^|\\\\s)' + term.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\const countHits = (text, terms) => terms.reduce((n, term) => n + (text.includes(term) ? 1 : 0), 0);') + '(?=\\\\s|$)', 'i').test(text);
+const countHits = (text, terms) => terms.reduce((n, term) => n + (hasTerm(text, term) ? 1 : 0), 0);
+
+const EMOTION_LEXICON = {
+  sadness: ['triste','chateado','chateada','deprimido','deprimida','vazio','vazia','chorar','saudade','perdi'],
+  anxiety: ['ansioso','ansiosa','ansiedade','medo','nervoso','nervosa','preocupado','preocupada','apreensivo'],
+  anger: ['raiva','irritado','irritada','odio','revoltado','revoltada','furioso','furiosa'],
+  joy: ['feliz','animado','animada','empolgado','empolgada','contente','amei','adorei'],
+  confusion: ['confuso','confusa','perdido','perdida','nao entendi','sem entender','duvida'],
+  shame: ['vergonha','culpa','envergonhado','envergonhada','me sinto mal']
+};
+const DISCOURSE_MARKERS = {
+  contrast: ['mas','porem','contudo','so que','entretanto'],
+  cause: ['porque','pois','ja que','por causa','devido'],
+  consequence: ['entao','portanto','por isso','assim','logo'],
+  condition: ['se','caso','desde que'],
+  addition: ['tambem','alem disso','e ainda'],
+  time: ['antes','depois','ontem','hoje','amanha','agora','recentemente']
+};
+const SYNONYMS = {
+  'namorada': ['parceira','minha garota'], 'namorado': ['parceiro','meu garoto'],
+  'triste': ['pra baixo','na pior','desanimado'], 'dinheiro': ['grana','dindin'],
+  'trabalho': ['trampo','servico'], 'amigo': ['parceiro','colega'],
+  'estudar': ['revisar','aprender','estou estudando'], 'medo': ['receio','temor'],
+  'briga': ['discussao','desentendimento','conflito']
+};
+function detectEmotion(text) {
+  return Object.entries(EMOTION_LEXICON)
+    .map(([emotion, terms]) => ({ emotion, score: countHits(text, terms) }))
+    .filter(item => item.score > 0).sort((a,b) => b.score-a.score)[0] || null;
+}
+function detectRelations(text) {
+  return Object.entries(DISCOURSE_MARKERS)
+    .filter(([, terms]) => terms.some(term => text.includes(term)))
+    .map(([relation]) => relation);
+}
+function inferSpeechAct(text, intent) {
+  if (intent !== 'statement') return intent;
+  if (/\\b(preciso|queria|quero|pode me|me ajuda|me ajude)\\b/.test(text)) return 'request';
+  if (/\\b(aconteceu|aconteceu comigo|hoje eu|ontem eu|eu sinto|estou sentindo)\\b/.test(text)) return 'personal_disclosure';
+  if (/\\b(nao sei|não sei|to perdido|estou perdido|estou confuso)\\b/.test(text)) return 'uncertainty';
+  return 'statement';
+}
 
 function extractEntities(text) {
   const entities = [];
@@ -84,7 +128,13 @@ function classify(text) {
   const intent = INTENTS.find(([, regex]) => regex.test(text))?.[0] || (text.includes('?') ? 'question' : 'statement');
   const topic = scores[0]?.score > 0 ? scores[0].topic : null;
   const confidence = Math.min(0.98, (scores[0]?.score || 0) * 0.22 + (intent !== 'statement' ? 0.24 : 0.08));
-  return { topic, intent, confidence, topicScores: scores.filter(x => x.score), entities: extractEntities(text) };
+  return {
+    topic, intent, confidence, topicScores: scores.filter(x => x.score),
+    entities: extractEntities(text), emotion: detectEmotion(text),
+    discourseRelations: detectRelations(text), speechAct: inferSpeechAct(text, intent),
+    isNegated: /\\b(nao|nunca|jamais|nem)\\b/.test(text),
+    isFollowUp: /^(e|mas|entao|ta|ok|certo|por que|como assim|e se|e depois|e agora|isso|ela|ele)\\b/.test(text)
+  };
 }
 
 function resolveReferences(text, history) {
@@ -101,7 +151,8 @@ function resolveReferences(text, history) {
     hasReference: true,
     likelyPerson: people.at(-1)?.value || null,
     likelyTopic: topics[0]?.topic || null,
-    ambiguous: people.length > 1 && people.at(-1).value !== people.at(-2)?.value
+    ambiguous: people.length > 1 && people.at(-1).value !== people.at(-2)?.value,
+    previousUserMessage: previousUser.at(-1) || null
   };
 }
 
@@ -137,12 +188,18 @@ export function analyzeNexusMessage(message, history = []) {
     tokens: tokenize(normalized),
     entities: frame.entities,
     topic: frame.topic,
+    emotion: frame.emotion,
+    discourseRelations: frame.discourseRelations,
+    speechAct: frame.speechAct,
+    isFollowUp: frame.isFollowUp,
+    isNegated: frame.isNegated,
     intent: frame.intent,
     confidence: frame.confidence,
     references,
     negated: frame.entities.some(entity => entity.type === 'negation'),
     isQuestion: /\?/.test(String(message || '')) || ['definition','explanation','procedure','comparison','question'].includes(frame.intent),
     hasUnseenVocabulary: tokenize(normalized).some(word => word.length > 5 && !TOPICS.some(([,terms]) => terms.includes(word))),
+    semanticSignals: Object.entries(SYNONYMS).filter(([,synonyms]) => synonyms.some(s => normalized.includes(fold(s)))).map(([concept]) => concept),
     fallbackReply: composeReply(normalized, frame, references)
   };
 }
@@ -152,7 +209,7 @@ export function analyzeNexusMessage(message, history = []) {
 // respostas específicas já existentes (cálculos, finanças e conhecimento curado).
 export function improveNexusFallback(message, history, legacyReply) {
   const analysis = analyzeNexusMessage(message, history);
-  const generic = /quero entender direito|estou aqui para conversar|pode falar do seu dia|quer uma explicacao|quer uma explicação/i.test(String(legacyReply || ''));
+  const generic = /quero entender direito|estou aqui para conversar|pode falar do seu dia|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem/i.test(String(legacyReply || ''));
   if (generic || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
     return analysis.fallbackReply;
   }
