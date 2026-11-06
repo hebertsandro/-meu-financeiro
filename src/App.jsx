@@ -260,7 +260,7 @@ function App(){
   function startQuiz(){if(!quizAvailable)return;const selected=[...gameQuestions].sort(()=>Math.random()-.5).slice(0,5);const now=Date.now();setRoundQuestions(selected);setGameQuestionIndex(0);setGameAnswer(null);setGameFeedback('');setQuizLastPlayed(now);window.localStorage.setItem('mf_quiz_last',String(now));setQuizActive(true)}
   function answerGame(index){if(gameAnswer!==null||!quizActive)return;setGameAnswer(index);const q=roundQuestions[gameQuestionIndex];if(index===q.correct){setGameXp(v=>v+5);setGameCorrect(v=>v+1);setGameFeedback('Resposta certa! +5 XP. '+q.explanation)}else{setGameFeedback('Quase! '+q.explanation)}}
   function nextGameQuestion(){if(gameQuestionIndex>=roundQuestions.length-1){setQuizActive(false);setGameFeedback('');return}setGameQuestionIndex(v=>v+1);setGameAnswer(null);setGameFeedback('')}
-  function awardFlapXp(score){const day=new Date().toLocaleDateString('en-CA');const saved=JSON.parse(window.localStorage.getItem('mf_flap_daily')||'{}');const used=saved.day===day?Number(saved.xp||0):0;const points=Math.max(0,Math.floor(Number(score)||0));const requested=points*2;const reward=Math.min(requested,Math.max(0,100-used));if(reward>0){const total=used+reward;window.localStorage.setItem('mf_flap_daily',JSON.stringify({day,xp:total}));setDailyGameXp(total);setGameXp(v=>v+reward);notify('Mandou bem! +'+reward+' XP no Flappy Financeiro (2 XP por ponto).')}else notify('Limite diário de 100 XP do Flappy atingido. Volte amanhã!')}
+  function awardFlapXp(score){const day=new Date().toLocaleDateString('en-CA');const saved=JSON.parse(window.localStorage.getItem('mf_flap_daily')||'{}');const used=saved.day===day?Number(saved.xp||0):0;const points=Math.max(0,Math.floor(Number(score)||0));const requested=points*2;const reward=Math.min(requested,Math.max(0,100-used));if(reward>0){const total=used+reward;window.localStorage.setItem('mf_flap_daily',JSON.stringify({day,xp:total}));setDailyGameXp(total);setGameXp(v=>v+reward);notify('Mandou bem! +'+reward+' XP no Asas da Fortuna (2 XP por ponto).')}else notify('Limite diário de 100 XP do Flappy atingido. Volte amanhã!')}
 
   function sendAssistantMessage(value=assistantInput){const question=value.trim();if(!question)return;const reply=answerFinancialQuestion(question,data);setAssistantMessages(old=>[...old,{role:'user',text:question},{role:'assistant',text:reply}]);setAssistantInput('');}
 
@@ -269,7 +269,7 @@ function App(){
   const gemMissions=[
     {id:'sapphire',name:'Safira da sabedoria',symbol:'💠',rarity:'common',rarityLabel:'COMUM',description:'Acerte sua primeira pergunta no Quiz.',progress:Math.min(1,gameCorrect),target:1,done:gameCorrect>=1},
     {id:'amethyst',name:'Ametista estrategista',symbol:'🔮',rarity:'rare',rarityLabel:'RARO',description:'Acumule 10 respostas corretas no Quiz.',progress:Math.min(10,gameCorrect),target:10,done:gameCorrect>=10},
-    {id:'ruby',name:'Rubi do arcade',symbol:'♦️',rarity:'epic',rarityLabel:'ÉPICO',description:'Alcance 30 pontos em uma partida do Flappy.',progress:Math.min(30,flapBestForGems),target:30,done:flapBestForGems>=30},
+    {id:'ruby',name:'Rubi do arcade',symbol:'♦️',rarity:'epic',rarityLabel:'ÉPICO',description:'Alcance 30 pontos em uma partida do Asas da Fortuna.',progress:Math.min(30,flapBestForGems),target:30,done:flapBestForGems>=30},
     {id:'prism',name:'Prisma lendário',symbol:'🌈',rarity:'legendary',rarityLabel:'LENDÁRIO',description:'Conclua o modo História na dificuldade Difícil.',progress:flapStoryForGems.hard?1:0,target:1,done:!!flapStoryForGems.hard}
   ];
   const currentMonth=monthStart();
@@ -403,7 +403,7 @@ function App(){
  <div className="arcade-library-grid">
   <button className="arcade-library-card space-library-card" onClick={()=>setActiveArcadeGame('space')}><div className="arcade-library-art"><span>🚀</span><i>✦</i><b>SPACE</b></div><div className="arcade-library-info"><strong>SPACE NEXUS</strong><small>Ação · Espaço · Chefões</small><span className="arcade-library-play">JOGAR <ChevronRight size={15}/></span></div></button>
   <button className="arcade-library-card quiz-library-card" onClick={()=>setActiveArcadeGame('quiz')}><div className="arcade-library-art"><span>🧠</span><i>✦</i><b>QUIZ</b></div><div className="arcade-library-info"><strong>QUIZ FINANCEIRO</strong><small>Conhecimento · Estratégia</small><span className="arcade-library-play">JOGAR <ChevronRight size={15}/></span></div></button>
-  <button className="arcade-library-card flap-library-card" onClick={()=>setActiveArcadeGame('flap')}><div className="arcade-library-art"><span>🐤</span><i>✦</i><b>FLAPPY</b></div><div className="arcade-library-info"><strong>FLAPPY FINANCEIRO</strong><small>Habilidade · Reflexos</small><span className="arcade-library-play">JOGAR <ChevronRight size={15}/></span></div></button>
+  <button className="arcade-library-card flap-library-card" onClick={()=>setActiveArcadeGame('flap')}><div className="arcade-library-art"><span>🐷</span><i>✦</i><b>ASAS</b></div><div className="arcade-library-info"><strong>ASAS DA FORTUNA</strong><small>Reflexos · Cofrinho voador</small><span className="arcade-library-play">JOGAR <ChevronRight size={15}/></span></div></button>
   {['DUNGEON RUSH','GEM MATCH','CORRIDA DO DINHEIRO','DEFESA DO COFRINHO'].map((name,i)=><div key={name} className="arcade-library-card arcade-coming-card"><div className="arcade-library-art"><span>{['⚔️','💎','🏎️','🏰'][i]}</span><b>EM BREVE</b></div><div className="arcade-library-info"><strong>{name}</strong><small>Um novo desafio está a caminho</small><span className="arcade-library-soon">EM DESENVOLVIMENTO</span></div></div>)}
  </div></>:<><button className="arcade-back-button" onClick={()=>setActiveArcadeGame(null)}><span>←</span> VOLTAR À BIBLIOTECA</button>
  {activeArcadeGame==='space'&&<><div className="gamer-section-heading"><div><span>PRIMEIRO LANÇAMENTO · SPACE NEXUS</span><h3>Defenda a galáxia</h3><p>Enfrente esquadrões alienígenas, mini-chefes e chefões que revidam.</p></div><div className="arcade-chip"><Gamepad2 size={14}/> AÇÃO ESPACIAL</div></div><SpaceNexusGame onReward={awardFlapXp}/></>}
@@ -551,62 +551,73 @@ function SpaceNexusGame({onReward}){
  </section>
 }
 function FinanceFlapGame({onReward}){
- const modes=[{id:'easy',name:'Fácil',speed:2,desc:'Para aprender a voar',skin:'explorer',color:'#54d6b0'},{id:'normal',name:'Médio',speed:4,desc:'Um desafio equilibrado',skin:'guardian',color:'#8c83ff'},{id:'hard',name:'Difícil',speed:8,desc:'Só para os mais habilidosos',skin:'legend',color:'#ff8a9e'},{id:'infinite',name:'Infinito',speed:2,desc:'A velocidade aumenta com os pontos',skin:null,color:'#f3cb75'}];
- const birdItems=[{id:'classic',name:'Padrão',icon:'🐤',unlock:0},{id:'hoodie',name:'Moletom',icon:'🧥',unlock:5},{id:'crown',name:'Coroa',icon:'👑',unlock:10},{id:'ninja',name:'Ninja',icon:'🥷',unlock:20},{id:'galaxy',name:'Galáxia',icon:'🌌',unlock:30},{id:'explorer',name:'Explorador',icon:'🧭',story:'easy'},{id:'guardian',name:'Guardião',icon:'🛡️',story:'normal'},{id:'legend',name:'Lendário',icon:'🐉',story:'hard'}];
- const pipeItems=[{id:'ocean',name:'Oceano',icon:'🌊',unlock:0,colors:['#256e83','#36c6b2','#1c526b']},{id:'gold',name:'Ouro',icon:'✨',unlock:8,colors:['#9b672b','#f7d77d','#8a4c1b']},{id:'neon',name:'Neon',icon:'💠',unlock:15,colors:['#5637a8','#c65bff','#263e9b']},{id:'lava',name:'Vulcão',icon:'🔥',unlock:25,colors:['#8d302b','#ff8951','#5e202c']},{id:'crystal',name:'Cristal',icon:'💎',unlock:40,colors:['#247e9d','#9af5ff','#4a5cbd']}];
+ const modes=[{id:'easy',name:'Fácil',speed:2,desc:'Aprenda a controlar o voo'},{id:'normal',name:'Médio',speed:4,desc:'Um desafio equilibrado'},{id:'hard',name:'Difícil',speed:8,desc:'Obstáculos mais rápidos'},{id:'infinite',name:'Infinito',speed:2,desc:'A velocidade aumenta com os pontos'}];
  const [mode,setMode]=useState(null),[bestScore,setBestScore]=useState(()=>Number(window.localStorage.getItem('mf_flap_best')||0));
  const [infiniteBest,setInfiniteBest]=useState(()=>Number(window.localStorage.getItem('mf_flap_best_infinite')||0));
- const [birdSkin,setBirdSkin]=useState(()=>window.localStorage.getItem('mf_flap_bird')||'classic');
- const [pipeSkin,setPipeSkin]=useState(()=>window.localStorage.getItem('mf_flap_pipe')||'ocean');
- const [unlockedStories,setUnlockedStories]=useState(()=>{try{return JSON.parse(window.localStorage.getItem('mf_flap_story_unlocks')||'{}')}catch{return {}}});
- useEffect(()=>{window.localStorage.setItem('mf_flap_bird',birdSkin)},[birdSkin]);
- useEffect(()=>{window.localStorage.setItem('mf_flap_pipe',pipeSkin)},[pipeSkin]);
- const canvasRef=React.useRef(null),stateRef=React.useRef({birdY:190,velocity:0,pipes:[],frame:0,score:0,rewarded:false,spawnTimer:0});
+ const canvasRef=React.useRef(null),stateRef=React.useRef({pigY:190,velocity:0,obstacles:[],frame:0,score:0,rewarded:false,spawnTimer:0});
  const [status,setStatus]=useState('choose'),[score,setScore]=useState(0);
- function begin(){const s=stateRef.current;s.birdY=190;s.velocity=0;s.pipes=[{x:360,gapY:145,passed:false}];s.frame=0;s.spawnTimer=0;s.score=0;s.rewarded=false;setScore(0);setStatus('playing')}
+ function begin(){const s=stateRef.current;s.pigY=190;s.velocity=0;s.obstacles=[{x:360,gapY:145,passed:false}];s.frame=0;s.spawnTimer=0;s.score=0;s.rewarded=false;setScore(0);setStatus('playing')}
  function flap(){if(status==='ready'||status==='over'||status==='won'){begin();return}if(status==='playing')stateRef.current.velocity=-6.2}
  function backToModes(){setStatus('choose');setMode(null)}
- useEffect(()=>{if(status!=='playing'||!mode)return;const canvas=canvasRef.current,ctx=canvas.getContext('2d');let raf;const W=320,H=420;
- let lastFrame=0;const loop=(timestamp)=>{if(!lastFrame)lastFrame=timestamp;const elapsed=timestamp-lastFrame;if(elapsed<1000/60){raf=requestAnimationFrame(loop);return}lastFrame=timestamp-(elapsed%(1000/60));const s=stateRef.current;s.frame++;s.velocity+=.34;s.birdY+=s.velocity;
- const multiplier=mode.id==='infinite'?Math.min(10,2+s.score*.08):mode.speed;
- const speed=2.8*multiplier;
- const spawnEvery=Math.max(28,Math.round(105/(speed/2.8)));
- s.spawnTimer++;if(s.spawnTimer>=spawnEvery){s.spawnTimer=0;s.pipes.push({x:W+10,gapY:85+Math.random()*190,passed:false})}
- s.pipes.forEach(p=>{p.x-=speed;if(!p.passed&&p.x+48<66){p.passed=true;s.score+=1;setScore(s.score)}});
- s.pipes=s.pipes.filter(p=>p.x>-55);
- let hit=s.birdY<8||s.birdY>H-24;
- s.pipes.forEach(p=>{const overlap=66+14>p.x&&66-14<p.x+48;if(overlap&&(s.birdY-12<p.gapY-66||s.birdY+12>p.gapY+66))hit=true});
- const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#111a38');bg.addColorStop(1,'#091426');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
- ctx.fillStyle='#8ba9ff22';for(let i=0;i<22;i++){const x=(i*53+s.frame*(speed*.11))%W,y=(i*79)%H;ctx.fillRect(x,y,2,2)}
- const pipeStyle=pipeItems.find(x=>x.id===pipeSkin)||pipeItems[0];
- s.pipes.forEach(p=>{const grad=ctx.createLinearGradient(p.x,0,p.x+48,0);grad.addColorStop(0,pipeStyle.colors[0]);grad.addColorStop(.5,pipeStyle.colors[1]);grad.addColorStop(1,pipeStyle.colors[2]);ctx.fillStyle=grad;ctx.fillRect(p.x,0,48,p.gapY-66);ctx.fillRect(p.x,p.gapY+66,48,H);ctx.fillStyle=pipeStyle.colors[1];ctx.fillRect(p.x-4,p.gapY-78,56,12);ctx.fillRect(p.x-4,p.gapY+66,56,12);if(pipeSkin!=='ocean'){ctx.save();ctx.globalAlpha=.7;ctx.fillStyle='#fff';for(let y=18;y<p.gapY-82;y+=27)ctx.fillRect(p.x+9,y,30,2);for(let y=p.gapY+88;y<H-10;y+=27)ctx.fillRect(p.x+9,y,30,2);ctx.restore()}});
- ctx.save();ctx.translate(66,s.birdY);ctx.rotate(Math.max(-.45,Math.min(.7,s.velocity*.055)));ctx.fillStyle='#f5cf73';ctx.shadowColor='#f5cf73';ctx.shadowBlur=15;ctx.beginPath();ctx.arc(0,0,13,0,Math.PI*2);ctx.fill();ctx.shadowBlur=0;
- if(birdSkin==='hoodie'){ctx.fillStyle='#8b5cf6';ctx.beginPath();ctx.arc(0,4,12,0,Math.PI);ctx.fill();ctx.fillRect(-9,2,18,8)}
- if(birdSkin==='crown'){ctx.fillStyle='#ffd76b';ctx.beginPath();ctx.moveTo(-10,-10);ctx.lineTo(-8,-21);ctx.lineTo(-2,-14);ctx.lineTo(2,-23);ctx.lineTo(7,-14);ctx.lineTo(11,-20);ctx.lineTo(10,-8);ctx.closePath();ctx.fill()}
- if(birdSkin==='ninja'){ctx.fillStyle='#e84c69';ctx.fillRect(-13,-7,26,5);ctx.beginPath();ctx.moveTo(10,-5);ctx.lineTo(21,1);ctx.lineTo(12,1);ctx.fill()}
- if(birdSkin==='galaxy'){ctx.strokeStyle='#c8a5ff';ctx.lineWidth=2;ctx.beginPath();ctx.ellipse(0,0,20,8,-.45,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#fff';ctx.fillRect(-2,-17,3,3)}
- if(birdSkin==='explorer'){ctx.fillStyle='#b77b42';ctx.fillRect(-10,2,20,8);ctx.fillStyle='#f6d18b';ctx.fillRect(-8,-12,16,4)}
- if(birdSkin==='guardian'){ctx.strokeStyle='#8bd6ff';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,17,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#8bd6ff';ctx.fillRect(-10,-13,20,4)}
- if(birdSkin==='legend'){ctx.strokeStyle='#ff9a68';ctx.lineWidth=3;ctx.beginPath();ctx.arc(0,0,19,0,Math.PI*2);ctx.stroke();ctx.fillStyle='#ff9a68';ctx.beginPath();ctx.moveTo(-8,-10);ctx.lineTo(-13,-22);ctx.lineTo(-2,-15);ctx.lineTo(7,-23);ctx.lineTo(9,-9);ctx.fill()}
- ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(5,-4,4,0,Math.PI*2);ctx.fill();ctx.fillStyle='#17213c';ctx.beginPath();ctx.arc(6,-4,2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ff9b72';ctx.beginPath();ctx.moveTo(12,1);ctx.lineTo(22,5);ctx.lineTo(12,8);ctx.fill();ctx.restore();
- ctx.fillStyle='#fff';ctx.font='bold 24px sans-serif';ctx.textAlign='center';ctx.fillText(String(s.score),W/2,38);
- ctx.fillStyle='#a9c6ff';ctx.font='bold 9px sans-serif';ctx.fillText(mode.id==='infinite'?'VELOCIDADE x'+multiplier.toFixed(1):mode.name.toUpperCase()+' · x'+multiplier,W/2,55);
- if(mode.id!=='infinite'&&s.score>=100){s.rewarded=true;const next={...unlockedStories,[mode.id]:true};setUnlockedStories(next);window.localStorage.setItem('mf_flap_story_unlocks',JSON.stringify(next));setBestScore(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best',String(value));return value});onReward(s.score);setStatus('won');return}
- if(hit){setBestScore(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best',String(value));return value});if(mode.id==='infinite')setInfiniteBest(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best_infinite',String(value));return value});if(!s.rewarded){s.rewarded=true;onReward(s.score)}setStatus('over');return}
- raf=requestAnimationFrame(loop)};
- raf=requestAnimationFrame(loop);return()=>cancelAnimationFrame(raf)},[status,mode,birdSkin,pipeSkin]);
- const currentMultiplier=mode?.id==='infinite'?Math.min(10,2+score*.08):mode?.speed;
+ useEffect(()=>{if(status!=='playing'||!mode)return;const canvas=canvasRef.current,ctx=canvas?.getContext('2d');if(!ctx)return;let raf,lastFrame=0;const W=320,H=420;
+ const roundRect=(x,y,w,h,r)=>{ctx.beginPath();ctx.roundRect(x,y,w,h,r)};
+ const drawPig=(y,velocity,frame)=>{
+  ctx.save();ctx.translate(67,y);ctx.rotate(Math.max(-.38,Math.min(.62,velocity*.045)));
+  // asas pequenas do mascote
+  const wingBeat=Math.sin(frame*.24)*3;
+  ctx.fillStyle='#f4a9c5';ctx.strokeStyle='#b95785';ctx.lineWidth=2;
+  ctx.beginPath();ctx.ellipse(-15,5+wingBeat,10,6,-.45,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // orelhas
+  ctx.fillStyle='#f49abb';ctx.strokeStyle='#b95785';ctx.lineWidth=2;
+  ctx.beginPath();ctx.ellipse(-9,-12,6,10,-.45,0,Math.PI*2);ctx.fill();ctx.stroke();
+  ctx.beginPath();ctx.ellipse(8,-13,6,10,.45,0,Math.PI*2);ctx.fill();ctx.stroke();
+  // corpo de porquinho-cofrinho
+  const body=ctx.createRadialGradient(-5,-8,2,0,0,23);body.addColorStop(0,'#ffd9e7');body.addColorStop(.58,'#f58fb5');body.addColorStop(1,'#c94f83');
+  ctx.shadowColor='#ff8fbd';ctx.shadowBlur=17;ctx.fillStyle=body;ctx.strokeStyle='#a83f70';ctx.lineWidth=2;
+  ctx.beginPath();ctx.ellipse(0,0,20,17,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.shadowBlur=0;
+  // pezinho
+  ctx.fillStyle='#d95f91';ctx.beginPath();ctx.ellipse(-8,14,5,4,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(8,14,5,4,0,0,Math.PI*2);ctx.fill();
+  // focinho em destaque
+  const snout=ctx.createLinearGradient(10,-2,24,10);snout.addColorStop(0,'#ffc2d7');snout.addColorStop(1,'#ed79a4');ctx.fillStyle=snout;ctx.strokeStyle='#b95785';ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.ellipse(17,3,8,6,0,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#9e426d';ctx.beginPath();ctx.ellipse(15,3,1.5,2,0,0,Math.PI*2);ctx.fill();ctx.beginPath();ctx.ellipse(20,3,1.5,2,0,0,Math.PI*2);ctx.fill();
+  // olho expressivo e brilho
+  ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(7,-6,4.3,0,Math.PI*2);ctx.fill();ctx.fillStyle='#29304f';ctx.beginPath();ctx.arc(8,-6,2.2,0,Math.PI*2);ctx.fill();ctx.fillStyle='#fff';ctx.beginPath();ctx.arc(8.7,-7,0.8,0,Math.PI*2);ctx.fill();
+  // bochecha
+  ctx.fillStyle='#ffb1ca';ctx.globalAlpha=.8;ctx.beginPath();ctx.arc(10,5,3,0,Math.PI*2);ctx.fill();ctx.globalAlpha=1;
+  // fenda da moeda no topo
+  ctx.strokeStyle='#8c3d69';ctx.lineWidth=2.4;ctx.lineCap='round';ctx.beginPath();ctx.moveTo(-4,-16);ctx.lineTo(5,-16);ctx.stroke();
+  // medalhinha de moeda
+  ctx.fillStyle='#ffd66f';ctx.strokeStyle='#a9792c';ctx.lineWidth=1.2;ctx.beginPath();ctx.arc(-13,-14,5,0,Math.PI*2);ctx.fill();ctx.stroke();ctx.fillStyle='#8a6427';ctx.font='bold 6px sans-serif';ctx.textAlign='center';ctx.fillText('$',-13,-12);
+  ctx.restore();
+ };
+ const loop=(timestamp)=>{if(!lastFrame)lastFrame=timestamp;const elapsed=timestamp-lastFrame;if(elapsed<1000/60){raf=requestAnimationFrame(loop);return}lastFrame=timestamp-(elapsed%(1000/60));const s=stateRef.current;s.frame++;s.velocity+=.34;s.pigY+=s.velocity;
+  const multiplier=mode.id==='infinite'?Math.min(10,2+s.score*.08):mode.speed;const speed=2.8*multiplier;const spawnEvery=Math.max(28,Math.round(105/(speed/2.8)));
+  s.spawnTimer++;if(s.spawnTimer>=spawnEvery){s.spawnTimer=0;s.obstacles.push({x:W+10,gapY:85+Math.random()*190,passed:false})}
+  s.obstacles.forEach(o=>{o.x-=speed;if(!o.passed&&o.x+48<67){o.passed=true;s.score++;setScore(s.score)}});s.obstacles=s.obstacles.filter(o=>o.x>-55);
+  let hit=s.pigY<13||s.pigY>H-25;s.obstacles.forEach(o=>{const overlap=67+16>o.x&&67-16<o.x+48;if(overlap&&(s.pigY-14<o.gapY-68||s.pigY+14>o.gapY+68))hit=true});
+  const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#15234a');bg.addColorStop(.55,'#101b39');bg.addColorStop(1,'#091327');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
+  // estrelas e nuvens luminosas
+  for(let i=0;i<25;i++){const x=(i*47+s.frame*(speed*.09))%W,y=(i*73)%H;ctx.fillStyle=i%3===0?'#b8a7ff88':'#8bdcf766';ctx.beginPath();ctx.arc(x,y,i%4===0?2:1,0,Math.PI*2);ctx.fill()}
+  ctx.save();ctx.globalAlpha=.13;ctx.fillStyle='#8e9eff';for(let i=0;i<4;i++){const x=(i*105-s.frame*.25+W*2)%W;ctx.beginPath();ctx.ellipse(x,75+i*87,34,9,0,0,Math.PI*2);ctx.fill()}ctx.restore();
+  // obstáculos: colunas-cofre com detalhes de moeda
+  s.obstacles.forEach(o=>{const drawVault=(x,y,h,top)=>{if(h<=0)return;const g=ctx.createLinearGradient(x,0,x+48,0);g.addColorStop(0,'#78502e');g.addColorStop(.28,'#d69b4b');g.addColorStop(.65,'#f4d17b');g.addColorStop(1,'#81532e');ctx.fillStyle=g;roundRect(x,y,48,h,7);ctx.fill();ctx.strokeStyle='#ffe4a1';ctx.lineWidth=1.5;ctx.stroke();ctx.fillStyle='#9b672e';ctx.globalAlpha=.65;for(let yy=y+17;yy<y+h-8;yy+=32){ctx.beginPath();ctx.arc(x+24,yy,7,0,Math.PI*2);ctx.fill();ctx.fillStyle='#ffdf87';ctx.font='bold 9px sans-serif';ctx.textAlign='center';ctx.fillText('$',x+24,yy+3);ctx.fillStyle='#9b672e'}ctx.globalAlpha=1;ctx.fillStyle='#ffdf87';roundRect(x-4,top?y+h-13:y,56,13,4);ctx.fill();ctx.strokeStyle='#a87332';ctx.stroke()};drawVault(o.x,0,o.gapY-68,true);drawVault(o.x,o.gapY+68,H-o.gapY-68,false)});
+  // rastro de brilho do porquinho
+  ctx.save();ctx.globalAlpha=.25;ctx.fillStyle='#ff9fc6';ctx.beginPath();ctx.ellipse(38,s.pigY+5,12,4,-.15,0,Math.PI*2);ctx.fill();ctx.restore();drawPig(s.pigY,s.velocity,s.frame);
+  ctx.fillStyle='#fff';ctx.font='bold 25px sans-serif';ctx.textAlign='center';ctx.fillText(String(s.score),W/2,39);ctx.fillStyle='#c5b8ff';ctx.font='bold 9px sans-serif';ctx.fillText(mode.id==='infinite'?'MODO INFINITO · x'+multiplier.toFixed(1):mode.name.toUpperCase()+' · x'+multiplier,W/2,56);
+  if(mode.id!=='infinite'&&s.score>=100){s.rewarded=true;setBestScore(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best',String(value));return value});onReward(s.score);setStatus('won');return}
+  if(hit){setBestScore(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best',String(value));return value});if(mode.id==='infinite')setInfiniteBest(old=>{const value=Math.max(old,s.score);window.localStorage.setItem('mf_flap_best_infinite',String(value));return value});if(!s.rewarded){s.rewarded=true;onReward(s.score)}setStatus('over');return}
+  raf=requestAnimationFrame(loop)};
+ raf=requestAnimationFrame(loop);return()=>cancelAnimationFrame(raf)},[status,mode]);
  return <div className="flap-game">
- {status==='choose'?<div className="flap-mode-select"><div className="flap-mode-heading"><b>ESCOLHA SEU MODO</b><span>História: alcance 100 pontos e conquiste uma roupa exclusiva</span></div><div className="flap-mode-grid">{modes.map(item=><button key={item.id} className={'flap-mode-card mode-'+item.id} onClick={()=>{setMode(item);setStatus('ready')}}><span className="flap-mode-icon">{item.id==='infinite'?'∞':item.id==='easy'?'🪽':item.id==='normal'?'⚡':'🔥'}</span><strong>{item.name}</strong><small>{item.id==='infinite'?'Recorde: '+infiniteBest+' pontos':'Velocidade inicial: '+item.speed+'x'}</small><em>{item.desc}</em>{item.id!=='infinite'&&<span className="flap-mode-reward">{unlockedStories[item.id]?'✓ Roupa conquistada':'🏆 Roupa exclusiva aos 100 pts'}</span>}</button>)}</div></div>:<>
+ {status==='choose'?<div className="flap-mode-select"><div className="flap-mode-heading"><b>ESCOLHA SEU MODO</b><span>Supere os obstáculos e leve o Cofrinho Voador até 100 pontos</span></div><div className="flap-mode-grid">{modes.map(item=><button key={item.id} className={'flap-mode-card mode-'+item.id} onClick={()=>{setMode(item);setStatus('ready')}}><span className="flap-mode-icon">{item.id==='infinite'?'∞':item.id==='easy'?'🪽':item.id==='normal'?'⚡':'🔥'}</span><strong>{item.name}</strong><small>{item.id==='infinite'?'Recorde: '+infiniteBest+' pontos':'Velocidade: '+item.speed+'x'}</small><em>{item.desc}</em>{item.id!=='infinite'&&<span className="flap-mode-reward">🏆 Complete 100 pontos</span>}</button>)}</div></div>:<>
  <div className="flap-mode-top"><button className="text-button" onClick={backToModes}>← Modos</button><b>{mode?.name} {mode?.id==='infinite'?'∞':'· '+mode?.speed+'x'}</b><span>{mode?.id==='infinite'?'Recorde: '+infiniteBest:'Meta: 100 pontos'}</span></div>
- <div className="flap-game-stage"><canvas ref={canvasRef} width="320" height="420" onPointerDown={flap} aria-label="Jogo Flappy Financeiro. Toque para voar."/>
- {status!=='playing'&&<div className="flap-overlay"><b>{status==='ready'?'Pronto para voar?':status==='won'?'FASE CONCLUÍDA! 🏆':'Fim de jogo!'}</b><span>{status==='ready'?'Toque para começar.':status==='won'?'Você alcançou 100 pontos e desbloqueou a roupa '+modes.find(x=>x.id===mode.id)?.name+'!': 'Pontuação: '+score+' · Toque para tentar novamente.'}</span>{status==='won'?<button className="primary" onClick={backToModes}>Escolher outro modo <ChevronRight size={16}/></button>:<button className="primary" onClick={begin}>{status==='ready'?'Começar':'Jogar novamente'} <ChevronRight size={16}/></button>}</div>}
+ <div className="flap-game-stage"><canvas ref={canvasRef} width="320" height="420" onPointerDown={flap} aria-label="Asas da Fortuna: toque para fazer o porquinho-cofrinho voar."/>
+ {status!=='playing'&&<div className="flap-overlay"><b>{status==='ready'?'Prepare o voo!':status==='won'?'COFRINHO LENDÁRIO! 🏆':'Ops! O porquinho bateu!'}</b><span>{status==='ready'?'Toque para começar e mantenha o porquinho no ar.':status==='won'?'Você alcançou 100 pontos e completou o desafio!':'Pontuação: '+score+' · Toque para tentar novamente.'}</span>{status==='won'?<button className="primary" onClick={backToModes}>Escolher outro modo <ChevronRight size={16}/></button>:<button className="primary" onClick={begin}>{status==='ready'?'Começar voo':'Tentar novamente'} <ChevronRight size={16}/></button>}</div>}
  </div>
  <div className="flap-game-info"><span><Zap size={15}/> 1 ponto por obstáculo · 2 XP por ponto</span><b>{score}{mode?.id==='infinite'?' pontos':' / 100'}</b></div>
  <div className="flap-progress-track"><i style={{width:(mode?.id==='infinite'?Math.min(100,score):Math.min(100,score))+'%'}}/></div>
- <div className="flap-best-score"><Trophy size={14}/> {mode?.id==='infinite'?'Recorde infinito: '+infiniteBest:'Melhor pontuação geral: '+bestScore}</div>
+ <div className="flap-best-score"><Trophy size={14}/> {mode?.id==='infinite'?'Recorde infinito: '+infiniteBest:'Melhor pontuação: '+bestScore}</div>
  </>}
- <div className="flap-customization"><div className="flap-custom-group"><b>ROUPAS DO MASCOTE</b><div className="flap-skin-grid">{birdItems.map(item=>{const unlocked=item.story?!!unlockedStories[item.story]:bestScore>=item.unlock;return <button key={item.id} disabled={!unlocked} className={'flap-skin '+(birdSkin===item.id?'selected':'')+(!unlocked?' locked':'')} onClick={()=>setBirdSkin(item.id)}><span>{unlocked?item.icon:'🔒'}</span><strong>{item.name}</strong><small>{unlocked?'DESBLOQUEADO':item.story?'Zere '+modes.find(x=>x.id===item.story).name: item.unlock+' pontos'}</small></button>})}</div></div><div className="flap-custom-group"><b>DECORAÇÕES DOS CANOS</b><div className="flap-skin-grid">{pipeItems.map(item=><button key={item.id} disabled={bestScore<item.unlock} className={'flap-skin '+(pipeSkin===item.id?'selected':'')+(bestScore<item.unlock?' locked':'')} onClick={()=>setPipeSkin(item.id)}><span>{bestScore>=item.unlock?item.icon:'🔒'}</span><strong>{item.name}</strong><small>{bestScore>=item.unlock?'DESBLOQUEADO':item.unlock+' pontos'}</small></button>)}</div></div></div>
  </div>
 }
 
