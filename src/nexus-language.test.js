@@ -298,3 +298,19 @@ test('perguntas sociais curtas recebem respostas sociais diretas', () => {
     assert.match(getLanguageResponse(message, []), /Estou aqui|pronta para conversar/);
   }
 });
+
+
+test('classifica a intenção principal antes de escolher uma resposta', () => {
+  const cases = [
+    ['Oi Nexus, tudo bem?', 'greeting'],
+    ['E você?', 'reciprocal_question'],
+    ['Me ajuda com uma coisa', 'request'],
+    ['Hoje eu passei por uma situação difícil', 'disclosure'],
+    ['Kkkkkkkkk', 'humor'],
+    ['Estou bem', 'answer'],
+    ['Como funciona a fotossíntese?', 'question']
+  ];
+  for (const [message, expected] of cases) {
+    assert.equal(analyzeLanguage(message).primaryAct, expected, message);
+  }
+});
