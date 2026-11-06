@@ -395,11 +395,27 @@ export function analyzeLanguage(message, history=[]) {
     :/^(mais ou menos|assim assim|normal|nada demais|nao sei)$/.test(normalized)?'neutral'
     :/^(sim|nao|claro|com certeza|acho que sim|acho que nao)$/.test(normalized)?'yes_no'
     :null;
+  const primaryAct=acts.includes('greeting')?'greeting'
+    :acts.includes('reciprocal_question')?'reciprocal_question'
+    :acts.includes('farewell')?'farewell'
+    :acts.includes('gratitude')?'gratitude'
+    :acts.includes('apology')?'apology'
+    :acts.includes('boundary')?'boundary'
+    :acts.includes('request')?'request'
+    :acts.includes('disclosure')?'disclosure'
+    :acts.includes('humor')?'humor'
+    :answerKind?'answer'
+    :acts.includes('agreement')?'agreement'
+    :acts.includes('disagreement')?'disagreement'
+    :acts.includes('uncertainty')?'uncertainty'
+    :currentTopic?'topic_message'
+    :String(original).includes('?')?'question'
+    :'statement';
   return {
     original,normalized,tokens:normalized.split(' ').filter(Boolean),
     matchedEntries:NEXUS_LEXICON.filter(entry=>entry.variants.some(v=>contains(original,v))||contains(normalized,entry.canonical))
       .slice(0,30).map(({canonical,meanings,tone,ambiguity})=>({canonical,meanings,tone,ambiguity})),
-    possibleActs:acts,emotions:detectEmotion(normalized),laughter,irony,indirectness,
+    possibleActs:acts,primaryAct,emotions:detectEmotion(normalized),laughter,irony,indirectness,
     ambiguousPhrases,unknownTokens,topics:currentTopics,topic:currentTopic,previousTopic,
     changedTopic,references,repeatedTerms,followUp,answerKind,context,memory,situation,reasoning,
     contextAvailable:context.hasConversation,
