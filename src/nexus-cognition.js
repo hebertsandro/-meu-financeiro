@@ -268,7 +268,8 @@ function composeReply(text, frame, references) {
     const feeling = emotionNames[emotion.emotion] || 'um sentimento importante';
     return 'Pelo que você escreveu, pode haver ' + feeling + ' envolvida. Não quero presumir exatamente como você está se sentindo. O que aconteceu antes disso?';
   }
-\n  if (discourseRelations.includes('contrast') && topic) {
+
+  if (discourseRelations.includes('contrast') && topic) {
     return 'Entendi que você está colocando dois lados dessa situação em contraste. Quero considerar tanto o que aconteceu quanto o que mudou ou entrou em conflito. Qual dos dois pontos pesa mais para você agora?';
   }
   if (intent === 'opinion') return 'Posso te dar uma opinião fundamentada, mas quero considerar os detalhes em vez de concordar automaticamente. Qual parte você quer que eu avalie?';
