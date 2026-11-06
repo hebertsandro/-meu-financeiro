@@ -240,6 +240,74 @@ function composeTimelineReply(message, history, memory) {
   return null;
 }
 
+// Modelo de situação: fatos relatados, estado atual, incertezas e correções.
+// Cada afirmação permanece atribuída ao relato do usuário, não como verdade objetiva.
+export function analyzeSituation(history=[]) {
+  const turns=(Array.isArray(history)?history:[]).filter(turn=>turn?.role==='user').map(historyText).filter(Boolean).slice(-16);
+  const facts=[];
+  const corrections=[];
+  const patterns=[
+    ['relationship_distance',/\b(namorada|namorado|parceira|parceiro)\b.*\b(distante|fria|frio|afastada|afastado)\b/],
+    ['communication_drop',/\b(quase nao conversa|quase nao fala|parou de falar|responde menos|nao me responde)\b/],
+    ['school_change',/\b(mudou de escola|trocou de escola|nova escola)\b/],
+    ['conflict',/\b(brigamos|briguei|brigou|discutimos|discuti|tivemos uma briga)\b/],
+    ['positive_feeling',/\b(estou feliz|to feliz|estou bem|to bem)\b/],
+    ['negative_feeling',/\b(estou triste|to triste|estou mal|to mal|estou ansioso|to ansioso)\b/]
+  ];
+  turns.forEach((raw,index)=>{
+    const text=fold(raw);
+    const correction=/\b(na verdade|quis dizer|me expressei mal|me confundi|corrigindo|o correto e|nao foi .* foi )\b/.test(text);
+    if(correction){
+      const previous=turns.slice(0,index).reverse().find(item=>item.trim());
+      corrections.push({turn:index+1,text:raw,previousStatement:previous||null,status:'user_correction'});
+      if(previous){
+        const previousText=fold(previous);
+        for(const fact of facts){
+          if(fact.status==='active' && (previousText.includes(fact.key.replace(/_/g,' ')) || fact.source===previous)){
+            fact.status='superseded_by_correction';
+            fact.supersededAt=index+1;
+          }
+        }
+      }
+    }
+    for(const [key,re] of patterns){
+      if(re.test(text)){
+        const negated=/\b(nao|nunca|jamais)\b/.test(text);
+        facts.push({
+          key,source:raw,turn:index+1,
+          polarity:negated?'denied':'reported',
+          status:'active',
+          certainty:'user_reported'
+        });
+      }
+    }
+  });
+  const activeFacts=facts.filter(fact=>fact.status==='active');
+  const latestByKey={};
+  for(const fact of activeFacts) latestByKey[fact.key]=fact;
+  return {
+    facts,
+    currentFacts:Object.values(latestByKey),
+    corrections,
+    people:buildConversationMemory((Array.isArray(history)?history:[])).people,
+    topic:buildConversationMemory((Array.isArray(history)?history:[])).activeTopic,
+    unresolved:corrections.length?['Confirmar qual versão corrigida deve substituir a anterior']:[],
+    turnCount:turns.length,
+    principle:'Correções explícitas mais recentes prevalecem; relatos não são tratados como fatos verificados.'
+  };
+}
+
+function composeCorrectionReply(message, situation) {
+  const text=fold(message);
+  const isCorrection=/\b(na verdade|quis dizer|me expressei mal|me confundi|corrigindo|o correto e)\b/.test(text);
+  if(!isCorrection) return null;
+  const previous=situation.corrections.at(-1)?.previousStatement;
+  if(previous){
+    return 'Entendi, obrigado por corrigir. Vou atualizar minha interpretação e considerar o que você acabou de esclarecer, em vez de continuar usando a informação anterior. Só para confirmar: a versão correta é “' + String(message).trim().replace(/[.!?]+$/,'') + '”, certo?';
+  }
+  return 'Entendi que você está corrigindo uma informação anterior. Vou dar prioridade ao que acabou de esclarecer. Qual é a versão correta que devo considerar?';
+}
+
 export function analyzeLanguage(message, history=[]) {
   const original=String(message||'');
   const normalized=normalizeLanguageText(original);
@@ -247,6 +315,7 @@ export function analyzeLanguage(message, history=[]) {
   const prior=turns.slice(-6);
   const context=getConversationContext(history);
   const memory=buildConversationMemory(history);
+  const situation=analyzeSituation(history);
   const currentTopics=topicsFor(normalized);
   const previousTopics=topicsFor(prior.slice(0,-1).join(' '));
   const currentTopic=currentTopics[0]?.topic||null;
@@ -275,7 +344,7 @@ export function analyzeLanguage(message, history=[]) {
       .slice(0,30).map(({canonical,meanings,tone,ambiguity})=>({canonical,meanings,tone,ambiguity})),
     possibleActs:acts,emotions:detectEmotion(normalized),laughter,irony,indirectness,
     ambiguousPhrases,unknownTokens,topics:currentTopics,topic:currentTopic,previousTopic,
-    changedTopic,references,repeatedTerms,followUp,answerKind,context,memory,
+    changedTopic,references,repeatedTerms,followUp,answerKind,context,memory,situation,
     contextAvailable:context.hasConversation,
     previousAssistant:context.lastAssistant,confidence:irony.possible||ambiguousPhrases.length?0.45:acts.length?0.78:currentTopic?0.62:0.25,
     caution:irony.possible||ambiguousPhrases.length>0||indirectness.length>0
@@ -303,6 +372,8 @@ export function getLanguageResponse(message,history=[]) {
   }
   // Respostas curtas a perguntas anteriores devem ser interpretadas pelo papel
   // que exercem na conversa, não como frases isoladas.
+  const correctionReply=composeCorrectionReply(message,a.situation);
+  if(correctionReply) return correctionReply;
   const timelineReply=composeTimelineReply(message,history,a.memory);
   if(timelineReply) return timelineReply;
   if(a.context.questionType==='event' && /^(nada|nada nao|nao sei|foi isso|so isso)$/.test(t)) {
