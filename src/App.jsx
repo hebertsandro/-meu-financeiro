@@ -496,16 +496,16 @@ function SpaceNexusGame({onReward}){
   const id=setInterval(()=>{
    const g=game.current;g.tick++;
    const n=g.tick;
-   if(n%(n<g.rapidUntil?7:15)===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
-   if(n%39===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%156===0?3:1,type:n%156===0?'brute':n%117===0?'scout':'drone',fire:n%52===0||Math.random()>.48});
-   if(n%540===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
-   g.foes.forEach(f=>{f.y+=(f.type==='scout'?.35:.2167)+(g.wave*.0267)});
-   g.shots.forEach(b=>{b.y-=1.333});
-   g.enemyShots.forEach(b=>{b.y+=.7333});g.drops.forEach(d=>{d.y+=.22});
-   if(n%78===0){g.foes.filter(f=>f.fire).slice(-2).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
-   if(g.boss&&n%54===0){const spread=g.boss.style==='spread'?[0,-10,10,-20,20]:g.boss.style==='cross'?[0,-14,14]:[0,-8,8];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}))}
-   if(n%1080===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:8,...chosen};setMessage('CHEFÃO DETECTADO! Prepare-se para o ataque!')}
-   if(g.boss){g.boss.x=Math.max(22,Math.min(78,g.boss.x+(Math.random()-.5)*1));}
+   if(n%(n<g.rapidUntil?9:19)===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
+   if(n%49===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%156===0?3:1,type:n%156===0?'brute':n%117===0?'scout':'drone',fire:n%52===0||Math.random()>.48});
+   if(n%675===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
+   g.foes.forEach(f=>{f.y+=((f.type==='scout'?.35:.2167)+(g.wave*.0267))*.8});
+   g.shots.forEach(b=>{b.y-=1.0664});
+   g.enemyShots.forEach(b=>{b.y+=.58664});g.drops.forEach(d=>{d.y+=.176});
+   if(n%98===0){g.foes.filter(f=>f.fire).slice(-2).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
+   if(g.boss&&n%68===0){const spread=g.boss.style==='spread'?[0,-10,10,-20,20]:g.boss.style==='cross'?[0,-14,14]:[0,-8,8];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}))}
+   if(n%1350===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:8,...chosen};setMessage('CHEFÃO DETECTADO! Prepare-se para o ataque!')}
+   if(g.boss){g.boss.x=Math.max(22,Math.min(78,g.boss.x+(Math.random()-.5)*.8));}
    // Colisão tiro da nave x inimigo: só remove o projétil quando realmente acerta.
    const remainingShots=[];
    for(const shot of g.shots){
@@ -519,7 +519,7 @@ function SpaceNexusGame({onReward}){
     if(!hit&&shot.y>0)remainingShots.push(shot);
    }
    g.shots=remainingShots;g.foes=g.foes.filter(f=>f.hp>0&&f.y<96);
-   const remainingDrops=[];for(const d of g.drops){if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}else if(d.type==='rapid'){g.rapidUntil=n+300;setMessage('DISPARO RÁPIDO! Poder ativo por 6 segundos.')}else if(d.type==='double'){g.doubleUntil=n+300;setMessage('TIRO DUPLO! Poder ativo por 6 segundos.')}else if(d.type==='repair'){g.lives=Math.min(3,g.lives+1);setLives(g.lives);setMessage('REPARO COLETADO! +1 vida.')}}else if(d.y<100)remainingDrops.push(d)}g.drops=remainingDrops;
+   const remainingDrops=[];for(const d of g.drops){if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}else if(d.type==='rapid'){g.rapidUntil=n+375;setMessage('DISPARO RÁPIDO! Poder ativo por 6 segundos.')}else if(d.type==='double'){g.doubleUntil=n+375;setMessage('TIRO DUPLO! Poder ativo por 6 segundos.')}else if(d.type==='repair'){g.lives=Math.min(3,g.lives+1);setLives(g.lives);setMessage('REPARO COLETADO! +1 vida.')}}else if(d.y<100)remainingDrops.push(d)}g.drops=remainingDrops;
    let tookHit=false;
    const enemyRemaining=[];
    for(const shot of g.enemyShots){if(Math.abs(shot.x-g.ship.x)<6&&Math.abs(shot.y-g.ship.y)<7){tookHit=true}else if(shot.y<100)enemyRemaining.push(shot)}
