@@ -312,7 +312,6 @@ function composeCorrectionReply(message, situation) {
 export function analyzeContextualReasoning(message, history=[]) {
   const normalized=fold(String(message||''));
   const situation=analyzeSituation(history);
-  const reasoning=analyzeContextualReasoning(message,history);
   const memory=buildConversationMemory(history);
   const current=topicsFor(normalized)[0]?.topic||null;
   const asksCause=/\b(por que|porque|qual o motivo|o que fez|o que pode ter causado)\b/.test(normalized);
@@ -373,6 +372,7 @@ export function analyzeLanguage(message, history=[]) {
   const context=getConversationContext(history);
   const memory=buildConversationMemory(history);
   const situation=analyzeSituation(history);
+  const reasoning=analyzeContextualReasoning(message,history);
   const currentTopics=topicsFor(normalized);
   const previousTopics=topicsFor(prior.slice(0,-1).join(' '));
   const currentTopic=currentTopics[0]?.topic||null;
