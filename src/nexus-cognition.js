@@ -498,6 +498,7 @@ export function improveNexusFallback(message, history, legacyReply) {
   if (socialReply) return socialReply;
 
   const analysis = analyzeNexusMessage(message, history);
+  if (analysis.intent === 'advice') return analysis.fallbackReply;
   const generic = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando/i.test(String(legacyReply || ''));
   if (generic || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
     const hypothesisReply = composeHypothesisReply(analyzeHypotheses(message, history));
