@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLogicalStructure, analyzeNexusMessage, improveNexusFallback } from './nexus-cognition.js';
+import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback } from './nexus-cognition.js';
 
 test('identifica causa e separa as duas proposições', () => {
   const result = parseLogicalStructure('Fui mal na prova porque não consegui estudar.');
