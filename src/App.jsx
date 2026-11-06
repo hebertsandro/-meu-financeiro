@@ -126,6 +126,54 @@ function generateNexusReply(question, finance={}, history=[]) {
   const greet = name ? name+', ' : '';
   const answer = (text) => text;
   const ask = (text, questionText='O que você acha?') => text+'\n\n'+questionText;
+  // MEMÓRIA DE REFERÊNCIAS: acompanha pessoas, assuntos e acontecimentos mencionados
+  // nos turnos recentes para interpretar "ela", "ele", "isso", "aquilo" e perguntas elípticas.
+  const recentUserMessages = historyBeforeCurrent.filter(m=>m.role==='user').slice(-6).map(m=>String(m.content||''));
+  const recentAssistantMessages = previous.filter(m=>m.role==='assistant').slice(-4).map(m=>String(m.content||''));
+  const recentConversationText = recentUserMessages.join(' ').toLocaleLowerCase('pt-BR');
+  const referenceLexicon = [
+    {id:'namorada',terms:['minha namorada','a namorada','namorada','ela']},
+    {id:'namorado',terms:['meu namorado','o namorado','namorado','ele']},
+    {id:'mae',terms:['minha mae','minha mãe','mae','mãe']},
+    {id:'pai',terms:['meu pai','pai']},
+    {id:'amigo',terms:['meu amigo','minha amiga','amigo','amiga']},
+    {id:'professor',terms:['professor','professora']},
+    {id:'prova',terms:['prova','avaliação','avaliacao','teste']},
+    {id:'escola',terms:['escola','sala de aula','colégio','colegio']},
+    {id:'trabalho',terms:['emprego','trabalho','chefe','entrevista','vaga']},
+    {id:'dinheiro',terms:['dinheiro','gastos','dívida','divida','cartão','cartao','fatura']},
+    {id:'site',terms:['site','aplicativo','app','sistema','código','codigo']}
+  ];
+  const recentReferences = referenceLexicon
+    .map(item=>({...item,hits:item.terms.filter(term=>recentConversationText.includes(term))}))
+    .filter(item=>item.hits.length>0)
+    .sort((a,b)=>Math.max(...b.hits.map(x=>x.length))-Math.max(...a.hits.map(x=>x.length)));
+  const hasPronounReference = /\b(ela|ele|eles|elas|isso|isto|aquilo|essa|esse|essa pessoa|aquele|aquela)\b/.test(q);
+  const isEllipticalFollowUp = /^(e\s+)?(ela|ele|isso|aquilo|essa|esse|e agora|e depois|por que|porque|o que faço|oq faço|como assim|é normal|isso mesmo)[?! .]*$/.test(q)
+    || /\b(e\s+ela|e\s+ele|e\s+isso|por que ela|por que ele|o que faço agora|o que eu faço agora|isso e normal|isso é normal)\b/.test(q);
+  const recentTopicWords = [
+    ['relacionamento',['namorada','namorado','namoro','relacionamento','ciúme','ciume','briga','brigamos']],
+    ['estudos',['prova','escola','estudar','matéria','materia','matemática','matematica','professor']],
+    ['família',['mãe','mae','pai','família','familia','irmão','irmao']],
+    ['amizades',['amigo','amiga','amizade','bullying']],
+    ['trabalho',['emprego','trabalho','chefe','entrevista','vaga']],
+    ['dinheiro',['dinheiro','gastos','dívida','divida','cartão','cartao','fatura']],
+    ['tecnologia',['site','aplicativo','código','codigo','celular','computador']]
+  ];
+  const recentTopic = recentTopicWords
+    .map(([topic,terms])=>({topic,score:terms.filter(term=>recentConversationText.includes(term)).length}))
+    .sort((a,b)=>b.score-a.score)[0];
+  const referenceSubject = recentReferences[0]?.id || null;
+  const hasRecentContext = recentUserMessages.length>0;
+  const referenceContext = {
+    subject:referenceSubject,
+    topic:recentTopic?.score>0?recentTopic.topic:null,
+    recentUserMessages,
+    lastAssistantPrompt:recentAssistantMessages.at(-1)||'',
+    ambiguous:recentReferences.length>1 && recentReferences[0].hits.length===recentReferences[1].hits.length
+  };
+  const referenceFollowUp = isEllipticalFollowUp || (hasPronounReference && words.length<=7);
+
   const topicContinuation = /^(sim|nao|não|isso|exato|verdade|pode ser|talvez|acho que|e agora|como assim|por que|porque|pq|continua|me explica|entendi|mas|tambem|também|kkkk+|rs+|haha+)[.!? ]*$/.test(q)
     || /^(e se|mas e|e quando|nesse caso|por exemplo)\b/.test(q);
   const greeting = /^(oi|ola|e ai|opa|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom)\b/.test(q);
@@ -133,6 +181,24 @@ function generateNexusReply(question, finance={}, history=[]) {
   const short = words.length <= 4;
   const emotional = match(/\b(ansios|ansiedade|cansad|sobrecarreg|triste|desanim|medo|preocup|frustrad|sozinh|solidao|chatead|nervos|pressionad|chorando|mal hoje|nao aguento)\b/);
   const urgentRisk = match(/\b(quero morrer|me matar|tirar minha vida|suicid|me machucar|me cortar|acabar com tudo|nao quero mais viver)\b/);
+
+  // Responde a referências curtas usando o antecedente recente, sem fingir certeza.
+  if (referenceFollowUp && hasRecentContext) {
+    if (referenceContext.ambiguous) {
+      return 'Quero acompanhar direitinho. 💙 Quando você diz isso, está falando de '+referenceContext.topic+' ou de outra pessoa/situação que apareceu na conversa?';
+    }
+    if (referenceContext.subject || referenceContext.topic) {
+      const subject=referenceContext.subject?(' '+referenceContext.subject):'';
+      const topic=referenceContext.topic||'assunto anterior';
+      if (/\b(e agora|o que faço|oq faço|o que eu faço|como devo agir)\b/.test(q)) {
+        return 'Pensando no que você contou sobre '+topic+subject+', eu não quero sugerir algo sem entender a parte que mudou. O próximo passo mais seguro é separar o que você sabe do que está supondo. O que aconteceu depois da última coisa que você me contou?';
+      }
+      if (/\b(é normal|isso é normal|e normal)\b/.test(q)) {
+        return 'Sobre '+topic+subject+': pode haver várias explicações, então não dá para afirmar que é normal ou concluir algo só com o contexto atual. Qual comportamento ou acontecimento específico você quer avaliar?';
+      }
+      return 'Estou relacionando sua mensagem ao que você comentou sobre '+topic+subject+'. Para não interpretar errado, você quer saber por que isso aconteceu, o que fazer agora ou como conversar sobre a situação?';
+    }
+  }
 
   // 0. Habilidades fundamentais: matemática simples e conversa social natural.
   // Avalia apenas expressões aritméticas permitidas; nunca usa eval() ou executa código.
