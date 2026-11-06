@@ -55,3 +55,29 @@ test('reconhece limites pessoais sem tratar o limite como hostilidade', () => {
   const result = analyzeLanguage('Não quero conversar sobre isso');
   assert.ok(result.possibleActs.includes('boundary'));
 });
+
+test('continua a conversa quando a pessoa responde que o dia está sendo bom', () => {
+  const history = [{ role:'assistant', content:'Como está sendo seu dia?' }];
+  const reply = getLanguageResponse('Está sendo bom', history);
+  assert.match(reply, /O que aconteceu de bom hoje/);
+});
+
+test('continua com respostas neutras considerando a pergunta anterior', () => {
+  const history = [{ role:'assistant', content:'Como está sendo seu dia?' }];
+  assert.match(getLanguageResponse('Mais ou menos', history), /dias que são mais neutros/);
+});
+
+test('acolhe uma resposta negativa sem mudar de assunto', () => {
+  const history = [{ role:'assistant', content:'Como está sendo seu dia?' }];
+  assert.match(getLanguageResponse('Está sendo ruim', history), /Quer me contar o que aconteceu/);
+});
+
+test('entende formas informais com pontuação', () => {
+  assert.equal(normalizeLanguageText('VC tá bem, hj?'), 'voce esta bem hoje');
+});
+
+test('expande o vocabulário cotidiano em várias categorias', () => {
+  for (const word of ['tmj','rlx','vdd','qnd','parabens','ansied']) {
+    assert.ok(NEXUS_LEXICON.some(entry => entry.variants.includes(word)), word);
+  }
+});
