@@ -2167,3 +2167,20 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
 @media(max-width:600px){
  .arcade-library-info .arcade-library-play{min-width:108px!important;min-height:39px!important;padding:0 13px!important;margin-top:12px!important;font-size:.64rem!important;border-radius:11px!important}
 }
+
+/* NEXUS AI — estado de conversa e indicador de geração */
+.assistant-popover-messages{scroll-behavior:smooth;overscroll-behavior:contain}
+.assistant-message{animation:nexusMessageIn .22s ease both}
+@keyframes nexusMessageIn{from{opacity:0;transform:translateY(7px)}to{opacity:1;transform:translateY(0)}}
+.assistant-bubble{white-space:pre-wrap;overflow-wrap:anywhere}
+.nexus-typing{display:flex;align-items:center;gap:5px;min-height:38px;color:#b9c9e2}
+.nexus-typing i{width:6px;height:6px;border-radius:50%;background:#91bfff;box-shadow:0 0 9px #78aaff;animation:nexusTyping .9s ease-in-out infinite}
+.nexus-typing i:nth-child(2){animation-delay:.15s}
+.nexus-typing i:nth-child(3){animation-delay:.3s;margin-right:5px}
+.nexus-typing span{font-size:11px;color:#91a5c4}
+@keyframes nexusTyping{0%,60%,100%{opacity:.35;transform:translateY(0)}30%{opacity:1;transform:translateY(-4px)}}
+.nexus-error{margin:8px 2px;padding:10px 12px;border:1px solid rgba(255,133,158,.32);border-radius:11px;background:rgba(95,35,54,.2);color:#ffb0bf;font-size:11px;line-height:1.5}
+.assistant-popover-compose button:disabled{opacity:.55;cursor:not-allowed;filter:saturate(.55)}
+.nexus-send-spinner{display:block;width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:nexusSpin .7s linear infinite}
+@keyframes nexusSpin{to{transform:rotate(360deg)}}
+.assistant-popover-suggestions button:disabled{opacity:.45;pointer-events:none}
