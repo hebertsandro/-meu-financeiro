@@ -533,7 +533,9 @@ function SpaceNexusGame({onReward}){
    for(const foe of g.foes){if(Math.abs(foe.x-g.ship.x)<7&&Math.abs(foe.y-g.ship.y)<6){tookHit=true}else foeRemaining.push(foe)}
    g.foes=foeRemaining;
    if(tookHit){if(g.shield){g.shield=false;setShieldActive(false);setMessage('Escudo absorveu o impacto!')}else{g.lives=Math.max(0,g.lives-1);setMessage('A nave foi atingida! Desvie dos disparos!')}}
-   setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);
+   // Mantém a simulação e colisões em 60 FPS, mas atualiza o React a cada 2 ciclos.
+   // Isso reduz pela metade as reconciliações do DOM sem alterar a velocidade da partida.
+   if(n%2===0||g.lives<=0){setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);}
    if(g.lives<=0){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});onReward(Math.floor(g.score/25))}
   },16);
   return()=>clearInterval(id);
