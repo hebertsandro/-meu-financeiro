@@ -1342,3 +1342,31 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 @keyframes bossEnrage{from{transform:scale(.96)}to{transform:scale(1.12)}}
 @keyframes shieldPulse{from{transform:scale(.94);opacity:.65}to{transform:scale(1.08);opacity:1}}
 @media(max-width:600px){.space-nexus-controls{gap:7px}.space-nexus-controls button{width:45px}.space-nexus-controls .space-shield-button{width:48px}}
+
+
+/* Biblioteca arcade — vitrine de jogos no estilo loja */
+.arcade-library-heading{display:flex;align-items:end;justify-content:space-between;gap:12px;margin:28px 2px 15px}
+.arcade-library-heading span{font-size:.65rem;letter-spacing:.15em;color:#7f9bc9;font-weight:900}
+.arcade-library-heading h3{font-size:1.35rem;margin:5px 0 0;color:#f4f7ff}
+.arcade-library-heading>small{font-size:.62rem;color:#8fa2c5;font-weight:800;letter-spacing:.08em}
+.arcade-library-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:15px}
+.arcade-library-card{padding:0;text-align:left;overflow:hidden;border:1px solid #7183aa35;border-radius:15px;background:#111a30;color:#f4f7ff;cursor:pointer;transition:transform .2s,border-color .2s,box-shadow .2s;min-width:0}
+.arcade-library-card:not(:disabled):hover{transform:translateY(-4px);border-color:#7c9bdfaa;box-shadow:0 12px 28px #02061766}
+.arcade-library-art{height:145px;position:relative;display:flex;align-items:center;justify-content:center;overflow:hidden;background:radial-gradient(circle at 50% 48%,#4d5fa8,#19254c 65%,#10172c)}
+.arcade-library-art>span{font-size:65px;filter:drop-shadow(0 8px 12px #0008);z-index:1}
+.arcade-library-art>i{position:absolute;top:16px;right:20px;color:#d9edff;font-style:normal;font-size:22px}
+.arcade-library-art>b{position:absolute;bottom:9px;left:12px;font-size:.58rem;letter-spacing:.2em;color:#ffffffb8}
+.space-library-card .arcade-library-art{background:radial-gradient(circle at 50% 45%,#285c91,#17234c 58%,#0b1227)}
+.quiz-library-card .arcade-library-art{background:radial-gradient(circle at 50% 45%,#7255a8,#32245c 60%,#17132f)}
+.flap-library-card .arcade-library-art{background:radial-gradient(circle at 50% 45%,#b68a43,#594222 60%,#241d17)}
+.arcade-library-info{padding:12px;display:flex;flex-direction:column;gap:6px}
+.arcade-library-info strong{font-size:.78rem;letter-spacing:.04em}
+.arcade-library-info small{font-size:.66rem;color:#a9b8d3;min-height:26px}
+.arcade-library-play{display:flex;align-items:center;gap:3px;color:#8feaff;font-size:.62rem;font-weight:900;letter-spacing:.12em;margin-top:4px}
+.arcade-coming-card{cursor:default;opacity:.72}
+.arcade-coming-card .arcade-library-art{background:linear-gradient(145deg,#252e43,#141b2c)}
+.arcade-coming-card .arcade-library-art>span{filter:grayscale(.35);opacity:.8}
+.arcade-library-soon{font-size:.57rem;color:#a5b1c8;font-weight:900;letter-spacing:.08em;margin-top:5px}
+.arcade-back-button{display:inline-flex;align-items:center;gap:9px;margin:8px 0 18px;padding:10px 14px;border:1px solid #7088ba55;border-radius:10px;background:#182541;color:#c8d8f5;font-size:.68rem;font-weight:900;letter-spacing:.08em;cursor:pointer}
+.arcade-back-button span{font-size:1.1rem}
+@media(max-width:600px){.arcade-library-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.arcade-library-art{height:118px}.arcade-library-art>span{font-size:53px}.arcade-library-info{padding:10px}.arcade-library-info strong{font-size:.68rem}.arcade-library-info small{font-size:.6rem}.arcade-library-heading>small{font-size:.53rem}}
