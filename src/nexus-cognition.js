@@ -298,22 +298,44 @@ function composeConversationalReply(message, history = []) {
   if (socialQuestion) {
     return 'Estou aqui, funcionando e pronta para conversar com você! 😊 Como está sendo seu dia?';
   }
-  const languageReply = getLanguageResponse(message, history);
-  if (languageReply) return languageReply;
   const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' ')).replace(/\s+/g, ' ').trim();
-  const previousAssistant = Array.isArray(history)
-    ? history.filter(turn => turn?.role === 'assistant').at(-1)?.content || history.filter(turn => turn?.role === 'assistant').at(-1)?.text || ''
-    : '';
+  const assistantTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'assistant') : [];
+  const previousAssistantTurn = assistantTurns[assistantTurns.length - 1];
+  const previousAssistant = previousAssistantTurn?.content || previousAssistantTurn?.text || '';
   const assistantAskedAboutUser = /como voce esta|como esta voce|como voce esta hoje|como esta sendo seu dia|como foi seu dia|como esta hoje/.test(normalizeNexusText(previousAssistant));
 
-  // Continuidade social: interpreta a resposta à pergunta anterior e avança a conversa.
-  // Não trata "estou bem também" como uma frase sem contexto.
+  // A resposta à pergunta anterior tem prioridade sobre classificadores genéricos.
   if (assistantAskedAboutUser && /^(estou|to|tou)? ?(bem|otimo|otima|legal|tranquilo|tranquila|de boa)( tambem)?$/.test(social)) {
     return 'Que bom saber disso! 😊 E o que você está fazendo hoje? Está sendo um dia tranquilo ou aconteceu alguma coisa interessante?';
   }
   if (assistantAskedAboutUser && /^(mais ou menos|assim assim|nao muito bem|nao estou bem|to mal|estou mal|cansado|cansada|desanimado|desanimada)$/.test(social)) {
     return 'Poxa, sinto muito que não esteja sendo um dia tão bom. 💙 Se quiser, pode me contar o que está acontecendo. Foi algo específico ou é só aquele cansaço acumulado?';
   }
+
+  // Reconhece relatos emocionais em primeira pessoa antes do fallback de "não entendi".
+  const emotionPatterns = [
+    { re: /^(?:eu )?(?:estou|to|tou|me sinto) (?:muito |bem |super )?(feliz|contente|animado|animada|empolgado|empolgada|realizado|realizada)\b/, kind: 'joy' },
+    { re: /^(?:eu )?(?:estou|to|tou|me sinto) (?:muito |bem |super )?(triste|chateado|chateada|desanimado|desanimada|pra baixo|mal)\b/, kind: 'sadness' },
+    { re: /^(?:eu )?(?:estou|to|tou|me sinto) (?:muito |bem |super )?(ansioso|ansiosa|preocupado|preocupada|nervoso|nervosa|com medo)\b/, kind: 'anxiety' },
+    { re: /^(?:eu )?(?:estou|to|tou|me sinto) (?:muito |bem |super )?(com raiva|irritado|irritada|revoltado|revoltada)\b/, kind: 'anger' }
+  ];
+  const emotionalDisclosure = emotionPatterns.map(item => ({ ...item, match: social.match(item.re) })).find(item => item.match);
+  if (emotionalDisclosure) {
+    const reason = String(message || '').match(/\b(?:porque|pois|já que|depois que|quando)\b\s+(.+)/i)?.[1]?.replace(/[.!?]+$/, '');
+    if (emotionalDisclosure.kind === 'joy') {
+      return reason
+        ? 'Que notícia boa! 😊 Você está feliz porque ' + reason + '. O que isso significa para você?'
+        : 'Que bom ler isso! 😊 Fico contente que você esteja vivendo um momento feliz. Aconteceu alguma coisa especial ou é uma felicidade que já vinha crescendo?';
+    }
+    if (emotionalDisclosure.kind === 'sadness') return reason
+      ? 'Sinto muito que você esteja passando por isso. 💙 Você comentou que isso tem relação com ' + reason + '. Quer me contar um pouco mais?'
+      : 'Poxa, sinto muito que você esteja se sentindo assim. 💙 Quer me contar o que aconteceu? Vou te ouvir sem julgar.';
+    if (emotionalDisclosure.kind === 'anxiety') return 'Entendo. Quando a ansiedade ou a preocupação aparece, pode ser difícil organizar tudo. O que está te deixando assim neste momento?';
+    return 'Parece que alguma coisa te irritou bastante. Quer me contar o que aconteceu? Podemos pensar nisso com calma, sem tirar conclusões antes de entender a situação.';
+  }
+
+  const languageReply = getLanguageResponse(message, history);
+  if (languageReply) return languageReply;
   if (/^(estou|to) bem e voce$/.test(social)) {
     return 'Que bom saber que você está bem! 😊 Eu não tenho sentimentos como uma pessoa, mas estou funcionando direitinho e pronta para conversar com você. Como está sendo seu dia?';
   }
