@@ -176,7 +176,7 @@ function generateNexusReply(question, finance={}, history=[]) {
     const text = ' '+q+' ';
     const includes = phrase => text.includes(' '+normalize(phrase)+' ') || text.includes(' '+normalize(phrase)+'? ');
     const topicDefinitions = [
-      {id:'relationship',label:'relacionamento',terms:['namorada','namorado','namoro','relacionamento','ficante','crush','terminar','terminou','terminamos','ciume','ciúme','confianca','confiança','me ignorou','nao responde','não responde','brigamos','discuti']},
+      {id:'relationship',label:'relacionamento',terms:['namorada','namorado','namoro','relacionamento','ficante','crush','terminar','terminou','terminamos','ciume','ciúme','confianca','confiança','me ignorou','nao responde','não responde','brigamos','discuti','estranha','estranho','distante','fria','frio','mudou comigo','me evita','parou de falar','sumiu']},
       {id:'school',label:'estudos',terms:['escola','prova','estudar','estudo','materia','matéria','matematica','matemática','enem','professor','professora','nota','trabalho escolar','faculdade','aula','exercicio','exercício']},
       {id:'family',label:'família',terms:['familia','família','mae','mãe','pai','irmao','irmão','irma','irmã','responsavel','responsável','em casa']},
       {id:'friendship',label:'amizades',terms:['amigo','amiga','amizade','grupo de amigos','me excluiu','me excluem','fofoca','bullying']},
@@ -204,7 +204,7 @@ function generateNexusReply(question, finance={}, history=[]) {
   })();
 
   // Se há sinais suficientes, responde ao significado combinado — não a um termo solto.
-  if (frame.primary && frame.primary.score >= 2) {
+  if (frame.primary && (frame.primary.score >= 2 || (frame.primary.score >= 1 && frame.personal && ['relationship','school','family','friendship','health'].includes(frame.primary.id)))) {
     const topic=frame.primary.id;
     if (topic==='relationship' && (frame.intent==='help'||frame.intent==='question'||frame.intent==='personal_story')) {
       return 'Entendi que você está falando de relacionamento e parece haver uma situação específica por trás disso. 💙 Não vou presumir o que a outra pessoa pensa nem quem está certo. O que aconteceu, o que você percebeu de diferente e o que você gostaria que acontecesse agora?';
