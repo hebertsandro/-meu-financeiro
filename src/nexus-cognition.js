@@ -283,7 +283,7 @@ function summarizeLogicalStructure(structure) {
 
 // Respostas sociais têm prioridade sobre referências vagas e classificações de tópico.
 function composeConversationalReply(message) {
-  const social = normalizeNexusText(message).replace(/[,.!?]/g, ' ').replace(/\\s+/g, ' ').trim();
+  const social = normalizeNexusText(message).replace(/[,.!?]/g, ' ').replace(/\s+/g, ' ').trim();
   if (/^(estou|to) bem e voce$/.test(social)) {
     return 'Que bom saber que você está bem! 😊 Eu não tenho sentimentos como uma pessoa, mas estou funcionando direitinho e pronta para conversar com você. Como está sendo seu dia?';
   }
@@ -316,8 +316,8 @@ export function analyzeHypotheses(message, history = []) {
   ].flatMap(value => value.split(/[.!?]+/).map(part => part.trim()).filter(Boolean));
   const polarity = statement => {
     const normalized = normalizeNexusText(statement);
-    const negated = /\\b(nao|nunca|jamais)\\b/.test(normalized);
-    const core = normalized.replace(/\\b(nao|nunca|jamais)\\b/g, '').replace(/[,.!?]/g, ' ').replace(/\\s+/g, ' ').trim();
+    const negated = /\b(nao|nunca|jamais)\b/.test(normalized);
+    const core = normalized.replace(/\b(nao|nunca|jamais)\b/g, '').replace(/[,.!?]/g, ' ').replace(/\s+/g, ' ').trim();
     return { core, negated };
   };
   const contradictions = [];
