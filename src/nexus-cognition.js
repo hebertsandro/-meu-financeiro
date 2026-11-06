@@ -188,6 +188,16 @@ export function parseLogicalStructure(text) {
     const before = source.slice(cursor, relation.index).replace(/^[,;\s]+|[,;\s]+$/g, '');
     if (before) clauses.push({ text: before, role: clauses.length === 0 ? 'initial' : 'context' });
     cursor = relation.end;
+    // Em estruturas "se X, Y", a condição vem antes do conector principal.
+    // Guardamos "se X" como a primeira proposição e "Y" como a segunda.
+    if (relation.type === 'condition' && relation.index === 0) {
+      const comma = source.indexOf(',', cursor);
+      if (comma >= 0) {
+        const conditionText = source.slice(cursor, comma).trim();
+        if (conditionText) clauses.push({ text: 'se ' + conditionText, role: 'condition' });
+        cursor = comma + 1;
+      }
+    }
     relation.clauseIndex = clauses.length;
   }
   const tail = source.slice(cursor).replace(/^[,;\s]+|[,;\s]+$/g, '');
