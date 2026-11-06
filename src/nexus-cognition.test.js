@@ -183,3 +183,15 @@ test('prioriza continuidade contextual antes de respostas genéricas da linguage
   const reply = improveNexusFallback('Estou bem também',history,'fallback genérico');
   assert.match(reply,/Que bom saber disso/);
 });
+
+test('fallback conversa de forma aberta sem dizer que não tem base para entender', () => {
+  const reply = improveNexusFallback('Hoje aconteceu uma coisa muito diferente comigo', [{role:'user',content:'Hoje aconteceu uma coisa muito diferente comigo'}], 'Quero entender exatamente o que você quis comunicar.');
+  assert.match(reply, /Entendi o que você está compartilhando|Tô acompanhando/);
+  assert.doesNotMatch(reply, /não tenho base suficiente|estrutura da frase|dar um exemplo|explicar o que espera de mim/);
+});
+
+test('fallback recebe uma pergunta inédita sem exigir reformulação imediata', () => {
+  const reply = improveNexusFallback('Por que algumas decisões parecem tão difíceis?', [{role:'user',content:'Por que algumas decisões parecem tão difíceis?'}], 'Quero entender exatamente o que você quis comunicar.');
+  assert.doesNotMatch(reply, /não tenho base suficiente|reformule a pergunta|dar um exemplo/);
+  assert.match(reply, /Boa pergunta|vamos falar/);
+});
