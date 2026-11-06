@@ -45,28 +45,38 @@ const gameQuestions = [
  {category:"SEGURANÇA",question:"Onde é mais seguro buscar informações sobre uma cobrança bancária suspeita?",options:["No link enviado por desconhecido","No aplicativo ou canal oficial do banco","Respondendo com sua senha"],correct:1,explanation:"Use sempre o aplicativo ou os canais oficiais, sem clicar em links suspeitos."}
 ];
 
-function answerFinancialQuestion(question, finance) {
- const q=question.toLowerCase(), money=brl, tx=finance.transactions||[], now=new Date();
- const key=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
- const mt=tx.filter(t=>String(t.date||'').slice(0,7)===key);
- const inc=mt.filter(t=>t.type==='entrada').reduce((s,t)=>s+Number(t.amount||0),0);
- const out=mt.filter(t=>t.type==='gasto').reduce((s,t)=>s+Number(t.amount||0),0);
- const allIn=tx.filter(t=>t.type==='entrada').reduce((s,t)=>s+Number(t.amount||0),0);
- const allOut=tx.filter(t=>t.type==='gasto').reduce((s,t)=>s+Number(t.amount||0),0);
- const debts=(finance.debts||[]).filter(d=>d.status!=='Pago'), debt=debts.reduce((s,d)=>s+Number(d.amount||0),0);
- const cards=finance.cards||[], limit=cards.reduce((s,c)=>s+Number(c.limit_amount||0),0), used=cards.reduce((s,c)=>s+Number(c.used||0),0);
- const parts=(finance.installments||[]).filter(i=>Number(i.paid_count||0)<Number(i.installment_count||0));
- const monthly=parts.reduce((s,i)=>s+Number(i.total_amount||0)/Math.max(1,Number(i.installment_count||1)),0);
- const goals=finance.goals||[];
- const cats=mt.filter(t=>t.type==='gasto').reduce((a,t)=>{const k=t.category||'Outros';a[k]=(a[k]||0)+Number(t.amount||0);return a;},{});
- const top=Object.entries(cats).sort((a,b)=>b[1]-a[1])[0];
- if(/saldo|sobrou|disponível|disponivel|quanto tenho/.test(q)) return 'Seu saldo registrado no período completo é '+money(allIn-allOut)+'. Neste mês, entraram '+money(inc)+' e saíram '+money(out)+'. Considero somente os registros cadastrados no site.';
- if(/gasto|despesa|categoria|economizar|economia/.test(q)) return 'Neste mês você registrou '+money(out)+' em gastos e '+money(inc)+' em entradas.'+(top?' Sua categoria com maior gasto é '+top[0]+' ('+money(top[1])+').':'')+(inc>0?' Isso representa '+(out/inc*100).toFixed(0)+'% das entradas.':' Ainda não há entradas registradas para comparar.')+(inc>0&&out/inc>.8?' Atenção: mais de 80% das entradas já foram comprometidas.':'');
- if(/cartão|cartões|cartao|cartoes|limite|crédito|credito|fatura/.test(q)) return cards.length?'Você tem '+cards.length+' cartão(ões), limite total de '+money(limit)+', uso registrado de '+money(used)+' e disponível estimado de '+money(limit-used)+'. Confira os valores com o aplicativo do banco.':'Você ainda não cadastrou cartões.';
- if(/dívida|divida|conta|vencimento/.test(q)) return debts.length?'Você tem '+debts.length+' conta(s) pendente(s), somando '+money(debt)+'. Priorize as essenciais e as que vencem primeiro.':'Não há contas em aberto cadastradas no momento.';
- if(/parcela|prestação|prestacao/.test(q)) return parts.length?'Há '+parts.length+' compra(s) parcelada(s) em andamento, com cerca de '+money(monthly)+' por mês em parcelas. É uma estimativa com base nos valores cadastrados.':'Não encontrei compras parceladas em aberto.';
- if(/meta|objetivo|guardar|juntar|poupar/.test(q)) return goals.length?'Suas metas: '+goals.map(g=>g.name+': '+money(g.saved)+' de '+money(g.target)+'; faltam '+money(Math.max(0,Number(g.target)-Number(g.saved||0)))).join(' | '):'Você ainda não criou metas. Cadastre um objetivo para eu acompanhar seu progresso.';
- return 'Resumo dos seus registros: neste mês entraram '+money(inc)+' e saíram '+money(out)+'. Saldo total registrado: '+money(allIn-allOut)+'. '+(debt?'Contas pendentes: '+money(debt)+'. ':'')+(monthly?'Parcelas estimadas por mês: '+money(monthly)+'. ':'')+'Pergunte sobre saldo, gastos, cartões, dívidas, parcelas ou metas.';
+function generateNexusReply(question, finance, history=[]) {
+ const q=String(question||'').toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\\u0300-\\u036f]/g,'');
+ const money=brl, transactions=finance.transactions||[], cards=finance.cards||[], debts=finance.debts||[], goals=finance.goals||[], installments=finance.installments||[];
+ const now=new Date(), month=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
+ const monthTx=transactions.filter(t=>String(t.date||'').slice(0,7)===month);
+ const income=monthTx.filter(t=>t.type==='entrada').reduce((s,t)=>s+Number(t.amount||0),0);
+ const expenses=monthTx.filter(t=>t.type==='gasto').reduce((s,t)=>s+Number(t.amount||0),0);
+ const allIncome=transactions.filter(t=>t.type==='entrada').reduce((s,t)=>s+Number(t.amount||0),0);
+ const allExpenses=transactions.filter(t=>t.type==='gasto').reduce((s,t)=>s+Number(t.amount||0),0);
+ const pendingDebts=debts.filter(d=>d.status!=='Pago');
+ const debtTotal=pendingDebts.reduce((s,d)=>s+Number(d.amount||0),0);
+ const cardLimit=cards.reduce((s,c)=>s+Number(c.limit||0),0), cardUsed=cards.reduce((s,c)=>s+Number(c.used||0),0);
+ const activeParts=installments.filter(i=>Number(i.paid||0)<Number(i.count||0));
+ const monthlyParts=activeParts.reduce((s,i)=>s+Number(i.amount||0)/Math.max(1,Number(i.count||1)),0);
+ const topCategory=Object.entries(monthTx.filter(t=>t.type==='gasto').reduce((o,t)=>{const k=t.category||'Outros';o[k]=(o[k]||0)+Number(t.amount||0);return o;},{})).sort((a,b)=>b[1]-a[1])[0];
+ const firstName=String(history.find(m=>m.role==='user')?.content||'').trim().split(/\\s+/)[0];
+ const greeting=/^(oi|ola|e ai|bom dia|boa tarde|boa noite|hey|opa)\\b/.test(q);
+ if(greeting) return 'Oii! 😊 Que bom ter você por aqui. Eu sou a NEXUS, sua assistente do Meu Financeiro. Posso conversar com você, analisar seus registros e ajudar a planejar os próximos passos. O que vamos organizar hoje?';
+ if(/\\b(quem e voce|seu nome|o que voce faz|como voce funciona)\\b/.test(q)) return 'Eu sou a NEXUS AI ⚡, a assistente do Meu Financeiro. Meu núcleo atual funciona com código próprio: interpreto assuntos financeiros, faço cálculos com os dados cadastrados e organizo recomendações. Ainda não sou um modelo de linguagem livre como o ChatGPT, mas posso ajudar bastante na sua organização financeira.';
+ if(/\\b(obrigad|valeu|agradecid)\\b/.test(q)) return 'Imagina! 💙 Estou aqui para ajudar. Quer olhar mais algum ponto das suas finanças?';
+ if(/\\b(tchau|ate mais|vou sair|falou)\\b/.test(q)) return 'Até mais! 💙 Quando voltar, podemos continuar organizando suas finanças. Cuide bem do seu dinheiro e de você!';
+ if(/\\b(ajuda|o que posso perguntar|como posso usar|comandos)\\b/.test(q)) return 'Pode falar comigo naturalmente! Por exemplo:\\n• “Como estão meus gastos este mês?”\\n• “Qual categoria está pesando mais?”\\n• “Quanto ainda tenho disponível nos cartões?”\\n• “Quais contas preciso priorizar?”\\n• “Como posso guardar dinheiro para uma meta?”\\nTambém pode me contar uma situação e eu ajudo a pensar em alternativas.';
+ if(/\\b(saldo|sobrou|quanto tenho|quanto resta|disponivel na conta)\\b/.test(q)) return 'Vamos conferir 😊\\n\\nNeste mês, você registrou '+money(income)+' em entradas e '+money(expenses)+' em gastos. A diferença é **'+money(income-expenses)+'**.\\nConsiderando todo o histórico cadastrado, o saldo entre entradas e gastos é '+money(allIncome-allExpenses)+'. Isso considera apenas o que foi registrado no Meu Financeiro, não o saldo bancário em tempo real.';
+ if(/\\b(gasto|gastos|despesa|despesas|economizar|economia|onde estou gastando)\\b/.test(q)) return 'Olhei seus lançamentos deste mês. 💡\\n\\n• Entradas: '+money(income)+'\\n• Gastos: '+money(expenses)+'\\n• Diferença: '+money(income-expenses)+(topCategory?'\\n• Maior categoria: '+topCategory[0]+' ('+money(topCategory[1])+')':'')+(income>0?'\\n• Seus gastos representam '+(expenses/income*100).toFixed(1).replace('.',',')+'% das entradas.':'')+(income>0&&expenses/income>.8?'\\n\\n⚠️ Atenção: mais de 80% das entradas já foram comprometidas. Vale revisar primeiro os gastos variáveis.':'')+'\\n\\nSe quiser, posso ajudar a montar um plano para reduzir uma categoria.';
+ if(/\\b(cartao|cartoes|limite|credito|fatura)\\b/.test(q)) return cards.length?'Você cadastrou '+cards.length+' cartão(ões). 💳\\n\\n• Limite total: '+money(cardLimit)+'\\n• Valor utilizado: '+money(cardUsed)+'\\n• Disponível estimado: '+money(cardLimit-cardUsed)+'\\n\\nUse esse valor como referência e confirme sempre a fatura no aplicativo do banco.': 'Ainda não encontrei cartões cadastrados. Você pode adicioná-los na área “Cartões e compromissos”.';
+ if(/\\b(divida|dividas|conta|contas|vencimento|pendencia|pendencias)\\b/.test(q)) return pendingDebts.length?'Encontrei '+pendingDebts.length+' compromisso(s) ainda não marcado(s) como pago(s), somando '+money(debtTotal)+'.\\n\\nUma boa ordem inicial é priorizar contas essenciais, as que vencem primeiro e as que podem gerar juros ou multas. Se você me disser as datas e taxas, posso ajudar a comparar a prioridade.':'Não encontrei contas pendentes cadastradas. Isso é um bom sinal! Confira se todos os compromissos foram registrados.';
+ if(/\\b(parcela|parcelas|parcelamento|prestacao|prestacoes)\\b/.test(q)) return activeParts.length?'Você tem '+activeParts.length+' compra(s) parcelada(s) em andamento. O valor mensal estimado é '+money(monthlyParts)+'.\\n\\nEsse cálculo divide o valor total de cada compra pela quantidade de parcelas. Confira os valores e vencimentos reais antes de decidir uma nova compra.':'Não encontrei parcelamentos em andamento cadastrados.';
+ if(/\\b(meta|metas|objetivo|objetivos|guardar|juntar|poupar|reserva)\\b/.test(q)) return goals.length?'Vamos olhar suas metas! 🎯\\n\\n'+goals.map(g=>'• '+g.name+': '+money(g.saved)+' guardados de '+money(g.target)+' ('+(Number(g.target)>0?Math.min(100,Number(g.saved||0)/Number(g.target)*100).toFixed(0):0)+'%). Faltam '+money(Math.max(0,Number(g.target)-Number(g.saved||0))+'.')).join('\\n')+'\\n\\nUma estratégia é separar um valor possível assim que receber, sem comprometer contas essenciais.':'Você ainda não cadastrou metas. Que tal começar com um objetivo pequeno e um valor mensal que caiba no seu orçamento?';
+ if(/\\b(planejamento|planejar|orcamento|organizar|por onde comeco|me ajuda)\\b/.test(q)) return 'Vamos por partes, sem complicar. 💙\\n\\n1. Garanta primeiro moradia, alimentação, transporte e contas essenciais.\\n2. Separe as despesas fixas das variáveis.\\n3. Veja quais dívidas têm juros ou vencem primeiro.\\n4. Defina uma meta de economia realista, mesmo que pequena.\\n\\nCom seus registros atuais, neste mês entraram '+money(income)+' e saíram '+money(expenses)+'. Posso montar um plano mais específico se você me contar qual é sua prioridade.';
+ if(/\\b(triste|ansios|preocup|desanim|dificil|difícil|apertad|sem dinheiro)\\b/.test(q)) return 'Poxa, sinto muito que esteja passando por isso. 💙 Não precisa resolver tudo de uma vez. Podemos olhar sua situação com calma, separar o que é urgente do que pode esperar e encontrar um próximo passo possível. Quer me contar o que está pesando mais agora?';
+ if(q.endsWith('?')||q.length>12) return 'Entendi o que você está dizendo. Quero te ajudar da melhor forma. 😊 Neste momento, consigo conversar sobre organização financeira e analisar seus registros, mas ainda não tenho compreensão livre de qualquer assunto como um modelo de linguagem. Se sua pergunta envolve dinheiro, me dê um pouquinho mais de contexto ou diga se é sobre gastos, cartões, dívidas, parcelas ou metas.';
+ return 'Estou aqui com você! 😊 Pode me contar um pouco mais? Posso ajudar a entender seus gastos, organizar dívidas, acompanhar cartões, planejar metas ou simplesmente pensar com você em um próximo passo.';
 }
 function App(){
   const [session,setSession]=useState(null), [loading,setLoading]=useState(true);
@@ -265,31 +275,27 @@ function App(){
   function awardFlapXp(score){const day=new Date().toLocaleDateString('en-CA');const saved=JSON.parse(window.localStorage.getItem('mf_flap_daily')||'{}');const used=saved.day===day?Number(saved.xp||0):0;const points=Math.max(0,Math.floor(Number(score)||0));const requested=points*2;const reward=Math.min(requested,Math.max(0,100-used));if(reward>0){const total=used+reward;window.localStorage.setItem('mf_flap_daily',JSON.stringify({day,xp:total}));setDailyGameXp(total);setGameXp(v=>v+reward);notify('Mandou bem! +'+reward+' XP no Asas da Fortuna (2 XP por ponto).')}else notify('Limite diário de 100 XP do Flappy atingido. Volte amanhã!')}
 
   async function sendAssistantMessage(value=assistantInput){
-    const question=value.trim();
+    const question=String(value||'').trim();
     if(!question||assistantBusy)return;
-    if(!supabase){setAssistantError('O Supabase ainda não está configurado.');return;}
-    const history=[...assistantMessages.filter(m=>m.role==='user'||m.role==='assistant'),{role:'user',text:question}]
-      .slice(-12).map(m=>({role:m.role,content:String(m.text||'').slice(0,4000)}));
-    const financeContext={
-      referenceMonth:new Date().toISOString().slice(0,7),
-      transactions:(data.transactions||[]).slice(0,40).map(t=>({date:t.date,type:t.type,category:t.category,description:String(t.description||'').slice(0,90),amount:Number(t.amount||0)})),
-      cards:(data.cards||[]).map(c=>({name:c.name,limit:Number(c.limit_amount||0),used:Number(c.used||0),dueDay:c.due_day})),
-      debts:(data.debts||[]).map(d=>({title:d.title,amount:Number(d.amount||0),dueDate:d.due_date,status:d.status})),
-      goals:(data.goals||[]).map(g=>({name:g.name,target:Number(g.target||0),saved:Number(g.saved||0),deadline:g.deadline})),
-      installments:(data.installments||[]).map(i=>({description:i.description,amount:Number(i.total_amount||0),count:Number(i.installment_count||0),paid:Number(i.paid_count||0)}))
-    };
+    const previous=assistantMessages.filter(m=>m.role==='user'||m.role==='assistant').slice(-10);
     setAssistantMessages(old=>[...old,{role:'user',text:question}]);
     setAssistantInput('');
     setAssistantBusy(true);
     setAssistantError('');
     try{
-      const {data:result,error}=await supabase.functions.invoke('nexus-chat',{body:{messages:history,financeContext}});
-      if(error)throw error;
-      if(!result?.reply)throw new Error('A resposta do núcleo veio vazia.');
-      setAssistantMessages(old=>[...old,{role:'assistant',text:result.reply}]);
+      // O núcleo local interpreta a intenção e calcula respostas usando os dados já carregados no Meu Financeiro.
+      await new Promise(resolve=>window.setTimeout(resolve,650));
+      const reply=generateNexusReply(question,{
+        transactions:(data.transactions||[]).map(t=>({date:t.date,type:t.type,category:t.category,description:t.description,amount:t.amount})),
+        cards:(data.cards||[]).map(c=>({name:c.name,limit:c.limit_amount,used:c.used,dueDay:c.due_day})),
+        debts:(data.debts||[]).map(d=>({title:d.title,amount:d.amount,dueDate:d.due_date,status:d.status})),
+        goals:(data.goals||[]).map(g=>({name:g.name,target:g.target,saved:g.saved,deadline:g.deadline})),
+        installments:(data.installments||[]).map(i=>({description:i.description,amount:i.total_amount,count:i.installment_count,paid:i.paid_count}))
+      },previous);
+      setAssistantMessages(old=>[...old,{role:'assistant',text:reply}]);
     }catch(error){
-      console.error('NEXUS AI:',error);
-      setAssistantError('Ainda não consegui alcançar o servidor da NEXUS. O núcleo próprio precisa estar instalado e conectado. Tente novamente em instantes.');
+      console.error('NEXUS local:',error);
+      setAssistantError('Tive um pequeno problema ao analisar sua mensagem. Pode tentar novamente?');
     }finally{setAssistantBusy(false);}
   }
 
@@ -470,7 +476,7 @@ function App(){
       {page==='reports'&&<><div className="stat-grid"><Stat icon={ArrowDownLeft} label="Entradas registradas" value={brl(paidIn)} tone="green" detail="Todo o período"/><Stat icon={ArrowUpRight} label="Gastos registrados" value={brl(paidOut)} tone="red" detail="Todo o período"/><Stat icon={Wallet} label="Saldo calculado" value={brl(balance)} tone="blue" detail="Entradas menos gastos"/><Stat icon={Target} label="Falta para metas" value={brl(goalTotal)} tone="purple" detail="Total restante"/></div><div className="two-col"><section className="panel"><div className="panel-head"><div><h3>Fluxo dos últimos meses</h3><p>Comparação mensal</p></div></div><ResponsiveContainer width="100%" height={260}><AreaChart data={chartData}><CartesianGrid stroke="#263044" strokeDasharray="4 4"/><XAxis dataKey="month" tick={{fill:'#8290a8',fontSize:11}}/><YAxis tick={{fill:'#8290a8',fontSize:10}}/><Tooltip formatter={v=>brl(v)}/><Area dataKey="Entradas" stroke="#35d39a" fill="#35d39a" fillOpacity={.12}/><Area dataKey="Gastos" stroke="#ff7085" fill="#ff7085" fillOpacity={.12}/></AreaChart></ResponsiveContainer></section><section className="panel"><div className="panel-head"><div><h3>Gastos por categoria</h3><p>Distribuição registrada</p></div></div>{categories.length?<div className="category-list">{categories.map(c=><div className="category-row" key={c.name}><span>{c.name}</span><b>{brl(c.value)}</b><div className="progress"><i style={{width:`${Math.min(100,c.value/Math.max(...categories.map(x=>x.value))*100)}%`}}/></div></div>)}</div>:<Empty icon={ChartNoAxesCombined} title="Sem dados suficientes" text="Registre despesas e escolha categorias para ver a análise."/ >}</section></div></>}
       <footer className="footer"><span>MEU FINANCEIRO <i>•</i> FEITO PARA SUA ROTINA</span><span><ShieldCheck size={14}/> Seus dados dependem da configuração segura da sua conta</span></footer>
     </div></main>
-    {assistantOpen&&<div className="assistant-popover"><div className="assistant-popover-head"><div className="assistant-popover-title"><span className="assistant-popover-icon"><Gamepad2 size={19}/><Sparkles size={11}/></span><div><b>NEXUS <em>AI</em></b><small><i/> NÚCLEO PRÓPRIO · EM CONFIGURAÇÃO</small></div></div><button className="icon-btn" onClick={()=>setAssistantOpen(false)} aria-label="Fechar assistente"><X size={18}/></button></div><div className="assistant-popover-messages">{assistantMessages.map((m,i)=><div className={'assistant-message '+m.role} key={i}><div className="assistant-bubble">{m.text}</div></div>)}{assistantBusy&&<div className="assistant-message assistant"><div className="assistant-bubble nexus-typing"><i/><i/><i/><span>NEXUS está pensando…</span></div></div>}{assistantError&&<div className="nexus-error" role="status">{assistantError}</div>}</div><div className="assistant-popover-suggestions"><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Como estão meus gastos?')}>Meus gastos</button><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Analise meus cartões')}>Meus cartões</button><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Quais dívidas devo priorizar?')}>Minhas dívidas</button></div><form className="assistant-popover-compose" onSubmit={e=>{e.preventDefault();sendAssistantMessage()}}><input value={assistantInput} onChange={e=>setAssistantInput(e.target.value)} placeholder="Converse com a NEXUS…" disabled={assistantBusy}/><button className="primary" type="submit" disabled={!assistantInput.trim()||assistantBusy} aria-label="Enviar">{assistantBusy?<span className="nexus-send-spinner"/>:<Send size={17}/>}</button></form><p className="assistant-popover-note">NEXUS AI · modelo aberto em servidor próprio. Suas informações são enviadas ao núcleo para responder à conversa.</p></div>}
+    {assistantOpen&&<div className="assistant-popover"><div className="assistant-popover-head"><div className="assistant-popover-title"><span className="assistant-popover-icon nexus-avatar"><Brain size={19}/><Sparkles size={11}/></span><div><b>NEXUS <em>AI</em></b><small><i/> NÚCLEO PRÓPRIO · EM CONFIGURAÇÃO</small></div></div><button className="icon-btn" onClick={()=>setAssistantOpen(false)} aria-label="Fechar assistente"><X size={18}/></button></div><div className="assistant-popover-messages">{assistantMessages.map((m,i)=><div className={'assistant-message '+m.role} key={i}><div className="assistant-bubble">{m.text}</div></div>)}{assistantBusy&&<div className="assistant-message assistant"><div className="assistant-bubble nexus-typing"><i/><i/><i/><span>NEXUS está pensando…</span></div></div>}{assistantError&&<div className="nexus-error" role="status">{assistantError}</div>}</div><div className="assistant-popover-suggestions"><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Como estão meus gastos?')}>Meus gastos</button><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Analise meus cartões')}>Meus cartões</button><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Quais dívidas devo priorizar?')}>Minhas dívidas</button></div><form className="assistant-popover-compose" onSubmit={e=>{e.preventDefault();sendAssistantMessage()}}><input value={assistantInput} onChange={e=>setAssistantInput(e.target.value)} placeholder="Converse com a NEXUS…" disabled={assistantBusy}/><button className="primary" type="submit" disabled={!assistantInput.trim()||assistantBusy} aria-label="Enviar">{assistantBusy?<span className="nexus-send-spinner"/>:<Send size={17}/>}</button></form><p className="assistant-popover-note">NEXUS AI · modelo aberto em servidor próprio. Suas informações são enviadas ao núcleo para responder à conversa.</p></div>}
     <button className={'assistant-fab '+(assistantOpen?'is-open':'')} onClick={()=>setAssistantOpen(v=>!v)} aria-label={assistantOpen?'Fechar assistente':'Abrir assistente'} title="Abrir NEXUS AI">{assistantOpen?<X size={23}/>:<><Gamepad2 size={25}/><span><Sparkles size={13}/></span></>}</button>
     {payModal&&<PayBillsModal debts={data.debts.filter(d=>d.is_continuous?d.paid_month!==currentMonthKey:d.status!=='Pago')} installments={data.installments.filter(i=>Number(i.paid_count||0)<Number(i.installment_count||0))} onClose={()=>setPayModal(false)} onConfirm={confirmPayments} busy={payBusy}/>}
     {modal&&<EntryModal type={typeof modal==='string'?modal:modal.type} extra={typeof modal==='string'?(modal==='installments'?{cards:data.cards}:null):modal} onClose={()=>setModal(null)} onSave={saveItem} busy={busy}/>}
