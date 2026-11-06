@@ -318,7 +318,7 @@ export function analyzeNexusMessage(message, history = []) {
 // respostas específicas já existentes (cálculos, finanças e conhecimento curado).
 export function improveNexusFallback(message, history, legacyReply) {
   const analysis = analyzeNexusMessage(message, history);
-  const generic = /quero entender direito|estou aqui para conversar|pode falar do seu dia|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem/i.test(String(legacyReply || ''));
+  const generic = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem/i.test(String(legacyReply || ''));
   if (generic || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
     return analysis.fallbackReply;
   }
