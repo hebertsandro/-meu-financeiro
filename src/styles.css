@@ -1818,3 +1818,29 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 @keyframes bossArtworkRage{to{transform:translateY(-2px) scale(1.025)}}
 @media(max-width:600px){.space-player-ship{width:66px!important;height:80px!important}.space-boss>.space-art-boss{width:180px;height:105px}.space-boss{width:195px!important}.space-enemy{width:59px!important;height:49px!important}.space-enemy.brute{width:69px!important;height:58px!important}}
 @media(prefers-reduced-motion:reduce){.space-art-ship,.space-boss>.space-art-boss{animation:none!important}}
+
+/* SPACE NEXUS — otimização de composição para dispositivos móveis */
+.space-boss{filter:none!important;will-change:transform}
+.space-boss>.space-art-boss{
+  filter:drop-shadow(0 0 9px #ff7da988)!important;
+  animation:bossArtworkFloat 3.2s ease-in-out infinite!important;
+  transform:translateZ(0);
+}
+.space-boss.phase-two>.space-art-boss{
+  filter:drop-shadow(0 0 13px #ff315e99)!important;
+  animation:bossArtworkRage .45s ease-in-out infinite alternate!important;
+}
+.space-boss>i{box-shadow:0 0 5px #ff668866!important}
+.space-art-ship,.space-art-enemy,.space-art-boss{backface-visibility:hidden}
+.space-player-ship{filter:drop-shadow(0 0 7px #56dfff99)!important}
+.space-enemy,.space-enemy.scout,.space-enemy.brute{filter:drop-shadow(0 0 7px #bd72ff88)!important}
+.space-nexus-arena:after{animation-duration:38s}
+.space-nebula{animation-duration:11s}
+@media(max-width:700px){
+ .space-boss>.space-art-boss{filter:drop-shadow(0 0 7px #ff7da977)!important}
+ .space-boss.phase-two>.space-art-boss{filter:drop-shadow(0 0 9px #ff315e99)!important}
+ .space-nebula{filter:blur(15px)}
+}
+@media(prefers-reduced-motion:reduce){
+ .space-boss>.space-art-boss{animation:none!important}
+}
