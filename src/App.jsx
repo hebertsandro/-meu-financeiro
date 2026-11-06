@@ -63,7 +63,8 @@ function generateNexusReply(question, finance={}, history=[]) {
   const goals = Array.isArray(finance.goals) ? finance.goals : [];
   const installments = Array.isArray(finance.installments) ? finance.installments : [];
   const previous = Array.isArray(history) ? history.slice(-12) : [];
-  const lastUser = [...previous].reverse().find(m => m.role === 'user')?.content || '';
+  const historyBeforeCurrent = previous.length && previous[previous.length-1].role === 'user' ? previous.slice(0,-1) : previous;
+  const lastUser = [...historyBeforeCurrent].reverse().find(m => m.role === 'user')?.content || '';
   const lastAssistant = [...previous].reverse().find(m => m.role === 'assistant')?.content || '';
   const userTurns = previous.filter(m => m.role === 'user').length;
   const monthKey = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
