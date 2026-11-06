@@ -96,6 +96,12 @@ function generateNexusReply(question, finance, history=[]) {
   return 'Obrigado por confiar em mim para falar disso. 💙 Você não precisa fingir que está tudo bem aqui. Pode contar do seu jeito, no seu tempo. O que mais está passando pela sua cabeça agora?';
  if(/\b(filme|serie|série|musica|música|cantor|cantora|futebol|time|anime|livro|jogo|game|hobby)\b/.test(q))
   return 'Bora falar disso também! 😄 Me conta mais — o que você está assistindo, ouvindo ou curtindo ultimamente?';
+ if(/\b(viagem|viajar|ferias|praia|passeio|hotel|turismo)\b/.test(q)) return 'Que delícia falar de viagem! ✈️ Você está planejando um passeio ou sonhando com algum destino?';
+ if(/\b(cachorro|cachorrinho|cao|gato|gatinho|pet|animal|filhote)\b/.test(q)) return 'Aaa, vamos falar dos bichinhos! 🐾 O que aconteceu com seu pet?';
+ if(/\b(celular|telefone|iphone|android|computador|notebook|internet|tecnologia|aplicativo)\b/.test(q)) return 'Tecnologia também é assunto! 😄 O que você está tentando fazer ou descobrir?';
+ if(/\b(igreja|deus|fe|biblia|oracao|jesus|religiao)\b/.test(q)) return 'Podemos conversar sobre espiritualidade com respeito. 💙 O que você está pensando ou sentindo sobre isso?';
+ if(/\b(receita|cozinhar|cozinha|comida|almoco|jantar|doce|sobremesa)\b/.test(q)) return 'Assunto bom! 😋 Você quer uma receita, uma ideia ou só conversar sobre comida?';
+ if(/\b(academia|treino|esporte|basquete|volei|corrida|campeonato)\b/.test(q)) return 'Bora falar de esporte! 🏆 Você está acompanhando alguma partida ou falando dos seus treinos?';
  if(/\b(como voce ta|como você tá|tudo bem|tudo bom|como vai)\b/.test(q))
   return 'Estou por aqui, pronta para conversar com você! 😊 E você, como está de verdade hoje?';
  if(/\b(kkkk|haha|rsrs|que bom|legal|bacana|top|massa)\b/.test(q))
