@@ -183,7 +183,7 @@ export function getLanguageResponse(message,history=[]) {
   const answer= t.replace(/^(eu )?(estou|to|tou) /,'').replace(/m{2,}$/,'m');
   if(askedDay){
     if(/^(esta sendo bom|esta bom|esta otimo|esta legal|foi bom|foi legal)$/.test(t)) return 'Que bom saber disso! 😊 O que aconteceu de bom hoje?';
-    if(/^(mais ou menos|assim assim|nem bom nem ruim|normal|nada demais)$/.test(t)) return 'Entendi! Tem dias que são mais neutros mesmo. Aconteceu algo específico ou foi só um dia comum?';
+    if(/^(mais ou menos|assim assim|nem bom nem ruim|normal|nada demais)$/.test(t)) return 'Entendi! Parece um dia mais ou menos; tem dias que são mais neutros mesmo. Aconteceu algo específico ou foi só um dia comum?';
     if(/^(esta ruim|esta sendo ruim|foi ruim|nao muito bem)$/.test(t)) return 'Poxa, sinto muito. Quer me contar o que aconteceu? Estou acompanhando você.';
     if(/^(cansativo|foi cansativo|muito corrido)$/.test(t)) return 'Imagino que tenha sido puxado. O que mais tomou sua energia hoje?';
   }
