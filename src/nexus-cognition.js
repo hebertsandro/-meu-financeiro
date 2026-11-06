@@ -313,7 +313,7 @@ export function analyzeHypotheses(message, history = []) {
   const statements = [
     ...structure.clauses.map(clause => clause.text),
     ...(Array.isArray(history) ? history.filter(turn => turn?.role === 'user').slice(-5).map(turn => normalizeNexusText(turn.content || turn.text || '')) : [])
-  ].filter(Boolean);
+  ].flatMap(value => value.split(/[.!?]+/).map(part => part.trim()).filter(Boolean));
   const polarity = statement => {
     const normalized = normalizeNexusText(statement);
     const negated = /\\b(nao|nunca|jamais)\\b/.test(normalized);
