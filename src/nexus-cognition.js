@@ -211,7 +211,7 @@ export function parseLogicalStructure(text) {
     if (marker.type === 'condition' && marker.start === 0) {
       const comma = source.indexOf(',', cursor);
       if (comma >= 0) {
-        const conditionIndex = addClause('se ' + source.slice(cursor, comma));
+        const conditionIndex = addClause('se ' + source.slice(cursor, comma).trim());
         cursor = comma + 1;
         const nextComma = source.indexOf(',', cursor);
         const resultEnd = nextComma < 0 ? source.length : nextComma;
