@@ -161,8 +161,16 @@ function resolveReferences(text, history) {
 
 function composeReply(text, frame, references) {
   const clean = text.trim();
-  const { topic, intent } = frame;
+  const { topic, intent, emotion, speechAct, discourseRelations = [] } = frame;
   if (intent === 'greeting') return 'Oii! 😊 Estou aqui para conversar. Como você está hoje?';
+  if (speechAct === 'personal_disclosure' && emotion) {
+    const emotionNames = { sadness: 'tristeza', anxiety: 'preocupação ou ansiedade', anger: 'irritação', joy: 'alegria', confusion: 'dúvida ou confusão', shame: 'culpa ou vergonha' };
+    const feeling = emotionNames[emotion.emotion] || 'um sentimento importante';
+    return 'Pelo que você escreveu, pode haver ' + feeling + ' envolvida. Não quero presumir exatamente como você está se sentindo. O que aconteceu antes disso?';
+  }
+  if (discourseRelations.includes('contrast') && topic) {
+    return 'Entendi que você está colocando dois lados dessa situação em contraste. Quero considerar tanto o que aconteceu quanto o que mudou ou entrou em conflito. Qual dos dois pontos pesa mais para você agora?';
+  }
   if (intent === 'opinion') return 'Posso te dar uma opinião fundamentada, mas quero considerar os detalhes em vez de concordar automaticamente. Qual parte você quer que eu avalie?';
   if (intent === 'definition') return 'Vou explicar de forma direta: para definir isso corretamente, preciso identificar o conceito exato que você está perguntando. Pode me dizer o termo ou a expressão que quer entender?';
   if (intent === 'explanation') return 'Quero explicar o mecanismo, não só repetir uma definição. Ainda não tenho informação suficiente para responder com segurança sobre esse ponto específico. Se você indicar o fenômeno ou colar o trecho, consigo analisar melhor.';
@@ -176,7 +184,8 @@ function composeReply(text, frame, references) {
   if (intent === 'translation') return 'Envie a frase e indique o idioma de destino. Vou preservar o sentido e adaptar a expressão ao contexto, não apenas traduzir palavra por palavra.';
   if (references?.ambiguous) return 'Quero acompanhar a conversa sem confundir as pessoas. Quando você diz “' + clean + '”, está falando de qual delas?';
   if (references?.hasReference && references.likelyTopic) return 'Estou relacionando isso ao assunto de ' + references.likelyTopic + ' que apareceu antes. Para responder sem inventar detalhes, qual parte desse assunto você está retomando?';
-  if (topic) return 'Entendi que sua mensagem envolve ' + topic + '. Não quero presumir que uma palavra isolada explica tudo. Você quer uma explicação, uma orientação prática ou está contando o que aconteceu?';
+  if (topic && intent === 'question') return 'Sua pergunta parece estar relacionada a ' + topic + '. Para responder diretamente, preciso identificar exatamente o ponto que você quer esclarecer. Pode reformular a pergunta em uma frase ou dar um exemplo?';
+  if (topic) return 'Entendi que sua mensagem envolve ' + topic + '. ' + (emotion ? 'Também percebi sinais de ' + (emotion.emotion === 'sadness' ? 'tristeza' : emotion.emotion === 'anxiety' ? 'preocupação' : emotion.emotion === 'anger' ? 'irritação' : emotion.emotion === 'joy' ? 'alegria' : 'dúvida') + ', mas posso estar interpretando errado. ' : '') + 'Você quer uma explicação, uma orientação prática ou está contando o que aconteceu?';
   return 'Quero entender exatamente o que você quis comunicar. Consigo identificar a estrutura da frase, mas ainda não tenho base suficiente para afirmar o significado sem arriscar uma resposta fora do assunto. Você pode dar um exemplo ou explicar o que espera de mim?';
 }
 
