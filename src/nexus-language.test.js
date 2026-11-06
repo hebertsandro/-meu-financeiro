@@ -256,3 +256,20 @@ test('diferencia previsão de explicação causal', () => {
   const reasoning = analyzeContextualReasoning('Será que vai dar certo?', []);
   assert.equal(reasoning.reasoningType, 'prediction');
 });
+
+
+test('reconhece saudação informal dirigida à NEXUS pelo nome', () => {
+  const reply = getLanguageResponse('Oii nexus tudo bem ?', []);
+  assert.match(reply, /Tudo bem por aqui/);
+  assert.match(reply, /E você, como está hoje/);
+});
+
+test('reconhece variação "oi nexus tudo bom"', () => {
+  const reply = getLanguageResponse('Oi nexus tudo bom?', []);
+  assert.match(reply, /Tudo bem por aqui/);
+});
+
+test('responde pergunta social simples sem exigir histórico', () => {
+  const reply = getLanguageResponse('Tudo bem?', []);
+  assert.match(reply, /Estou aqui|Tudo bem por aqui/);
+});
