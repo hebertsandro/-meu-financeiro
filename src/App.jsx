@@ -489,7 +489,7 @@ function EntryModal({type,extra,onClose,onSave,busy}){
 function SpaceNexusGame({onReward}){
  const [running,setRunning]=useState(false),[ended,setEnded]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState(50),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[tick,setTick]=useState(0),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('A galáxia precisa de você!'),[shieldActive,setShieldActive]=useState(false);
  const start=()=>{setScore(0);setLives(3);setShip(50);setShots([]);setFoes([]);setEnemyShots([]);setBoss(null);setWave(1);setTick(0);setShieldActive(false);setEnded(false);setMessage('O esquadrão alienígena está chegando!');setRunning(true)};
- const move=d=>setShip(v=>Math.max(7,Math.min(93,v+d)));
+ const moveTo=(clientX,arena)=>{const r=arena.getBoundingClientRect();setShip(Math.max(6,Math.min(94,(clientX-r.left)/r.width*100)))};
  const activateShield=()=>{if(running&&!shieldActive){setShieldActive(true);setMessage('🛡️ ESCUDO ATIVADO! O próximo impacto será bloqueado.')}};
  useEffect(()=>{if(!running)return;const id=setInterval(()=>{setTick(t=>{const n=t+1;
   if(n%5===0)setShots(v=>[...v,{id:Date.now()+Math.random(),x:ship,y:78}]);
@@ -512,17 +512,17 @@ function SpaceNexusGame({onReward}){
  const finish=()=>{setRunning(false);setEnded(true);setBest(v=>{const b=Math.max(v,score);localStorage.setItem('mf_space_best',String(b));return b});onReward(Math.floor(score/25))};
  return <section className="space-nexus-card">
   <div className="space-nexus-hud"><span>🚀 ONDA {wave}</span><b>⭐ {score}</b><span>{'❤️'.repeat(lives)}{'🖤'.repeat(3-lives)}</span></div>
-  <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;const r=e.currentTarget.getBoundingClientRect();setShip(Math.max(7,Math.min(93,(e.clientX-r.left)/r.width*100)))}}>
+  <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.currentTarget)}} onPointerMove={e=>{if(!running||e.buttons!==1)return;moveTo(e.clientX,e.currentTarget)}}>
    <div className="space-stars"/><div className="space-nebula"/>
-   {foes.map(f=><div key={f.id} className={'space-enemy '+(f.type==='brute'?'brute':f.type==='scout'?'scout':'')} style={{left:f.x+'%',top:f.y+'%'}}>{f.type==='brute'?'👾':f.type==='scout'?'🦇':'🛸'}</div>)}
+   {foes.map(f=><div key={f.id} className={'space-enemy '+(f.type==='brute'?'brute':f.type==='scout'?'scout':'')} style={{left:f.x+'%',top:f.y+'%'}}><span className="space-enemy-core"/></div>)}
    {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}
    {shots.map(b=><i key={b.id} className="space-player-shot" style={{left:b.x+'%',top:b.y+'%'}}/>)}
-   {boss&&<div className={'space-boss '+(boss.hp<=boss.max*.5?'phase-two':'')} style={{left:boss.x+'%',top:boss.y+'%'}}><span>{boss.emoji}</span><b>{boss.name}</b><small>{boss.hp<=boss.max*.5?'FASE 2 · FÚRIA MÁXIMA':'FASE 1'}</small><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
-   <div className={'space-player-ship '+(shieldActive?'shielded':'')} style={{left:ship+'%'}}>🚀</div>
-   {!running&&<div className="space-overlay"><div className="space-overlay-icon">{ended?'💥':'🌌'}</div><h3>{ended?'MISSÃO ENCERRADA':'SPACE NEXUS'}</h3><p>{ended?'Pontuação: '+score+' · Recorde: '+best:message}</p><button className="primary" onClick={start}>{ended?'Jogar novamente':'Iniciar missão'} <ChevronRight size={17}/></button></div>}
+   {boss&&<div className={'space-boss '+(boss.hp<=boss.max*.5?'phase-two':'')} style={{left:boss.x+'%',top:boss.y+'%'}}><span><span className="space-boss-core"><i/><i/><i/></span></span><b>{boss.name}</b><small>{boss.hp<=boss.max*.5?'FASE 2 · FÚRIA MÁXIMA':'FASE 1'}</small><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
+   <div className={'space-player-ship '+(shieldActive?'shielded':'')} style={{left:ship+'%'}}><span className="ship-wing"/><span className="ship-body"/><span className="ship-flame"/></div>
+   {!running&&<div className="space-overlay"><div className="space-overlay-icon"><span className="space-overlay-orbit"/></div><h3>{ended?'MISSÃO ENCERRADA':'SPACE NEXUS'}</h3><p>{ended?'Pontuação: '+score+' · Recorde: '+best:message}</p><button className="primary" onClick={start}>{ended?'Jogar novamente':'Iniciar missão'} <ChevronRight size={17}/></button></div>}
   </div>
-  <div className="space-nexus-controls"><button onClick={()=>move(-9)} disabled={!running}>◀</button><span>TOQUE NA ARENA OU USE AS SETAS</span><button onClick={()=>move(9)} disabled={!running}>▶</button><button className="space-shield-button" onClick={activateShield} disabled={!running||shieldActive}>🛡️</button></div>
-  <div className="space-nexus-footer"><span>🏆 Recorde: {best}</span><span>⚡ Disparo automático</span><span>🛡️ Escudo: {shieldActive?'ativo':'pronto'}</span><span>👾 Chefões em duas fases</span></div>
+  <div className="space-nexus-controls"><span>ARRASTE O DEDO NA ARENA PARA PILOTAR</span><button className="space-shield-button" onClick={activateShield} disabled={!running||shieldActive}>ATIVAR ESCUDO</button></div>
+  <div className="space-nexus-footer"><span>🏆 Recorde: {best}</span><span>⚡ Disparo automático</span><span>🛡️ Escudo: {shieldActive?'ativo':'pronto'}</span><span>Chefões com evolução de combate</span></div>
  </section>
 }
 
