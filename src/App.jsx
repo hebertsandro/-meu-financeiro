@@ -448,11 +448,26 @@ function generateNexusReply(question, finance={}, history=[]) {
     {keys:['direitos do adolescente','estatuto da crianca','estatuto da criança','eca','direitos de adolescente'],reply:'No Brasil, o Estatuto da Criança e do Adolescente (ECA) estabelece direitos e proteções para crianças e adolescentes, incluindo dignidade, educação, saúde, convivência familiar e proteção contra negligência, discriminação, exploração e violência. A aplicação depende dos fatos e da legislação vigente; em situações concretas, procure um adulto seguro, Conselho Tutelar ou orientação jurídica adequada. Quer entender algum direito específico?'},
     {keys:['habito','hábito','procrastinacao','procrastinação','disciplina','rotina','organizacao pessoal','organização pessoal'],reply:'Para construir um hábito, reduza o tamanho da primeira ação e associe-a a um momento concreto. Em vez de “estudar mais”, experimente “abrir o caderno depois do lanche e resolver uma questão”. Acompanhe consistência, ajuste o ambiente e trate recaídas como informação, não como prova de incapacidade. Quer montar uma rotina realista para sua semana?'}
   ];
-  const deepMatch = deepKnowledge.find(item=>item.keys.some(key=>has(key)));
-  if (deepMatch) return deepMatch.reply;
-
-  const found = knowledge.find(item=>item.keys.some(key=>has(key)));
-  if (found) return found.reply;
+  // Busca por relevância, não pela primeira palavra coincidente.
+  // Expressões específicas valem mais que termos genéricos; vários sinais coerentes
+  // aumentam a pontuação. Empates próximos são tratados com cautela.
+  const rankKnowledge = entries => entries.map((item,index)=>{
+    const matched = (item.keys||[]).filter(key=>has(key));
+    const score = matched.reduce((total,key)=>{
+      const normalizedKey=normalize(key);
+      const tokenCount=normalizedKey.split(/\s+/).length;
+      return total + (tokenCount>=4?5:tokenCount===3?4:tokenCount===2?3:1.15);
+    },0) + Math.min(matched.length,4)*0.35;
+    return {item,index,score,matched};
+  }).filter(entry=>entry.score>0).sort((a,b)=>b.score-a.score);
+  const deepRanked=rankKnowledge(deepKnowledge);
+  const knowledgeRanked=rankKnowledge(knowledge);
+  const bestDeep=deepRanked[0];
+  const bestGeneral=knowledgeRanked[0];
+  const bestKnowledge=bestDeep && (!bestGeneral || bestDeep.score>=bestGeneral.score) ? bestDeep : bestGeneral;
+  const runnerUp=bestDeep && bestGeneral ? (bestKnowledge===bestDeep?bestGeneral:bestDeep) : null;
+  const knowledgeIsClear=bestKnowledge && (!runnerUp || bestKnowledge.score-runnerUp.score>=0.8 || bestKnowledge.score>=4);
+  if (knowledgeIsClear) return bestKnowledge.item.reply;
 
   // 5. CAMADA DE COMPREENSÃO — interpreta intenção, contexto e necessidade antes de responder.
   // É um sistema determinístico: amplia a cobertura e a qualidade das perguntas, mas não
@@ -746,7 +761,7 @@ function App(){
       // Dá tempo para o navegador renderizar o estado "NEXUS está pensando…" antes
       // de executar o motor local síncrono. Sem esta pausa, React pode agrupar as
       // atualizações de estado e o indicador desaparecer antes de chegar à tela.
-      await new Promise(resolve=>window.setTimeout(resolve,550));
+      await new Promise(resolve=>window.setTimeout(resolve,750));
       // Execução inteiramente local no navegador: nenhum texto ou dado financeiro é enviado a uma IA externa.
       const reply=generateNexusReply(question,financeContext,nextHistory);
       setAssistantMessages(old=>[...old,{role:'assistant',text:reply}]);
