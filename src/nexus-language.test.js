@@ -81,3 +81,8 @@ test('expande o vocabulário cotidiano em várias categorias', () => {
     assert.ok(NEXUS_LEXICON.some(entry => entry.variants.includes(word)), word);
   }
 });
+
+test('não deixa um cumprimento apagar uma pergunta importante', () => {
+  assert.equal(getLanguageResponse('Oi, me explica fotossíntese'), null);
+  assert.match(getLanguageResponse('Oi, como está?'), /Como você está hoje/);
+});
