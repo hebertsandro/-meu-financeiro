@@ -119,3 +119,19 @@ test('usa o contexto da pergunta anterior para continuar uma conversa', () => {
 test('não transforma uma pergunta inédita em resposta social genérica', () => {
   assert.equal(getLanguageResponse('Por que as folhas mudam de cor no outono?'), null);
 });
+
+
+test('reconhece resposta informal com prefixo e letra repetida', () => {
+  const history = [{ role:'assistant', content:'Como você está hoje?' }];
+  assert.match(getLanguageResponse('Estou bemm', history), /Fico feliz em saber/);
+});
+
+test('reconhece resposta curta mesmo quando o histórico usa campo text', () => {
+  const history = [{ role:'assistant', text:'Como você está hoje?' }];
+  assert.match(getLanguageResponse('Tô bem', history), /Fico feliz em saber/);
+});
+
+test('continua naturalmente depois de uma resposta positiva', () => {
+  const history = [{ role:'assistant', content:'Como você está hoje?' }];
+  assert.match(getLanguageResponse('Estou muito bem 😊', history), /Como está sendo seu dia/);
+});
