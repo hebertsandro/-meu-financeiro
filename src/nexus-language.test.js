@@ -135,3 +135,44 @@ test('continua naturalmente depois de uma resposta positiva', () => {
   const history = [{ role:'assistant', content:'Como você está hoje?' }];
   assert.match(getLanguageResponse('Estou muito bem 😊', history), /Como está sendo seu dia/);
 });
+
+
+test('entende resposta curta à pergunta "Como você está hoje?"', () => {
+  const history = [
+    { role:'assistant', content:'Oii! Estou aqui para conversar. Como você está hoje?' },
+    { role:'user', content:'Estou bemm' }
+  ];
+  assert.match(getLanguageResponse('Estou bemm', history), /Fico feliz em saber/);
+});
+
+test('expõe o fio da conversa com assunto ativo e tipo da pergunta anterior', () => {
+  const history = [
+    { role:'user', content:'Minha namorada anda distante' },
+    { role:'assistant', content:'O que aconteceu entre vocês?' },
+    { role:'user', content:'Ela quase não fala comigo' },
+    { role:'assistant', content:'Como você se sente com essa distância?' }
+  ];
+  const result = analyzeLanguage('Estou triste', history);
+  assert.equal(result.context.questionType, 'wellbeing');
+  assert.equal(result.context.activeTopic, 'relacionamento');
+  assert.equal(result.context.hasConversation, true);
+});
+
+test('mantém continuidade quando a pessoa responde a uma pergunta sobre o que houve', () => {
+  const history = [
+    { role:'user', content:'Hoje estou meio estranho' },
+    { role:'assistant', content:'Quer me contar o que aconteceu?' },
+    { role:'user', content:'Briguei com um amigo' },
+    { role:'assistant', content:'O que aconteceu na discussão?' }
+  ];
+  const reply = getLanguageResponse('Nada não', history);
+  assert.match(reply, /Não precisa contar mais do que quiser/);
+});
+
+test('não trata mudança explícita de assunto como continuação forçada', () => {
+  const history = [
+    { role:'user', content:'Estou preocupado com minha namorada' },
+    { role:'assistant', content:'Quer me contar o que aconteceu?' }
+  ];
+  assert.equal(getLanguageResponse('Como funciona juros compostos?', history), null);
+});
