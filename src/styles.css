@@ -1450,3 +1450,12 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .quiz-feedback p{margin:0;color:#dce4f5;font-size:.88rem;line-height:1.5}
 .quiz-feedback .primary{width:100%;justify-content:center}
 @media(max-width:420px){.quiz-start-panel,.quiz-question-panel{padding:16px;gap:15px}.quiz-hero{padding:19px 16px}.quiz-stats-grid{gap:7px}.quiz-stat-card{padding:11px 3px}.quiz-stat-card strong{font-size:1.05rem}.quiz-start-button{min-height:50px}}
+
+
+/* ASAS DA FORTUNA — identidade visual do cofrinho voador */
+.flap-library-card .arcade-library-art>span{font-size:3.1rem;filter:drop-shadow(0 5px 12px #f58fb577)}
+.flap-game-stage{border-color:#8878e977;background:linear-gradient(145deg,#15234a,#091327);box-shadow:0 14px 36px #02081777,0 0 25px #7d70e322}
+.flap-mode-heading span{display:block;max-width:34rem;line-height:1.5}
+.flap-mode-reward{color:#e9ce8b!important}
+.flap-best-score{color:#d0c6ff}
+@media(max-width:420px){.flap-game-stage canvas{width:100%;height:auto;aspect-ratio:320/420;touch-action:manipulation}}
