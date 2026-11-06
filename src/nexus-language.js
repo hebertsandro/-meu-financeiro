@@ -115,7 +115,7 @@ export function normalizeLanguageText(value = '') {
 }
 
 const ACT_PATTERNS = [
-  ['greeting', /^(oi|ola|opa|e ai|bom dia|boa tarde|boa noite|fala|salve)\b/],
+  ['greeting', /^(oi|ola|opa|e ai|bom dia|boa tarde|boa noite|fala|salve)( como voce esta| como esta| tudo bem| tudo bom)?$/],
   ['reciprocal_question', /^(e voce|e vc|e contigo|e com voce|como voce esta|tudo bem com voce)\b/],
   ['gratitude', /^(obrigado|obrigada|valeu|muito obrigado|agradeco)\b/],
   ['apology', /^(desculpa|foi mal|perdao|me perdoa)\b/],
