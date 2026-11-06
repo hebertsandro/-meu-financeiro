@@ -159,16 +159,103 @@ function resolveReferences(text, history) {
   };
 }
 
+
+const RELATION_PATTERNS = [
+  { type: 'condition', regex: /\\b(se|caso|desde que)\\b/g },
+  { type: 'contrast', regex: /\\b(mas|porem|contudo|entretanto|so que)\\b/g },
+  { type: 'cause', regex: /\\b(porque|pois|ja que|uma vez que|por causa de|devido a)\\b/g },
+  { type: 'consequence', regex: /\\b(por isso|portanto|entao|consequentemente|assim)\\b/g },
+  { type: 'addition', regex: /\\b(alem disso|tambem|alem do mais)\\b/g },
+  { type: 'time', regex: /\\b(depois que|antes que|quando|enquanto|assim que)\\b/g }
+];
+
+// Divide a mensagem em proposições e preserva o conector que explica a relação.
+// É uma análise estrutural: não presume que a relação expressa pelo usuário seja um fato.
+function parseLogicalStructure(text) {
+  const source = normalizeNexusText(text);
+  const matches = [];
+  for (const pattern of RELATION_PATTERNS) {
+    const regex = new RegExp(pattern.regex.source, 'g');
+    for (const match of source.matchAll(regex)) {
+      matches.push({ type: pattern.type, connector: match[0], index: match.index, end: match.index + match[0].length });
+    }
+  }
+  matches.sort((a, b) => a.index - b.index);
+  const unique = matches.filter((item, index) => !matches.slice(0, index).some(prev => item.index >= prev.index && item.index < prev.end));
+  const clauses = [];
+  let cursor = 0;
+  for (const relation of unique) {
+    const before = source.slice(cursor, relation.index).replace(/^[,;\\s]+|[,;\\s]+$/g, '');
+    if (before) clauses.push({ text: before, role: clauses.length === 0 ? 'initial' : 'context' });
+    cursor = relation.end;
+    relation.clauseIndex = clauses.length;
+  }
+  const tail = source.slice(cursor).replace(/^[,;\\s]+|[,;\\s]+$/g, '');
+  if (tail) clauses.push({ text: tail, role: clauses.length === 0 ? 'initial' : 'related' });
+  const relations = unique.map((item, index) => ({
+    type: item.type,
+    connector: item.connector,
+    fromClause: Math.max(0, item.clauseIndex - 1),
+    toClause: Math.min(clauses.length - 1, item.clauseIndex)
+  }));
+  const negations = clauses.map((clause, index) => ({
+    clauseIndex: index,
+    negated: /\\b(nao|nunca|jamais|nem)\\b/.test(clause.text),
+    markers: (clause.text.match(/\\b(nao|nunca|jamais|nem)\\b/g) || [])
+  }));
+  return {
+    clauses: clauses.map((clause, index) => ({
+      ...clause,
+      index,
+      negated: negations[index]?.negated || false,
+      question: /[?]$/.test(clause.text)
+    })),
+    relations,
+    negations,
+    hasMultiplePropositions: clauses.length > 1,
+    relationTypes: [...new Set(relations.map(item => item.type))]
+  };
+}
+
+function summarizeLogicalStructure(structure) {
+  if (!structure?.hasMultiplePropositions || !structure.relations.length) return null;
+  const clauses = structure.clauses;
+  const relation = structure.relations[0];
+  const first = clauses[relation.fromClause]?.text || clauses[0]?.text || '';
+  const second = clauses[relation.toClause]?.text || '';
+  if (!first || !second) return null;
+  if (relation.type === 'cause') {
+    return 'Você apresentou “' + first + '” e relacionou isso a “' + second + '” como causa ou explicação. Vou tratar essa ligação como a sua hipótese, não como algo comprovado.';
+  }
+  if (relation.type === 'consequence') {
+    return 'Você descreveu “' + first + '” e depois “' + second + '” como consequência. Precisamos conferir se essa consequência realmente decorre do primeiro ponto.';
+  }
+  if (relation.type === 'condition') {
+    return 'Você colocou uma condição — “' + first + '” — ligada a “' + second + '”. Então a segunda parte depende de a condição ser satisfeita.';
+  }
+  if (relation.type === 'contrast') {
+    return 'Você colocou duas ideias em contraste: “' + first + '” e “' + second + '”. As duas podem ser verdadeiras ao mesmo tempo, mesmo que exista uma tensão entre elas.';
+  }
+  if (relation.type === 'addition') {
+    return 'Além de “' + first + '”, você acrescentou “' + second + '”. Vou considerar os dois pontos, sem reduzir a situação a apenas um deles.';
+  }
+  if (relation.type === 'time') {
+    return 'Você organizou os acontecimentos em uma relação temporal: “' + first + '” e “' + second + '”. A ordem dos fatos pode ser importante para entender o que ocorreu.';
+  }
+  return null;
+}
+
 function composeReply(text, frame, references) {
   const clean = text.trim();
-  const { topic, intent, emotion, speechAct, discourseRelations = [] } = frame;
+  const { topic, intent, emotion, speechAct, discourseRelations = [], logicalStructure } = frame;
+  const logicalSummary = summarizeLogicalStructure(logicalStructure);
   if (intent === 'greeting') return 'Oii! 😊 Estou aqui para conversar. Como você está hoje?';
   if (speechAct === 'personal_disclosure' && emotion) {
     const emotionNames = { sadness: 'tristeza', anxiety: 'preocupação ou ansiedade', anger: 'irritação', joy: 'alegria', confusion: 'dúvida ou confusão', shame: 'culpa ou vergonha' };
     const feeling = emotionNames[emotion.emotion] || 'um sentimento importante';
     return 'Pelo que você escreveu, pode haver ' + feeling + ' envolvida. Não quero presumir exatamente como você está se sentindo. O que aconteceu antes disso?';
   }
-  if (discourseRelations.includes('contrast') && topic) {
+  if (logicalSummary && speechAct === 'statement') {\n    return logicalSummary + '\\n\\nQual parte dessa ligação você quer que eu analise primeiro?';\n  }\n  if (discourseRelations.includes('contrast') && topic) {
     return 'Entendi que você está colocando dois lados dessa situação em contraste. Quero considerar tanto o que aconteceu quanto o que mudou ou entrou em conflito. Qual dos dois pontos pesa mais para você agora?';
   }
   if (intent === 'opinion') return 'Posso te dar uma opinião fundamentada, mas quero considerar os detalhes em vez de concordar automaticamente. Qual parte você quer que eu avalie?';
@@ -192,7 +279,7 @@ function composeReply(text, frame, references) {
 // Retorna um quadro semântico que pode ser usado por outras partes do núcleo.
 export function analyzeNexusMessage(message, history = []) {
   const normalized = normalizeNexusText(message);
-  const frame = classify(normalized);
+  const frame = classify(normalized);\n  frame.logicalStructure = parseLogicalStructure(normalized);
   const references = resolveReferences(normalized, history);
   return {
     original: String(message || ''),
@@ -201,7 +288,7 @@ export function analyzeNexusMessage(message, history = []) {
     entities: frame.entities,
     topic: frame.topic,
     emotion: frame.emotion,
-    discourseRelations: frame.discourseRelations,
+    discourseRelations: frame.discourseRelations,\n    logicalStructure: parseLogicalStructure(normalized),
     speechAct: frame.speechAct,
     isFollowUp: frame.isFollowUp,
     isNegated: frame.isNegated,
