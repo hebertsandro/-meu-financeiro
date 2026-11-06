@@ -87,7 +87,7 @@ const ACTS = [
   ['agreement',/^(sim|concordo|exato|isso mesmo|verdade|pode ser|beleza|ok|certo|fechou)$/],
   ['disagreement',/^(nao|discordo|de jeito nenhum|nem pensar|nao e bem assim)$/],
   ['uncertainty',/^(nao sei|sei la|talvez|acho que|nao faco ideia)$/],
-  ['humor',/^(kkkk+|kakaka+|hahaha+|haha+|rsrs+)$/],
+  ['humor',/^(kkkk+|(?:ka){2,}k*|hahaha+|haha+|rsrs+)$/],
   ['boundary',/\b(nao quero|nao gosto|para com|prefiro que nao|nao me sinto confortavel|me deixa em paz)\b/],
   ['request',/\b(me ajuda|me ajude|pode me ajudar|quero saber|me explica|me ensina|faz para mim)\b/],
   ['disclosure',/\b(eu sinto|estou sentindo|aconteceu comigo|hoje eu|eu passei por|preciso desabafar)\b/]
@@ -379,7 +379,7 @@ export function analyzeLanguage(message, history=[]) {
   const previousTopic=previousTopics[0]?.topic||context.activeTopic;
   const changedTopic=Boolean(currentTopic&&previousTopic&&currentTopic!==previousTopic&&currentTopics[0].score>=1);
   const acts=ACTS.filter(([,re])=>re.test(normalized)).map(([act])=>act);
-  const laughter=/\b(kkk+|kakak+|hahaha+|haha+|rsrs+)\b/.test(normalized);
+  const laughter=/(?:\bkkk+\b|\b(?:ka){2,}k*\b|\bhahaha+\b|\bhaha+\b|\brsrs+\b)/.test(normalized);
   const ambiguousPhrases=[];
   for(const item of ['faz o que quiser','tanto faz','ta bom entao','deixa pra la','esquece','imagina','beleza']){
     if(contains(normalized,item)) ambiguousPhrases.push({phrase:item,needsContext:true});
@@ -437,7 +437,7 @@ export function getLanguageResponse(message,history=[]) {
   // no fallback genérico nem ser confundida com uma pergunta sem contexto.
   const directGreeting=/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( nexus)?( tudo bem| tudo bom| tudo certo| como voce esta| como esta| como vai)?$/.test(t);
   const directSocialQuestion=/^(e voce|e contigo|e com voce|como voce esta|tudo bem com voce|tudo bem|tudo bom|como vai voce)$/.test(t);
-  if(directGreeting) return 'Oii! 😊 Tudo bem por aqui, obrigada por perguntar! Como você está hoje? E me conta: o que gostaria de conversar?';
+  if(directGreeting) return 'Oii! 😊 Tudo bem por aqui, obrigada por perguntar! E você, como está hoje?';
   if(directSocialQuestion) return 'Estou aqui, funcionando e pronta para conversar com você! 😊 E como está sendo seu dia?';
   if(askedDay){
     if(/^(esta sendo bom|esta bom|esta otimo|esta legal|foi bom|foi legal)$/.test(t)) return 'Que bom saber disso! 😊 O que aconteceu de bom hoje?';
