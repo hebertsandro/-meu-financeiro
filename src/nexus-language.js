@@ -174,12 +174,79 @@ function getConversationContext(history=[]) {
   };
 }
 
+// Memória semântica leve: registra fatos relatados e ordem temporal sem tratá-los
+// como verdades verificadas nem transformar sequência em causalidade.
+export function buildConversationMemory(history=[]) {
+  const turns=(Array.isArray(history)?history:[])
+    .filter(turn=>turn?.role==='user')
+    .map(historyText).filter(Boolean).slice(-12);
+  const joined=turns.join(' ').toLocaleLowerCase('pt-BR');
+  const people=[
+    ['namorada',/\b(minha namorada|a namorada|minha parceira)\b/],
+    ['namorado',/\b(meu namorado|o namorado|meu parceiro)\b/],
+    ['amiga',/\b(minha amiga|a amiga)\b/],
+    ['amigo',/\b(meu amigo|o amigo)\b/],
+    ['mãe',/\b(minha mae|minha mãe)\b/],
+    ['pai',/\b(meu pai)\b/],
+    ['irmã',/\b(minha irma|minha irmã)\b/],
+    ['irmão',/\b(meu irmao|meu irmão)\b/]
+  ].filter(([,re])=>re.test(fold(joined))).map(([person])=>person);
+  const eventPatterns=[
+    ['distanciamento',/\b(esta distante|anda distante|ficou distante|se afastou|esta mais fria|esta mais frio)\b/],
+    ['menos_conversa',/\b(quase nao fala|nao conversa|parou de falar|fala menos|responde menos)\b/],
+    ['mudanca_escola',/\b(mudou de escola|trocou de escola|nova escola)\b/],
+    ['mudanca_cidade',/\b(mudou de cidade|foi morar em outra cidade)\b/],
+    ['conflito',/\b(brigou|brigamos|discutiu|discutimos|tivemos uma briga)\b/],
+    ['termino',/\b(terminou comigo|terminamos|terminou o namoro)\b/],
+    ['contato_interrompido',/\b(sumiu|parou de responder|me deixou no vacuo|nao respondeu)\b/],
+    ['reaproximacao',/\b voltou a falar|se reaproximou|voltamos a conversar\b/]
+  ];
+  const events=eventPatterns.filter(([,re])=>re.test(fold(joined))).map(([event])=>event);
+  const temporalMarkers=['depois que','depois de','desde que','a partir de','antes de','quando','naquela epoca','nesse periodo'];
+  const temporalEvidence=turns.flatMap((text,index)=>{
+    const normalized=fold(text);
+    const marker=temporalMarkers.find(item=>normalized.includes(item));
+    return marker?[{turn:index+1,marker,text:text.trim()}]:[];
+  });
+  const causalMarkers=['porque','por causa de','ja que','devido a'];
+  const causalEvidence=turns.flatMap((text,index)=>{
+    const normalized=fold(text);
+    const marker=causalMarkers.find(item=>normalized.includes(item));
+    return marker?[{turn:index+1,marker,text:text.trim(),status:'relato_nao_verificado'}]:[];
+  });
+  const facts=turns.slice(-8).map((text,index)=>({text:text.trim(),sequence:Math.max(1,turns.length-7)+index}));
+  return {
+    people:[...new Set(people)],
+    events:[...new Set(events)],
+    facts,
+    temporalEvidence,
+    causalEvidence,
+    activeTopic:topicsFor(joined)[0]?.topic||null,
+    turnCount:turns.length,
+    limitations:'Memória baseada apenas no que foi escrito; sequência temporal não comprova causa.'
+  };
+}
+
+function composeTimelineReply(message, history, memory) {
+  const text=fold(message);
+  const hasTemporalStart=/^(depois que|depois de|desde que|a partir de|quando|foi depois que)\b/.test(text);
+  const hasRelationshipContext=memory.activeTopic==='relacionamento'||
+    memory.people.includes('namorada')||memory.people.includes('namorado');
+  const refersToSchool=/mudou de escola|trocou de escola|nova escola/.test(text);
+  if(hasTemporalStart&&hasRelationshipContext) {
+    const detail=refersToSchool?'a mudança de escola':String(message).trim().replace(/[.!?]+$/,'');
+    return 'Entendi. Você está situando o distanciamento depois de ' + detail + '. Isso mostra a ordem em que as coisas aconteceram, mas ainda não confirma que uma coisa causou a outra. O que mudou no contato ou na rotina de vocês naquela época?';
+  }
+  return null;
+}
+
 export function analyzeLanguage(message, history=[]) {
   const original=String(message||'');
   const normalized=normalizeLanguageText(original);
   const turns=getUserTurns(history);
   const prior=turns.slice(-6);
   const context=getConversationContext(history);
+  const memory=buildConversationMemory(history);
   const currentTopics=topicsFor(normalized);
   const previousTopics=topicsFor(prior.slice(0,-1).join(' '));
   const currentTopic=currentTopics[0]?.topic||null;
@@ -208,7 +275,7 @@ export function analyzeLanguage(message, history=[]) {
       .slice(0,30).map(({canonical,meanings,tone,ambiguity})=>({canonical,meanings,tone,ambiguity})),
     possibleActs:acts,emotions:detectEmotion(normalized),laughter,irony,indirectness,
     ambiguousPhrases,unknownTokens,topics:currentTopics,topic:currentTopic,previousTopic,
-    changedTopic,references,repeatedTerms,followUp,answerKind,context,
+    changedTopic,references,repeatedTerms,followUp,answerKind,context,memory,
     contextAvailable:context.hasConversation,
     previousAssistant:context.lastAssistant,confidence:irony.possible||ambiguousPhrases.length?0.45:acts.length?0.78:currentTopic?0.62:0.25,
     caution:irony.possible||ambiguousPhrases.length>0||indirectness.length>0
@@ -236,6 +303,8 @@ export function getLanguageResponse(message,history=[]) {
   }
   // Respostas curtas a perguntas anteriores devem ser interpretadas pelo papel
   // que exercem na conversa, não como frases isoladas.
+  const timelineReply=composeTimelineReply(message,history,a.memory);
+  if(timelineReply) return timelineReply;
   if(a.context.questionType==='event' && /^(nada|nada nao|nao sei|foi isso|so isso)$/.test(t)) {
     return 'Tudo bem. Não precisa contar mais do que quiser. Quer conversar sobre outra coisa ou prefere ficar nesse assunto?';
   }
