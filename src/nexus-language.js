@@ -416,6 +416,13 @@ export function getLanguageResponse(message,history=[]) {
   // Respostas espontâneas podem vir com "estou", abreviações e letras repetidas
   // ("bemmm", "bemm"). Removemos o prefixo antes de interpretar o estado.
   const answer= t.replace(/^(eu )?(estou|to|tou) /,'').replace(/m{2,}$/,'m');
+
+  // Prioridade máxima para atos sociais explícitos. Uma saudação não deve cair
+  // no fallback genérico nem ser confundida com uma pergunta sem contexto.
+  const directGreeting=/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( nexus)?( tudo bem| tudo bom| tudo certo| como voce esta| como esta| como vai)?$/.test(t);
+  const directSocialQuestion=/^(e voce|e contigo|e com voce|como voce esta|tudo bem com voce|tudo bem|tudo bom|como vai voce)$/.test(t);
+  if(directGreeting) return 'Oii! 😊 Tudo bem por aqui, obrigada por perguntar! E você, como está hoje?';
+  if(directSocialQuestion) return 'Estou aqui, funcionando e pronta para conversar com você! 😊 E como está sendo seu dia?';
   if(askedDay){
     if(/^(esta sendo bom|esta bom|esta otimo|esta legal|foi bom|foi legal)$/.test(t)) return 'Que bom saber disso! 😊 O que aconteceu de bom hoje?';
     if(/^(mais ou menos|assim assim|nem bom nem ruim|normal|nada demais)$/.test(t)) return 'Entendi! Parece um dia mais ou menos; tem dias que são mais neutros mesmo. Aconteceu algo específico ou foi só um dia comum?';
@@ -445,8 +452,7 @@ export function getLanguageResponse(message,history=[]) {
   if(a.irony.possible) return 'Pode ter ironia ou sarcasmo no que você escreveu, mas o tom depende do contexto. Você está falando literalmente ou quis dizer o contrário?';
   if(a.indirectness.length) return 'Parece que talvez exista uma mensagem indireta ou algo que você não quis dizer de forma explícita. Não quero presumir para quem ou sobre o quê. O que você gostaria que eu entendesse dessa frase?';
   if(a.ambiguousPhrases.length) return 'Essa expressão pode ter sentidos diferentes dependendo do tom e do que aconteceu antes. Você quis dizer isso de verdade, está chateado(a) ou foi uma brincadeira?';
-  if(a.possibleActs.includes('greeting')) return 'Oii! 😊 Tudo bem por aqui, obrigada por perguntar! E você, como está hoje?';
-  if(a.possibleActs.includes('reciprocal_question')) return 'Estou aqui, funcionando e pronta para conversar com você! 😊 E como está sendo seu dia?';
+
   if(a.possibleActs.includes('gratitude')) return 'Por nada! 💙 Fico feliz em poder ajudar.';
   if(a.possibleActs.includes('apology')) return 'Tudo bem. Obrigada por falar comigo. Quer me contar o que aconteceu?';
   if(a.possibleActs.includes('farewell')) return 'Até mais! 😊 Quando quiser continuar, estarei por aqui.';
