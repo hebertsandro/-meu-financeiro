@@ -196,7 +196,76 @@ function generateNexusReply(question, finance={}, history=[]) {
   if (has('meta','metas','objetivo','objetivos','guardar','juntar','poupar','reserva')) return goals.length?'Suas metas cadastradas:\n'+goals.map(g=>'• '+g.name+': '+money(g.saved)+' de '+money(g.target)+' ('+(Number(g.target)>0?Math.min(100,Number(g.saved||0)/Number(g.target)*100).toFixed(0):0)+'%). Faltam '+money(Math.max(0,Number(g.target)-Number(g.saved||0)))+'.').join('\n')+'\n\nUma meta fica mais alcançável quando você divide o total pelo prazo e escolhe uma contribuição que não comprometa o básico.':'Você ainda não cadastrou metas. Uma boa primeira meta pode ser pequena e concreta, como guardar um valor possível por semana.';
   if (has('orcamento','orçamento','planejamento financeiro','planejar minhas finanças','organizar dinheiro','por onde comeco')) return 'Vamos montar uma base simples:\n1. Anote quanto entra e quando entra.\n2. Liste moradia, alimentação, transporte e outras despesas essenciais.\n3. Separe dívidas e parcelas com seus vencimentos.\n4. Defina um limite realista para gastos variáveis.\n5. Reserve algo para imprevistos, mesmo que comece pequeno.\n\nPelos seus registros deste mês, entraram '+money(income)+' e saíram '+money(expenses)+'. Qual é sua prioridade agora: sair das dívidas, controlar gastos ou juntar para um objetivo?';
 
-  // 4. Núcleo de conhecimento geral: respostas explicativas e orientação por domínio.
+  // 4. INTERPRETADOR DE MENSAGEM: identifica assunto + intenção + relação entre as palavras.
+  // Não dispara apenas porque uma palavra apareceu: exige sinais combinados e dá prioridade
+  // ao que a pessoa está fazendo com a frase (perguntar, contar, negar, pedir ajuda, comparar).
+  const hasAnyWord = list => list.some(term => has(term));
+  const hasNegation = has('nao','nunca','jamais','nem');
+  const asksMeaning = /^(o que significa|oq significa|que significa|o que e|oq e|o que quer dizer|qual o significado)/.test(q);
+  const asksHow = /^(como|de que jeito|de que forma|qual o jeito)/.test(q);
+  const asksWhy = /^(por que|porque|pq|qual motivo|por qual razao)/.test(q);
+  const asksWhatToDo = hasAnyWord(['o que eu faço','o que fazer','como resolver','como posso resolver','me ajuda']);
+  const tellsExperience = /^(eu|meu|minha|ontem|hoje|agora|aconteceu|estou|to|tô|fui|recebi|vi|senti)\b/.test(q);
+  const topicScores = [
+    {name:'estudos',keys:['prova','estudar','escola','materia','matematica','matemática','enem','professor','nota','trabalho escolar','faculdade','aprender','aula']},
+    {name:'relacionamento',keys:['namoro','namorada','namorado','relacionamento','ficante','crush','terminar','ciume','ciúme','briga','brigamos','discuti','confianca','confiança','mensagem dele','mensagem dela']},
+    {name:'amizades',keys:['amigo','amiga','amizade','grupo','excluido','excluida','fofoca','bullying']},
+    {name:'familia',keys:['familia','família','mae','mãe','pai','irmao','irmão','irma','irmã','responsavel','responsável']},
+    {name:'trabalho',keys:['emprego','trabalho','chefe','entrevista','curriculo','currículo','salario','salário','jovem aprendiz']},
+    {name:'dinheiro',keys:['dinheiro','gasto','gastos','salario','salário','cartao','cartão','divida','dívida','juros','fatura','economizar','poupar']},
+    {name:'tecnologia',keys:['celular','computador','internet','aplicativo','site','programa','programar','codigo','código','javascript','html','wifi','wi-fi']},
+    {name:'saude e bem-estar',keys:['sono','dormir','cansaco','cansaço','ansiedade','triste','dor','alimentacao','alimentação','exercicio','exercício','saude','saúde']},
+    {name:'sentimentos',keys:['medo','triste','ansioso','ansiosa','sozinho','sozinha','preocupado','preocupada','confuso','confusa','desanimado','desanimada','pressionado','pressionada']},
+    {name:'ciencias',keys:['fotossintese','fotossíntese','gravidade','atomo','átomo','celula','célula','evolucao','evolução','energia','planeta','quimica','química','fisica','física']},
+    {name:'historia e sociedade',keys:['historia','história','guerra','revolucao','revolução','globalizacao','globalização','democracia','politica','política','geografia','racismo','desigualdade']}
+  ];
+  const rankedTopics = topicScores.map(topic=>({
+    name:topic.name,
+    score:topic.keys.reduce((score,key)=>score+(has(key)?(key.includes(' ')?2:1):0),0)
+  })).sort((a,b)=>b.score-a.score);
+  const mainTopic = rankedTopics[0]?.score>0 ? rankedTopics[0].name : null;
+  const intent = asksMeaning?'meaning':asksWhy?'why':asksHow?'how':asksWhatToDo?'help':questionMark?'question':tellsExperience?'experience':'statement';
+  // Respostas por combinação semântica. A pergunta de esclarecimento é específica ao tema,
+  // em vez de devolver uma pergunta genérica desconectada.
+  if (mainTopic==='estudos' && (asksWhatToDo || intent==='experience' || hasAnyWord(['nao entendo','não entendo','nao consigo','não consigo','tenho dificuldade','estou perdido','to perdido']))) {
+    return 'Entendi que você está falando dos estudos. 💙 '+(hasAnyWord(['prova','amanha','amanhã','nota'])?'Como existe uma avaliação envolvida, vale priorizar o que mais cai e praticar questões. ':'')+'Vamos localizar a dificuldade: é para entender a explicação, memorizar o conteúdo, resolver exercícios ou organizar o tempo?';
+  }
+  if (mainTopic==='relacionamento' && (asksWhatToDo || intent==='experience' || hasAnyWord(['brigou','brigamos','discuti','terminou','terminamos','me ignorou','nao responde','não responde']))) {
+    return 'Entendi: você está falando de uma situação de relacionamento. Não vou presumir quem está certo só por uma frase. O que aconteceu concretamente, como isso te afetou e o que você gostaria que mudasse? Posso ajudar a pensar numa conversa respeitosa e em limites saudáveis.';
+  }
+  if (mainTopic==='amizades' && (asksWhatToDo || intent==='experience' || hasAnyWord(['me excluiu','me excluem','me zoa','me zoaram','brigou','brigamos']))) {
+    return 'Parece que o assunto são suas amizades. Quero entender o que aconteceu, sem minimizar nem tirar conclusões cedo demais: alguém fez ou falou algo específico, ou você vem se sentindo deixado(a) de lado há algum tempo?';
+  }
+  if (mainTopic==='familia' && (asksWhatToDo || intent==='experience' || hasAnyWord(['brigou','brigamos','discuti','nao deixa','não deixa','proibiu','proibiram']))) {
+    return 'Entendi que isso envolve sua família. 💙 Conflitos em casa podem misturar regras, cuidado e sentimentos. O que a pessoa fez ou disse, e você se sente seguro(a) para conversar com ela?';
+  }
+  if (mainTopic==='trabalho' && (asksWhatToDo || asksHow || intent==='question')) {
+    return 'Você está falando de trabalho ou oportunidade profissional. Posso ajudar a avaliar requisitos, preparar currículo, treinar entrevista ou comparar propostas. Qual é a situação concreta: procurando a primeira vaga, participando de seleção ou já trabalhando?';
+  }
+  if (mainTopic==='dinheiro' && (asksHow || asksWhatToDo || intent==='question')) {
+    return 'Entendi que sua dúvida envolve dinheiro. Para responder corretamente, preciso distinguir se você quer calcular um valor, organizar gastos, entender uma dívida ou comparar opções. Qual desses pontos está no centro da sua pergunta?';
+  }
+  if (mainTopic==='tecnologia' && (asksHow || asksWhy || asksMeaning || intent==='question')) {
+    return 'Você está perguntando sobre tecnologia. Posso explicar o conceito, orientar a configuração ou ajudar a encontrar um erro. Qual aparelho, aplicativo ou parte do sistema você está usando e o que acontece quando tenta?';
+  }
+  if (mainTopic==='saude e bem-estar' && (asksWhatToDo || intent==='experience' || intent==='question')) {
+    return 'Entendi que a questão é sobre saúde ou bem-estar. Posso compartilhar informações gerais, mas não consigo diagnosticar. O que você está sentindo, há quanto tempo e existe algum sinal intenso ou repentino? Se for grave ou urgente, procure atendimento presencial.';
+  }
+  if (mainTopic==='sentimentos' && (intent==='experience' || asksWhatToDo || intent==='question')) {
+    return 'Parece que você está falando de como está se sentindo. Não quero colocar um rótulo no que você vive. O que aconteceu antes desse sentimento aparecer? Você quer primeiro desabafar ou prefere pensar em algo que possa ajudar agora?';
+  }
+  if (mainTopic==='ciencias' && (asksMeaning || asksWhy || asksHow || intent==='question')) {
+    return 'Sua pergunta parece ser sobre ciências. Posso explicar a ideia central, o mecanismo por trás dela e um exemplo do cotidiano. Qual parte você quer entender: o que é, como funciona ou por que acontece?';
+  }
+  if (mainTopic==='historia e sociedade' && (asksMeaning || asksWhy || asksHow || intent==='question')) {
+    return 'Entendi que o assunto é história ou sociedade. Para não misturar conceitos, posso explicar o contexto, as causas, os acontecimentos e as consequências. Qual acontecimento ou ideia você quer analisar?';
+  }
+  // Se a pessoa contou algo, não converter automaticamente o relato em um pedido de plano.
+  if (tellsExperience && !mainTopic && words.length>5) {
+    return 'Quero ter certeza de que entendi o que você contou. Qual é a parte mais importante para você nessa situação: o que aconteceu, como você se sentiu ou o que gostaria de fazer agora?';
+  }
+
+  // 5. Núcleo de conhecimento geral: respostas explicativas e orientação por domínio.
   const knowledge = [
     {keys:['matematica','matemática','equacao','equação','porcentagem','fracoes','frações','geometria','algebra','álgebra'],reply:'Posso te ajudar a entender matemática passo a passo. Primeiro identificamos o que a questão pede, depois os dados, a operação e por fim conferimos o resultado. Se você mandar o enunciado, explico sem pular etapas — e também posso mostrar um jeito mais fácil de lembrar.'},
     {keys:['enem','redacao','redação','vestibular','prova','estudar','estudo','escola','faculdade','professor','trabalho escolar'],reply:'Vamos transformar isso em algo estudável. 😊 Podemos dividir o assunto em: o que você precisa saber, conceitos principais, exemplo resolvido e uma questão para praticar. Se for redação, posso ajudar com tese, argumentos, repertório, coesão e proposta de intervenção, sem tirar sua autoria.'},
