@@ -497,16 +497,16 @@ function SpaceNexusGame({onReward}){
   const id=setInterval(()=>{
    const g=game.current;g.tick++;
    const n=g.tick;
-   if(n%5===0)g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});
-   if(n%13===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%52===0?3:1,type:n%52===0?'brute':n%39===0?'scout':'drone',fire:n%52===0||Math.random()>.48});
-   if(n%180===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
-   g.foes.forEach(f=>{f.y+=(f.type==='scout'?1.05:.65)+(g.wave*.08)});
-   g.shots.forEach(b=>{b.y-=4});
-   g.enemyShots.forEach(b=>{b.y+=2.2});
-   if(n%26===0){g.foes.filter(f=>f.fire).slice(-2).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
-   if(g.boss&&n%18===0){const spread=g.boss.style==='spread'?[0,-10,10,-20,20]:g.boss.style==='cross'?[0,-14,14]:[0,-8,8];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}))}
-   if(n%360===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:8,...chosen};setMessage('CHEFÃO DETECTADO! Prepare-se para o ataque!')}
-   if(g.boss){g.boss.x=Math.max(22,Math.min(78,g.boss.x+(Math.random()-.5)*3));}
+   if(n%15===0)g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});
+   if(n%39===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%156===0?3:1,type:n%156===0?'brute':n%117===0?'scout':'drone',fire:n%52===0||Math.random()>.48});
+   if(n%540===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
+   g.foes.forEach(f=>{f.y+=(f.type==='scout'?.35:.2167)+(g.wave*.0267)});
+   g.shots.forEach(b=>{b.y-=1.333});
+   g.enemyShots.forEach(b=>{b.y+=.7333});
+   if(n%78===0){g.foes.filter(f=>f.fire).slice(-2).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
+   if(g.boss&&n%54===0){const spread=g.boss.style==='spread'?[0,-10,10,-20,20]:g.boss.style==='cross'?[0,-14,14]:[0,-8,8];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}))}
+   if(n%1080===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:8,...chosen};setMessage('CHEFÃO DETECTADO! Prepare-se para o ataque!')}
+   if(g.boss){g.boss.x=Math.max(22,Math.min(78,g.boss.x+(Math.random()-.5)*1));}
    // Colisão tiro da nave x inimigo: só remove o projétil quando realmente acerta.
    const remainingShots=[];
    for(const shot of g.shots){
@@ -530,7 +530,7 @@ function SpaceNexusGame({onReward}){
    if(tookHit){if(g.shield){g.shield=false;setShieldActive(false);setMessage('Escudo absorveu o impacto!')}else{g.lives=Math.max(0,g.lives-1);setMessage('A nave foi atingida! Desvie dos disparos!')}}
    setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setBoss(g.boss?{...g.boss}:null);
    if(g.lives<=0){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});onReward(Math.floor(g.score/25))}
-  },60);
+  },20);
   return()=>clearInterval(id);
  },[running,onReward]);
  return <section className="space-nexus-card">
