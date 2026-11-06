@@ -79,8 +79,8 @@ const TOPIC_TERMS = {
   lazer:['musica','filme','serie','anime','livro','jogo','futebol']
 };
 const ACTS = [
-  ['greeting',/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( tudo bem| tudo bom| como voce esta| como esta)?$/],
-  ['reciprocal_question',/^(e voce|e contigo|e com voce|como voce esta|tudo bem com voce)$/],
+  ['greeting',/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( nexus)?( tudo bem| tudo bom| como voce esta| como esta| como vai)?[!?.,]*$/],
+  ['reciprocal_question',/^(e voce|e contigo|e com voce|como voce esta|tudo bem com voce|tudo bem|tudo bom|como vai voce)[!?.,]*$/],
   ['gratitude',/^(obrigado|obrigada|valeu|muito obrigado|agradeco)( demais)?$/],
   ['apology',/^(desculpa|foi mal|perdao|me perdoa)$/],
   ['farewell',/^(tchau|ate mais|falou|fui|ate logo|boa noite)$/],
@@ -445,7 +445,7 @@ export function getLanguageResponse(message,history=[]) {
   if(a.irony.possible) return 'Pode ter ironia ou sarcasmo no que você escreveu, mas o tom depende do contexto. Você está falando literalmente ou quis dizer o contrário?';
   if(a.indirectness.length) return 'Parece que talvez exista uma mensagem indireta ou algo que você não quis dizer de forma explícita. Não quero presumir para quem ou sobre o quê. O que você gostaria que eu entendesse dessa frase?';
   if(a.ambiguousPhrases.length) return 'Essa expressão pode ter sentidos diferentes dependendo do tom e do que aconteceu antes. Você quis dizer isso de verdade, está chateado(a) ou foi uma brincadeira?';
-  if(a.possibleActs.includes('greeting')) return 'Oii! 😊 Que bom conversar com você. Como você está hoje?';
+  if(a.possibleActs.includes('greeting')) return 'Oii! 😊 Tudo bem por aqui, obrigada por perguntar! E você, como está hoje?';
   if(a.possibleActs.includes('reciprocal_question')) return 'Estou aqui, funcionando e pronta para conversar com você! 😊 E como está sendo seu dia?';
   if(a.possibleActs.includes('gratitude')) return 'Por nada! 💙 Fico feliz em poder ajudar.';
   if(a.possibleActs.includes('apology')) return 'Tudo bem. Obrigada por falar comigo. Quer me contar o que aconteceu?';
