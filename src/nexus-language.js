@@ -194,10 +194,10 @@ export function analyzeLanguage(message, history=[]) {
   const unknownTokens=normalized.split(' ').filter(token=>token.length>3&&!NEXUS_LEXICON.some(entry=>entry.canonical===token||entry.variants.includes(token)));
   const irony=detectIrony(normalized);
   const indirectness=detectIndirectness(normalized);
-  const references=/\b(ela|ele|eles|elas|isso|aquilo|essa|esse|dela|dele|la|dele|dela)\b/.test(normalized);
+  const references=/\b(ela|ele|eles|elas|isso|aquilo|essa|esse|dela|dele|la)\b/.test(normalized);
   const repeatedTerms=[...tokenSet(normalized)].filter(token=>token.length>3&&prior.slice(0,-1).some(turn=>contains(turn,token)));
-  const followUp=normalized.split(' ').length<=10&&(references||/^(e|mas|entao|por que|como assim|e agora|e depois|isso|ela|ele|tambem|ai)/.test(normalized));
-  const answerKind=/^(eu )?(estou|to|tou )?(bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|animado|animada)$/.test(normalized.replace(/m{2,}$/,'m'))?'positive'
+  const followUp=normalized.split(' ').length<=10&&(references||/^(e|mas|entao|por que|como assim|e agora|e depois|isso|ela|ele|tambem|ai)\b/.test(normalized));
+  const answerKind=/^(eu )?(estou |to |tou )?(bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|animado|animada)$/.test(normalized.replace(/m{2,}$/,'m'))?'positive'
     :/^(eu )?(estou|to|tou )?(mal|ruim|triste|cansado|cansada|ansioso|ansiosa|preocupado|preocupada)$/.test(normalized)?'negative'
     :/^(mais ou menos|assim assim|normal|nada demais|nao sei)$/.test(normalized)?'neutral'
     :/^(sim|nao|claro|com certeza|acho que sim|acho que nao)$/.test(normalized)?'yes_no'
