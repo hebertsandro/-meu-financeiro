@@ -13,12 +13,12 @@ const VARIANTS = {
   agora:['agr','ag'], comigo:['cmg'], contigo:['ctg'], quando:['qnd','qdo'],
   quanto:['qto','qta','qts'], mesmo:['msm'], muito:['mt','mto','mta'], tudo:['td'],
   todos:['tds'], ninguem:['ngm','nmg'], obrigado:['obg','obgd','obgda'],
-  valeu:['vlw'], beleza:['blz'], por favor:['pfv','pf'], queria:['qria'],
+  valeu:['vlw'], beleza:['blz'], 'por favor':['pfv','pf'], queria:['qria'],
   estou:['to','tô','tou'], esta:['ta','tá'], certeza:['ctz'], verdade:['vdd'],
   nada:['nd'], demais:['dms'], saudades:['sdds'], mensagem:['msg','msgs'],
-  meu deus:['mds'], papo reto:['pprt'], sei la:['sla'], relaxa:['rlx'],
-  tamo junto:['tmj'], pode crer:['pdc'], demorou:['dmr'], brincadeira:['brinks'],
-  zoeira:['zuera'], parceiro:['parça'], fim de semana:['fds'], parabens:['parabens'], ansiedade:['ansied']
+  'meu deus':['mds'], 'papo reto':['pprt'], 'sei la':['sla'], relaxa:['rlx'],
+  'tamo junto':['tmj'], 'pode crer':['pdc'], demorou:['dmr'], brincadeira:['brinks'],
+  zoeira:['zuera'], parceiro:['parça'], 'fim de semana':['fds'], parabens:['parabens'], ansiedade:['ansied']
 };
 const VARIANT_MAP = new Map(Object.entries(VARIANTS).flatMap(([canonical, variants]) =>
   variants.map(variant => [fold(variant), canonical])
