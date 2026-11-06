@@ -139,3 +139,25 @@ test('fluxo principal responde pergunta social curta', () => {
   const reply = improveNexusFallback('E vc?',[{role:'user',content:'E vc?'}],'fallback genérico');
   assert.match(reply,/pronta para conversar/);
 });
+
+test('continua a conversa quando a pessoa responde que está bem também', () => {
+  const history = [
+    { role: 'user', content: 'Oi nexus tudo bom?' },
+    { role: 'assistant', content: 'Oii! Tudo bem por aqui! E você, como está hoje?' },
+    { role: 'user', content: 'Estou bem também' },
+    { role: 'assistant', content: 'Como está sendo seu dia?' }
+  ];
+  const reply = improveNexusFallback('Estou bem também', history, 'Quero entender exatamente o que você quis comunicar.');
+  assert.match(reply, /Que bom saber disso/);
+  assert.match(reply, /o que você está fazendo hoje/);
+  assert.doesNotMatch(reply, /base suficiente|dar um exemplo|estrutura da frase/);
+});
+
+test('acolhe uma resposta negativa sem encerrar nem banalizar a conversa', () => {
+  const history = [
+    { role: 'assistant', content: 'Como você está hoje?' }
+  ];
+  const reply = improveNexusFallback('Mais ou menos', history, 'fallback genérico');
+  assert.match(reply, /sinto muito/);
+  assert.match(reply, /pode me contar/);
+});
