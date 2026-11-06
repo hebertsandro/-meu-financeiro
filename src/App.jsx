@@ -551,7 +551,7 @@ function SpaceNexusGame({onReward}){
  </section>
 }
 function FinanceFlapGame({onReward}){
- const modes=[{id:'easy',name:'Fácil',speed:1,desc:'Aprenda a controlar o voo'},{id:'normal',name:'Normal',speed:2,desc:'Um desafio equilibrado'},{id:'medium',name:'Médio',speed:3,desc:'Exige reflexos e precisão'},{id:'hard',name:'Difícil',speed:4,desc:'Para quem domina o voo'},{id:'infinite',name:'Infinito',speed:2,desc:'A velocidade aumenta com os pontos'}];
+ const modes=[{id:'normal',name:'Normal',speed:2,desc:'Um desafio equilibrado'},{id:'medium',name:'Médio',speed:3,desc:'Exige reflexos e precisão'},{id:'hard',name:'Difícil',speed:4,desc:'Para quem domina o voo'}];
  const [mode,setMode]=useState(null),[bestScore,setBestScore]=useState(()=>Number(window.localStorage.getItem('mf_flap_best')||0));
  const [infiniteBest,setInfiniteBest]=useState(()=>Number(window.localStorage.getItem('mf_flap_best_infinite')||0));
  const canvasRef=React.useRef(null),stateRef=React.useRef({pigY:190,velocity:0,obstacles:[],items:[],frame:0,score:0,rewarded:false,spawnTimer:0,shield:0,slow:0});
@@ -592,7 +592,7 @@ function FinanceFlapGame({onReward}){
  };
  const loop=(timestamp)=>{if(!lastFrame)lastFrame=timestamp;const elapsed=timestamp-lastFrame;if(elapsed<1000/60){raf=requestAnimationFrame(loop);return}lastFrame=timestamp-(elapsed%(1000/60));const s=stateRef.current;s.frame++;s.velocity+=.34;s.pigY+=s.velocity;
   const multiplier=mode.id==='infinite'?Math.min(10,2+s.score*.08):mode.speed;const speed=2.8*multiplier;const spawnEvery=Math.max(30,Math.round(150/multiplier));
-  s.spawnTimer++;if(s.spawnTimer>=spawnEvery){s.spawnTimer=0;const gapY=105+Math.random()*150;s.obstacles.push({x:W+10,gapY,passed:false});if(Math.random()<.78){const types=['coin','shield','slow'];const type=types[Math.floor(Math.random()*types.length)];s.items.push({x:W+34,y:gapY,type,taken:false,pulse:Math.random()*6})}}
+  s.spawnTimer++;if(s.spawnTimer>=spawnEvery){s.spawnTimer=0;const gapY=105+Math.random()*150;s.obstacles.push({x:W+10,gapY,passed:false});if(Math.random()<.14){const types=['coin','shield','slow'];const type=types[Math.floor(Math.random()*types.length)];s.items.push({x:W+34,y:gapY,type,taken:false,pulse:Math.random()*6})}}
   const currentSpeed=s.slow>0?speed*.62:speed;if(s.slow>0)s.slow--;s.obstacles.forEach(o=>{o.x-=currentSpeed;if(!o.passed&&o.x+48<67){o.passed=true;s.score++;setScore(s.score)}});s.obstacles=s.obstacles.filter(o=>o.x>-55);s.items.forEach(item=>{item.x-=currentSpeed;item.pulse+=.12;if(!item.taken&&Math.hypot(item.x-67,item.y-s.pigY)<25){item.taken=true;if(item.type==='coin'){s.score+=3;setScore(s.score)}else if(item.type==='shield')s.shield=1;else if(item.type==='slow')s.slow=240}});s.items=s.items.filter(item=>item.x>-30&&!item.taken);
   let hit=s.pigY<13||s.pigY>H-25;s.obstacles.forEach(o=>{const overlap=67+16>o.x&&67-16<o.x+48;if(overlap&&(s.pigY-14<o.gapY-68||s.pigY+14>o.gapY+68))hit=true});if(hit&&s.shield>0){s.shield=0;hit=false;s.velocity=-4}
   const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#15234a');bg.addColorStop(.55,'#101b39');bg.addColorStop(1,'#091327');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
