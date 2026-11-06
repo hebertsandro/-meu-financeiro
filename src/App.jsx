@@ -169,6 +169,78 @@ function generateNexusReply(question, finance={}, history=[]) {
   if (urgentRisk) return 'Sinto muito que esteja doendo tanto. Obrigada por me contar. 💙 Você não precisa enfrentar isso sozinho(a), e sua segurança vem primeiro. Se existe risco de você se machucar agora, procure imediatamente um adulto de confiança que esteja perto, fique acompanhado(a) e ligue para o SAMU (192) ou vá a uma UPA/pronto-socorro. No Brasil, o CVV atende pelo 188, 24 horas. Você está em perigo neste momento ou já pensou em como faria isso?';
   if (match(/\b(abuso|abusad|violencia|violento|ameac|assedi|chantag|me bate|apanho|tenho medo dele|tenho medo dela)\b/)) return 'Quero levar isso a sério. Você merece estar em segurança e não tem culpa por alguém ultrapassar seus limites. 💙 Se houver perigo imediato, vá para perto de uma pessoa segura e procure ajuda de um adulto de confiança ou dos serviços de emergência. Se você for menor de idade, não precisa resolver isso sozinho(a). Quer me contar apenas o que se sentir confortável em compartilhar?';
   if (match(/\b(nudes|foto intima|foto íntima|me pediu foto|vazou foto|exposicao intima|sextorsao)\b/)) return 'Isso é delicado, e você não precisa enviar, produzir ou manter qualquer imagem íntima para provar carinho. Se alguém estiver pressionando ou ameaçando divulgar algo, não pague nem envie mais conteúdo; preserve as mensagens e procure um adulto de confiança e ajuda oficial. Se você for menor de idade, peça apoio de um responsável seguro. Quer me contar se alguém está te pressionando agora?';
+  // NEXUS CONTEXT ENGINE v2 — constrói uma leitura da frase antes de escolher a resposta.
+  // Extrai sinais de assunto, ação, negação, tempo, pergunta e intenção.
+  // Usa mais de um indício para reduzir respostas disparadas por uma palavra isolada.
+  const frame = (() => {
+    const text = ' '+q+' ';
+    const includes = phrase => text.includes(' '+normalize(phrase)+' ') || text.includes(' '+normalize(phrase)+'? ');
+    const topicDefinitions = [
+      {id:'relationship',label:'relacionamento',terms:['namorada','namorado','namoro','relacionamento','ficante','crush','terminar','terminou','terminamos','ciume','ciúme','confianca','confiança','me ignorou','nao responde','não responde','brigamos','discuti']},
+      {id:'school',label:'estudos',terms:['escola','prova','estudar','estudo','materia','matéria','matematica','matemática','enem','professor','professora','nota','trabalho escolar','faculdade','aula','exercicio','exercício']},
+      {id:'family',label:'família',terms:['familia','família','mae','mãe','pai','irmao','irmão','irma','irmã','responsavel','responsável','em casa']},
+      {id:'friendship',label:'amizades',terms:['amigo','amiga','amizade','grupo de amigos','me excluiu','me excluem','fofoca','bullying']},
+      {id:'work',label:'trabalho',terms:['emprego','trabalho','chefe','entrevista','curriculo','currículo','salario','salário','jovem aprendiz','vaga']},
+      {id:'finance',label:'dinheiro',terms:['dinheiro','gasto','gastos','salario','salário','cartao','cartão','divida','dívida','juros','fatura','economizar','poupar','renda']},
+      {id:'technology',label:'tecnologia',terms:['celular','computador','internet','aplicativo','site','programa','programar','codigo','código','javascript','html','wifi','wi-fi']},
+      {id:'health',label:'saúde e bem-estar',terms:['sono','dormir','cansaco','cansaço','ansiedade','triste','dor','alimentacao','alimentação','exercicio','exercício','saude','saúde']},
+      {id:'science',label:'ciências',terms:['fotossintese','fotossíntese','gravidade','atomo','átomo','celula','célula','evolucao','evolução','energia','planeta','quimica','química','fisica','física']},
+      {id:'society',label:'história e sociedade',terms:['historia','história','guerra','revolucao','revolução','globalizacao','globalização','democracia','politica','política','geografia','desigualdade']}
+    ];
+    const ranked = topicDefinitions.map(topic => {
+      const hits = topic.terms.filter(term=>includes(term));
+      return {...topic,score:hits.reduce((n,term)=>n+(term.includes(' ')?2:1),0),hits};
+    }).sort((a,b)=>b.score-a.score);
+    const primary = ranked[0]?.score>0 ? ranked[0] : null;
+    const negated = /\b(nao|nunca|jamais|nem)\b/.test(q);
+    const question = questionMark || /^(como|porque|por que|pq|o que|oq|qual|quais|quando|onde|quem|quanto|quantos)\b/.test(q);
+    const request = /\b(me ajuda|ajuda|pode me|poderia|quero saber|quero entender|me explica|explique|como faco|como faço|o que faco|o que faço|o que fazer|devo|vale a pena)\b/.test(q);
+    const personal = /\b(eu|meu|minha|comigo|me|estou|to|tô|fui|senti|aconteceu|ontem|hoje)\b/.test(q);
+    const temporal = /\b(ontem|hoje|amanha|amanhã|agora|desde|faz dias|semana passada|ultimamente)\b/.test(q);
+    const asksStep = /\b(passo a passo|mostra como|me ensina|ensina do zero)\b/.test(q);
+    const intent = asksStep?'learn':request?'help':question?'question':personal?'personal_story':'statement';
+    const confidence = primary ? Math.min(1,primary.score/3 + (question?0.1:0) + (personal?0.1:0)) : 0;
+    return {text:q,words,primary,ranked,intent,negated,question,request,personal,temporal,confidence};
+  })();
+
+  // Se há sinais suficientes, responde ao significado combinado — não a um termo solto.
+  if (frame.primary && frame.primary.score >= 2) {
+    const topic=frame.primary.id;
+    if (topic==='relationship' && (frame.intent==='help'||frame.intent==='question'||frame.intent==='personal_story')) {
+      return 'Entendi que você está falando de relacionamento e parece haver uma situação específica por trás disso. 💙 Não vou presumir o que a outra pessoa pensa nem quem está certo. O que aconteceu, o que você percebeu de diferente e o que você gostaria que acontecesse agora?';
+    }
+    if (topic==='school' && (frame.intent==='help'||frame.intent==='question'||frame.intent==='personal_story'||frame.intent==='learn')) {
+      return 'Entendi: o assunto são seus estudos. Vamos localizar exatamente o que você precisa. É uma matéria ou questão que não entendeu, uma prova para se preparar, uma dificuldade com alguém na escola ou organização do tempo? Se mandar o exercício ou o conteúdo, posso explicar por etapas.';
+    }
+    if (topic==='family' && (frame.intent==='help'||frame.intent==='question'||frame.intent==='personal_story')) {
+      return 'Parece que isso envolve alguém da sua família. Quero entender o que foi dito ou feito, sem tirar conclusões precipitadas. Foi uma discussão, uma regra com a qual você não concorda ou algo que fez você se sentir magoado(a)? Você se sente seguro(a) em casa?';
+    }
+    if (topic==='friendship' && (frame.intent==='help'||frame.intent==='question'||frame.intent==='personal_story')) {
+      return 'Entendi que a situação envolve amizade. Ser deixado de lado ou ter um conflito pode mexer bastante com a gente. O que aconteceu concretamente: alguém falou algo, te excluiu de alguma coisa ou vocês se desentenderam?';
+    }
+    if (topic==='work' && (frame.intent==='help'||frame.intent==='question'||frame.intent==='learn')) {
+      return 'O assunto é trabalho ou oportunidade profissional. Posso ajudar com currículo, primeiro emprego, entrevista, direitos básicos e comparação de propostas. Você está procurando uma vaga, participando de uma seleção ou tentando resolver algo no trabalho?';
+    }
+    if (topic==='finance' && (frame.intent==='help'||frame.intent==='question')) {
+      return 'Entendi que sua pergunta envolve dinheiro. Para não responder outra coisa, vou separar: você quer fazer uma conta, entender uma dívida ou juros, organizar gastos, controlar cartão ou planejar uma economia? Se mandar os valores, faço o cálculo com você.';
+    }
+    if (topic==='technology' && (frame.intent==='help'||frame.intent==='question'||frame.intent==='learn')) {
+      return 'Entendi que sua dúvida é sobre tecnologia. Posso explicar como algo funciona ou ajudar a resolver um problema. Qual aparelho, aplicativo ou código está envolvido, o que você tentou fazer e o que aconteceu?';
+    }
+    if (topic==='health' && (frame.intent==='help'||frame.intent==='question'||frame.intent==='personal_story')) {
+      return 'Entendi que você está falando de saúde ou bem-estar. Posso compartilhar informações gerais, mas não fazer diagnóstico. O que você está sentindo, há quanto tempo e isso está piorando? Se for intenso, repentino ou houver risco imediato, procure atendimento presencial.';
+    }
+    if (topic==='science' && (frame.intent==='question'||frame.intent==='learn')) {
+      return 'Vamos entender esse assunto de ciências. Posso explicar o conceito, como funciona, por que acontece e dar um exemplo simples. Você quer uma explicação rápida ou uma aula passo a passo?';
+    }
+    if (topic==='society' && (frame.intent==='question'||frame.intent==='learn')) {
+      return 'Vamos analisar esse tema de história ou sociedade separando contexto, causas, acontecimentos e consequências. Qual período, acontecimento ou conceito você quer entender?';
+    }
+  }
+  // Em frases com negação, preserva o "não": não confunde "não estou triste" com tristeza declarada.
+  if (frame.negated && frame.primary && frame.primary.id==='health' && /\bnao\s+(estou|to|tô|me sinto)\s+(triste|ansioso|ansiosa|cansado|cansada)\b/.test(q)) {
+    return 'Entendi — você está dizendo que não está se sentindo assim. Obrigada por esclarecer. O que você gostaria de conversar ou resolver?';
+  }
   if (emotional) return 'Ei, vamos com calma. 💙 Você não precisa fingir que está tudo bem nem resolver tudo de uma vez. Posso te ouvir sem te julgar e ajudar a separar o que aconteceu, o que você está sentindo e qual pode ser o próximo passo. Você quer desabafar ou prefere pensar em uma solução comigo?';
 
   // 2. Conversa, intenção e continuidade.
