@@ -161,3 +161,25 @@ test('acolhe uma resposta negativa sem encerrar nem banalizar a conversa', () =>
   assert.match(reply, /sinto muito/);
   assert.match(reply, /pode me contar/);
 });
+
+test('reconhece relato positivo em primeira pessoa e desenvolve a conversa', () => {
+  const reply = improveNexusFallback('Estou muito feliz', [{role:'user',content:'Estou muito feliz'}], 'Quero entender exatamente o que você quis comunicar.');
+  assert.match(reply, /Que bom ler isso/);
+  assert.match(reply, /Aconteceu alguma coisa especial/);
+  assert.doesNotMatch(reply, /base suficiente|estrutura da frase|dar um exemplo/);
+});
+
+test('aproveita o motivo quando a pessoa explica por que está feliz', () => {
+  const reply = improveNexusFallback('Estou muito feliz porque passei na prova', [{role:'user',content:'Estou muito feliz porque passei na prova'}], 'fallback genérico');
+  assert.match(reply, /passou na prova/);
+  assert.match(reply, /O que isso significa para você/);
+});
+
+test('prioriza continuidade contextual antes de respostas genéricas da linguagem', () => {
+  const history = [
+    {role:'assistant',content:'E você, como está hoje?'},
+    {role:'user',content:'Estou bem também'}
+  ];
+  const reply = improveNexusFallback('Estou bem também',history,'fallback genérico');
+  assert.match(reply,/Que bom saber disso/);
+});
