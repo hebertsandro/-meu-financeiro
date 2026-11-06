@@ -74,7 +74,7 @@ function generateNexusReply(question, finance={}, history=[]) {
       'fds':'fim de semana','mds':'meu deus','slk':'cê é louco',
       'pqpp':'caramba','pfv':'por favor','pf':'por favor',
       'nd':'nada','ngm':'ninguem','nmg':'ninguem','alguem':'alguem',
-      'tb':'tambem','eh':'e','ehh':'e'
+      'eh':'e','ehh':'e'
     };
     return String(value || '').toLocaleLowerCase('pt-BR')
       .replace(/(^|[^\p{L}\p{N}])([\p{L}\p{N}]+)(?=$|[^\p{L}\p{N}])/gu,
