@@ -497,7 +497,7 @@ function SpaceNexusGame({onReward}){
    const g=game.current;g.tick++;
    const n=g.tick;
    if(n%(n<g.rapidUntil?9:19)===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
-   if(n%49===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%156===0?3:1,type:n%156===0?'brute':n%117===0?'scout':'drone',fire:n%52===0||Math.random()>.48});
+   if(n%49===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%195===0?3:1,type:n%156===0?'brute':n%146===0?'scout':'drone',fire:n%65===0||Math.random()>.48});
    if(n%675===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
    g.foes.forEach(f=>{f.y+=((f.type==='scout'?.35:.2167)+(g.wave*.0267))*.8});
    g.shots.forEach(b=>{b.y-=1.0664});
@@ -530,7 +530,7 @@ function SpaceNexusGame({onReward}){
    if(tookHit){if(g.shield){g.shield=false;setShieldActive(false);setMessage('Escudo absorveu o impacto!')}else{g.lives=Math.max(0,g.lives-1);setMessage('A nave foi atingida! Desvie dos disparos!')}}
    setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);
    if(g.lives<=0){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});onReward(Math.floor(g.score/25))}
-  },20);
+  },16);
   return()=>clearInterval(id);
  },[running,onReward]);
  return <section className="space-nexus-card">
