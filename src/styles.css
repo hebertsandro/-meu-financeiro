@@ -1849,3 +1849,96 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .space-boss{will-change:left}
 .space-boss>.space-art-boss{animation:none!important}
 .space-boss.phase-two>.space-art-boss{animation:none!important}
+
+/* MEU FINANCEIRO — refinamento visual global */
+:root{--bg:#070c17;--panel:#0e1728;--panel2:#121e32;--line:#2b405f;--muted:#91a1bb;--text:#eff5ff;--blue:#79a9ff;--green:#4be0ad;--red:#ff8298;--purple:#bba5ff;--cyan:#6ce8f5;--surface-shadow:0 16px 42px #02071355;--surface-inset:inset 0 1px 0 #ffffff0c}
+html{scroll-behavior:smooth;scrollbar-color:#344969 #080f1d;scrollbar-width:thin}
+body{background:radial-gradient(ellipse at 8% 0%,#17294a44,transparent 34%),radial-gradient(ellipse at 92% 12%,#30225322,transparent 30%),#070c17;color:var(--text);letter-spacing:.005em}
+::selection{background:#6d9fff55;color:#fff}
+:focus-visible{outline:2px solid #8bb8ff!important;outline-offset:3px}
+button{transition:transform .18s ease,border-color .18s ease,background .18s ease,box-shadow .18s ease,color .18s ease}
+button:active{transform:translateY(1px) scale(.985)}
+.sidebar{background:linear-gradient(180deg,#0d1729f5,#0a1221f7);border-right:1px solid #30436288;box-shadow:12px 0 40px #02061122}
+.brand-icon{position:relative;isolation:isolate;overflow:hidden;border:1px solid #b9d3ff55;background:linear-gradient(145deg,#82b8ff,#587ff1 48%,#6558ce);box-shadow:0 7px 22px #557eff44,inset 0 1px #ffffff88}
+.brand-icon:after{content:"";position:absolute;inset:1px;border-radius:12px;border:1px solid #ffffff28;pointer-events:none}
+.side-caption{color:#7185a5!important;letter-spacing:.16em;font-size:9px!important;font-weight:800}
+.nav-item{position:relative;border:1px solid transparent;border-radius:13px;color:#a9b8ce;min-height:45px;padding:0 13px}
+.nav-item:hover{color:#f4f8ff;background:linear-gradient(100deg,#1a2b47aa,#18243b66);border-color:#7ea9ef20}
+.nav-item.active{color:#eaf3ff;background:linear-gradient(105deg,#25477b88,#24264f88);border-color:#7baaff55;box-shadow:inset 3px 0 #80b6ff,0 5px 18px #07142a66}
+.nav-item.active svg{color:#9bc8ff;filter:drop-shadow(0 0 7px #66aaff88)}
+.sidebar-bottom{border-top:1px solid #293b57}
+.privacy-card{background:linear-gradient(145deg,#14243a,#101a2c)!important;border:1px solid #38517466!important;box-shadow:inset 0 1px #ffffff0b}
+.topbar{background:linear-gradient(180deg,#0b1424f5,#0b1424e8);border-bottom:1px solid #2a3a54;box-shadow:0 8px 26px #02071322;backdrop-filter:blur(12px)}
+.icon-btn,.menu-toggle,.notification-bell{border:1px solid #344968!important;background:linear-gradient(145deg,#16243a,#101a2b)!important;color:#c7d8f0!important;box-shadow:inset 0 1px #ffffff0b,0 4px 12px #02071333}
+.icon-btn:hover,.menu-toggle:hover,.notification-bell:hover{border-color:#7eacff99!important;color:#fff!important;background:#1b2d49!important;box-shadow:0 0 0 3px #6ea2ff16,0 7px 18px #02071355}
+.xp-header-chip{border:1px solid #a78aff77!important;background:linear-gradient(135deg,#30265b,#192747)!important;box-shadow:0 0 22px #8965ff24,inset 0 1px #ffffff22}
+.content{animation:mfContentIn .28s ease both}
+@keyframes mfContentIn{from{opacity:0;transform:translateY(4px)}to{opacity:1;transform:translateY(0)}}
+.page-heading h1{letter-spacing:-.045em;text-wrap:balance}
+.page-heading p{color:#9aabc4;line-height:1.65}
+.panel,.stat-card,.finance-item,.history-box,.admin-panel,.maintenance-card,.journey-banner,.overview-unified,.game-world-hero,.profile-editor,.achievement-card,.level-reward,.arcade-library-card,.quiz-start-panel,.quiz-question-panel{position:relative;isolation:isolate;border:1px solid #2c4161!important;background:linear-gradient(145deg,#111e32,#0e192b 58%,#101a2c)!important;box-shadow:var(--surface-shadow),var(--surface-inset)}
+.panel{border-radius:19px!important;padding:22px}
+.panel-head{gap:16px;padding-bottom:15px;margin-bottom:17px;border-bottom:1px solid #293a55}
+.panel-head h3{font:750 15px Manrope,sans-serif;letter-spacing:-.025em;color:#edf4ff}
+.panel-head p{color:#8fa1bd;line-height:1.55}
+.stat-grid{gap:14px}
+.stat-card{overflow:hidden;border-radius:18px!important;padding:19px!important;transition:transform .2s ease,border-color .2s ease,box-shadow .2s ease}
+.stat-card:after{content:"";position:absolute;width:110px;height:110px;right:-45px;top:-55px;border:1px solid #ffffff0b;border-radius:50%;box-shadow:0 0 0 15px #ffffff04,0 0 0 30px #ffffff03;pointer-events:none}
+.stat-card:hover,.finance-item:hover,.arcade-library-card:hover{transform:translateY(-3px);border-color:#628bc477!important;box-shadow:0 20px 38px #02071377,inset 0 1px #ffffff12}
+.stat-icon{border:1px solid #ffffff1b;box-shadow:inset 0 1px #ffffff2b,0 6px 15px #02071333}
+.stat-label{font-size:11px;font-weight:700;letter-spacing:.045em;color:#9aabc4}
+.stat-value{font:800 clamp(20px,2vw,27px)/1.2 Manrope,sans-serif;letter-spacing:-.045em;font-variant-numeric:tabular-nums}
+.stat-detail{color:#8092ad;font-size:11px}
+.overview-unified{overflow:hidden;border-radius:22px!important}
+.unified-balance{background:radial-gradient(ellipse at 90% 0%,#557bd633,transparent 42%),linear-gradient(135deg,#172c4a,#111c34)!important}
+.unified-month-flow,.unified-footer{border-top:1px solid #ffffff12}
+.unified-icon{border:1px solid #ffffff20;box-shadow:inset 0 1px #ffffff22,0 5px 14px #02071333}
+.journey-banner{overflow:hidden;border-radius:22px!important;background:radial-gradient(ellipse at 90% 15%,#6d8fff33,transparent 34%),linear-gradient(115deg,#172e50,#182443 58%,#28214a)!important}
+.journey-banner:after{content:"";position:absolute;right:-45px;top:-85px;width:210px;height:210px;border:1px solid #a6c6ff22;border-radius:50%;box-shadow:0 0 0 22px #a6c6ff08,0 0 0 46px #a6c6ff06;pointer-events:none}
+.journey-kicker,.gamer-section-heading>div>span{letter-spacing:.17em;font-weight:800}
+.primary,.journey-cta,.quiz-start-button{border:1px solid #a8c9ff55!important;background:linear-gradient(115deg,#568fff,#6279ef 52%,#8066d9)!important;box-shadow:0 8px 22px #4b78e944,inset 0 1px #ffffff66!important;color:#fff!important}
+.primary:hover,.journey-cta:hover,.quiz-start-button:hover{filter:brightness(1.1);box-shadow:0 11px 27px #4b78e966,inset 0 1px #ffffff88!important;transform:translateY(-2px)}
+.secondary,.text-button{border:1px solid #344c6d!important;background:linear-gradient(145deg,#192941,#121e31)!important;color:#c9d9f0!important}
+.secondary:hover,.text-button:hover{border-color:#7daaff88!important;color:#fff!important;background:#1d3150!important}
+input,select,textarea{color:#edf4ff!important;background:linear-gradient(180deg,#0a1424,#0d192b)!important;border:1px solid #314663!important;border-radius:12px!important;box-shadow:inset 0 2px 5px #02071344;transition:border-color .18s ease,box-shadow .18s ease}
+input:hover,select:hover,textarea:hover{border-color:#58749b!important}
+input:focus,select:focus,textarea:focus{border-color:#82b0ff!important;box-shadow:0 0 0 3px #79aaff20,inset 0 1px #ffffff0b!important}
+input::placeholder,textarea::placeholder{color:#6e809d!important}
+.progress,.goal-progress,.player-xp-track,.gem-mission-progress,.flap-progress-track{background:#091323!important;border:1px solid #34476166;box-shadow:inset 0 2px 4px #02071388;overflow:hidden}
+.progress i,.goal-progress i,.player-xp-track i,.gem-mission-progress i,.flap-progress-track i{border-radius:inherit;box-shadow:0 0 10px currentColor,0 0 18px #ffffff22;position:relative}
+.transaction-row,.simple-row,.history-row,.commitment-row,.category-row{border-bottom:1px solid #293b55!important;transition:background .16s ease}
+.transaction-row:hover,.simple-row:hover,.history-row:hover,.commitment-row:hover{background:#ffffff05}
+.transaction-icon,.row-icon{border:1px solid #ffffff16;box-shadow:inset 0 1px #ffffff22,0 5px 12px #02071344}
+.transaction-amount{font-variant-numeric:tabular-nums;font-weight:800}
+.delete-btn{border:1px solid #70415455!important;background:#351d2b55!important;color:#ff9eae!important;border-radius:9px;padding:7px 10px}
+.delete-btn:hover{background:#6a263a88!important;border-color:#ff829888!important}
+.empty{border:1px dashed #3a4f6d!important;border-radius:16px;background:linear-gradient(145deg,#111d30aa,#0c1728aa);padding:30px 18px}
+.empty-icon{border:1px solid #47658c;background:linear-gradient(145deg,#1b3150,#17213c);box-shadow:0 8px 22px #02071355}
+.modal-backdrop{backdrop-filter:blur(8px);background:#030813c9!important}
+.modal{border:1px solid #49658b!important;border-radius:21px!important;background:linear-gradient(145deg,#15243a,#0c1729 75%)!important;box-shadow:0 30px 90px #000b,inset 0 1px #ffffff15!important}
+.modal-head{border-bottom:1px solid #30435f;padding-bottom:15px}
+.modal-actions{border-top:1px solid #30435f;padding-top:15px}
+.toast{border:1px solid #5d9d8b!important;background:linear-gradient(145deg,#143d38,#102c30)!important;box-shadow:0 12px 32px #0008,0 0 20px #42d6a522}
+.footer{border-top:1px solid #263750;color:#70829e}
+.footer svg{color:#82aaff}
+.assistant-fab{border:1px solid #a5caff88!important;box-shadow:0 12px 30px #426eea55,0 0 25px #61bfff33,inset 0 1px #ffffff88!important}
+.assistant-popover{border:1px solid #536e98!important;background:linear-gradient(145deg,#15253e,#0d1729)!important;box-shadow:0 24px 70px #000a,inset 0 1px #ffffff12!important}
+.assistant-popover-head{border-bottom:1px solid #30435f}
+.assistant-bubble{border:1px solid #ffffff12;box-shadow:0 5px 15px #02071344;line-height:1.6}
+.assistant-message.assistant .assistant-bubble{background:linear-gradient(145deg,#1a3151,#17223c)}
+.assistant-popover-suggestions button{border:1px solid #3b5476;background:#16263e;color:#bcd2f0;border-radius:10px}
+.arcade-library-card{overflow:hidden;border-radius:19px!important}
+.arcade-library-art{border-bottom:1px solid #ffffff14}
+.arcade-library-info{padding:17px}
+.quiz-hero,.game-world-hero{border-radius:22px!important}
+.quiz-stat-card{border:1px solid #344c70!important;background:linear-gradient(145deg,#172945,#101b30)!important;border-radius:15px;box-shadow:inset 0 1px #ffffff10,0 8px 20px #02071333}
+.quiz-answer{border:1px solid #3a506f!important;background:linear-gradient(145deg,#17263d,#111d30)!important;border-radius:13px!important}
+.quiz-answer:hover:not(:disabled){border-color:#8ab4ff!important;transform:translateX(3px);background:#1c3150!important}
+.achievement-card,.level-reward,.gem-mission-card{border-radius:16px!important;box-shadow:inset 0 1px #ffffff0b,0 10px 24px #02071344}
+.achievement-card.unlocked{border-color:#8c78d877!important;background:linear-gradient(145deg,#29264b,#151e35)!important}
+.gem-mission-card{background:linear-gradient(145deg,#17263d,#101a2d)!important}
+.gem-mission-card:hover{transform:translateY(-2px);border-color:#789bce!important}
+.profile-frame-option{border:1px solid #354c6b!important;border-radius:14px!important;background:linear-gradient(145deg,#16253c,#101a2b)!important}
+.profile-frame-option.selected{border-color:#8ab8ff!important;box-shadow:0 0 0 3px #7eafff20,0 8px 20px #02071355}
+@media(max-width:760px){.panel{padding:16px!important;border-radius:17px!important}.page-heading{margin-bottom:17px}.stat-grid{gap:10px}.stat-card{padding:14px!important;border-radius:15px!important}.topbar{backdrop-filter:none}.content{animation:none}.panel-head{gap:10px}.transaction-row{gap:9px}.modal{max-height:calc(100dvh - 24px);overflow:auto}}
+@media(prefers-reduced-motion:reduce){*,*:before,*:after{scroll-behavior:auto!important;animation-duration:.01ms!important;animation-iteration-count:1!important;transition-duration:.01ms!important}}
