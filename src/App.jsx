@@ -45,72 +45,113 @@ const gameQuestions = [
  {category:"SEGURANÇA",question:"Onde é mais seguro buscar informações sobre uma cobrança bancária suspeita?",options:["No link enviado por desconhecido","No aplicativo ou canal oficial do banco","Respondendo com sua senha"],correct:1,explanation:"Use sempre o aplicativo ou os canais oficiais, sem clicar em links suspeitos."}
 ];
 
-function generateNexusReply(question, finance, history=[]) {
- const q=String(question||'').toLocaleLowerCase('pt-BR').normalize('NFD').replace(/[\u0300-\u036f]/g,'');
- const money=brl, transactions=finance.transactions||[], cards=finance.cards||[], debts=finance.debts||[], goals=finance.goals||[], installments=finance.installments||[];
- const now=new Date(), month=now.getFullYear()+'-'+String(now.getMonth()+1).padStart(2,'0');
- const monthTx=transactions.filter(t=>String(t.date||'').slice(0,7)===month);
- const income=monthTx.filter(t=>t.type==='entrada').reduce((s,t)=>s+Number(t.amount||0),0);
- const expenses=monthTx.filter(t=>t.type==='gasto').reduce((s,t)=>s+Number(t.amount||0),0);
- const allIncome=transactions.filter(t=>t.type==='entrada').reduce((s,t)=>s+Number(t.amount||0),0);
- const allExpenses=transactions.filter(t=>t.type==='gasto').reduce((s,t)=>s+Number(t.amount||0),0);
- const pendingDebts=debts.filter(d=>d.status!=='Pago');
- const debtTotal=pendingDebts.reduce((s,d)=>s+Number(d.amount||0),0);
- const cardLimit=cards.reduce((s,c)=>s+Number(c.limit||0),0), cardUsed=cards.reduce((s,c)=>s+Number(c.used||0),0);
- const activeParts=installments.filter(i=>Number(i.paid||0)<Number(i.count||0));
- const monthlyParts=activeParts.reduce((s,i)=>s+Number(i.amount||0)/Math.max(1,Number(i.count||1)),0);
- const topCategory=Object.entries(monthTx.filter(t=>t.type==='gasto').reduce((o,t)=>{const k=t.category||'Outros';o[k]=(o[k]||0)+Number(t.amount||0);return o;},{})).sort((a,b)=>b[1]-a[1])[0];
- const firstName=String(history.find(m=>m.role==='user')?.content||'').trim().split(/\s+/)[0];
+function generateNexusReply(question, finance={}, history=[]) {
+  // NEXUS CORE — motor local de linguagem por regras, contexto e conhecimento estruturado.
+  // Não usa APIs, modelos externos, serviços pagos ou envia a conversa para outro servidor.
+  const raw = String(question || '').trim();
+  const normalize = value => String(value || '').toLocaleLowerCase('pt-BR')
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\p{L}\p{N}\s?.,!]/gu,' ')
+    .replace(/\s+/g,' ').trim();
+  const q = normalize(raw);
+  const words = q.split(/\s+/).filter(Boolean);
+  const has = (...terms) => terms.some(term => q.includes(normalize(term)));
+  const match = regex => regex.test(q);
+  const money = brl;
+  const transactions = Array.isArray(finance.transactions) ? finance.transactions : [];
+  const cards = Array.isArray(finance.cards) ? finance.cards : [];
+  const debts = Array.isArray(finance.debts) ? finance.debts : [];
+  const goals = Array.isArray(finance.goals) ? finance.goals : [];
+  const installments = Array.isArray(finance.installments) ? finance.installments : [];
+  const previous = Array.isArray(history) ? history.slice(-12) : [];
+  const lastUser = [...previous].reverse().find(m => m.role === 'user')?.content || '';
+  const lastAssistant = [...previous].reverse().find(m => m.role === 'assistant')?.content || '';
+  const userTurns = previous.filter(m => m.role === 'user').length;
+  const monthKey = new Date().getFullYear()+'-'+String(new Date().getMonth()+1).padStart(2,'0');
+  const monthTx = transactions.filter(t => String(t.date || '').slice(0,7) === monthKey);
+  const sum = (list, predicate) => list.filter(predicate).reduce((total,item) => total + Number(item.amount || 0),0);
+  const income = sum(monthTx,t=>t.type==='entrada');
+  const expenses = sum(monthTx,t=>t.type==='gasto');
+  const allIncome = sum(transactions,t=>t.type==='entrada');
+  const allExpenses = sum(transactions,t=>t.type==='gasto');
+  const pendingDebts = debts.filter(d => normalize(d.status) !== 'pago');
+  const debtTotal = sum(pendingDebts,()=>true);
+  const cardLimit = cards.reduce((s,c)=>s+Number(c.limit || c.limit_amount || 0),0);
+  const cardUsed = cards.reduce((s,c)=>s+Number(c.used || 0),0);
+  const activeParts = installments.filter(i=>Number(i.paid || i.paid_count || 0)<Number(i.count || i.installment_count || 0));
+  const monthlyParts = activeParts.reduce((s,i)=>s+Number(i.amount || i.total_amount || 0)/Math.max(1,Number(i.count || i.installment_count || 1)),0);
+  const categories = monthTx.filter(t=>t.type==='gasto').reduce((acc,t)=>{
+    const key=t.category || 'Outros'; acc[key]=(acc[key]||0)+Number(t.amount||0); return acc;
+  },{});
+  const topCategory = Object.entries(categories).sort((a,b)=>b[1]-a[1])[0];
+  const name = String(finance.profile?.name || '').trim().split(/\s+/)[0];
+  const greet = name ? name+', ' : '';
+  const answer = (text) => text;
+  const ask = (text, questionText='O que você acha?') => text+'\n\n'+questionText;
+  const topicContinuation = /^(sim|nao|não|isso|exato|verdade|pode ser|talvez|acho que|e agora|como assim|por que|porque|pq|continua|me explica|entendi|mas|tambem|também|kkkk+|rs+|haha+)[.!? ]*$/.test(q)
+    || /^(e se|mas e|e quando|nesse caso|por exemplo)\b/.test(q);
+  const greeting = /^(oi|ola|e ai|opa|hey|bom dia|boa tarde|boa noite|tudo bem|tudo bom)\b/.test(q);
+  const questionMark = raw.includes('?');
+  const short = words.length <= 4;
+  const emotional = match(/\b(ansios|ansiedade|cansad|sobrecarreg|triste|desanim|medo|preocup|frustrad|sozinh|solidao|chatead|nervos|pressionad|chorando|mal hoje|nao aguento)\b/);
+  const urgentRisk = match(/\b(quero morrer|me matar|tirar minha vida|suicid|me machucar|me cortar|acabar com tudo|nao quero mais viver)\b/);
 
- const previousAssistant=history.filter(m=>m.role==='assistant').slice(-1)[0]?.content||'';
- const previousUser=history.filter(m=>m.role==='user').slice(-1)[0]?.content||'';
- const conversational=/\b(kkkk+|rs+|haha+|entendi|sim|nao|não|isso|exato|verdade|pode ser|acho que|mas|porque|pq|e agora|e ai|e aí|como assim|me explica|continua|tambem|também|obrigado|obrigada)\b/.test(q);
- const casualFinance=/\b(apertad[oa]|sem grana|sem dinheiro|dinheiro some|dinheiro desaparece|nao sobra|não sobra|to liso|tô liso|quebrad[oa]|gastando demais|me enrolei|me perdi nas contas|nao consigo guardar|não consigo guardar|ta dificil|tá difícil|ta complicado|tá complicado|fim do mes|fim do mês)\b/.test(q);
- const emotional=/\b(cansad[oa]|ansios[oa]|preocupad[oa]|desesperad[oa]|frustrad[oa]|com medo|desanimad[oa]|estressad[oa])\b/.test(q);
- if(casualFinance) return 'Entendi você 😅💙. Quando parece que o dinheiro some, dá mesmo aquela sensação de não saber por onde começar. Vamos olhar isso sem julgamento. Neste mês, pelos seus registros, entraram '+money(income)+' e saíram '+money(expenses)+'. '+(topCategory?'A categoria que mais pesou foi '+topCategory[0]+' ('+money(topCategory[1])+'). ':'')+'Você sente que o problema está mais nas pequenas compras do dia a dia ou nas contas maiores?';
- if(emotional) return 'Poxa, imagino que isso esteja pesando. 💙 Não precisa organizar tudo de uma vez, nem se cobrar por isso. Podemos conversar com calma e separar uma coisa de cada vez. O que aconteceu?';
- if(conversational&&previousAssistant) return 'Entendi! 😊 '+(previousUser?'Você comentou “'+previousUser.slice(0,110)+(previousUser.length>110?'…':'')+'”. ':'')+( /\b(sim|isso|exato|verdade|pode ser)\b/.test(q)?'Então vamos seguir por esse caminho. ':'')+'Me conta só mais um detalhe para eu conseguir te ajudar melhor.';
- if(/\b(nao entendi|não entendi|explica melhor|pode explicar|como assim)\b/.test(q)) return 'Claro! Vou explicar de um jeito mais simples. 😊 Me diz qual parte ficou confusa, ou posso resumir: seus registros mostram '+money(income)+' de entradas e '+money(expenses)+' de gastos neste mês.';
- const greeting=/^(oi|ola|e ai|bom dia|boa tarde|boa noite|hey|opa)\b/.test(q);
- if(greeting) return 'Oii! 😊 Que bom ter você por aqui. Eu sou a NEXUS, sua assistente do Meu Financeiro. Posso conversar com você, analisar seus registros e ajudar a planejar os próximos passos. O que vamos organizar hoje?';
- if(/\b(quem e voce|seu nome|o que voce faz|como voce funciona)\b/.test(q)) return 'Eu sou a NEXUS AI ⚡, a assistente do Meu Financeiro. Meu núcleo atual funciona com código próprio: interpreto assuntos financeiros, faço cálculos com os dados cadastrados e organizo recomendações. Ainda não sou um modelo de linguagem livre como o ChatGPT, mas posso ajudar bastante na sua organização financeira.';
- if(/\b(obrigad|valeu|agradecid)\b/.test(q)) return 'Imagina! 💙 Estou aqui para ajudar. Quer olhar mais algum ponto das suas finanças?';
- if(/\b(tchau|ate mais|vou sair|falou)\b/.test(q)) return 'Até mais! 💙 Quando voltar, podemos continuar organizando suas finanças. Cuide bem do seu dinheiro e de você!';
- if(/\b(ajuda|o que posso perguntar|como posso usar|comandos)\b/.test(q)) return 'Pode falar comigo naturalmente! Por exemplo:\n• “Como estão meus gastos este mês?”\n• “Qual categoria está pesando mais?”\n• “Quanto ainda tenho disponível nos cartões?”\n• “Quais contas preciso priorizar?”\n• “Como posso guardar dinheiro para uma meta?”\nTambém pode me contar uma situação e eu ajudo a pensar em alternativas.';
- if(/\b(saldo|sobrou|quanto tenho|quanto resta|disponivel na conta)\b/.test(q)) return 'Vamos conferir 😊\n\nNeste mês, você registrou '+money(income)+' em entradas e '+money(expenses)+' em gastos. A diferença é **'+money(income-expenses)+'**.\nConsiderando todo o histórico cadastrado, o saldo entre entradas e gastos é '+money(allIncome-allExpenses)+'. Isso considera apenas o que foi registrado no Meu Financeiro, não o saldo bancário em tempo real.';
- if(/\b(gasto|gastos|despesa|despesas|economizar|economia|onde estou gastando)\b/.test(q)) return 'Olhei seus lançamentos deste mês. 💡\n\n• Entradas: '+money(income)+'\n• Gastos: '+money(expenses)+'\n• Diferença: '+money(income-expenses)+(topCategory?'\n• Maior categoria: '+topCategory[0]+' ('+money(topCategory[1])+')':'')+(income>0?'\n• Seus gastos representam '+(expenses/income*100).toFixed(1).replace('.',',')+'% das entradas.':'')+(income>0&&expenses/income>.8?'\n\n⚠️ Atenção: mais de 80% das entradas já foram comprometidas. Vale revisar primeiro os gastos variáveis.':'')+'\n\nSe quiser, posso ajudar a montar um plano para reduzir uma categoria.';
- if(/\b(cartao|cartoes|limite|credito|fatura)\b/.test(q)) return cards.length?'Você cadastrou '+cards.length+' cartão(ões). 💳\n\n• Limite total: '+money(cardLimit)+'\n• Valor utilizado: '+money(cardUsed)+'\n• Disponível estimado: '+money(cardLimit-cardUsed)+'\n\nUse esse valor como referência e confirme sempre a fatura no aplicativo do banco.': 'Ainda não encontrei cartões cadastrados. Você pode adicioná-los na área “Cartões e compromissos”.';
- if(/\b(divida|dividas|conta|contas|vencimento|pendencia|pendencias)\b/.test(q)) return pendingDebts.length?'Encontrei '+pendingDebts.length+' compromisso(s) ainda não marcado(s) como pago(s), somando '+money(debtTotal)+'.\n\nUma boa ordem inicial é priorizar contas essenciais, as que vencem primeiro e as que podem gerar juros ou multas. Se você me disser as datas e taxas, posso ajudar a comparar a prioridade.':'Não encontrei contas pendentes cadastradas. Isso é um bom sinal! Confira se todos os compromissos foram registrados.';
- if(/\b(parcela|parcelas|parcelamento|prestacao|prestacoes)\b/.test(q)) return activeParts.length?'Você tem '+activeParts.length+' compra(s) parcelada(s) em andamento. O valor mensal estimado é '+money(monthlyParts)+'.\n\nEsse cálculo divide o valor total de cada compra pela quantidade de parcelas. Confira os valores e vencimentos reais antes de decidir uma nova compra.':'Não encontrei parcelamentos em andamento cadastrados.';
- if(/\b(meta|metas|objetivo|objetivos|guardar|juntar|poupar|reserva)\b/.test(q)) return goals.length?'Vamos olhar suas metas! 🎯\n\n'+goals.map(g=>'• '+g.name+': '+money(g.saved)+' guardados de '+money(g.target)+' ('+(Number(g.target)>0?Math.min(100,Number(g.saved||0)/Number(g.target)*100).toFixed(0):0)+'%). Faltam '+money(Math.max(0,Number(g.target)-Number(g.saved||0)))+'.').join('\n')+'\n\nUma estratégia é separar um valor possível assim que receber, sem comprometer contas essenciais.':'Você ainda não cadastrou metas. Que tal começar com um objetivo pequeno e um valor mensal que caiba no seu orçamento?';
- if(/\b(planejamento|planejar|orcamento|organizar|por onde comeco|me ajuda)\b/.test(q)) return 'Vamos por partes, sem complicar. 💙\n\n1. Garanta primeiro moradia, alimentação, transporte e contas essenciais.\n2. Separe as despesas fixas das variáveis.\n3. Veja quais dívidas têm juros ou vencem primeiro.\n4. Defina uma meta de economia realista, mesmo que pequena.\n\nCom seus registros atuais, neste mês entraram '+money(income)+' e saíram '+money(expenses)+'. Posso montar um plano mais específico se você me contar qual é sua prioridade.';
- if(/\b(triste|ansios|preocup|desanim|dificil|difícil|apertad|sem dinheiro)\b/.test(q)) return 'Poxa, sinto muito que esteja passando por isso. 💙 Não precisa resolver tudo de uma vez. Podemos olhar sua situação com calma, separar o que é urgente do que pode esperar e encontrar um próximo passo possível. Quer me contar o que está pesando mais agora?';
- // A NEXUS também acolhe conversas que não são sobre dinheiro.
- if(/\b(namorad|namoro|relacionamento|termin|ficante|crush|casal|ciume|ciúme)\b/.test(q))
-  return 'Relacionamentos podem mexer bastante com a gente. 💙 Se quiser, me conta o que aconteceu. Posso te ajudar a organizar os pensamentos, enxergar possibilidades e pensar no que você gostaria de fazer — sem te julgar.';
- if(/\b(familia|família|mae|mãe|pai|irma|irmã|irmao|irmão|pais|pais|casa)\b/.test(q))
-  return 'Entendi. Assuntos de família às vezes são delicados e podem pesar muito. Estou aqui para te ouvir com respeito. O que aconteceu?';
- if(/\b(escola|faculdade|prova|estudo|estudar|professor|trabalho|emprego|chefe|carreira)\b/.test(q))
-  return 'Essa parte da vida também pode trazer bastante pressão. 😊 Quer me contar melhor o que está acontecendo? Podemos pensar juntos em um próximo passo que faça sentido para você.';
- if(/\b(amigo|amiga|amizade|sozinho|sozinha|solitario|solitária|ninguem|ninguém|desabafar|desabafo)\b/.test(q))
-  return 'Obrigado por confiar em mim para falar disso. 💙 Você não precisa fingir que está tudo bem aqui. Pode contar do seu jeito, no seu tempo. O que mais está passando pela sua cabeça agora?';
- if(/\b(filme|serie|série|musica|música|cantor|cantora|futebol|time|anime|livro|jogo|game|hobby)\b/.test(q))
-  return 'Bora falar disso também! 😄 Me conta mais — o que você está assistindo, ouvindo ou curtindo ultimamente?';
- if(/\b(viagem|viajar|ferias|praia|passeio|hotel|turismo)\b/.test(q)) return 'Que delícia falar de viagem! ✈️ Você está planejando um passeio ou sonhando com algum destino?';
- if(/\b(cachorro|cachorrinho|cao|gato|gatinho|pet|animal|filhote)\b/.test(q)) return 'Aaa, vamos falar dos bichinhos! 🐾 O que aconteceu com seu pet?';
- if(/\b(celular|telefone|iphone|android|computador|notebook|internet|tecnologia|aplicativo)\b/.test(q)) return 'Tecnologia também é assunto! 😄 O que você está tentando fazer ou descobrir?';
- if(/\b(igreja|deus|fe|biblia|oracao|jesus|religiao)\b/.test(q)) return 'Podemos conversar sobre espiritualidade com respeito. 💙 O que você está pensando ou sentindo sobre isso?';
- if(/\b(receita|cozinhar|cozinha|comida|almoco|jantar|doce|sobremesa)\b/.test(q)) return 'Assunto bom! 😋 Você quer uma receita, uma ideia ou só conversar sobre comida?';
- if(/\b(academia|treino|esporte|basquete|volei|corrida|campeonato)\b/.test(q)) return 'Bora falar de esporte! 🏆 Você está acompanhando alguma partida ou falando dos seus treinos?';
- if(/\b(como voce ta|como você tá|tudo bem|tudo bom|como vai)\b/.test(q))
-  return 'Estou por aqui, pronta para conversar com você! 😊 E você, como está de verdade hoje?';
- if(/\b(kkkk|haha|rsrs|que bom|legal|bacana|top|massa)\b/.test(q))
-  return 'Hahaha 😄 Gosto quando a conversa fica leve também. Me conta, o que mais aconteceu?';
- if(/\b(nao sei|não sei|confuso|confusa|perdido|perdida|nao consigo|não consigo)\b/.test(q))
-  return 'Tudo bem não ter as respostas agora. 💙 A gente pode começar pelo começo, sem pressa. O que está mais difícil de entender ou resolver neste momento?';
- if(q.endsWith('?')||q.length>12)
-  return 'Quero entender melhor. 💙 Pode me contar um pouco mais sobre isso? Você pode falar comigo sobre dinheiro, sentimentos, família, relacionamento, estudos, trabalho, planos ou qualquer assunto do seu dia. Ainda estou aprendendo a lidar com conversas muito abertas, então, se eu não captar algo, pode me explicar de outro jeito — sem precisar mudar de assunto.';
- return 'Estou aqui com você. 💙 Pode falar de qualquer assunto, não só de finanças. Como foi seu dia? Tem alguma coisa na cabeça ou só quer conversar um pouquinho?';
+  // 1. Segurança, acolhimento e limites — especialmente importante para usuários jovens.
+  if (urgentRisk) return 'Sinto muito que esteja doendo tanto. Obrigada por me contar. 💙 Você não precisa enfrentar isso sozinho(a), e sua segurança vem primeiro. Se existe risco de você se machucar agora, procure imediatamente um adulto de confiança que esteja perto, fique acompanhado(a) e ligue para o SAMU (192) ou vá a uma UPA/pronto-socorro. No Brasil, o CVV atende pelo 188, 24 horas. Você está em perigo neste momento ou já pensou em como faria isso?';
+  if (match(/\b(abuso|abusad|violencia|violento|ameac|assedi|chantag|me bate|apanho|tenho medo dele|tenho medo dela)\b/)) return 'Quero levar isso a sério. Você merece estar em segurança e não tem culpa por alguém ultrapassar seus limites. 💙 Se houver perigo imediato, vá para perto de uma pessoa segura e procure ajuda de um adulto de confiança ou dos serviços de emergência. Se você for menor de idade, não precisa resolver isso sozinho(a). Quer me contar apenas o que se sentir confortável em compartilhar?';
+  if (match(/\b(nudes|foto intima|foto íntima|me pediu foto|vazou foto|exposicao intima|sextorsao)\b/)) return 'Isso é delicado, e você não precisa enviar, produzir ou manter qualquer imagem íntima para provar carinho. Se alguém estiver pressionando ou ameaçando divulgar algo, não pague nem envie mais conteúdo; preserve as mensagens e procure um adulto de confiança e ajuda oficial. Se você for menor de idade, peça apoio de um responsável seguro. Quer me contar se alguém está te pressionando agora?';
+  if (emotional) return 'Ei, vamos com calma. 💙 Você não precisa fingir que está tudo bem nem resolver tudo de uma vez. Posso te ouvir sem te julgar e ajudar a separar o que aconteceu, o que você está sentindo e qual pode ser o próximo passo. Você quer desabafar ou prefere pensar em uma solução comigo?';
+
+  // 2. Conversa, intenção e continuidade.
+  if (greeting) return 'Oii! 😊 Eu sou a NEXUS. Pode conversar comigo sobre sua vida, estudos, sentimentos, amizades, família, tecnologia, sonhos e também dinheiro. Não precisa escrever de um jeito formal. Como você está hoje?';
+  if (has('quem e voce','qual seu nome','o que voce faz','como voce funciona')) return 'Eu sou a NEXUS AI, uma assistente criada para conversar, explicar ideias e ajudar a organizar decisões. Meu funcionamento atual é baseado em código próprio, regras de interpretação, contexto e uma base de conhecimentos — não sou uma pessoa nem um modelo de linguagem como o ChatGPT. Se eu não entender algo, pode reformular e eu tento por outro caminho.';
+  if (has('obrigado','obrigada','valeu','tmj','agradeco')) return 'Imagina! 💙 Fico feliz em ajudar. E pode voltar ao assunto quando quiser.';
+  if (has('tchau','ate mais','vou sair','falou','fui')) return 'Até mais! 💙 Cuide de você. Quando voltar, podemos continuar de onde paramos.';
+  if (has('o que posso perguntar','como posso usar','no que voce ajuda','que assuntos')) return 'Pode falar comigo de forma natural. Posso ajudar com escola, ENEM, matemática, escrita, tecnologia, criatividade, carreira, amizades, família, relacionamentos, sentimentos, hábitos, organização, ideias de projetos e educação financeira. Também posso ouvir quando você só quiser conversar. Quanto mais contexto você me der, melhor consigo direcionar a resposta.';
+  if (has('voce lembra','lembra do que eu disse','sobre o que falamos')) {
+    if (lastUser && lastAssistant) return 'Nesta conversa, consigo usar o contexto recente. A última coisa que você comentou foi: “'+String(lastUser).slice(0,180)+'”. É disso que você quer continuar falando?';
+    return 'Consigo usar as mensagens recentes que estão disponíveis nesta conversa, mas não quero inventar lembranças. Me dá uma pista do assunto?';
+  }
+  if (topicContinuation && lastAssistant) {
+    if (has('sim','isso','exato','verdade','pode ser')) return 'Entendi. Então vamos continuar a partir daí. '+(lastAssistant.length<260?lastAssistant:'Qual parte você quer aprofundar primeiro?');
+    if (has('nao','não')) return 'Tudo bem — não quero presumir o que você pensa. O que você mudaria na ideia ou o que aconteceu de verdade?';
+    return 'Entendi. Você está continuando o assunto anterior. '+(lastUser?'Você tinha comentado: “'+String(lastUser).slice(0,120)+'”. ':'')+'Me conta mais um pouco para eu não tirar conclusões precipitadas.';
+  }
+
+  // 3. Educação financeira com cálculos feitos localmente a partir dos registros.
+  if (has('saldo','quanto sobrou','quanto resta','quanto tenho registrado','diferenca entre entrada')) return 'Pelos lançamentos registrados neste mês:\n• Entradas: '+money(income)+'\n• Gastos: '+money(expenses)+'\n• Diferença: '+money(income-expenses)+'\n\nNo histórico completo, a diferença registrada é '+money(allIncome-allExpenses)+'. Isso não consulta sua conta bancária em tempo real; considera somente os dados cadastrados.';
+  if (has('gasto','gastos','despesa','despesas','economizar','economia','onde gasto','onde estou gastando','categoria')) return 'Vamos olhar seus números. 💡\n• Entradas neste mês: '+money(income)+'\n• Gastos neste mês: '+money(expenses)+'\n• Diferença: '+money(income-expenses)+(topCategory?'\n• Categoria com maior gasto: '+topCategory[0]+' ('+money(topCategory[1])+')':'\n• Ainda não há gastos categorizados neste mês.')+(income>0?'\n• Gastos equivalem a '+(expenses/income*100).toFixed(1).replace('.',',')+'% das entradas.':'')+'\n\nUm bom começo é separar gastos essenciais, importantes e que podem ser reduzidos. Quer analisar uma categoria específica?';
+  if (has('cartao','cartoes','limite','credito','crédito','fatura')) return cards.length?'Seus cartões cadastrados:\n• Limite total: '+money(cardLimit)+'\n• Utilizado: '+money(cardUsed)+'\n• Disponível estimado: '+money(cardLimit-cardUsed)+'\n\nEsse é um cálculo com os dados cadastrados no site. Confira a fatura e o limite atualizado no aplicativo do banco antes de comprar.':'Ainda não há cartões cadastrados. Você pode adicionar na área “Cartões e compromissos”.';
+  if (has('divida','dividas','conta atrasada','contas','vencimento','pendencia','pendencias','devo')) return pendingDebts.length?'Encontrei '+pendingDebts.length+' compromisso(s) ainda não marcado(s) como pago(s), totalizando '+money(debtTotal)+'.\n\nPara organizar, compare vencimento, juros, risco de corte/negativação e importância da despesa. Não escolha apenas pelo valor: uma dívida pequena com juros altos pode crescer rápido.':'Não encontrei compromissos pendentes cadastrados. Confira se todos foram registrados.';
+  if (has('parcela','parcelas','parcelamento','prestacao','prestacoes')) return activeParts.length?'Há '+activeParts.length+' parcelamento(s) em andamento. A estimativa mensal somada é '+money(monthlyParts)+'.\n\nAntes de assumir uma nova parcela, some as parcelas antigas com as despesas fixas e veja se ainda sobra margem.':'Não encontrei parcelamentos em andamento cadastrados.';
+  if (has('meta','metas','objetivo','objetivos','guardar','juntar','poupar','reserva')) return goals.length?'Suas metas cadastradas:\n'+goals.map(g=>'• '+g.name+': '+money(g.saved)+' de '+money(g.target)+' ('+(Number(g.target)>0?Math.min(100,Number(g.saved||0)/Number(g.target)*100).toFixed(0):0)+'%). Faltam '+money(Math.max(0,Number(g.target)-Number(g.saved||0))+'.').join('\n')+'\n\nUma meta fica mais alcançável quando você divide o total pelo prazo e escolhe uma contribuição que não comprometa o básico.':'Você ainda não cadastrou metas. Uma boa primeira meta pode ser pequena e concreta, como guardar um valor possível por semana.';
+  if (has('orcamento','orçamento','planejamento financeiro','planejar minhas finanças','organizar dinheiro','por onde comeco')) return 'Vamos montar uma base simples:\n1. Anote quanto entra e quando entra.\n2. Liste moradia, alimentação, transporte e outras despesas essenciais.\n3. Separe dívidas e parcelas com seus vencimentos.\n4. Defina um limite realista para gastos variáveis.\n5. Reserve algo para imprevistos, mesmo que comece pequeno.\n\nPelos seus registros deste mês, entraram '+money(income)+' e saíram '+money(expenses)+'. Qual é sua prioridade agora: sair das dívidas, controlar gastos ou juntar para um objetivo?';
+
+  // 4. Núcleo de conhecimento geral: respostas explicativas e orientação por domínio.
+  const knowledge = [
+    {keys:['matematica','matemática','equacao','equação','porcentagem','fracoes','frações','geometria','algebra','álgebra'],reply:'Posso te ajudar a entender matemática passo a passo. Primeiro identificamos o que a questão pede, depois os dados, a operação e por fim conferimos o resultado. Se você mandar o enunciado, explico sem pular etapas — e também posso mostrar um jeito mais fácil de lembrar.'},
+    {keys:['enem','redacao','redação','vestibular','prova','estudar','estudo','escola','faculdade','professor','trabalho escolar'],reply:'Vamos transformar isso em algo estudável. 😊 Podemos dividir o assunto em: o que você precisa saber, conceitos principais, exemplo resolvido e uma questão para praticar. Se for redação, posso ajudar com tese, argumentos, repertório, coesão e proposta de intervenção, sem tirar sua autoria.'},
+    {keys:['namoro','namorad','relacionamento','ficante','crush','termin','ciume','ciúme','paquera'],reply:'Relacionamento envolve sentimentos, limites, confiança e conversa. Não existe uma resposta automática para todo casal. Tente separar o que aconteceu de fato, o que você sentiu, o que precisa e o que gostaria de pedir. Posso ajudar a pensar sem escolher por você e sem normalizar controle, pressão ou desrespeito.'},
+    {keys:['amizade','amigo','amiga','grupo','excluido','excluida','sozinho','sozinha','fofoca','bullying','zoacao'],reply:'Amizades podem ser muito boas, mas também podem machucar. Vale observar se existe respeito, reciprocidade e liberdade para ser você. Se alguém te humilha, ameaça ou te exclui repetidamente, isso não é algo que você precisa aceitar sozinho(a). O que aconteceu?'},
+    {keys:['familia','família','mae','mãe','pai','irmao','irmão','irma','irmã','responsavel','responsável','pais'],reply:'Questões familiares podem ser complicadas porque existe afeto, convivência e às vezes conflito ao mesmo tempo. Podemos pensar em como falar, escolher um momento seguro e explicar o que você sente sem transformar a conversa numa disputa. O que você gostaria que sua família entendesse?'},
+    {keys:['ansiedade','ansioso','ansiosa','estresse','pressao','pressão','autoestima','inseguranca','insegurança','tristeza','motivacao','motivação'],reply:'O que você sente merece atenção, sem vergonha. Uma coisa que pode ajudar é dar nome ao sentimento, perceber o que aconteceu antes dele e escolher um passo pequeno para agora — respirar, beber água, sair um pouco do ambiente ou conversar com alguém confiável. Isso não substitui apoio profissional quando o sofrimento é frequente ou intenso.'},
+    {keys:['tecnologia','programacao','programação','codigo','código','site','aplicativo','celular','iphone','android','computador','internet'],reply:'Posso ajudar a entender tecnologia, planejar um projeto, explicar código e investigar erros. O melhor caminho é separar objetivo, ferramentas, etapas e possíveis falhas. Se você estiver criando algo, me diga o que quer que aconteça e o que está acontecendo de verdade.'},
+    {keys:['carreira','profissao','profissão','emprego','trabalho','curriculo','currículo','entrevista','dinheiro extra','empreender','negocio','negócio'],reply:'Podemos pensar em carreira e projetos de um jeito prático: interesses, habilidades, oportunidades, custos, riscos e primeiro teste pequeno. Não precisa decidir a vida inteira agora. Qual área ou ideia está chamando sua atenção?'},
+    {keys:['deus','igreja','biblia','bíblia','fe','fé','oracao','oração','jesus','religiao','religião','espiritualidade'],reply:'Posso conversar sobre fé e espiritualidade com respeito, distinguindo interpretação, contexto e opinião. Se estivermos falando de um texto bíblico, podemos olhar o trecho, o contexto histórico e outras passagens relacionadas, sem fingir que existe uma única leitura em todos os casos.'},
+    {keys:['musica','música','filme','serie','série','anime','livro','jogo','game','futebol','basquete','hobby'],reply:'Esse assunto também vale! 😄 Posso conversar sobre histórias, personagens, estilos, jogos, esportes e ideias. Me diz o que você está curtindo ou o que quer descobrir.'},
+    {keys:['saude','saúde','dor','sintoma','remedio','remédio','medicamento','sono','alimentacao','alimentação','treino','academia'],reply:'Posso compartilhar informações gerais e ajudar a organizar dúvidas, mas não consigo diagnosticar nem substituir um profissional de saúde. Se houver sintoma intenso, piora rápida ou risco imediato, procure atendimento. O que você quer entender?'}
+  ];
+  const found = knowledge.find(item=>item.keys.some(key=>has(key)));
+  if (found) return found.reply;
+
+  // 5. Pedidos de escrita, criatividade, decisão e explicação.
+  if (has('escreva','escrever','mensagem','texto para','carta','legenda','bio','convite','pedido de desculpas','parabens','parabéns')) return 'Posso ajudar a escrever isso com a sua voz. Para não ficar genérico, pense em três coisas: para quem é, o que você realmente quer transmitir e qual tom combina com você (carinhoso, direto, formal, engraçado ou emocionante). Me diga o contexto e eu preparo uma versão que você pode adaptar.';
+  if (has('ideia','ideias','criativo','criatividade','inventar','projeto')) return 'Vamos explorar possibilidades! Posso gerar ideias, comparar vantagens e dificuldades e transformar uma delas em etapas concretas. Uma boa ideia precisa combinar com seu objetivo, recursos e tempo. O que você quer criar ou melhorar?';
+  if (has('decidir','decisao','decisão','escolher','qual e melhor','qual é melhor','vale a pena')) return 'Posso te ajudar a decidir sem tomar a decisão por você. Vamos comparar: o que importa mais, quais são as opções, o que você ganha, o que pode perder e qual escolha é reversível. Quais são as opções que você está considerando?';
+  if (has('explica','explicar','o que significa','como funciona','por que','porque')) return 'Quero te explicar de um jeito que faça sentido, não só jogar uma definição. Me diga o tema ou a parte que te deixou com dúvida. Posso começar pelo básico, dar um exemplo do cotidiano e depois aprofundar.';
+  if (has('nao sei','não sei','confuso','confusa','perdido','perdida','nao consigo','não consigo')) return 'Tudo bem ainda não saber. 💙 Vamos diminuir o tamanho do problema: o que aconteceu, o que está sob seu controle e qual é a menor próxima ação possível? Se nem isso estiver claro, pode começar contando do seu jeito.';
+  if (match(/\b(kkkk+|haha+|rsrs+|legal|massa|top|bacana|boa|amei)\b/)) return 'Hahaha 😄 Que bom! Quer continuar nessa ideia ou mudar de assunto?';
+  if (questionMark || words.length > 7) return 'Quero entender direito para não te responder com algo inventado. Pelo que consegui captar, você está falando de: “'+raw.slice(0,180)+'”. Você quer uma explicação, um conselho, ajuda para fazer algo ou só conversar sobre isso?';
+  return greet+'Estou aqui para conversar. 💙 Pode falar do seu dia, de uma dúvida, de uma ideia ou de algo que esteja te preocupando. Não precisa escrever perfeitamente — eu tento entender e, se faltar contexto, pergunto.';
 }
 function App(){
   const [session,setSession]=useState(null), [loading,setLoading]=useState(true);
@@ -311,36 +352,26 @@ function App(){
   async function sendAssistantMessage(value=assistantInput){
     const question=String(value||'').trim();
     if(!question||assistantBusy)return;
-    const previous=assistantMessages.filter(m=>m.role==='user'||m.role==='assistant').slice(-10);
+    const previous=assistantMessages.filter(m=>m.role==='user'||m.role==='assistant').slice(-12);
     const nextHistory=[...previous.map(m=>({role:m.role,content:m.text})),{role:'user',content:question}];
+    const financeContext={
+      transactions:(data.transactions||[]).map(t=>({date:t.date,type:t.type,category:t.category,description:t.description,amount:t.amount})),
+      cards:(data.cards||[]).map(c=>({name:c.name,limit:c.limit_amount,used:c.used,dueDay:c.due_day})),
+      debts:(data.debts||[]).map(d=>({title:d.title,amount:d.amount,dueDate:d.due_date,status:d.status})),
+      goals:(data.goals||[]).map(g=>({name:g.name,target:g.target,saved:g.saved,deadline:g.deadline})),
+      installments:(data.installments||[]).map(i=>({description:i.description,amount:i.total_amount,count:i.installment_count,paid:i.paid_count}))
+    };
     setAssistantMessages(old=>[...old,{role:'user',text:question}]);
     setAssistantInput('');
     setAssistantBusy(true);
     setAssistantError('');
     try{
-      const supabaseUrl=import.meta.env.VITE_SUPABASE_URL;
-      const anonKey=import.meta.env.VITE_SUPABASE_ANON_KEY;
-      const accessToken=session?.access_token;
-      if(!supabaseUrl||!anonKey||!accessToken) throw new Error('Entre na sua conta para conversar com a NEXUS.');
-      const financeContext={
-        transactions:(data.transactions||[]).map(t=>({date:t.date,type:t.type,category:t.category,description:t.description,amount:t.amount})),
-        cards:(data.cards||[]).map(c=>({name:c.name,limit:c.limit_amount,used:c.used,dueDay:c.due_day})),
-        debts:(data.debts||[]).map(d=>({title:d.title,amount:d.amount,dueDate:d.due_date,status:d.status})),
-        goals:(data.goals||[]).map(g=>({name:g.name,target:g.target,saved:g.saved,deadline:g.deadline})),
-        installments:(data.installments||[]).map(i=>({description:i.description,amount:i.total_amount,count:i.installment_count,paid:i.paid_count}))
-      };
-      const response=await fetch('/api/nexus',{
-        method:'POST',
-        headers:{'Content-Type':'application/json'},
-        body:JSON.stringify({messages:nextHistory,supabaseUrl,anonKey,accessToken,financeContext})
-      });
-      const result=await response.json().catch(()=>({}));
-      if(!response.ok) throw new Error(result.error||'A NEXUS não conseguiu responder agora.');
-      if(typeof result.reply!=='string'||!result.reply.trim()) throw new Error('O modelo não retornou uma resposta válida.');
-      setAssistantMessages(old=>[...old,{role:'assistant',text:result.reply.trim()}]);
+      // Execução inteiramente local no navegador: nenhum texto ou dado financeiro é enviado a uma IA externa.
+      const reply=generateNexusReply(question,financeContext,nextHistory);
+      setAssistantMessages(old=>[...old,{role:'assistant',text:reply}]);
     }catch(error){
-      console.error('NEXUS AI:',error);
-      setAssistantError(error.message||'Não foi possível conectar ao núcleo inteligente da NEXUS. Tente novamente.');
+      console.error('NEXUS CORE:',error);
+      setAssistantError('Tive dificuldade para interpretar essa mensagem. Tente explicar de outro jeito.');
     }finally{setAssistantBusy(false);}
   }
 
