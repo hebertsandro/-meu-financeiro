@@ -233,6 +233,15 @@ export function parseLogicalStructure(text) {
 function summarizeLogicalStructure(structure) {
   if (!structure?.hasMultiplePropositions || !structure.relations.length) return null;
   const clauses = structure.clauses;
+  const causal = structure.causalChains || [];
+  if (causal.length > 1) {
+    const steps = causal.map((edge, index) => {
+      const cause = clauses[edge.causeClause]?.text || 'causa não identificada';
+      const effect = clauses[edge.effectClause]?.text || 'consequência não identificada';
+      return (index + 1) + '. “' + cause + '” aparece relacionado a “' + effect + '”.';
+    });
+    return 'Percebi uma cadeia com várias relações de causa e consequência. Pelo que você relatou — sem assumir que todas as ligações já estão comprovadas — temos:\n' + steps.join('\n') + '\n\nPodemos conferir cada ligação e descobrir onde existe uma causa confirmada, uma possibilidade ou alguma informação faltando.';
+  }
   const relation = structure.relations[0];
   const first = clauses[relation.fromClause]?.text || clauses[0]?.text || '';
   const second = clauses[relation.toClause]?.text || '';
