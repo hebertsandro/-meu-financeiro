@@ -56,7 +56,7 @@ const INTENTS = [
   ['comparison', /\b(qual e melhor|qual compensa|vale mais a pena|compare|comparar|diferenca entre)\b/],
   ['summary', /\b(resuma|resumir|faz um resumo|me resume|sintetiza)\b/],
   ['writing', /\b(escreva|escreve|redija|monta uma mensagem|me ajuda a responder|como responder|o que eu falo)\b/],
-  ['advice', /\b(o que eu faco|o que devo fazer|me aconselha|preciso de conselho|como lidar|como devo agir)\b/],
+  ['advice', /\\b(o que eu faco|o que devo fazer|o que voce recomenda|o que voce recomendaria|oque voce recomenda|oque voce recomendaria|qual conselho|me aconselha|preciso de conselho|como lidar|como devo agir|o que voce faria|oque vc recomendaria)\\b/],
   ['ideas', /\b(me de ideias|me da ideias|sugestoes|ideias para|brainstorm)\b/],
   ['planning', /\b(monta um plano|me ajuda a planejar|organiza para mim|cria um cronograma|quero um plano)\b/],
   ['calculation', /\b(quanto e|calcule|calcula|qual o resultado|quanto sobra|quanto falta)\b/],
