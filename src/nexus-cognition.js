@@ -284,6 +284,20 @@ function summarizeLogicalStructure(structure) {
 
 // Respostas sociais têm prioridade sobre referências vagas e classificações de tópico.
 function composeConversationalReply(message, history = []) {
+  // Porta de entrada social no mesmo módulo chamado diretamente pelo App.jsx.
+  // Não depende da classificação temática nem do fallback do motor financeiro.
+  const socialText = normalizeNexusText(message)
+    .replace(/[!?.,:;]+/g, ' ')
+    .replace(/\\s+/g, ' ')
+    .trim();
+  const greeting = /^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( nexus)?( tudo bem| tudo bom| tudo certo| como voce esta| como esta| como vai)?$/.test(socialText);
+  if (greeting) {
+    return 'Oii! 😊 Tudo bem por aqui! E você, como está hoje?';
+  }
+  const socialQuestion = /^(e voce|e vc|como voce esta|tudo bem com voce|tudo bem|tudo bom|como vai voce)$/.test(socialText);
+  if (socialQuestion) {
+    return 'Estou aqui, funcionando e pronta para conversar com você! 😊 Como está sendo seu dia?';
+  }
   const languageReply = getLanguageResponse(message, history);
   if (languageReply) return languageReply;
   const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' ')).replace(/\s+/g, ' ').trim();
