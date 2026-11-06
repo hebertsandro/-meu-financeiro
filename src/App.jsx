@@ -144,7 +144,46 @@ function generateNexusReply(question, finance={}, history=[]) {
   const found = knowledge.find(item=>item.keys.some(key=>has(key)));
   if (found) return found.reply;
 
-  // 5. Pedidos de escrita, criatividade, decisão e explicação.
+  // 5. CAMADA DE COMPREENSÃO — interpreta intenção, contexto e necessidade antes de responder.
+  // É um sistema determinístico: amplia a cobertura e a qualidade das perguntas, mas não
+  // aprende sozinho nem substitui a capacidade generativa de um modelo de linguagem.
+  const containsAny = (list) => list.some(term => has(term));
+  const asksForAdvice = containsAny(['o que eu faço','o que devo fazer','me aconselha','preciso de um conselho','qual atitude','como devo agir','como lidar']);
+  const asksForExplanation = containsAny(['me explica','explique','por que isso','como isso funciona','qual a diferenca','o que significa','nao entendi','não entendi']);
+  const asksForPlan = containsAny(['me ajuda a planejar','monta um plano','por onde começo','por onde comeco','quero melhorar','quero mudar','como posso começar','passo a passo']);
+  const asksForComparison = containsAny(['qual e melhor','qual é melhor','qual compensa','vale mais a pena','compare','comparar','vantagem e desvantagem']);
+  const asksForValidation = containsAny(['estou errado','to errado','fui errado','estou exagerando','sou estranho','isso e normal','isso é normal']);
+  const asksForWriting = containsAny(['me ajuda a responder','como responder','o que eu falo','o que dizer','escreve para mim','escreva para mim']);
+  const uncertainty = containsAny(['nao sei o que fazer','não sei o que fazer','estou confuso','to confuso','não consigo decidir','nao consigo decidir','minha cabeça está cheia','minha cabeca esta cheia']);
+  const relationshipConflict = containsAny(['brigamos','a gente brigou','discuti com','discutimos','me ignorou','me deixou no vácuo','me deixou no vacuo','perdi a confiança','perdi a confianca','não me escuta','nao me escuta']);
+  const schoolDifficulty = containsAny(['não consigo aprender','nao consigo aprender','tenho dificuldade','não entendo a matéria','nao entendo a materia','vou reprovar','estou atrasado na escola','procrastino para estudar']);
+  const socialPressure = containsAny(['estão me pressionando','estao me pressionando','tenho medo de decepcionar','medo do que vão pensar','medo do que vao pensar','todo mundo espera','me sinto obrigado','me sinto obrigada']);
+  const lowSelfWorth = containsAny(['não sou bom o suficiente','nao sou bom o suficiente','não sou suficiente','nao sou suficiente','me odeio','me acho um lixo','não gosto de mim','nao gosto de mim','me sinto inferior','ninguém gosta de mim','ninguem gosta de mim']);
+  const wantsToLearn = containsAny(['quero aprender','me ensina','ensina do zero','quero entender melhor','me explica do começo','me explica do comeco']);
+  const asksForIdeas = containsAny(['me dá ideias','me de ideias','sugestões','sugestoes','o que posso fazer','me ajuda com uma ideia']);
+  const recentTopic = lastUser ? String(lastUser).slice(0,220) : '';
+  const gentleClarifier = 'Para eu não presumir coisas sobre você, me conta um pouco mais do contexto?';
+  const structuredAdvice = (topic) => 'Vamos pensar em '+topic+' sem decidir tudo no impulso.\n\n1. **Fato:** o que aconteceu, sem interpretar ainda?\n2. **Sentimento:** como isso te afetou?\n3. **Necessidade:** o que você precisa que mude?\n4. **Opções:** quais caminhos existem e quais consequências podem trazer?\n5. **Próximo passo:** qual atitude pequena, segura e realista você consegue tomar agora?\n\n'+gentleClarifier;
+  if (urgentRisk) return 'Eu quero levar o que você está dizendo muito a sério. Você merece apoio de verdade, agora, e não precisa lidar com isso sozinho(a). Se houver risco imediato, afaste-se de qualquer coisa que possa usar para se machucar, fique perto de alguém de confiança e procure ajuda presencial urgente (SAMU 192 ou UPA). No Brasil, o CVV atende pelo 188. Se for possível, diga agora a um adulto seguro: “não estou bem e preciso que fique comigo”. Você está em segurança neste momento?';
+  if (lowSelfWorth) return 'Sinto muito que você esteja se enxergando desse jeito. 💙 Um pensamento muito duro sobre si mesmo não é uma definição de quem você é. Você não precisa provar seu valor sendo perfeito, agradando todo mundo ou dando conta de tudo. Quero entender de onde veio esse sentimento: aconteceu alguma coisa hoje, alguém falou algo, ou isso vem se acumulando há um tempo?';
+  if (relationshipConflict) return structuredAdvice('essa situação com essa pessoa');
+  if (schoolDifficulty) return 'Ter dificuldade em uma matéria não significa que você seja incapaz. Às vezes falta uma explicação diferente, uma base anterior ou um método que combine com você. Podemos descobrir onde a compreensão trava e reconstruir do ponto certo: **qual matéria é, qual assunto e em que parte você começa a se perder?** Se quiser, eu explico do zero, com exemplos e exercícios graduais.';
+  if (socialPressure) return 'É pesado sentir que precisa corresponder às expectativas de todo mundo. Mas a opinião dos outros não precisa decidir sua vida inteira. Podemos separar o que é uma responsabilidade real, o que é uma expectativa externa e o que você realmente deseja. Existe alguém seguro com quem você consiga conversar sem medo de ser humilhado(a)?';
+  if (uncertainty || asksForAdvice) return structuredAdvice('o que está acontecendo');
+  if (asksForValidation) return 'Posso te ajudar a olhar para isso com equilíbrio, sem te julgar e sem concordar automaticamente só para agradar. Uma situação pode ter sentimentos legítimos e, ao mesmo tempo, atitudes que precisam ser revistas. O que aconteceu exatamente, e o que você está questionando em si mesmo(a)?';
+  if (asksForWriting) return 'Claro. Posso montar uma resposta que soe natural e pareça sua, não uma mensagem artificial. Me diga para quem é, o que a pessoa falou e o que você quer transmitir. Posso deixar carinhosa, firme, respeitosa, curta ou mais detalhada.';
+  if (asksForComparison) return 'Vamos comparar pelo que realmente importa, não só escolher a opção que parece mais bonita. Posso avaliar: objetivo, custo, benefício, riscos, esforço, prazo e possibilidade de voltar atrás. Quais são as opções?';
+  if (asksForPlan) return 'Vamos transformar isso em um plano possível, sem exigir uma mudança gigante de uma vez. Primeiro definimos o objetivo; depois identificamos onde você está hoje, o que está no seu controle, os recursos disponíveis e uma primeira ação pequena. **O que você quer conseguir e qual é sua maior dificuldade neste momento?**';
+  if (wantsToLearn) return 'Bora aprender de verdade. Posso adaptar a explicação ao seu nível: começo com uma ideia simples, dou um exemplo do cotidiano, aprofundo o conceito e depois proponho um exercício para conferir se fez sentido. Qual assunto você quer aprender?';
+  if (asksForIdeas) return 'Vamos criar opções que sejam úteis e possíveis de executar. Posso sugerir caminhos mais simples, criativos e ambiciosos, depois comparar esforço, custo e resultado esperado. Para não jogar ideias aleatórias: qual é o objetivo e quais limites você tem (tempo, dinheiro ou ferramentas)?';
+  if (asksForExplanation) return 'Vou tentar explicar sem complicar: primeiro a ideia central, depois por que ela acontece, um exemplo concreto e o que costuma ser confundido com ela. Qual é exatamente o assunto ou trecho que você quer entender?';
+  if (asksForAdvice && recentTopic) return 'Pelo contexto, parece que você quer orientação sobre “'+recentTopic+'”. Não quero tirar conclusões sem conhecer os detalhes. O que aconteceu depois disso?';
+
+  // 6. Detecção de mensagens vagas e continuidade conversacional.
+  if (words.length <= 3 && !greeting) return 'Pode falar do seu jeito, mesmo que seja só uma frase ou uma ideia pela metade. 💙 Você quer me contar algo que aconteceu, fazer uma pergunta ou pensar em alguma coisa comigo?';
+  if (questionMark || words.length > 7) return 'Quero responder ao que você realmente quis dizer, não apenas às palavras. Pelo que entendi, você trouxe: “'+raw.slice(0,180)+'”. Posso estar interpretando errado. O que é mais importante nessa mensagem: entender o assunto, resolver uma situação, tomar uma decisão ou simplesmente ser ouvido(a)?';
+
+  // 7. Pedidos de escrita, criatividade, decisão e explicação.
   if (has('escreva','escrever','mensagem','texto para','carta','legenda','bio','convite','pedido de desculpas','parabens','parabéns')) return 'Posso ajudar a escrever isso com a sua voz. Para não ficar genérico, pense em três coisas: para quem é, o que você realmente quer transmitir e qual tom combina com você (carinhoso, direto, formal, engraçado ou emocionante). Me diga o contexto e eu preparo uma versão que você pode adaptar.';
   if (has('ideia','ideias','criativo','criatividade','inventar','projeto')) return 'Vamos explorar possibilidades! Posso gerar ideias, comparar vantagens e dificuldades e transformar uma delas em etapas concretas. Uma boa ideia precisa combinar com seu objetivo, recursos e tempo. O que você quer criar ou melhorar?';
   if (has('decidir','decisao','decisão','escolher','qual e melhor','qual é melhor','vale a pena')) return 'Posso te ajudar a decidir sem tomar a decisão por você. Vamos comparar: o que importa mais, quais são as opções, o que você ganha, o que pode perder e qual escolha é reversível. Quais são as opções que você está considerando?';
