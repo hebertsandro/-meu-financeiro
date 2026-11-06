@@ -105,12 +105,12 @@ function detectRelations(text) {
 }
 function inferSpeechAct(text, intent) {
   if (intent !== 'statement') return intent;
-  if (/\b(preciso|queria|quero|pode me|me ajuda|me ajude)\b/.test(text)) return 'request';
-  if (/\b(aconteceu|aconteceu comigo|hoje eu|ontem eu|eu sinto|estou sentindo)\b/.test(text)) return 'personal_disclosure';
-  if (/\b(nao sei|não sei|to perdido|estou perdido|estou confuso)\b/.test(text)) return 'uncertainty';
+  // Desejos narrados ("eu queria estudar") não são automaticamente pedidos ao assistente.
+  if (/^(me ajuda|me ajude|pode me|queria saber|quero saber|me explica|me ensina|preciso de ajuda|preciso que voce|quero que voce)\b/.test(text)) return 'request';
+  if (/\b(aconteceu comigo|hoje eu|ontem eu|eu sinto|estou sentindo)\b/.test(text)) return 'personal_disclosure';
+  if (/\b(nao sei|to perdido|estou perdido|estou confuso|estou confusa)\b/.test(text)) return 'uncertainty';
   return 'statement';
 }
-
 function extractEntities(text) {
   const entities = [];
   const patterns = [
