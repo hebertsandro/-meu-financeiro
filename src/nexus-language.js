@@ -136,48 +136,90 @@ function detectEmotion(text) {
   };
   return Object.entries(lex).flatMap(([emotion,terms])=>terms.filter(term=>contains(text,term)).map(evidence=>({emotion,evidence})));
 }
+function historyText(turn) {
+  return String(turn?.content ?? turn?.text ?? '');
+}
+function getConversationContext(history=[]) {
+  const turns=Array.isArray(history)?history:[];
+  const lastAssistant=[...turns].reverse().find(turn=>turn?.role==='assistant');
+  const userTurns=turns.filter(turn=>turn?.role==='user');
+  const previousUser=userTurns.length>1?historyText(userTurns[userTurns.length-2]):'';
+  const lastQuestion=historyText(lastAssistant);
+  const questionType=/como voce esta( hoje)?|como esta se sentindo/.test(fold(lastQuestion))
+    ? 'wellbeing'
+    : /como esta sendo seu dia|como foi seu dia|como esta seu dia/.test(fold(lastQuestion))
+      ? 'day'
+      : /o que aconteceu|o que houve|quer me contar/.test(fold(lastQuestion))
+        ? 'event'
+        : /qual deles|qual delas|de quem voce esta falando/.test(fold(lastQuestion))
+          ? 'clarification'
+          : /pode explicar|pode dar um exemplo|o que voce quis dizer/.test(fold(lastQuestion))
+            ? 'clarification'
+            : /quer uma explicacao|quer uma orientacao|quer ajuda/.test(fold(lastQuestion))
+              ? 'choice'
+              : lastQuestion.includes('?') ? 'open_question' : null;
+  const recentUserText=userTurns.slice(-6).map(historyText).join(' ');
+  const recentTopics=topicsFor(recentUserText);
+  const currentUser=historyText(userTurns[userTurns.length-1]);
+  const priorUser=historyText(userTurns[userTurns.length-2]);
+  return {
+    lastAssistant:lastQuestion,
+    previousUser:priorUser,
+    currentUser,
+    questionType,
+    activeTopic:recentTopics[0]?.topic||null,
+    recentTopics,
+    userTurnCount:userTurns.length,
+    hasConversation:userTurns.length>1||Boolean(lastAssistant)
+  };
+}
+
 export function analyzeLanguage(message, history=[]) {
   const original=String(message||'');
   const normalized=normalizeLanguageText(original);
   const turns=getUserTurns(history);
-  const prior=turns.slice(-5);
+  const prior=turns.slice(-6);
+  const context=getConversationContext(history);
   const currentTopics=topicsFor(normalized);
-  const previousTopics=topicsFor(prior.join(' '));
+  const previousTopics=topicsFor(prior.slice(0,-1).join(' '));
   const currentTopic=currentTopics[0]?.topic||null;
-  const previousTopic=previousTopics[0]?.topic||null;
+  const previousTopic=previousTopics[0]?.topic||context.activeTopic;
   const changedTopic=Boolean(currentTopic&&previousTopic&&currentTopic!==previousTopic&&currentTopics[0].score>=1);
   const acts=ACTS.filter(([,re])=>re.test(normalized)).map(([act])=>act);
   const laughter=/\b(kkkk+|kakaka+|hahaha+|haha+|rsrs+)\b/.test(normalized);
   const ambiguousPhrases=[];
-  for(const item of ['faz o que quiser','tanto faz','ta bom entao','deixa pra la','imagina','beleza']){
+  for(const item of ['faz o que quiser','tanto faz','ta bom entao','deixa pra la','esquece','imagina','beleza']){
     if(contains(normalized,item)) ambiguousPhrases.push({phrase:item,needsContext:true});
   }
   const unknownTokens=normalized.split(' ').filter(token=>token.length>3&&!NEXUS_LEXICON.some(entry=>entry.canonical===token||entry.variants.includes(token)));
-  const priorAssistantTurn=[...(Array.isArray(history)?history:[])].reverse().find(turn=>turn?.role==='assistant');
-  const priorAssistant=String(priorAssistantTurn?.content||priorAssistantTurn?.text||'');
   const irony=detectIrony(normalized);
   const indirectness=detectIndirectness(normalized);
-  const references=/(\b(ela|ele|eles|elas|isso|aquilo|essa|esse|dela|dele|la)\b)/.test(normalized);
-  const repeatedTerms=[...tokenSet(normalized)].filter(token=>token.length>3&&prior.some(turn=>contains(turn,token)));
-  const followUp=normalized.split(' ').length<=7&&(references||/^(e|mas|entao|por que|como assim|e agora|e depois|isso|ela|ele)\b/.test(normalized));
+  const references=/\b(ela|ele|eles|elas|isso|aquilo|essa|esse|dela|dele|la|dele|dela)\b/.test(normalized);
+  const repeatedTerms=[...tokenSet(normalized)].filter(token=>token.length>3&&prior.slice(0,-1).some(turn=>contains(turn,token)));
+  const followUp=normalized.split(' ').length<=10&&(references||/^(e|mas|entao|por que|como assim|e agora|e depois|isso|ela|ele|tambem|ai)/.test(normalized));
+  const answerKind=/^(eu )?(estou|to|tou )?(bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|animado|animada)$/.test(normalized.replace(/m{2,}$/,'m'))?'positive'
+    :/^(eu )?(estou|to|tou )?(mal|ruim|triste|cansado|cansada|ansioso|ansiosa|preocupado|preocupada)$/.test(normalized)?'negative'
+    :/^(mais ou menos|assim assim|normal|nada demais|nao sei)$/.test(normalized)?'neutral'
+    :/^(sim|nao|claro|com certeza|acho que sim|acho que nao)$/.test(normalized)?'yes_no'
+    :null;
   return {
     original,normalized,tokens:normalized.split(' ').filter(Boolean),
     matchedEntries:NEXUS_LEXICON.filter(entry=>entry.variants.some(v=>contains(original,v))||contains(normalized,entry.canonical))
       .slice(0,30).map(({canonical,meanings,tone,ambiguity})=>({canonical,meanings,tone,ambiguity})),
     possibleActs:acts,emotions:detectEmotion(normalized),laughter,irony,indirectness,
     ambiguousPhrases,unknownTokens,topics:currentTopics,topic:currentTopic,previousTopic,
-    changedTopic, references, repeatedTerms, followUp, contextAvailable:prior.length>0,
-    previousAssistant, confidence:irony.possible||ambiguousPhrases.length?0.45:acts.length?0.78:currentTopic?0.62:0.25,
+    changedTopic,references,repeatedTerms,followUp,answerKind,context,
+    contextAvailable:context.hasConversation,
+    previousAssistant:context.lastAssistant,confidence:irony.possible||ambiguousPhrases.length?0.45:acts.length?0.78:currentTopic?0.62:0.25,
     caution:irony.possible||ambiguousPhrases.length>0||indirectness.length>0
   };
 }
-
 export function getLanguageResponse(message,history=[]) {
   const a=analyzeLanguage(message,history);
   const t=a.normalized;
   const prev=fold(a.previousAssistant);
   const askedDay=/como esta sendo seu dia|como foi seu dia|como esta seu dia/.test(prev);
-  const askedHow=/como voce esta|como esta se sentindo|como voce ta/.test(prev);
+  const askedHow=/como voce esta( hoje)?|como esta se sentindo|como voce ta( hoje)?/.test(prev);
   // Respostas espontâneas podem vir com "estou", abreviações e letras repetidas
   // ("bemmm", "bemm"). Removemos o prefixo antes de interpretar o estado.
   const answer= t.replace(/^(eu )?(estou|to|tou) /,'').replace(/m{2,}$/,'m');
@@ -191,6 +233,14 @@ export function getLanguageResponse(message,history=[]) {
     if(/^(bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|animado|animada)$/.test(answer)) return 'Que bom! 😊 Fico feliz em saber. Como está sendo seu dia?';
     if(/^(mais ou menos|assim assim|nao sei)$/.test(answer)) return 'Entendi. Tem dias que a gente fica assim mesmo. Aconteceu alguma coisa ou está tudo só meio normal hoje?';
     if(/^(mal|ruim|triste|cansado|cansada|ansioso|ansiosa|preocupado|preocupada)$/.test(answer)) return 'Poxa, sinto muito. Quer me contar o que aconteceu? Estou aqui para te ouvir.';
+  }
+  // Respostas curtas a perguntas anteriores devem ser interpretadas pelo papel
+  // que exercem na conversa, não como frases isoladas.
+  if(a.context.questionType==='event' && /^(nada|nada nao|nao sei|foi isso|so isso)$/.test(t)) {
+    return 'Tudo bem. Não precisa contar mais do que quiser. Quer conversar sobre outra coisa ou prefere ficar nesse assunto?';
+  }
+  if(a.context.questionType==='clarification' && a.followUp) {
+    return 'Obrigado por esclarecer. Vou usar esse detalhe para continuar, sem voltar a perguntar a mesma coisa.';
   }
   if(a.changedTopic) return null; // deixa o motor principal responder ao novo assunto, sem forçar continuidade.
   if(a.irony.possible) return 'Pode ter ironia ou sarcasmo no que você escreveu, mas o tom depende do contexto. Você está falando literalmente ou quis dizer o contrário?';
