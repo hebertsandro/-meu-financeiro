@@ -76,19 +76,23 @@ function generateNexusReply(question, finance={}, history=[]) {
       'tb':'tambem','eh':'e','ehh':'e'
     };
     return String(value || '').toLocaleLowerCase('pt-BR')
-      .replace(/(^|[^\\p{L}\\p{N}])([\\p{L}\\p{N}]+)(?=$|[^\\p{L}\\p{N}])/gu,
+      .replace(/(^|[^\p{L}\p{N}])([\p{L}\p{N}]+)(?=$|[^\p{L}\p{N}])/gu,
         (full,before,word) => before + (dictionary[word] || word))
-      .replace(/\\b(to|tô|tou)\\b/giu,'estou')
-      .replace(/\\b(ta|tá)\\b/giu,'esta')
-      .replace(/\\b(pro|pra)\\b/giu,'para')
-      .replace(/\\b(p vcs|pra vcs)\\b/giu,'para voces')
-      .replace(/\\b(nao|n)\\s+([aeiou])\\b/giu,'nao $2')
-      .replace(/([!?])\\1{1,}/g,'$1')
-      .replace(/\\s+/g,' ').trim();
+      .replace(/\b(to|tô|tou)\b/giu,'estou')
+      .replace(/\b(ta|tá)\b/giu,'esta')
+      .replace(/\b(pro|pra)\b/giu,'para')
+      .replace(/\b(p vcs|pra vcs)\b/giu,'para voces')
+      .replace(/\b(nao|n)\s+([aeiou])\b/giu,'nao $2')
+      .replace(/([!?])\1{1,}/g,'$1')
+      .replace(/\s+/g,' ').trim();
   };
   const q = normalize(expandInformal(raw));
   const words = q.split(/\s+/).filter(Boolean);
-  const has = (...terms) => terms.some(term => q.includes(normalize(term)));
+  const searchableText = q.replace(/[?.,!]/g,' ').replace(/\s+/g,' ').trim();
+  const has = (...terms) => terms.some(term => {
+    const phrase = normalize(term).replace(/[?.,!]/g,' ').replace(/\s+/g,' ').trim();
+    return phrase.length > 0 && (' '+searchableText+' ').includes(' '+phrase+' ');
+  });
   const match = regex => regex.test(q);
   const money = brl;
   const transactions = Array.isArray(finance.transactions) ? finance.transactions : [];
@@ -249,7 +253,7 @@ function generateNexusReply(question, finance={}, history=[]) {
   const containsAny = (list) => list.some(term => has(term));
   // Continuação contextual: quando a pessoa pede o passo a passo do cálculo anterior.
   if (containsAny(['mostre passo a passo','mostra passo a passo','passo a passo','como chegou nesse resultado','como fez essa conta'])) {
-    const previousMath = String(lastUser || '').match(/(?:quanto\\s+(?:e|é)\\s+|calcule\\s+|resolva\\s+)?([\\d.]+)\\s*([+*/-])\\s*([\\d.]+)/i);
+    const previousMath = String(lastUser || '').match(/(?:quanto\s+(?:e|é)\s+|calcule\s+|resolva\s+)?([\d.]+)\s*([+*/-])\s*([\d.]+)/i);
     if (previousMath) {
       const a=Number(previousMath[1].replace(/\\./g,'')), b=Number(previousMath[3].replace(/\\./g,''));
       const op=previousMath[2];
@@ -257,6 +261,20 @@ function generateNexusReply(question, finance={}, history=[]) {
       if (Number.isFinite(result)) {
         const names={'+':'somamos','-':'subtraímos','*':'multiplicamos','/':'dividimos'};
         return 'Claro! Vamos por partes. 😊\\n\\n1. Primeiro, identificamos os números: '+a.toLocaleString('pt-BR')+' e '+b.toLocaleString('pt-BR')+'.\\n2. A operação é '+(op==='+'?'adição':op==='-'?'subtração':op==='*'?'multiplicação':'divisão')+'.\\n3. Então, '+names[op]+' os valores.\\n\\nResultado: '+result.toLocaleString('pt-BR')+'.';
+      }
+    }
+  }
+  // Prioridade de intenção: pedidos de explicação sobre a mensagem anterior não são pedidos de planejamento.
+  const asksStepByStep = containsAny(['mostre passo a passo','mostra passo a passo','passo a passo','como chegou nesse resultado','como fez essa conta','me explica essa conta']);
+  if (asksStepByStep && lastUser) {
+    const previousExpression = String(lastUser).match(/([\d.]+)\s*([+*/-])\s*([\d.]+)/);
+    if (previousExpression) {
+      const left=Number(previousExpression[1].replace(/\./g,'')), right=Number(previousExpression[3].replace(/\./g,''));
+      const op=previousExpression[2];
+      const value=op==='+'?left+right:op==='-'?left-right:op==='*'?left*right:right!==0?left/right:NaN;
+      if (Number.isFinite(value)) {
+        const explanation=op==='+'?'somamos':op==='-'?'subtraímos':op==='*'?'multiplicamos':'dividimos';
+        return 'Claro! 😊\\n\\n1. Identificamos os números: '+left.toLocaleString('pt-BR')+' e '+right.toLocaleString('pt-BR')+'.\\n2. A operação é '+(op==='+'?'adição':op==='-'?'subtração':op==='*'?'multiplicação':'divisão')+'.\\n3. '+(op==='+'?'A soma':op==='-'?'A diferença':op==='*'?'O produto':'O quociente')+' é obtido quando '+explanation+' esses valores.\\n\\n**Resultado: '+value.toLocaleString('pt-BR')+'**';
       }
     }
   }
