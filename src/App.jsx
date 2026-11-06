@@ -489,17 +489,17 @@ function SpaceNexusGame({onReward}){
   setFoes(v=>v.map(f=>({...f,y:f.y+0.65+(wave*.08)})).filter(f=>f.y<91));
   setShots(v=>v.map(b=>({...b,y:b.y-4})).filter(b=>b.y>0));
   setEnemyShots(v=>v.map(b=>({...b,y:b.y+2.2})).filter(b=>b.y<100));
-  if(n%26===0)setFoes(v=>{const target=v.filter(f=>f.fire).slice(-2);if(target.length)setEnemyShots(q=>[...q,...target.map(f=>({id:Math.random(),x:f.x,y:f.y+3}))]);return v});
+  if(n%26===0)setFoes(v=>{const target=v.filter(f=>f.fire).slice(-2);if(target.length)setEnemyShots(q=>[...q,...target.map(f=>({id:Math.random(),x:f.x,y:f.y+3}))]);return v});if(boss&&n%18===0)setEnemyShots(q=>[...q,{id:Math.random(),x:boss.x,y:boss.y+8},{id:Math.random(),x:boss.x-9,y:boss.y+8},{id:Math.random(),x:boss.x+9,y:boss.y+8}]);
   if(n%360===0)setBoss({hp:12+wave*3,max:12+wave*3,x:50,y:8,name:['DEVORADOR ESTELAR','GENERAL VORTEX','TITÃ NEBULAR'][Math.floor(n/360-1)%3]});
   if(n%360===0)setMessage('⚠ CHEFÃO DETECTADO! Desvie dos disparos!');
   return n;
- });},85);return()=>clearInterval(id)},[running,ship,wave]);
+ });},85);return()=>clearInterval(id)},[running,ship,wave,boss]);
  useEffect(()=>{if(!running)return;
   setShots(current=>{let next=current;setFoes(enemies=>{let remaining=[...enemies];next=next.filter(b=>{const i=remaining.findIndex(f=>Math.abs(f.x-b.x)<7&&Math.abs(f.y-b.y)<8);if(i>=0){remaining[i].hp-=1;if(remaining[i].hp<=0)setScore(s=>s+10);return false}return true});return remaining.filter(f=>f.hp>0)});if(boss){next=next.filter(b=>{if(Math.abs(b.x-b.x)<0)return true;return true});}return next});
   setEnemyShots(v=>{const hit=v.some(b=>Math.abs(b.x-ship)<6&&b.y>76&&b.y<88);if(hit){setLives(l=>Math.max(0,l-1));setMessage('A nave foi atingida! Cuidado!')}return hit?v.filter(b=>!(Math.abs(b.x-ship)<6&&b.y>76&&b.y<88)):v});
   setFoes(v=>{const hit=v.some(f=>Math.abs(f.x-ship)<7&&f.y>76&&f.y<90);if(hit){setLives(l=>Math.max(0,l-1));setMessage('Colisão! Desvie dos invasores!')}return hit?v.filter(f=>!(Math.abs(f.x-ship)<7&&f.y>76&&f.y<90)):v});
  },[tick]);
- useEffect(()=>{if(lives<=0&&running){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(v=>{const b=Math.max(v,score);localStorage.setItem('mf_space_best',String(b));return b})}},[lives,running,score]);
+ useEffect(()=>{if(lives<=0&&running){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(v=>{const b=Math.max(v,score);localStorage.setItem('mf_space_best',String(b));return b});onReward(Math.floor(score/25))}},[lives,running,score,onReward]);
  useEffect(()=>{if(!running)return;const id=setInterval(()=>{setBoss(b=>{if(!b)return b;const hit=shots.filter(s=>Math.abs(s.x-b.x)<18&&s.y<25&&s.y>5).length;if(hit){setShots(v=>v.filter(s=>!(Math.abs(s.x-b.x)<18&&s.y<25&&s.y>5)));const hp=b.hp-hit;if(hp<=0){setScore(v=>v+250);setMessage('CHEFÃO DERROTADO! +250 pontos');return null}return {...b,hp}}return {...b,x:Math.max(22,Math.min(78,b.x+(Math.random()-.5)*8))}})},120);return()=>clearInterval(id)},[running,shots]);
  const finish=()=>{setRunning(false);setEnded(true);setBest(v=>{const b=Math.max(v,score);localStorage.setItem('mf_space_best',String(b));return b});onReward(Math.floor(score/25))};
  return <section className="space-nexus-card">
