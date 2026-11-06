@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { NEXUS_LEXICON, normalizeLanguageText, analyzeLanguage, getLanguageResponse } from './nexus-language.js';
+import { NEXUS_LEXICON, normalizeLanguageText, analyzeLanguage, getLanguageResponse, buildConversationMemory } from './nexus-language.js';
 
 test('normaliza abreviações comuns sem alterar a mensagem original', () => {
   assert.equal(normalizeLanguageText('vc tá bem hj?'), 'voce esta bem hoje');
@@ -175,4 +175,45 @@ test('não trata mudança explícita de assunto como continuação forçada', ()
     { role:'assistant', content:'Quer me contar o que aconteceu?' }
   ];
   assert.equal(getLanguageResponse('Como funciona juros compostos?', history), null);
+});
+
+
+test('constrói memória com pessoas, acontecimentos e evidências temporais', () => {
+  const history = [
+    { role:'user', content:'Minha namorada está distante' },
+    { role:'assistant', content:'O que mudou?' },
+    { role:'user', content:'Ela quase não conversa comigo' },
+    { role:'assistant', content:'Isso começou quando?' }
+  ];
+  const memory = buildConversationMemory(history);
+  assert.ok(memory.people.includes('namorada'));
+  assert.ok(memory.events.includes('distanciamento'));
+  assert.ok(memory.events.includes('menos_conversa'));
+  assert.equal(memory.activeTopic, 'relacionamento');
+});
+
+test('relaciona mudança de escola à ordem temporal sem afirmar causalidade', () => {
+  const history = [
+    { role:'user', content:'Minha namorada está distante' },
+    { role:'assistant', content:'Isso começou recentemente?' }
+  ];
+  const reply = getLanguageResponse('Depois que ela mudou de escola', history);
+  assert.match(reply, /ordem em que as coisas aconteceram/);
+  assert.match(reply, /não confirma que uma coisa causou a outra/);
+  assert.match(reply, /O que mudou no contato ou na rotina/);
+});
+
+test('guarda evidência causal como relato não verificado', () => {
+  const memory = buildConversationMemory([
+    { role:'user', content:'Minha amiga parou de falar comigo porque mudou de turma' }
+  ]);
+  assert.ok(memory.causalEvidence.some(item => item.status === 'relato_nao_verificado'));
+});
+
+test('não inventa pessoa nem acontecimento quando não foram mencionados', () => {
+  const memory = buildConversationMemory([
+    { role:'user', content:'Hoje foi um dia comum' }
+  ]);
+  assert.deepEqual(memory.people, []);
+  assert.deepEqual(memory.events, []);
 });
