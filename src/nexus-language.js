@@ -234,7 +234,7 @@ function composeTimelineReply(message, history, memory) {
     memory.people.includes('namorada')||memory.people.includes('namorado');
   const refersToSchool=/mudou de escola|trocou de escola|nova escola/.test(text);
   if(hasTemporalStart&&hasRelationshipContext) {
-    const detail=refersToSchool?'a mudança de escola':String(message).trim().replace(/[.!?]+$/,'');
+    const detail=refersToSchool?'ela ter mudado de escola':String(message).trim().replace(/[.!?]+$/,'');
     return 'Entendi. Você está situando o distanciamento depois de ' + detail + '. Isso mostra a ordem em que as coisas aconteceram, mas ainda não confirma que uma coisa causou a outra. O que mudou no contato ou na rotina de vocês naquela época?';
   }
   return null;
