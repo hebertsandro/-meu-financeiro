@@ -86,3 +86,36 @@ test('não deixa um cumprimento apagar uma pergunta importante', () => {
   assert.equal(getLanguageResponse('Oi, me explica fotossíntese'), null);
   assert.match(getLanguageResponse('Oi, como está?'), /Como você está hoje/);
 });
+
+test('detecta marcadores de possível sarcasmo sem afirmar intenção como certeza', () => {
+  const result = analyzeLanguage('Nossa, que ótimo, deu tudo errado');
+  assert.equal(result.irony.possible, true);
+  assert.match(getLanguageResponse('Nossa, que ótimo, deu tudo errado'), /ironia ou sarcasmo/);
+});
+
+test('identifica possíveis indiretas sem inventar destinatário', () => {
+  const result = analyzeLanguage('Tem gente que só lembra da gente quando precisa');
+  assert.ok(result.indirectness.includes('indirect_criticism'));
+});
+
+test('detecta mudança de assunto e libera o motor especializado', () => {
+  const history = [{role:'user',content:'Minha namorada está distante'}];
+  const result = analyzeLanguage('Como funciona a fotossíntese?', history);
+  assert.equal(result.changedTopic, true);
+  assert.equal(getLanguageResponse('Como funciona a fotossíntese?', history), null);
+});
+
+test('reconhece vocabulário de relacionamento sem concluir o que a outra pessoa sente', () => {
+  const result = analyzeLanguage('Meu crush visualizou e me deixou no vácuo');
+  assert.equal(result.topic, 'relacionamento');
+  assert.ok(result.matchedEntries.some(item => item.canonical === 'crush'));
+});
+
+test('usa o contexto da pergunta anterior para continuar uma conversa', () => {
+  const history = [{role:'assistant',content:'Como está sendo seu dia?'}];
+  assert.match(getLanguageResponse('Mais ou menos', history), /dia mais ou menos/);
+});
+
+test('não transforma uma pergunta inédita em resposta social genérica', () => {
+  assert.equal(getLanguageResponse('Por que as folhas mudam de cor no outono?'), null);
+});
