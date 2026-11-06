@@ -308,6 +308,63 @@ function composeCorrectionReply(message, situation) {
   return 'Entendi que você está corrigindo uma informação anterior. Vou dar prioridade ao que acabou de esclarecer. Qual é a versão correta que devo considerar?';
 }
 
+// Motor de raciocínio contextual: separa pergunta, evidências, lacunas e próximos passos.
+export function analyzeContextualReasoning(message, history=[]) {
+  const normalized=fold(String(message||''));
+  const situation=analyzeSituation(history);
+  const reasoning=analyzeContextualReasoning(message,history);
+  const memory=buildConversationMemory(history);
+  const current=topicsFor(normalized)[0]?.topic||null;
+  const asksCause=/\b(por que|porque|qual o motivo|o que fez|o que pode ter causado)\b/.test(normalized);
+  const asksAction=/\b(o que eu faco|como devo agir|o que fazer|qual minha atitude|como resolver)\b/.test(normalized);
+  const asksMeaning=/\b(o que isso significa|o que quer dizer|como interpretar|isso quer dizer)\b/.test(normalized);
+  const asksPrediction=/\b(vai dar certo|sera que|será que|o que vai acontecer|tem chance)\b/.test(normalized);
+  const asksComparison=/\b(ou|melhor|pior|qual a diferenca|vale mais a pena)\b/.test(normalized);
+  const evidence=situation.currentFacts.map(f=>({fact:f.key,source:f.source,certainty:f.certainty,polarity:f.polarity}));
+  const unknowns=[];
+  if(memory.people.length===0 && /ela|ele|essa pessoa|essa pessoa/.test(normalized)) unknowns.push('identidade da pessoa mencionada');
+  if(asksCause&&!evidence.length) unknowns.push('acontecimentos concretos que antecederam a situação');
+  if(asksAction) unknowns.push('objetivo que a pessoa deseja alcançar e limites envolvidos');
+  if(asksPrediction) unknowns.push('informações suficientes para estimar cenários futuros');
+  const possibleExplanations=[];
+  if(asksCause){
+    if(evidence.some(e=>e.fact==='school_change')) possibleExplanations.push('a mudança de rotina ou de disponibilidade pode ter influenciado o contato');
+    if(evidence.some(e=>e.fact==='conflict')) possibleExplanations.push('algum conflito pode ter afetado a comunicação');
+    if(evidence.some(e=>e.fact==='communication_drop')) possibleExplanations.push('pode haver uma mudança na forma ou frequência de comunicação');
+    possibleExplanations.push('também podem existir motivos pessoais que ainda não foram mencionados');
+  }
+  const reasoningType=asksCause?'cause':asksAction?'action':asksMeaning?'meaning':asksPrediction?'prediction':asksComparison?'comparison':/\?$/.test(String(message||''))?'question':'reflection';
+  return {
+    reasoningType,topic:current||memory.activeTopic||situation.topic,
+    evidence,possibleExplanations:[...new Set(possibleExplanations)],
+    unknowns:[...new Set(unknowns)],
+    requiresClarification:unknowns.length>0,
+    avoidCertainty:asksCause||asksPrediction,
+    userGoal:asksAction?'understand_next_step':asksCause?'understand_possible_causes':asksMeaning?'interpret_situation':'understand_question',
+    principle:'As hipóteses são possibilidades, não conclusões; evidências novas podem alterar a interpretação.'
+  };
+}
+
+function composeReasoningReply(message, reasoning) {
+  const clean=String(message||'').trim();
+  if(reasoning.reasoningType==='cause' && reasoning.topic==='relacionamento'){
+    if(reasoning.possibleExplanations.length){
+      return 'Não dá para saber o motivo com certeza só pelo que temos até agora. Algumas possibilidades são: '+reasoning.possibleExplanations.join('; ')+'. O que sabemos é o que você observou; ainda falta entender como a outra pessoa está vendo a situação. Você percebeu alguma mudança concreta além da frequência das conversas?';
+    }
+    return 'Posso ajudar a investigar, mas não quero inventar um motivo. O que aconteceu antes dessa mudança? Houve alguma conversa, discussão ou alteração na rotina?';
+  }
+  if(reasoning.reasoningType==='action' && reasoning.topic==='relacionamento'){
+    return 'Antes de decidir, vale separar três coisas: o que aconteceu de fato, o que você está imaginando que pode significar e o que você gostaria que mudasse. Um primeiro passo seguro costuma ser conversar com calma, falar do que você percebeu sem acusar e ouvir o lado da outra pessoa. O que você quer principalmente: entender o que houve, recuperar a proximidade ou definir um limite?';
+  }
+  if(reasoning.reasoningType==='prediction'){
+    return 'Não consigo prever isso com segurança. Posso ajudar a pensar em cenários: o que favorece que dê certo, o que pode dificultar e o que está ao seu alcance. Qual é o resultado que você espera?';
+  }
+  if(reasoning.reasoningType==='meaning' && reasoning.topic==='relacionamento'){
+    return 'Isso pode ter mais de uma interpretação. É importante distinguir o comportamento que você observou da intenção que está atribuindo à pessoa. O que ela fez ou disse exatamente, e em que contexto?';
+  }
+  return null;
+}
+
 export function analyzeLanguage(message, history=[]) {
   const original=String(message||'');
   const normalized=normalizeLanguageText(original);
@@ -344,7 +401,7 @@ export function analyzeLanguage(message, history=[]) {
       .slice(0,30).map(({canonical,meanings,tone,ambiguity})=>({canonical,meanings,tone,ambiguity})),
     possibleActs:acts,emotions:detectEmotion(normalized),laughter,irony,indirectness,
     ambiguousPhrases,unknownTokens,topics:currentTopics,topic:currentTopic,previousTopic,
-    changedTopic,references,repeatedTerms,followUp,answerKind,context,memory,situation,
+    changedTopic,references,repeatedTerms,followUp,answerKind,context,memory,situation,reasoning,
     contextAvailable:context.hasConversation,
     previousAssistant:context.lastAssistant,confidence:irony.possible||ambiguousPhrases.length?0.45:acts.length?0.78:currentTopic?0.62:0.25,
     caution:irony.possible||ambiguousPhrases.length>0||indirectness.length>0
@@ -373,6 +430,8 @@ export function getLanguageResponse(message,history=[]) {
   // Respostas curtas a perguntas anteriores devem ser interpretadas pelo papel
   // que exercem na conversa, não como frases isoladas.
   const correctionReply=composeCorrectionReply(message,a.situation);
+  const reasoningReply=composeReasoningReply(message,a.reasoning);
+  if(reasoningReply) return reasoningReply;
   if(correctionReply) return correctionReply;
   const timelineReply=composeTimelineReply(message,history,a.memory);
   if(timelineReply) return timelineReply;
