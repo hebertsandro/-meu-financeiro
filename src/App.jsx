@@ -81,6 +81,8 @@ function App(){
   const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);
   const [assistantOpen,setAssistantOpen]=useState(false);
   const [assistantInput,setAssistantInput]=useState('');
+  const [assistantBusy,setAssistantBusy]=useState(false);
+  const [assistantError,setAssistantError]=useState('');
   const [activeArcadeGame,setActiveArcadeGame]=useState(null);
   const [gameQuestionIndex,setGameQuestionIndex]=useState(0),[gameAnswer,setGameAnswer]=useState(null),[gameFeedback,setGameFeedback]=useState(''),[gameXp,setGameXp]=useState(()=>Number(window.localStorage.getItem('mf_game_xp')||0)),[gameCorrect,setGameCorrect]=useState(()=>Number(window.localStorage.getItem('mf_game_correct')||0));
   const [quizLastPlayed,setQuizLastPlayed]=useState(()=>Number(window.localStorage.getItem('mf_quiz_last')||0)),[quizClock,setQuizClock]=useState(Date.now()),[quizActive,setQuizActive]=useState(false),[roundQuestions,setRoundQuestions]=useState([]);
@@ -262,7 +264,34 @@ function App(){
   function nextGameQuestion(){if(gameQuestionIndex>=roundQuestions.length-1){setQuizActive(false);setGameFeedback('');return}setGameQuestionIndex(v=>v+1);setGameAnswer(null);setGameFeedback('')}
   function awardFlapXp(score){const day=new Date().toLocaleDateString('en-CA');const saved=JSON.parse(window.localStorage.getItem('mf_flap_daily')||'{}');const used=saved.day===day?Number(saved.xp||0):0;const points=Math.max(0,Math.floor(Number(score)||0));const requested=points*2;const reward=Math.min(requested,Math.max(0,100-used));if(reward>0){const total=used+reward;window.localStorage.setItem('mf_flap_daily',JSON.stringify({day,xp:total}));setDailyGameXp(total);setGameXp(v=>v+reward);notify('Mandou bem! +'+reward+' XP no Asas da Fortuna (2 XP por ponto).')}else notify('Limite diário de 100 XP do Flappy atingido. Volte amanhã!')}
 
-  function sendAssistantMessage(value=assistantInput){const question=value.trim();if(!question)return;const reply=answerFinancialQuestion(question,data);setAssistantMessages(old=>[...old,{role:'user',text:question},{role:'assistant',text:reply}]);setAssistantInput('');}
+  async function sendAssistantMessage(value=assistantInput){
+    const question=value.trim();
+    if(!question||assistantBusy)return;
+    if(!supabase){setAssistantError('O Supabase ainda não está configurado.');return;}
+    const history=[...assistantMessages.filter(m=>m.role==='user'||m.role==='assistant'),{role:'user',text:question}]
+      .slice(-12).map(m=>({role:m.role,content:String(m.text||'').slice(0,4000)}));
+    const financeContext={
+      referenceMonth:new Date().toISOString().slice(0,7),
+      transactions:(data.transactions||[]).slice(0,40).map(t=>({date:t.date,type:t.type,category:t.category,description:String(t.description||'').slice(0,90),amount:Number(t.amount||0)})),
+      cards:(data.cards||[]).map(c=>({name:c.name,limit:Number(c.limit_amount||0),used:Number(c.used||0),dueDay:c.due_day})),
+      debts:(data.debts||[]).map(d=>({title:d.title,amount:Number(d.amount||0),dueDate:d.due_date,status:d.status})),
+      goals:(data.goals||[]).map(g=>({name:g.name,target:Number(g.target||0),saved:Number(g.saved||0),deadline:g.deadline})),
+      installments:(data.installments||[]).map(i=>({description:i.description,amount:Number(i.total_amount||0),count:Number(i.installment_count||0),paid:Number(i.paid_count||0)}))
+    };
+    setAssistantMessages(old=>[...old,{role:'user',text:question}]);
+    setAssistantInput('');
+    setAssistantBusy(true);
+    setAssistantError('');
+    try{
+      const {data:result,error}=await supabase.functions.invoke('nexus-chat',{body:{messages:history,financeContext}});
+      if(error)throw error;
+      if(!result?.reply)throw new Error('A resposta do núcleo veio vazia.');
+      setAssistantMessages(old=>[...old,{role:'assistant',text:result.reply}]);
+    }catch(error){
+      console.error('NEXUS AI:',error);
+      setAssistantError('Ainda não consegui alcançar o servidor da NEXUS. O núcleo próprio precisa estar instalado e conectado. Tente novamente em instantes.');
+    }finally{setAssistantBusy(false);}
+  }
 
   const flapBestForGems=Math.max(Number(window.localStorage.getItem('mf_flap_best')||0),Number(window.localStorage.getItem('mf_flap_best_infinite')||0));
   let flapStoryForGems={};try{flapStoryForGems=JSON.parse(window.localStorage.getItem('mf_flap_story_unlocks')||'{}')}catch{}
@@ -441,7 +470,7 @@ function App(){
       {page==='reports'&&<><div className="stat-grid"><Stat icon={ArrowDownLeft} label="Entradas registradas" value={brl(paidIn)} tone="green" detail="Todo o período"/><Stat icon={ArrowUpRight} label="Gastos registrados" value={brl(paidOut)} tone="red" detail="Todo o período"/><Stat icon={Wallet} label="Saldo calculado" value={brl(balance)} tone="blue" detail="Entradas menos gastos"/><Stat icon={Target} label="Falta para metas" value={brl(goalTotal)} tone="purple" detail="Total restante"/></div><div className="two-col"><section className="panel"><div className="panel-head"><div><h3>Fluxo dos últimos meses</h3><p>Comparação mensal</p></div></div><ResponsiveContainer width="100%" height={260}><AreaChart data={chartData}><CartesianGrid stroke="#263044" strokeDasharray="4 4"/><XAxis dataKey="month" tick={{fill:'#8290a8',fontSize:11}}/><YAxis tick={{fill:'#8290a8',fontSize:10}}/><Tooltip formatter={v=>brl(v)}/><Area dataKey="Entradas" stroke="#35d39a" fill="#35d39a" fillOpacity={.12}/><Area dataKey="Gastos" stroke="#ff7085" fill="#ff7085" fillOpacity={.12}/></AreaChart></ResponsiveContainer></section><section className="panel"><div className="panel-head"><div><h3>Gastos por categoria</h3><p>Distribuição registrada</p></div></div>{categories.length?<div className="category-list">{categories.map(c=><div className="category-row" key={c.name}><span>{c.name}</span><b>{brl(c.value)}</b><div className="progress"><i style={{width:`${Math.min(100,c.value/Math.max(...categories.map(x=>x.value))*100)}%`}}/></div></div>)}</div>:<Empty icon={ChartNoAxesCombined} title="Sem dados suficientes" text="Registre despesas e escolha categorias para ver a análise."/ >}</section></div></>}
       <footer className="footer"><span>MEU FINANCEIRO <i>•</i> FEITO PARA SUA ROTINA</span><span><ShieldCheck size={14}/> Seus dados dependem da configuração segura da sua conta</span></footer>
     </div></main>
-    {assistantOpen&&<div className="assistant-popover"><div className="assistant-popover-head"><div className="assistant-popover-title"><span className="assistant-popover-icon"><Gamepad2 size={19}/><Sparkles size={11}/></span><div><b>NEXUS <em>AI</em></b><small><i/> SISTEMA ONLINE · SEU CO-PILOTO</small></div></div><button className="icon-btn" onClick={()=>setAssistantOpen(false)} aria-label="Fechar assistente"><X size={18}/></button></div><div className="assistant-popover-messages">{assistantMessages.map((m,i)=><div className={'assistant-message '+m.role} key={i}><div className="assistant-bubble">{m.text}</div></div>)}</div><div className="assistant-popover-suggestions"><button onClick={()=>sendAssistantMessage('Como estão meus gastos?')}>Meus gastos</button><button onClick={()=>sendAssistantMessage('Analise meus cartões')}>Meus cartões</button><button onClick={()=>sendAssistantMessage('Quais dívidas devo priorizar?')}>Minhas dívidas</button></div><form className="assistant-popover-compose" onSubmit={e=>{e.preventDefault();sendAssistantMessage()}}><input value={assistantInput} onChange={e=>setAssistantInput(e.target.value)} placeholder="Digite sua próxima missão…"/><button className="primary" type="submit" disabled={!assistantInput.trim()} aria-label="Enviar"><Send size={17}/></button></form><p className="assistant-popover-note">Respostas calculadas com os dados cadastrados. Não é aconselhamento profissional.</p></div>}
+    {assistantOpen&&<div className="assistant-popover"><div className="assistant-popover-head"><div className="assistant-popover-title"><span className="assistant-popover-icon"><Gamepad2 size={19}/><Sparkles size={11}/></span><div><b>NEXUS <em>AI</em></b><small><i/> SISTEMA ONLINE · SEU CO-PILOTO</small></div></div><button className="icon-btn" onClick={()=>setAssistantOpen(false)} aria-label="Fechar assistente"><X size={18}/></button></div><div className="assistant-popover-messages">{assistantMessages.map((m,i)=><div className={'assistant-message '+m.role} key={i}><div className="assistant-bubble">{m.text}</div></div>)}{assistantBusy&&<div className="assistant-message assistant"><div className="assistant-bubble nexus-typing"><i/><i/><i/><span>NEXUS está pensando…</span></div></div>}{assistantError&&<div className="nexus-error" role="status">{assistantError}</div>}</div><div className="assistant-popover-suggestions"><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Como estão meus gastos?')}>Meus gastos</button><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Analise meus cartões')}>Meus cartões</button><button disabled={assistantBusy} onClick={()=>sendAssistantMessage('Quais dívidas devo priorizar?')}>Minhas dívidas</button></div><form className="assistant-popover-compose" onSubmit={e=>{e.preventDefault();sendAssistantMessage()}}><input value={assistantInput} onChange={e=>setAssistantInput(e.target.value)} placeholder="Converse com a NEXUS…" disabled={assistantBusy}/><button className="primary" type="submit" disabled={!assistantInput.trim()||assistantBusy} aria-label="Enviar">{assistantBusy?<span className="nexus-send-spinner"/>:<Send size={17}/>}</button></form><p className="assistant-popover-note">NEXUS AI · modelo aberto em servidor próprio. Suas informações são enviadas ao núcleo para responder à conversa.</p></div>}
     <button className={'assistant-fab '+(assistantOpen?'is-open':'')} onClick={()=>setAssistantOpen(v=>!v)} aria-label={assistantOpen?'Fechar assistente':'Abrir assistente'} title="Abrir NEXUS AI">{assistantOpen?<X size={23}/>:<><Gamepad2 size={25}/><span><Sparkles size={13}/></span></>}</button>
     {payModal&&<PayBillsModal debts={data.debts.filter(d=>d.is_continuous?d.paid_month!==currentMonthKey:d.status!=='Pago')} installments={data.installments.filter(i=>Number(i.paid_count||0)<Number(i.installment_count||0))} onClose={()=>setPayModal(false)} onConfirm={confirmPayments} busy={payBusy}/>}
     {modal&&<EntryModal type={typeof modal==='string'?modal:modal.type} extra={typeof modal==='string'?(modal==='installments'?{cards:data.cards}:null):modal} onClose={()=>setModal(null)} onSave={saveItem} busy={busy}/>}

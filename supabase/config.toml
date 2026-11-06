@@ -1,2 +1,5 @@
 [functions.admin-panel]
 verify_jwt = true
+
+[functions.nexus-chat]
+verify_jwt = true
