@@ -64,13 +64,13 @@ function generateNexusReply(question, finance, history=[]) {
 
  const previousAssistant=history.filter(m=>m.role==='assistant').slice(-1)[0]?.content||'';
  const previousUser=history.filter(m=>m.role==='user').slice(-1)[0]?.content||'';
- const conversational=/\\b(kkkk+|rs+|haha+|entendi|sim|nao|não|isso|exato|verdade|pode ser|acho que|mas|porque|pq|e agora|e ai|e aí|como assim|me explica|continua|tambem|também|obrigado|obrigada)\\b/.test(q);
- const casualFinance=/\\b(apertad[oa]|sem grana|sem dinheiro|dinheiro some|dinheiro desaparece|nao sobra|não sobra|to liso|tô liso|quebrad[oa]|gastando demais|me enrolei|me perdi nas contas|nao consigo guardar|não consigo guardar|ta dificil|tá difícil|ta complicado|tá complicado|fim do mes|fim do mês)\\b/.test(q);
- const emotional=/\\b(cansad[oa]|ansios[oa]|preocupad[oa]|desesperad[oa]|frustrad[oa]|com medo|desanimad[oa]|estressad[oa])\\b/.test(q);
+ const conversational=/\b(kkkk+|rs+|haha+|entendi|sim|nao|não|isso|exato|verdade|pode ser|acho que|mas|porque|pq|e agora|e ai|e aí|como assim|me explica|continua|tambem|também|obrigado|obrigada)\b/.test(q);
+ const casualFinance=/\b(apertad[oa]|sem grana|sem dinheiro|dinheiro some|dinheiro desaparece|nao sobra|não sobra|to liso|tô liso|quebrad[oa]|gastando demais|me enrolei|me perdi nas contas|nao consigo guardar|não consigo guardar|ta dificil|tá difícil|ta complicado|tá complicado|fim do mes|fim do mês)\b/.test(q);
+ const emotional=/\b(cansad[oa]|ansios[oa]|preocupad[oa]|desesperad[oa]|frustrad[oa]|com medo|desanimad[oa]|estressad[oa])\b/.test(q);
  if(casualFinance) return 'Entendi você 😅💙. Quando parece que o dinheiro some, dá mesmo aquela sensação de não saber por onde começar. Vamos olhar isso sem julgamento. Neste mês, pelos seus registros, entraram '+money(income)+' e saíram '+money(expenses)+'. '+(topCategory?'A categoria que mais pesou foi '+topCategory[0]+' ('+money(topCategory[1])+'). ':'')+'Você sente que o problema está mais nas pequenas compras do dia a dia ou nas contas maiores?';
  if(emotional) return 'Poxa, imagino que isso esteja pesando. 💙 Não precisa organizar tudo de uma vez, nem se cobrar por isso. Podemos conversar com calma e separar uma coisa de cada vez. O que aconteceu?';
- if(conversational&&previousAssistant) return 'Entendi! 😊 '+(previousUser?'Você comentou “'+previousUser.slice(0,110)+(previousUser.length>110?'…':'')+'”. ':'')+( /\\b(sim|isso|exato|verdade|pode ser)\\b/.test(q)?'Então vamos seguir por esse caminho. ':'')+'Me conta só mais um detalhe para eu conseguir te ajudar melhor.';
- if(/\\b(nao entendi|não entendi|explica melhor|pode explicar|como assim)\\b/.test(q)) return 'Claro! Vou explicar de um jeito mais simples. 😊 Me diz qual parte ficou confusa, ou posso resumir: seus registros mostram '+money(income)+' de entradas e '+money(expenses)+' de gastos neste mês.';
+ if(conversational&&previousAssistant) return 'Entendi! 😊 '+(previousUser?'Você comentou “'+previousUser.slice(0,110)+(previousUser.length>110?'…':'')+'”. ':'')+( /\b(sim|isso|exato|verdade|pode ser)\b/.test(q)?'Então vamos seguir por esse caminho. ':'')+'Me conta só mais um detalhe para eu conseguir te ajudar melhor.';
+ if(/\b(nao entendi|não entendi|explica melhor|pode explicar|como assim)\b/.test(q)) return 'Claro! Vou explicar de um jeito mais simples. 😊 Me diz qual parte ficou confusa, ou posso resumir: seus registros mostram '+money(income)+' de entradas e '+money(expenses)+' de gastos neste mês.';
  const greeting=/^(oi|ola|e ai|bom dia|boa tarde|boa noite|hey|opa)\b/.test(q);
  if(greeting) return 'Oii! 😊 Que bom ter você por aqui. Eu sou a NEXUS, sua assistente do Meu Financeiro. Posso conversar com você, analisar seus registros e ajudar a planejar os próximos passos. O que vamos organizar hoje?';
  if(/\b(quem e voce|seu nome|o que voce faz|como voce funciona)\b/.test(q)) return 'Eu sou a NEXUS AI ⚡, a assistente do Meu Financeiro. Meu núcleo atual funciona com código próprio: interpreto assuntos financeiros, faço cálculos com os dados cadastrados e organizo recomendações. Ainda não sou um modelo de linguagem livre como o ChatGPT, mas posso ajudar bastante na sua organização financeira.';
@@ -86,21 +86,21 @@ function generateNexusReply(question, finance, history=[]) {
  if(/\b(planejamento|planejar|orcamento|organizar|por onde comeco|me ajuda)\b/.test(q)) return 'Vamos por partes, sem complicar. 💙\n\n1. Garanta primeiro moradia, alimentação, transporte e contas essenciais.\n2. Separe as despesas fixas das variáveis.\n3. Veja quais dívidas têm juros ou vencem primeiro.\n4. Defina uma meta de economia realista, mesmo que pequena.\n\nCom seus registros atuais, neste mês entraram '+money(income)+' e saíram '+money(expenses)+'. Posso montar um plano mais específico se você me contar qual é sua prioridade.';
  if(/\b(triste|ansios|preocup|desanim|dificil|difícil|apertad|sem dinheiro)\b/.test(q)) return 'Poxa, sinto muito que esteja passando por isso. 💙 Não precisa resolver tudo de uma vez. Podemos olhar sua situação com calma, separar o que é urgente do que pode esperar e encontrar um próximo passo possível. Quer me contar o que está pesando mais agora?';
  // A NEXUS também acolhe conversas que não são sobre dinheiro.
- if(/\\b(namorad|namoro|relacionamento|termin|ficante|crush|casal|ciume|ciúme)\\b/.test(q))
+ if(/\b(namorad|namoro|relacionamento|termin|ficante|crush|casal|ciume|ciúme)\b/.test(q))
   return 'Relacionamentos podem mexer bastante com a gente. 💙 Se quiser, me conta o que aconteceu. Posso te ajudar a organizar os pensamentos, enxergar possibilidades e pensar no que você gostaria de fazer — sem te julgar.';
- if(/\\b(familia|família|mae|mãe|pai|irma|irmã|irmao|irmão|pais|pais|casa)\\b/.test(q))
+ if(/\b(familia|família|mae|mãe|pai|irma|irmã|irmao|irmão|pais|pais|casa)\b/.test(q))
   return 'Entendi. Assuntos de família às vezes são delicados e podem pesar muito. Estou aqui para te ouvir com respeito. O que aconteceu?';
- if(/\\b(escola|faculdade|prova|estudo|estudar|professor|trabalho|emprego|chefe|carreira)\\b/.test(q))
+ if(/\b(escola|faculdade|prova|estudo|estudar|professor|trabalho|emprego|chefe|carreira)\b/.test(q))
   return 'Essa parte da vida também pode trazer bastante pressão. 😊 Quer me contar melhor o que está acontecendo? Podemos pensar juntos em um próximo passo que faça sentido para você.';
- if(/\\b(amigo|amiga|amizade|sozinho|sozinha|solitario|solitária|ninguem|ninguém|desabafar|desabafo)\\b/.test(q))
+ if(/\b(amigo|amiga|amizade|sozinho|sozinha|solitario|solitária|ninguem|ninguém|desabafar|desabafo)\b/.test(q))
   return 'Obrigado por confiar em mim para falar disso. 💙 Você não precisa fingir que está tudo bem aqui. Pode contar do seu jeito, no seu tempo. O que mais está passando pela sua cabeça agora?';
- if(/\\b(filme|serie|série|musica|música|cantor|cantora|futebol|time|anime|livro|jogo|game|hobby)\\b/.test(q))
+ if(/\b(filme|serie|série|musica|música|cantor|cantora|futebol|time|anime|livro|jogo|game|hobby)\b/.test(q))
   return 'Bora falar disso também! 😄 Me conta mais — o que você está assistindo, ouvindo ou curtindo ultimamente?';
- if(/\\b(como voce ta|como você tá|tudo bem|tudo bom|como vai)\\b/.test(q))
+ if(/\b(como voce ta|como você tá|tudo bem|tudo bom|como vai)\b/.test(q))
   return 'Estou por aqui, pronta para conversar com você! 😊 E você, como está de verdade hoje?';
- if(/\\b(kkkk|haha|rsrs|que bom|legal|bacana|top|massa)\\b/.test(q))
+ if(/\b(kkkk|haha|rsrs|que bom|legal|bacana|top|massa)\b/.test(q))
   return 'Hahaha 😄 Gosto quando a conversa fica leve também. Me conta, o que mais aconteceu?';
- if(/\\b(nao sei|não sei|confuso|confusa|perdido|perdida|nao consigo|não consigo)\\b/.test(q))
+ if(/\b(nao sei|não sei|confuso|confusa|perdido|perdida|nao consigo|não consigo)\b/.test(q))
   return 'Tudo bem não ter as respostas agora. 💙 A gente pode começar pelo começo, sem pressa. O que está mais difícil de entender ou resolver neste momento?';
  if(q.endsWith('?')||q.length>12)
   return 'Quero entender melhor. 💙 Pode me contar um pouco mais sobre isso? Você pode falar comigo sobre dinheiro, sentimentos, família, relacionamento, estudos, trabalho, planos ou qualquer assunto do seu dia. Ainda estou aprendendo a lidar com conversas muito abertas, então, se eu não captar algo, pode me explicar de outro jeito — sem precisar mudar de assunto.';
