@@ -406,6 +406,10 @@ function App(){
     setAssistantBusy(true);
     setAssistantError('');
     try{
+      // Dá tempo para o navegador renderizar o estado "NEXUS está pensando…" antes
+      // de executar o motor local síncrono. Sem esta pausa, React pode agrupar as
+      // atualizações de estado e o indicador desaparecer antes de chegar à tela.
+      await new Promise(resolve=>window.setTimeout(resolve,550));
       // Execução inteiramente local no navegador: nenhum texto ou dado financeiro é enviado a uma IA externa.
       const reply=generateNexusReply(question,financeContext,nextHistory);
       setAssistantMessages(old=>[...old,{role:'assistant',text:reply}]);
