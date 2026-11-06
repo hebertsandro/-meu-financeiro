@@ -64,15 +64,15 @@ test('reconstrói várias relações causais numa mensagem com várias frases', 
   assert.ok(result.causalChains.some(edge => edge.causeClause === 4 && edge.effectClause === 3));
 });
 
-test('a resposta reconhece uma cadeia sem afirmar que a causa está comprovada', () => {
+test('a resposta apresenta uma cadeia causal como hipóteses não comprovadas', () => {
   const message = 'Fui mal porque não estudei. Não estudei porque trabalhei.';
   const reply = improveNexusFallback(
     message,
     [{ role: 'user', content: message }],
     'Quero entender exatamente o que você quis dizer.'
   );
-  assert.match(reply, /cadeia com várias relações/);
-  assert.match(reply, /sem assumir que todas as ligações já estão comprovadas/);
+  assert.match(reply, /hipóteses, não conclusões comprovadas/);
+  assert.match(reply, /trabalhei/);
 });
 
 test('responde naturalmente a “estou bem, e vc?” após um cumprimento', () => {
