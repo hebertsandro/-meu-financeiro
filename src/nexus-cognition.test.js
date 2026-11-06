@@ -52,3 +52,22 @@ test('a resposta genérica passa a considerar o contraste da mensagem', () => {
   );
   assert.match(reply, /duas ideias em contraste/);
 });
+
+test('reconstrói várias relações causais numa mensagem com várias frases', () => {
+  const message = 'Minha mãe ficou brava porque tirei uma nota baixa. Eu tirei essa nota porque não consegui estudar. Não consegui estudar porque estava trabalhando.';
+  const result = parseLogicalStructure(message);
+  assert.equal(result.causalChains.length, 3);
+  assert.equal(result.clauses.length, 6);
+  assert.ok(result.causalChains.every(edge => edge.causeClause !== edge.effectClause));
+});
+
+test('a resposta reconhece uma cadeia sem afirmar que a causa está comprovada', () => {
+  const message = 'Fui mal porque não estudei. Não estudei porque trabalhei.';
+  const reply = improveNexusFallback(
+    message,
+    [{ role: 'user', content: message }],
+    'Quero entender exatamente o que você quis dizer.'
+  );
+  assert.match(reply, /cadeia com várias relações/);
+  assert.match(reply, /sem assumir que todas as ligações já estão comprovadas/);
+});
