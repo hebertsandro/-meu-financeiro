@@ -38,7 +38,7 @@ const VARIANT_MAP = new Map(NEXUS_LEXICON.flatMap(entry =>
 ));
 
 export function normalizeLanguageText(value = '') {
-  return fold(value).split(' ').map(word => VARIANT_MAP.get(word) || word).join(' ').replace(/\s+/g, ' ').trim();
+  return fold(value).replace(/[!?.,]+/g, ' ').split(' ').map(word => VARIANT_MAP.get(word) || word).join(' ').replace(/\s+/g, ' ').trim();
 }
 
 const ACT_PATTERNS = [
@@ -95,6 +95,23 @@ export function analyzeLanguage(message, history = []) {
 export function getLanguageResponse(message, history = []) {
   const analysis = analyzeLanguage(message, history);
   const text = analysis.normalized;
+  const previousAssistant = String(analysis.previousAssistant || '');
+  const priorAskedAboutDay = /como esta sendo seu dia|como foi seu dia|como esta seu dia|como voce esta/i.test(previousAssistant);
+  const priorAskedHow = /como voce esta|como esta se sentindo|como voce se sente/i.test(previousAssistant);
+  if (priorAskedAboutDay) {
+    if (/^(esta sendo bom|esta bom|esta otimo|esta legal|esta muito bom|esta sendo legal|foi bom|foi legal|foi otimo)$/.test(text)) return 'Que bom saber disso! 😊 O que aconteceu de bom hoje?';
+    if (/^(mais ou menos|assim assim|nem bom nem ruim|normal|nada demais)$/.test(text)) return 'Entendi! Tem dias que são mais neutros mesmo. Aconteceu alguma coisa diferente ou foi só um dia comum?';
+    if (/^(esta ruim|esta sendo ruim|foi ruim|nao muito bem|nao esta bom)$/.test(text)) return 'Poxa, sinto muito que o dia não esteja sendo tão bom. Quer me contar o que aconteceu? Posso te ouvir.';
+    if (/^(cansativo|foi cansativo|muito corrido|corrid[oa])$/.test(text)) return 'Imagino que tenha sido puxado. O que mais tomou sua energia hoje?';
+  }
+  if (priorAskedHow) {
+    if (/^(bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|animado|animada)$/.test(text)) return 'Que bom! 😊 O que te deixou assim hoje?';
+    if (/^(mais ou menos|assim assim|nao sei)$/.test(text)) return 'Tudo bem não saber explicar de primeira. Quer me contar como foi seu dia até agora?';
+    if (/^(mal|ruim|triste|cansado|cansada|ansioso|ansiosa)$/.test(text)) return 'Sinto muito que você esteja assim. Quer me contar o que aconteceu?';
+  }
+  if (/^(esta sendo bom|esta bom|esta otimo|esta legal|foi bom|foi legal)$/.test(text)) return 'Que bom! 😊 O que aconteceu de bom?';
+  if (/^(mais ou menos|assim assim|nem bom nem ruim|nada demais)$/.test(text)) return 'Entendi! Quer me contar um pouco mais ou prefere falar de outra coisa?';
+  if (/^(esta sendo ruim|esta ruim|foi ruim|nao muito bem)$/.test(text)) return 'Poxa, sinto muito. Quer me contar o que aconteceu? Estou aqui para te ouvir.';
   if (analysis.possibleActs.includes('greeting')) return 'Oii! 😊 Que bom conversar com você. Como você está hoje?';
   if (analysis.possibleActs.includes('reciprocal_question')) return 'Estou aqui, funcionando e pronta para conversar com você! 😊 E como está sendo seu dia?';
   if (analysis.possibleActs.includes('gratitude')) return 'Por nada! 💙 Fico feliz em poder ajudar.';
