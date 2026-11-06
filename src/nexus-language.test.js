@@ -86,7 +86,7 @@ test('não deixa um cumprimento apagar uma pergunta importante', () => {
   assert.equal(getLanguageResponse('Oi, me explica fotossíntese'), null);
   assert.equal(getLanguageResponse('Opa, me ajuda com matemática'), null);
   assert.equal(getLanguageResponse('Bom dia, como funciona a gravidade?'), null);
-  assert.match(getLanguageResponse('Oi, como está?'), /Como você está hoje/);
+  assert.match(getLanguageResponse('Oi, como está?'), /você, como está hoje/);
 });
 
 test('detecta marcadores de possível sarcasmo sem afirmar intenção como certeza', () => {
