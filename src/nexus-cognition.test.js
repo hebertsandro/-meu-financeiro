@@ -195,3 +195,21 @@ test('fallback recebe uma pergunta inédita sem exigir reformulação imediata',
   assert.doesNotMatch(reply, /não tenho base suficiente|reformule a pergunta|dar um exemplo/);
   assert.match(reply, /Boa pergunta|vamos falar/);
 });
+
+test('entende pedido de recomendação no meio de uma conversa sobre namoro', () => {
+  const history = [
+    {role:'user',content:'Eu e minha namorada estamos estranhos'},
+    {role:'assistant',content:'Entendi que você está falando de relacionamento. O que mudou entre vocês?'},
+    {role:'user',content:'Eu quero conversar com ela, oque vc recomendaria?'}
+  ];
+  const reply = improveNexusFallback('Eu quero conversar com ela, oque vc recomendaria?', history, 'Estou relacionando isso ao assunto de relacionamentos que apareceu antes. Para responder sem inventar detalhes, qual parte desse assunto você está retomando?');
+  assert.match(reply,/chama ela para conversar|conversar num momento tranquilo/);
+  assert.match(reply,/sem começar cobrando|sem começar acusando/);
+  assert.match(reply,/escuta o lado dela/);
+  assert.doesNotMatch(reply,/qual parte desse assunto|não tenho base suficiente/);
+});
+
+test('reconhece pedido de recomendação mesmo com abreviação e erro informal', () => {
+  const reply = improveNexusFallback('oque vc recomendaria?', [], 'fallback genérico');
+  assert.match(reply,/Eu começaria de um jeito simples/);
+});
