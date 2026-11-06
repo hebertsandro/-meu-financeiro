@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLogicalStructure, analyzeNexusMessage } from './nexus-cognition.js';
+import { parseLogicalStructure, analyzeNexusMessage, improveNexusFallback } from './nexus-cognition.js';
 
 test('identifica causa e separa as duas proposições', () => {
   const result = parseLogicalStructure('Fui mal na prova porque não consegui estudar.');
@@ -34,4 +34,21 @@ test('a análise pública inclui a estrutura composicional', () => {
   const result = analyzeNexusMessage('Eu queria estudar, mas fiquei muito ansioso.');
   assert.equal(result.logicalStructure.relations[0]?.type, 'contrast');
   assert.equal(result.logicalStructure.clauses.length, 2);
+});
+
+test('a condição inicial preserva condição e resultado em partes distintas', () => {
+  const result = parseLogicalStructure('Se eu conseguir um emprego, vou guardar dinheiro.');
+  assert.equal(result.relations[0]?.type, 'condition');
+  assert.equal(result.clauses.length, 2);
+  assert.match(result.clauses[0].text, /^se eu conseguir um emprego$/);
+  assert.match(result.clauses[1].text, /vou guardar dinheiro/);
+});
+
+test('a resposta genérica passa a considerar o contraste da mensagem', () => {
+  const reply = improveNexusFallback(
+    'Eu gosto dela, mas estou magoado.',
+    [{ role: 'user', content: 'Eu gosto dela, mas estou magoado.' }],
+    'Pode falar do seu jeito.'
+  );
+  assert.match(reply, /duas ideias em contraste/);
 });
