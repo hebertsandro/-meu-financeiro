@@ -173,60 +173,63 @@ const RELATION_PATTERNS = [
 // É uma análise estrutural: não presume que a relação expressa pelo usuário seja um fato.
 export function parseLogicalStructure(text) {
   const source = normalizeNexusText(text);
-  const matches = [];
-  for (const pattern of RELATION_PATTERNS) {
-    const regex = new RegExp(pattern.regex.source, 'g');
-    for (const match of source.matchAll(regex)) {
-      matches.push({ type: pattern.type, connector: match[0], index: match.index, end: match.index + match[0].length });
-    }
+  const patterns = RELATION_PATTERNS.map(item => ({ type: item.type, regex: new RegExp(item.regex.source, 'g') }));
+  const markers = [];
+  for (const pattern of patterns) {
+    for (const match of source.matchAll(pattern.regex)) markers.push({ type: pattern.type, connector: match[0], start: match.index, end: match.index + match[0].length });
   }
-  matches.sort((a, b) => a.index - b.index);
-  const unique = matches.filter((item, index) => !matches.slice(0, index).some(prev => item.index >= prev.index && item.index < prev.end));
+  markers.sort((a, b) => a.start - b.start);
+  const selected = markers.filter((item, i) => !markers.slice(0, i).some(prev => item.start < prev.end && item.end > prev.start));
   const clauses = [];
+  const relations = [];
   let cursor = 0;
-  for (const relation of unique) {
-    const before = source.slice(cursor, relation.index).replace(/^[,;\s]+|[,;\s]+$/g, '');
-    if (before) clauses.push({ text: before, role: clauses.length === 0 ? 'initial' : 'context' });
-    cursor = relation.end;
-    // Em estruturas "se X, Y", a condição vem antes do conector principal.
-    // Guardamos "se X" como a primeira proposição e "Y" como a segunda.
-    if (relation.type === 'condition' && relation.index === 0) {
+  let previous = null;
+  const addClause = raw => {
+    const value = raw.replace(/^[,;.\\s]+|[,;.\\s]+$/g, '').trim();
+    if (!value) return null;
+    const index = clauses.length;
+    clauses.push({ index, text: value, negated: /\\b(nao|nunca|jamais|nem)\\b/.test(value), question: /[?]$/.test(value) });
+    return index;
+  };
+  for (const marker of selected) {
+    const beforeIndex = addClause(source.slice(cursor, marker.start));
+    if (beforeIndex !== null) previous = beforeIndex;
+    cursor = marker.end;
+    if (marker.type === 'condition' && marker.start === 0) {
       const comma = source.indexOf(',', cursor);
       if (comma >= 0) {
-        const conditionText = source.slice(cursor, comma).trim();
-        if (conditionText) clauses.push({ text: 'se ' + conditionText, role: 'condition' });
+        const conditionIndex = addClause('se ' + source.slice(cursor, comma));
         cursor = comma + 1;
+        const nextComma = source.indexOf(',', cursor);
+        const resultEnd = nextComma < 0 ? source.length : nextComma;
+        const resultIndex = addClause(source.slice(cursor, resultEnd));
+        if (conditionIndex !== null && resultIndex !== null) relations.push({ type: 'condition', connector: marker.connector, fromClause: conditionIndex, toClause: resultIndex, direction: 'condition_to_result' });
+        previous = resultIndex;
+        cursor = resultEnd;
+        continue;
       }
     }
-    relation.clauseIndex = clauses.length;
+    const nextMarker = selected.find(item => item.start >= cursor);
+    const limit = nextMarker ? nextMarker.start : source.length;
+    const segment = source.slice(cursor, limit);
+    const punctuation = segment.search(/[.;!?]/);
+    const clauseEnd = punctuation < 0 ? limit : cursor + punctuation;
+    const afterIndex = addClause(source.slice(cursor, clauseEnd));
+    if (previous !== null && afterIndex !== null) {
+      let fromClause = previous, toClause = afterIndex, direction = 'left_to_right';
+      if (marker.type === 'cause') { fromClause = afterIndex; toClause = previous; direction = 'cause_to_effect'; }
+      if (marker.type === 'consequence') direction = 'cause_to_effect';
+      if (marker.type === 'condition') direction = 'condition_to_result';
+      relations.push({ type: marker.type, connector: marker.connector, fromClause, toClause, direction });
+    }
+    previous = afterIndex === null ? previous : afterIndex;
+    cursor = clauseEnd;
+    if (/[.;!?]/.test(source[cursor] || '')) cursor++;
   }
-  const tail = source.slice(cursor).replace(/^[,;\s]+|[,;\s]+$/g, '');
-  if (tail) clauses.push({ text: tail, role: clauses.length === 0 ? 'initial' : 'related' });
-  const relations = unique.map((item, index) => ({
-    type: item.type,
-    connector: item.connector,
-    fromClause: Math.max(0, item.clauseIndex - 1),
-    toClause: Math.min(clauses.length - 1, item.clauseIndex)
-  }));
-  const negations = clauses.map((clause, index) => ({
-    clauseIndex: index,
-    negated: /\b(nao|nunca|jamais|nem)\b/.test(clause.text),
-    markers: (clause.text.match(/\b(nao|nunca|jamais|nem)\b/g) || [])
-  }));
-  return {
-    clauses: clauses.map((clause, index) => ({
-      ...clause,
-      index,
-      negated: negations[index]?.negated || false,
-      question: /[?]$/.test(clause.text)
-    })),
-    relations,
-    negations,
-    hasMultiplePropositions: clauses.length > 1,
-    relationTypes: [...new Set(relations.map(item => item.type))]
-  };
+  const finalIndex = addClause(source.slice(cursor));
+  const negations = clauses.map(clause => ({ clauseIndex: clause.index, negated: clause.negated, markers: (clause.text.match(/\\b(nao|nunca|jamais|nem)\\b/g) || []) }));
+  return { clauses, relations, negations, hasMultiplePropositions: clauses.length > 1, relationTypes: [...new Set(relations.map(item => item.type))], causalChains: relations.filter(item => item.type === 'cause' || item.type === 'consequence').map(item => ({ causeClause: item.fromClause, effectClause: item.toClause })) };
 }
-
 function summarizeLogicalStructure(structure) {
   if (!structure?.hasMultiplePropositions || !structure.relations.length) return null;
   const clauses = structure.clauses;
