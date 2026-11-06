@@ -487,22 +487,21 @@ function EntryModal({type,extra,onClose,onSave,busy}){
 
 
 function SpaceNexusGame({onReward}){
- const [running,setRunning]=useState(false),[ended,setEnded]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState({x:50,y:84}),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('A galáxia precisa de você!'),[shieldActive,setShieldActive]=useState(false);
- const game=React.useRef({tick:0,ship:{x:50,y:84},score:0,lives:3,wave:1,shots:[],foes:[],enemyShots:[],boss:null,shield:false});
+ const [running,setRunning]=useState(false),[ended,setEnded]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState({x:50,y:84}),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[drops,setDrops]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('A galáxia precisa de você!'),[shieldActive,setShieldActive]=useState(false);
+ const game=React.useRef({tick:0,ship:{x:50,y:84},score:0,lives:3,wave:1,shots:[],foes:[],enemyShots:[],drops:[],boss:null,shield:false,rapidUntil:0,doubleUntil:0});
  const moveTo=(clientX,clientY,arena)=>{const r=arena.getBoundingClientRect();const x=Math.max(5,Math.min(95,(clientX-r.left)/r.width*100));const y=Math.max(9,Math.min(91,(clientY-r.top)/r.height*100));game.current.ship={x,y};setShip({x,y})};
- const start=()=>{game.current={tick:0,ship:{x:50,y:84},score:0,lives:3,wave:1,shots:[],foes:[],enemyShots:[],boss:null,shield:false};setScore(0);setLives(3);setShip({x:50,y:84});setShots([]);setFoes([]);setEnemyShots([]);setBoss(null);setWave(1);setShieldActive(false);setEnded(false);setMessage('O esquadrão alienígena está chegando!');setRunning(true)};
- const activateShield=()=>{if(running&&!game.current.shield){game.current.shield=true;setShieldActive(true);setMessage('ESCUDO ATIVADO! O próximo impacto será bloqueado.')}};
+ const start=()=>{game.current={tick:0,ship:{x:50,y:84},score:0,lives:3,wave:1,shots:[],foes:[],enemyShots:[],drops:[],boss:null,shield:false,rapidUntil:0,doubleUntil:0};setScore(0);setLives(3);setShip({x:50,y:84});setShots([]);setFoes([]);setEnemyShots([]);setDrops([]);setBoss(null);setWave(1);setShieldActive(false);setEnded(false);setMessage('O esquadrão alienígena está chegando!');setRunning(true)};
  useEffect(()=>{
   if(!running)return;
   const id=setInterval(()=>{
    const g=game.current;g.tick++;
    const n=g.tick;
-   if(n%15===0)g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});
+   if(n%(n<g.rapidUntil?7:15)===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
    if(n%39===0)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%156===0?3:1,type:n%156===0?'brute':n%117===0?'scout':'drone',fire:n%52===0||Math.random()>.48});
    if(n%540===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
    g.foes.forEach(f=>{f.y+=(f.type==='scout'?.35:.2167)+(g.wave*.0267)});
    g.shots.forEach(b=>{b.y-=1.333});
-   g.enemyShots.forEach(b=>{b.y+=.7333});
+   g.enemyShots.forEach(b=>{b.y+=.7333});g.drops.forEach(d=>{d.y+=.22});
    if(n%78===0){g.foes.filter(f=>f.fire).slice(-2).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
    if(g.boss&&n%54===0){const spread=g.boss.style==='spread'?[0,-10,10,-20,20]:g.boss.style==='cross'?[0,-14,14]:[0,-8,8];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}))}
    if(n%1080===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:8,...chosen};setMessage('CHEFÃO DETECTADO! Prepare-se para o ataque!')}
@@ -514,13 +513,13 @@ function SpaceNexusGame({onReward}){
     for(const foe of g.foes){
      const hitX=Math.abs(shot.x-foe.x)<(foe.type==='brute'?7:5.5);
      const hitY=shot.y>=foe.y-4&&shot.y<=foe.y+5;
-     if(hitX&&hitY){foe.hp-=1;hit=true;if(foe.hp<=0){g.score+=foe.type==='brute'?35:foe.type==='scout'?20:10;}break;}
+     if(hitX&&hitY){foe.hp-=1;hit=true;if(foe.hp<=0){g.score+=foe.type==='brute'?35:foe.type==='scout'?20:10;if(Math.random()<.24){const types=['shield','rapid','double','repair'];const type=types[Math.floor(Math.random()*types.length)];g.drops.push({id:'drop-'+n+'-'+foe.id,type,x:foe.x,y:foe.y})}}break;}
     }
-    if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){g.boss.hp--;hit=true;if(g.boss.hp<=0){g.score+=250;g.boss=null;setMessage('CHEFÃO DERROTADO! +250 pontos')}else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão ficou mais agressivo!')}
+    if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){g.boss.hp--;hit=true;if(g.boss.hp<=0){g.score+=250;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;setMessage('CHEFÃO DERROTADO! +250 pontos — recompensa liberada!')}else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão ficou mais agressivo!')}
     if(!hit&&shot.y>0)remainingShots.push(shot);
    }
    g.shots=remainingShots;g.foes=g.foes.filter(f=>f.hp>0&&f.y<96);
-   let tookHit=false;
+   const remainingDrops=[];for(const d of g.drops){if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}else if(d.type==='rapid'){g.rapidUntil=n+300;setMessage('DISPARO RÁPIDO! Poder ativo por 6 segundos.')}else if(d.type==='double'){g.doubleUntil=n+300;setMessage('TIRO DUPLO! Poder ativo por 6 segundos.')}else if(d.type==='repair'){g.lives=Math.min(3,g.lives+1);setLives(g.lives);setMessage('REPARO COLETADO! +1 vida.')}}else if(d.y<100)remainingDrops.push(d)}g.drops=remainingDrops;\n   let tookHit=false;
    const enemyRemaining=[];
    for(const shot of g.enemyShots){if(Math.abs(shot.x-g.ship.x)<6&&Math.abs(shot.y-g.ship.y)<7){tookHit=true}else if(shot.y<100)enemyRemaining.push(shot)}
    g.enemyShots=enemyRemaining;
@@ -528,7 +527,7 @@ function SpaceNexusGame({onReward}){
    for(const foe of g.foes){if(Math.abs(foe.x-g.ship.x)<7&&Math.abs(foe.y-g.ship.y)<6){tookHit=true}else foeRemaining.push(foe)}
    g.foes=foeRemaining;
    if(tookHit){if(g.shield){g.shield=false;setShieldActive(false);setMessage('Escudo absorveu o impacto!')}else{g.lives=Math.max(0,g.lives-1);setMessage('A nave foi atingida! Desvie dos disparos!')}}
-   setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setBoss(g.boss?{...g.boss}:null);
+   setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);
    if(g.lives<=0){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});onReward(Math.floor(g.score/25))}
   },20);
   return()=>clearInterval(id);
@@ -538,14 +537,14 @@ function SpaceNexusGame({onReward}){
   <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.clientY,e.currentTarget)}} onPointerMove={e=>{if(!running)return;if(e.pointerType==='touch'||(e.buttons&1))moveTo(e.clientX,e.clientY,e.currentTarget)}}>
    <div className="space-stars"/><div className="space-nebula"/>
    {foes.map(f=><div key={f.id} className={'space-enemy '+(f.type==='brute'?'brute':f.type==='scout'?'scout':'')} style={{left:f.x+'%',top:f.y+'%'}}><span className="space-enemy-core"/></div>)}
-   {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}
+   {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}\n   {drops.map(d=><div key={d.id} className={'space-drop space-drop-'+d.type} style={{left:d.x+'%',top:d.y+'%'}}><span>{d.type==='shield'?'S':d.type==='rapid'?'R':d.type==='double'?'×2':'+'}</span></div>)}
    {shots.map(b=><i key={b.id} className="space-player-shot" style={{left:b.x+'%',top:b.y+'%'}}/>)}
    {boss&&<div className={'space-boss '+(boss.hp<=boss.max*.5?'phase-two':'')} style={{left:boss.x+'%',top:boss.y+'%'}}><span><span className="space-boss-core"><i/><i/><i/></span></span><b>{boss.name}</b><small>{boss.hp<=boss.max*.5?'FASE 2 · FÚRIA MÁXIMA':'FASE 1'}</small><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
    <div className={'space-player-ship '+(shieldActive?'shielded':'')} style={{left:ship.x+'%',top:ship.y+'%'}}><span className="ship-wing"/><span className="ship-body"/><span className="ship-flame"/></div>
    {!running&&<div className="space-overlay"><div className="space-overlay-icon"><span className="space-overlay-orbit"/></div><h3>{ended?'MISSÃO ENCERRADA':'SPACE NEXUS'}</h3><p>{ended?'Pontuação: '+score+' · Recorde: '+best:message}</p><button className="primary" onClick={start}>{ended?'Jogar novamente':'Iniciar missão'} <ChevronRight size={17}/></button></div>}
   </div>
-  <div className="space-nexus-controls"><span>ARRASTE A NAVE LIVREMENTE PELA ARENA</span><button className="space-shield-button" onClick={activateShield} disabled={!running||shieldActive}>ATIVAR ESCUDO</button></div>
-  <div className="space-nexus-footer"><span>Recorde: {best}</span><span>Disparo automático</span><span>Escudo: {shieldActive?'ativo':'pronto'}</span><span>Chefões com evolução de combate</span></div>
+  <div className="space-nexus-controls"><span>ARRASTE A NAVE E COLETE AS RECOMPENSAS</span></div>
+  <div className="space-nexus-footer"><span>Recorde: {best}</span><span>Disparo automático</span><span>Escudo: {shieldActive?'ativo':'aguardando coleta'}</span><span>Chefões com evolução de combate</span></div>
  </section>
 }
 function FinanceFlapGame({onReward}){
