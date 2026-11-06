@@ -283,7 +283,7 @@ function summarizeLogicalStructure(structure) {
 }
 
 // Respostas sociais têm prioridade sobre referências vagas e classificações de tópico.
-function composeConversationalReply(message) {
+function composeConversationalReply(message, history = []) {
   const languageReply = getLanguageResponse(message, history);
   if (languageReply) return languageReply;
   const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' ')).replace(/\s+/g, ' ').trim();
@@ -428,7 +428,7 @@ export function analyzeNexusMessage(message, history = []) {
 // respostas específicas já existentes (cálculos, finanças e conhecimento curado).
 export function improveNexusFallback(message, history, legacyReply) {
   // Primeiro resolve a intenção social explícita, antes de tentar inferir tópicos ou referências.
-  const socialReply = composeConversationalReply(message);
+  const socialReply = composeConversationalReply(message, history);
   if (socialReply) return socialReply;
 
   const analysis = analyzeNexusMessage(message, history);
