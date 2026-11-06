@@ -74,3 +74,32 @@ test('a resposta reconhece uma cadeia sem afirmar que a causa está comprovada',
   assert.match(reply, /cadeia com várias relações/);
   assert.match(reply, /sem assumir que todas as ligações já estão comprovadas/);
 });
+
+test('responde naturalmente a “estou bem, e vc?” após um cumprimento', () => {
+  const history = [
+    { role: 'user', content: 'Oi, como está?' },
+    { role: 'assistant', content: 'Oii! Como você está hoje?' },
+    { role: 'user', content: 'Estou bem, e vc?' }
+  ];
+  const reply = improveNexusFallback('Estou bem, e vc?', history, 'Entendi que sua mensagem envolve sentimentos.');
+  assert.match(reply, /Que bom saber que você está bem/);
+  assert.match(reply, /não tenho sentimentos como uma pessoa/);
+});
+
+test('responde a uma pergunta social curta sem depender de tópico', () => {
+  const reply = improveNexusFallback('E vc?', [], 'Quero entender exatamente o que você quis comunicar.');
+  assert.match(reply, /pronta para conversar/);
+});
+
+test('transforma uma relação causal relatada em hipótese não comprovada', () => {
+  const result = analyzeHypotheses('Fui mal na prova porque não consegui estudar.');
+  assert.equal(result.hypotheses.length, 1);
+  assert.equal(result.hypotheses[0].certainty, 'unconfirmed');
+  assert.match(result.missingInformation, /falta verificar/);
+});
+
+test('identifica afirmações opostas e pede esclarecimento', () => {
+  const result = analyzeHypotheses('Eu gosto dela. Eu não gosto dela.');
+  assert.equal(result.contradictions.length, 1);
+  assert.equal(result.requiresClarification, true);
+});
