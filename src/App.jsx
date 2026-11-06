@@ -535,7 +535,7 @@ function SpaceNexusGame({onReward}){
   return()=>clearInterval(id);
  },[running,onReward]);
  return <section className="space-nexus-card">
-  <div className="space-nexus-hud"><span>ONDA {wave}</span><b>{score}</b><span>{'❤️'.repeat(lives)}{'🖤'.repeat(3-lives)}</span></div>
+  <div className="space-nexus-hud"><div className="space-hud-block"><small>SETOR ATUAL</small><span className="space-wave-pill"><i/> ONDA {wave}</span></div><div className="space-score-block"><small>PONTUAÇÃO</small><b>{score.toLocaleString('pt-BR')}</b></div><div className="space-lives-block"><small>INTEGRIDADE</small><span>{'❤️'.repeat(lives)}{'🖤'.repeat(3-lives)}</span></div></div>
   <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.clientY,e.currentTarget)}} onPointerMove={e=>{if(!running)return;if(e.pointerType==='touch'||(e.buttons&1))moveTo(e.clientX,e.clientY,e.currentTarget)}}>
    <div className="space-stars"/><div className="space-nebula"/>
    {foes.map(f=><div key={f.id} className={'space-enemy '+(f.type==='brute'?'brute':f.type==='scout'?'scout':'')} style={{left:f.x+'%',top:f.y+'%'}}><span className="space-enemy-core"/></div>)}
