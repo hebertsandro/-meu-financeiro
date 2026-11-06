@@ -519,7 +519,8 @@ function SpaceNexusGame({onReward}){
     if(!hit&&shot.y>0)remainingShots.push(shot);
    }
    g.shots=remainingShots;g.foes=g.foes.filter(f=>f.hp>0&&f.y<96);
-   const remainingDrops=[];for(const d of g.drops){if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}else if(d.type==='rapid'){g.rapidUntil=n+300;setMessage('DISPARO RÁPIDO! Poder ativo por 6 segundos.')}else if(d.type==='double'){g.doubleUntil=n+300;setMessage('TIRO DUPLO! Poder ativo por 6 segundos.')}else if(d.type==='repair'){g.lives=Math.min(3,g.lives+1);setLives(g.lives);setMessage('REPARO COLETADO! +1 vida.')}}else if(d.y<100)remainingDrops.push(d)}g.drops=remainingDrops;\n   let tookHit=false;
+   const remainingDrops=[];for(const d of g.drops){if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}else if(d.type==='rapid'){g.rapidUntil=n+300;setMessage('DISPARO RÁPIDO! Poder ativo por 6 segundos.')}else if(d.type==='double'){g.doubleUntil=n+300;setMessage('TIRO DUPLO! Poder ativo por 6 segundos.')}else if(d.type==='repair'){g.lives=Math.min(3,g.lives+1);setLives(g.lives);setMessage('REPARO COLETADO! +1 vida.')}}else if(d.y<100)remainingDrops.push(d)}g.drops=remainingDrops;
+   let tookHit=false;
    const enemyRemaining=[];
    for(const shot of g.enemyShots){if(Math.abs(shot.x-g.ship.x)<6&&Math.abs(shot.y-g.ship.y)<7){tookHit=true}else if(shot.y<100)enemyRemaining.push(shot)}
    g.enemyShots=enemyRemaining;
