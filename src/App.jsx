@@ -96,6 +96,37 @@ function generateNexusReply(question, finance={}, history=[]) {
   const emotional = match(/\b(ansios|ansiedade|cansad|sobrecarreg|triste|desanim|medo|preocup|frustrad|sozinh|solidao|chatead|nervos|pressionad|chorando|mal hoje|nao aguento)\b/);
   const urgentRisk = match(/\b(quero morrer|me matar|tirar minha vida|suicid|me machucar|me cortar|acabar com tudo|nao quero mais viver)\b/);
 
+  // 0. Habilidades fundamentais: matemática simples e conversa social natural.
+  // Avalia apenas expressões aritméticas permitidas; nunca usa eval() ou executa código.
+  const mathPrompt = raw.match(/^(?:quanto\s+(?:e|é)\s+|calcule\s+|resolva\s+)?([\d\s.,()+*/-]+)[?!. ]*$/i);
+  if (mathPrompt && /\d/.test(mathPrompt[1]) && /[+*/-]/.test(mathPrompt[1])) {
+    const expr = mathPrompt[1].replace(/,/g,'.').trim();
+    if (/^[\d\s.()+*/-]+$/.test(expr)) {
+      const tokens = expr.match(/\d+(?:\.\d+)?|[()+*/-]/g) || [];
+      let index = 0;
+      const factor = () => {
+        const t = tokens[index++];
+        if (t === '+') return factor();
+        if (t === '-') return -factor();
+        if (t === '(') { const v = expression(); if (tokens[index++] !== ')') throw new Error('parentese'); return v; }
+        if (!t || !/^\d+(?:\.\d+)?$/.test(t)) throw new Error('numero');
+        return Number(t);
+      };
+      const term = () => { let v=factor(); while(tokens[index]==='*'||tokens[index]==='/'){const op=tokens[index++],n=factor();if(op==='/'&&n===0)throw new Error('zero');v=op==='*'?v*n:v/n;} return v; };
+      const expression = () => { let v=term(); while(tokens[index]==='+'||tokens[index]==='-'){const op=tokens[index++],n=term();v=op==='+'?v+n:v-n;} return v; };
+      try {
+        const answer=expression();
+        if(index===tokens.length&&Number.isFinite(answer)) return 'Vamos calcular! 😊\n\n**'+expr+' = '+Number(answer.toFixed(8)).toLocaleString('pt-BR')+'**\n\nQuer que eu mostre o passo a passo?';
+      } catch {}
+    }
+  }
+  if (/^(como\s+vc\s+ta|como\s+voce\s+ta|como\s+você\s+está|como\s+esta\s+voce|como\s+está\s+você|e\s+ai\s+como\s+vc\s+ta)[?! .]*$/i.test(raw)) {
+    return 'Tô por aqui, pronta para conversar! 😊 Obrigada por perguntar. E você, como está de verdade hoje? Seu dia está tranquilo ou aconteceu alguma coisa?';
+  }
+  if (/^(to|tô|estou)\s+bem\s*(e\s+(vc|voce|você))?[?! .]*$/i.test(raw)) {
+    return 'Que bom saber! 😊 Meu papel é estar aqui para te ajudar e conversar. O que você está fazendo hoje?';
+  }
+
   // 1. Segurança, acolhimento e limites — especialmente importante para usuários jovens.
   if (urgentRisk) return 'Sinto muito que esteja doendo tanto. Obrigada por me contar. 💙 Você não precisa enfrentar isso sozinho(a), e sua segurança vem primeiro. Se existe risco de você se machucar agora, procure imediatamente um adulto de confiança que esteja perto, fique acompanhado(a) e ligue para o SAMU (192) ou vá a uma UPA/pronto-socorro. No Brasil, o CVV atende pelo 188, 24 horas. Você está em perigo neste momento ou já pensou em como faria isso?';
   if (match(/\b(abuso|abusad|violencia|violento|ameac|assedi|chantag|me bate|apanho|tenho medo dele|tenho medo dela)\b/)) return 'Quero levar isso a sério. Você merece estar em segurança e não tem culpa por alguém ultrapassar seus limites. 💙 Se houver perigo imediato, vá para perto de uma pessoa segura e procure ajuda de um adulto de confiança ou dos serviços de emergência. Se você for menor de idade, não precisa resolver isso sozinho(a). Quer me contar apenas o que se sentir confortável em compartilhar?';
