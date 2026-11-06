@@ -429,7 +429,7 @@ export function getLanguageResponse(message,history=[]) {
   const prev=fold(a.previousAssistant);
   // Um cumprimento no início não deve esconder um pedido ou pergunta que vem depois.
   // A camada social só assume a mensagem quando o restante também é uma saudação.
-  const greetingPrefix=/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)(?: nexus)?\\s*/;
+  const greetingPrefix=/^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)(?: nexus)?\s*/;
   const greetingRemainder=t.replace(greetingPrefix,'').trim();
   const onlySocialGreeting=!greetingRemainder || /^(tudo bem|tudo bom|tudo certo|como voce esta|como esta|como vai)$/.test(greetingRemainder);
   if(greetingPrefix.test(t) && !onlySocialGreeting) return null;
