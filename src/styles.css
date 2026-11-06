@@ -1844,3 +1844,8 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 @media(prefers-reduced-motion:reduce){
  .space-boss>.space-art-boss{animation:none!important}
 }
+
+/* Boss arena: movimento horizontal limpo, sem animação extra custosa */
+.space-boss{will-change:left}
+.space-boss>.space-art-boss{animation:none!important}
+.space-boss.phase-two>.space-art-boss{animation:none!important}
