@@ -432,7 +432,7 @@ function composeReply(text, frame, references) {
   if (intent === 'comparison') return 'Para comparar com justiça, vou considerar objetivo, custo, benefícios, riscos, prazo e limitações. Quais são as opções que você quer colocar lado a lado?';
   if (intent === 'summary') return 'Claro — envie o texto ou indique o conteúdo que deseja resumir. Vou separar ideia central, pontos de apoio e conclusão.';
   if (intent === 'writing') return 'Posso ajudar a escrever de um jeito natural. Qual é o destinatário, o que precisa ser comunicado e qual tom você quer transmitir?';
-  if (intent === 'advice') return 'Posso pensar nisso com você sem julgar nem decidir por você. Vamos separar o que aconteceu, o que você sentiu, o que está sob seu controle e quais consequências cada opção pode ter. O que aconteceu exatamente?';
+  if (intent === 'advice') return 'Eu começaria de um jeito simples e sincero: chama ela para conversar num momento tranquilo, sem começar cobrando ou acusando. Você pode dizer: “Sinto que a gente está meio distante ultimamente e queria entender como você está se sentindo. Gosto de você e queria que a gente conversasse com calma.” Depois, escuta o lado dela sem preparar uma resposta enquanto ela fala. Evita tentar resolver tudo por mensagem se o assunto for delicado. E lembra: conversar é abrir espaço para os dois, não assumir sozinho a responsabilidade pelo relacionamento. Se quiser, posso te ajudar a adaptar essa abordagem ao jeito de vocês.
   if (intent === 'ideas') return 'Vamos gerar opções diferentes e depois filtrar pelas que são viáveis. Qual é o objetivo, para quem é a ideia e quais limites precisamos respeitar?';
   if (intent === 'planning') return 'Vamos montar um plano realista com objetivo, etapas, prazo, recursos e uma forma de acompanhar o progresso. O que você quer alcançar e até quando?';
   if (intent === 'translation') return 'Envie a frase e indique o idioma de destino. Vou preservar o sentido e adaptar a expressão ao contexto, não apenas traduzir palavra por palavra.';
@@ -498,7 +498,7 @@ export function improveNexusFallback(message, history, legacyReply) {
   if (socialReply) return socialReply;
 
   const analysis = analyzeNexusMessage(message, history);
-  const generic = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem/i.test(String(legacyReply || ''));
+  const generic = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando/i.test(String(legacyReply || ''));
   if (generic || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
     const hypothesisReply = composeHypothesisReply(analyzeHypotheses(message, history));
     return hypothesisReply || analysis.fallbackReply;
