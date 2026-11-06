@@ -2184,3 +2184,19 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
 .nexus-send-spinner{display:block;width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:nexusSpin .7s linear infinite}
 @keyframes nexusSpin{to{transform:rotate(360deg)}}
 .assistant-popover-suggestions button:disabled{opacity:.45;pointer-events:none}
+
+/* NEXUS AI — núcleo visual animado */
+.assistant-popover-icon.nexus-avatar{position:relative;display:grid;place-items:center;overflow:visible;background:radial-gradient(circle at 35% 25%,#75d8ff,#5478ed 48%,#754ed0)!important;box-shadow:0 0 0 4px #6f9dff18,0 0 24px #568eff66,inset 0 1px #ffffff99!important;animation:nexusCorePulse 3s ease-in-out infinite}
+.assistant-popover-icon.nexus-avatar:before,.assistant-popover-icon.nexus-avatar:after{content:"";position:absolute;inset:-5px;border:1px solid #8abaff66;border-radius:50%;animation:nexusCoreOrbit 4s linear infinite}
+.assistant-popover-icon.nexus-avatar:after{inset:-9px;border-color:#b18aff55;animation-duration:7s;animation-direction:reverse}
+.assistant-popover-icon.nexus-avatar svg:first-child{filter:drop-shadow(0 0 5px #fff9)}
+.assistant-popover-messages{min-height:190px}
+.assistant-message.assistant .assistant-bubble{position:relative}
+.nexus-typing{background:linear-gradient(110deg,#1b3152,#20264b)!important;border-color:#6b8edc55!important;box-shadow:0 0 22px #557de522,inset 0 1px #ffffff14!important}
+.nexus-typing:before{content:"";position:absolute;left:0;top:8px;bottom:8px;width:2px;border-radius:4px;background:linear-gradient(#67d8ff,#9c7aff);box-shadow:0 0 10px #78aaff}
+@keyframes nexusCorePulse{0%,100%{transform:scale(1);filter:brightness(1);box-shadow:0 0 0 4px #6f9dff18,0 0 18px #568eff55,inset 0 1px #ffffff99}50%{transform:scale(1.07);filter:brightness(1.18);box-shadow:0 0 0 7px #6f9dff12,0 0 30px #568eff99,inset 0 1px #ffffffcc}}
+@keyframes nexusCoreOrbit{to{transform:rotate(360deg)}}
+.assistant-popover-title small{letter-spacing:.08em}
+.assistant-popover-title small i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#57e4b2;box-shadow:0 0 9px #57e4b2;animation:nexusOnlinePulse 1.8s ease-in-out infinite}
+@keyframes nexusOnlinePulse{50%{opacity:.35;transform:scale(.75)}}
+@media(prefers-reduced-motion:reduce){.assistant-popover-icon.nexus-avatar,.assistant-popover-icon.nexus-avatar:before,.assistant-popover-icon.nexus-avatar:after,.assistant-popover-title small i{animation:none!important}}
