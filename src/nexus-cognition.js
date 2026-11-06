@@ -105,9 +105,9 @@ function detectRelations(text) {
 }
 function inferSpeechAct(text, intent) {
   if (intent !== 'statement') return intent;
-  if (/\\b(preciso|queria|quero|pode me|me ajuda|me ajude)\\b/.test(text)) return 'request';
-  if (/\\b(aconteceu|aconteceu comigo|hoje eu|ontem eu|eu sinto|estou sentindo)\\b/.test(text)) return 'personal_disclosure';
-  if (/\\b(nao sei|não sei|to perdido|estou perdido|estou confuso)\\b/.test(text)) return 'uncertainty';
+  if (/\b(preciso|queria|quero|pode me|me ajuda|me ajude)\b/.test(text)) return 'request';
+  if (/\b(aconteceu|aconteceu comigo|hoje eu|ontem eu|eu sinto|estou sentindo)\b/.test(text)) return 'personal_disclosure';
+  if (/\b(nao sei|não sei|to perdido|estou perdido|estou confuso)\b/.test(text)) return 'uncertainty';
   return 'statement';
 }
 
@@ -135,8 +135,8 @@ function classify(text) {
     topic, intent, confidence, topicScores: scores.filter(x => x.score),
     entities: extractEntities(text), emotion: detectEmotion(text),
     discourseRelations: detectRelations(text), speechAct: inferSpeechAct(text, intent),
-    isNegated: /\\b(nao|nunca|jamais|nem)\\b/.test(text),
-    isFollowUp: /^(e|mas|entao|ta|ok|certo|por que|como assim|e se|e depois|e agora|isso|ela|ele)\\b/.test(text)
+    isNegated: /\b(nao|nunca|jamais|nem)\b/.test(text),
+    isFollowUp: /^(e|mas|entao|ta|ok|certo|por que|como assim|e se|e depois|e agora|isso|ela|ele)\b/.test(text)
   };
 }
 
