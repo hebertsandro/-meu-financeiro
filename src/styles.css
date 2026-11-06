@@ -1378,7 +1378,7 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .space-nexus-controls{justify-content:center;padding:10px 2px}
 .space-nexus-controls>span{font-size:.68rem;letter-spacing:.1em}
 .space-nexus-controls .space-shield-button{width:auto;min-width:132px;padding:0 16px;font-size:.66rem;letter-spacing:.08em}
-.space-player-ship{width:44px;height:48px;font-size:0;transition:left .045s linear;filter:drop-shadow(0 0 12px #68eaff)}
+.space-player-ship{width:44px;height:48px;font-size:0;transition:none!important;will-change:left,top;filter:drop-shadow(0 0 12px #68eaff)}
 .ship-body{position:absolute;left:13px;top:3px;width:18px;height:37px;background:linear-gradient(90deg,#8ba9c9,#f3fbff 48%,#6b91b8);clip-path:polygon(50% 0,100% 78%,75% 100%,25% 100%,0 78%);border:1px solid #dffaff}
 .ship-wing{position:absolute;left:1px;top:24px;width:42px;height:18px;background:linear-gradient(180deg,#46c9ed,#235a9d);clip-path:polygon(50% 0,100% 100%,66% 78%,34% 78%,0 100%)}
 .ship-flame{position:absolute;left:18px;top:36px;width:9px;height:15px;background:linear-gradient(#fff,#5cecff,transparent);clip-path:polygon(0 0,100% 0,50% 100%);filter:drop-shadow(0 0 6px #4ceaff);animation:shipFlame .12s infinite alternate}
