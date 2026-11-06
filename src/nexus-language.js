@@ -168,7 +168,7 @@ export function analyzeLanguage(message, history = []) {
 export function getLanguageResponse(message, history = []) {
   const analysis = analyzeLanguage(message, history);
   const text = analysis.normalized;
-  const previousAssistant = String(analysis.previousAssistant || '');
+  const previousAssistant = fold(analysis.previousAssistant || '');
   const priorAskedAboutDay = /como esta sendo seu dia|como foi seu dia|como esta seu dia|como voce esta/i.test(previousAssistant);
   const priorAskedHow = /como voce esta|como esta se sentindo|como voce se sente/i.test(previousAssistant);
   if (priorAskedAboutDay) {
