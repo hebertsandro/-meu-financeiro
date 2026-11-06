@@ -68,7 +68,7 @@ function generateNexusReply(question, finance={}, history=[]) {
       'blz':'beleza','bjs':'beijos','bj':'beijo','flw':'falou',
       'msg':'mensagem','msgs':'mensagens','qnd':'quando','qd':'quando',
       'qto':'quanto','qta':'quanta','qts':'quantos','qtas':'quantas',
-      'msm':'mesmo','msm':'mesma','mt':'muito','mto':'muito','mta':'muita','mtooo':'muito',
+      'msm':'mesmo','mt':'muito','mto':'muito','mta':'muita','mtooo':'muito',
       'td':'tudo','tds':'todos','pprt':' papo reto ','sdds':'saudades',
       'fds':'fim de semana','mds':'meu deus','slk':'cê é louco',
       'pqpp':'caramba','pfv':'por favor','pf':'por favor',
