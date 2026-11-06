@@ -1326,3 +1326,19 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 @keyframes spaceDrift{from{background-position:0 0}to{background-position:190px 340px}}
 @keyframes bossPulse{from{transform:scale(.96)}to{transform:scale(1.06)}}
 @media(max-width:600px){.space-nexus-card{padding:10px;border-radius:17px}.space-nexus-arena{height:390px;min-height:330px}.space-nexus-footer{font-size:.59rem}.space-nexus-controls span{font-size:.52rem}}
+
+
+/* SPACE NEXUS — chefões em fases, inimigos ágeis e escudo */
+.space-enemy.scout{font-size:21px;filter:drop-shadow(0 0 10px #71f6ff);animation:scoutWiggle .45s ease-in-out infinite alternate}
+.space-boss small{font-size:.52rem;color:#ffb6ce;letter-spacing:.12em}
+.space-boss.phase-two span{filter:drop-shadow(0 0 18px #ff263f);animation:bossEnrage .24s ease-in-out infinite alternate}
+.space-boss.phase-two i{box-shadow:0 0 12px #ff315d}
+.space-enemy-shot.boss-shot{width:7px;height:18px;background:#ffb04d;box-shadow:0 0 12px 4px #ff416d}
+.space-player-ship.shielded{filter:drop-shadow(0 0 12px #75f7ff);text-shadow:0 0 18px #71f7ff}
+.space-player-ship.shielded:after{content:"";position:absolute;inset:-9px -13px;border:2px solid #72f4ff;border-radius:50%;box-shadow:0 0 13px #42dfff,inset 0 0 10px #42dfff66;animation:shieldPulse .65s ease-in-out infinite alternate}
+.space-nexus-controls .space-shield-button{background:linear-gradient(145deg,#176b91,#293e78);border-color:#7defff;color:#bafaff;font-size:1rem}
+.space-nexus-controls .space-shield-button:disabled{opacity:.45}
+@keyframes scoutWiggle{from{transform:translate(-50%,-50%) rotate(-12deg)}to{transform:translate(-50%,-50%) rotate(12deg)}}
+@keyframes bossEnrage{from{transform:scale(.96)}to{transform:scale(1.12)}}
+@keyframes shieldPulse{from{transform:scale(.94);opacity:.65}to{transform:scale(1.08);opacity:1}}
+@media(max-width:600px){.space-nexus-controls{gap:7px}.space-nexus-controls button{width:45px}.space-nexus-controls .space-shield-button{width:48px}}
