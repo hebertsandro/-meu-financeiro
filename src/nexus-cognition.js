@@ -21,7 +21,7 @@ const INFORMAL = {
   vcs: 'voces', ctz: 'certeza', pq: 'porque', pprt: 'papo reto', nd: 'nada',
   cm: 'com', tb: 'tambem', dms: 'demais', tipo: 'tipo', vdd: 'verdade',
   sdds: 'saudades', mds: 'meu deus', msg: 'mensagem', fds: 'fim de semana',
-  ta: 'esta', to: 'estou', tou: 'estou', num: 'nao'
+  ta: 'esta', to: 'estou', tou: 'estou'
 };
 
 export function normalizeNexusText(value = '') {
@@ -64,7 +64,10 @@ const INTENTS = [
 ];
 
 const tokenize = text => text.match(/[\p{L}\p{N}]+/gu) || [];
-const hasTerm = (text, term) => new RegExp('(^|\\\\s)' + term.replace(/[.*+?^${}()|[\\]\\\\]/g, '\\\\const countHits = (text, terms) => terms.reduce((n, term) => n + (text.includes(term) ? 1 : 0), 0);') + '(?=\\\\s|$)', 'i').test(text);
+const hasTerm = (text, term) => {
+  const padded = ' ' + text + ' ';
+  return padded.includes(' ' + term + ' ');
+};
 const countHits = (text, terms) => terms.reduce((n, term) => n + (hasTerm(text, term) ? 1 : 0), 0);
 
 const EMOTION_LEXICON = {
