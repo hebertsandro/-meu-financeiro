@@ -301,6 +301,19 @@ function composeConversationalReply(message, history = []) {
   const languageReply = getLanguageResponse(message, history);
   if (languageReply) return languageReply;
   const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' ')).replace(/\s+/g, ' ').trim();
+  const previousAssistant = Array.isArray(history)
+    ? history.filter(turn => turn?.role === 'assistant').at(-1)?.content || history.filter(turn => turn?.role === 'assistant').at(-1)?.text || ''
+    : '';
+  const assistantAskedAboutUser = /como voce esta|como esta voce|como voce esta hoje|como esta sendo seu dia|como foi seu dia|como esta hoje/.test(normalizeNexusText(previousAssistant));
+
+  // Continuidade social: interpreta a resposta à pergunta anterior e avança a conversa.
+  // Não trata "estou bem também" como uma frase sem contexto.
+  if (assistantAskedAboutUser && /^(estou|to|tou)? ?(bem|otimo|otima|legal|tranquilo|tranquila|de boa)( tambem)?$/.test(social)) {
+    return 'Que bom saber disso! 😊 E o que você está fazendo hoje? Está sendo um dia tranquilo ou aconteceu alguma coisa interessante?';
+  }
+  if (assistantAskedAboutUser && /^(mais ou menos|assim assim|nao muito bem|nao estou bem|to mal|estou mal|cansado|cansada|desanimado|desanimada)$/.test(social)) {
+    return 'Poxa, sinto muito que não esteja sendo um dia tão bom. 💙 Se quiser, pode me contar o que está acontecendo. Foi algo específico ou é só aquele cansaço acumulado?';
+  }
   if (/^(estou|to) bem e voce$/.test(social)) {
     return 'Que bom saber que você está bem! 😊 Eu não tenho sentimentos como uma pessoa, mas estou funcionando direitinho e pronta para conversar com você. Como está sendo seu dia?';
   }
