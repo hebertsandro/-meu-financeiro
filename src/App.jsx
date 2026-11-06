@@ -61,6 +61,16 @@ function generateNexusReply(question, finance, history=[]) {
  const monthlyParts=activeParts.reduce((s,i)=>s+Number(i.amount||0)/Math.max(1,Number(i.count||1)),0);
  const topCategory=Object.entries(monthTx.filter(t=>t.type==='gasto').reduce((o,t)=>{const k=t.category||'Outros';o[k]=(o[k]||0)+Number(t.amount||0);return o;},{})).sort((a,b)=>b[1]-a[1])[0];
  const firstName=String(history.find(m=>m.role==='user')?.content||'').trim().split(/\s+/)[0];
+
+ const previousAssistant=history.filter(m=>m.role==='assistant').slice(-1)[0]?.content||'';
+ const previousUser=history.filter(m=>m.role==='user').slice(-1)[0]?.content||'';
+ const conversational=/\\b(kkkk+|rs+|haha+|entendi|sim|nao|não|isso|exato|verdade|pode ser|acho que|mas|porque|pq|e agora|e ai|e aí|como assim|me explica|continua|tambem|também|obrigado|obrigada)\\b/.test(q);
+ const casualFinance=/\\b(apertad[oa]|sem grana|sem dinheiro|dinheiro some|dinheiro desaparece|nao sobra|não sobra|to liso|tô liso|quebrad[oa]|gastando demais|me enrolei|me perdi nas contas|nao consigo guardar|não consigo guardar|ta dificil|tá difícil|ta complicado|tá complicado|fim do mes|fim do mês)\\b/.test(q);
+ const emotional=/\\b(cansad[oa]|ansios[oa]|preocupad[oa]|desesperad[oa]|frustrad[oa]|com medo|desanimad[oa]|estressad[oa])\\b/.test(q);
+ if(casualFinance) return 'Entendi você 😅💙. Quando parece que o dinheiro some, dá mesmo aquela sensação de não saber por onde começar. Vamos olhar isso sem julgamento. Neste mês, pelos seus registros, entraram '+money(income)+' e saíram '+money(expenses)+'. '+(topCategory?'A categoria que mais pesou foi '+topCategory[0]+' ('+money(topCategory[1])+'). ':'')+'Você sente que o problema está mais nas pequenas compras do dia a dia ou nas contas maiores?';
+ if(emotional) return 'Poxa, imagino que isso esteja pesando. 💙 Não precisa organizar tudo de uma vez, nem se cobrar por isso. Podemos conversar com calma e separar uma coisa de cada vez. O que aconteceu?';
+ if(conversational&&previousAssistant) return 'Entendi! 😊 '+(previousUser?'Você comentou “'+previousUser.slice(0,110)+(previousUser.length>110?'…':'')+'”. ':'')+( /\\b(sim|isso|exato|verdade|pode ser)\\b/.test(q)?'Então vamos seguir por esse caminho. ':'')+'Me conta só mais um detalhe para eu conseguir te ajudar melhor.';
+ if(/\\b(nao entendi|não entendi|explica melhor|pode explicar|como assim)\\b/.test(q)) return 'Claro! Vou explicar de um jeito mais simples. 😊 Me diz qual parte ficou confusa, ou posso resumir: seus registros mostram '+money(income)+' de entradas e '+money(expenses)+' de gastos neste mês.';
  const greeting=/^(oi|ola|e ai|bom dia|boa tarde|boa noite|hey|opa)\b/.test(q);
  if(greeting) return 'Oii! 😊 Que bom ter você por aqui. Eu sou a NEXUS, sua assistente do Meu Financeiro. Posso conversar com você, analisar seus registros e ajudar a planejar os próximos passos. O que vamos organizar hoje?';
  if(/\b(quem e voce|seu nome|o que voce faz|como voce funciona)\b/.test(q)) return 'Eu sou a NEXUS AI ⚡, a assistente do Meu Financeiro. Meu núcleo atual funciona com código próprio: interpreto assuntos financeiros, faço cálculos com os dados cadastrados e organizo recomendações. Ainda não sou um modelo de linguagem livre como o ChatGPT, mas posso ajudar bastante na sua organização financeira.';
