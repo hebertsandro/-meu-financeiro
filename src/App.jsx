@@ -255,12 +255,12 @@ function generateNexusReply(question, finance={}, history=[]) {
   if (containsAny(['mostre passo a passo','mostra passo a passo','passo a passo','como chegou nesse resultado','como fez essa conta'])) {
     const previousMath = String(lastUser || '').match(/(?:quanto\s+(?:e|é)\s+|calcule\s+|resolva\s+)?([\d.]+)\s*([+*/-])\s*([\d.]+)/i);
     if (previousMath) {
-      const a=Number(previousMath[1].replace(/\\./g,'')), b=Number(previousMath[3].replace(/\\./g,''));
+      const a=Number(previousMath[1].replace(/\./g,'')), b=Number(previousMath[3].replace(/\./g,''));
       const op=previousMath[2];
       const result=op==='+'?a+b:op==='-'?a-b:op==='*'?a*b:b!==0?a/b:NaN;
       if (Number.isFinite(result)) {
         const names={'+':'somamos','-':'subtraímos','*':'multiplicamos','/':'dividimos'};
-        return 'Claro! Vamos por partes. 😊\\n\\n1. Primeiro, identificamos os números: '+a.toLocaleString('pt-BR')+' e '+b.toLocaleString('pt-BR')+'.\\n2. A operação é '+(op==='+'?'adição':op==='-'?'subtração':op==='*'?'multiplicação':'divisão')+'.\\n3. Então, '+names[op]+' os valores.\\n\\nResultado: '+result.toLocaleString('pt-BR')+'.';
+        return 'Claro! Vamos por partes. 😊\n\n1. Primeiro, identificamos os números: '+a.toLocaleString('pt-BR')+' e '+b.toLocaleString('pt-BR')+'.\n2. A operação é '+(op==='+'?'adição':op==='-'?'subtração':op==='*'?'multiplicação':'divisão')+'.\n3. Então, '+names[op]+' os valores.\n\nResultado: '+result.toLocaleString('pt-BR')+'.';
       }
     }
   }
@@ -274,7 +274,7 @@ function generateNexusReply(question, finance={}, history=[]) {
       const value=op==='+'?left+right:op==='-'?left-right:op==='*'?left*right:right!==0?left/right:NaN;
       if (Number.isFinite(value)) {
         const explanation=op==='+'?'somamos':op==='-'?'subtraímos':op==='*'?'multiplicamos':'dividimos';
-        return 'Claro! 😊\\n\\n1. Identificamos os números: '+left.toLocaleString('pt-BR')+' e '+right.toLocaleString('pt-BR')+'.\\n2. A operação é '+(op==='+'?'adição':op==='-'?'subtração':op==='*'?'multiplicação':'divisão')+'.\\n3. '+(op==='+'?'A soma':op==='-'?'A diferença':op==='*'?'O produto':'O quociente')+' é obtido quando '+explanation+' esses valores.\\n\\n**Resultado: '+value.toLocaleString('pt-BR')+'**';
+        return 'Claro! 😊\n\n1. Identificamos os números: '+left.toLocaleString('pt-BR')+' e '+right.toLocaleString('pt-BR')+'.\n2. A operação é '+(op==='+'?'adição':op==='-'?'subtração':op==='*'?'multiplicação':'divisão')+'.\n3. '+(op==='+'?'A soma':op==='-'?'A diferença':op==='*'?'O produto':'O quociente')+' é obtido quando '+explanation+' esses valores.\n\n**Resultado: '+value.toLocaleString('pt-BR')+'**';
       }
     }
   }
