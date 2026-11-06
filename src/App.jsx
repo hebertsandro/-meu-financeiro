@@ -514,7 +514,7 @@ function generateNexusReply(question, finance={}, history=[]) {
   const lowSelfWorth = containsAny(['não sou bom o suficiente','nao sou bom o suficiente','não sou suficiente','nao sou suficiente','me odeio','me acho um lixo','não gosto de mim','nao gosto de mim','me sinto inferior','ninguém gosta de mim','ninguem gosta de mim']);
   const wantsToLearn = containsAny(['quero aprender','me ensina','ensina do zero','quero entender melhor','me explica do começo','me explica do comeco']);
   const asksForIdeas = containsAny(['me dá ideias','me de ideias','sugestões','sugestoes','o que posso fazer','me ajuda com uma ideia']);
-  const recentTopic = lastUser ? String(lastUser).slice(0,220) : '';
+  const recentTopicText = lastUser ? String(lastUser).slice(0,220) : '';
   const gentleClarifier = 'Para eu não presumir coisas sobre você, me conta um pouco mais do contexto?';
   const structuredAdvice = (topic) => 'Vamos pensar em '+topic+' sem decidir tudo no impulso.\n\n1. **Fato:** o que aconteceu, sem interpretar ainda?\n2. **Sentimento:** como isso te afetou?\n3. **Necessidade:** o que você precisa que mude?\n4. **Opções:** quais caminhos existem e quais consequências podem trazer?\n5. **Próximo passo:** qual atitude pequena, segura e realista você consegue tomar agora?\n\n'+gentleClarifier;
   if (urgentRisk) return 'Eu quero levar o que você está dizendo muito a sério. Você merece apoio de verdade, agora, e não precisa lidar com isso sozinho(a). Se houver risco imediato, afaste-se de qualquer coisa que possa usar para se machucar, fique perto de alguém de confiança e procure ajuda presencial urgente (SAMU 192 ou UPA). No Brasil, o CVV atende pelo 188. Se for possível, diga agora a um adulto seguro: “não estou bem e preciso que fique comigo”. Você está em segurança neste momento?';
@@ -530,7 +530,7 @@ function generateNexusReply(question, finance={}, history=[]) {
   if (wantsToLearn) return 'Bora aprender de verdade. Posso adaptar a explicação ao seu nível: começo com uma ideia simples, dou um exemplo do cotidiano, aprofundo o conceito e depois proponho um exercício para conferir se fez sentido. Qual assunto você quer aprender?';
   if (asksForIdeas) return 'Vamos criar opções que sejam úteis e possíveis de executar. Posso sugerir caminhos mais simples, criativos e ambiciosos, depois comparar esforço, custo e resultado esperado. Para não jogar ideias aleatórias: qual é o objetivo e quais limites você tem (tempo, dinheiro ou ferramentas)?';
   if (asksForExplanation) return 'Vou tentar explicar sem complicar: primeiro a ideia central, depois por que ela acontece, um exemplo concreto e o que costuma ser confundido com ela. Qual é exatamente o assunto ou trecho que você quer entender?';
-  if (asksForAdvice && recentTopic) return 'Pelo contexto, parece que você quer orientação sobre “'+recentTopic+'”. Não quero tirar conclusões sem conhecer os detalhes. O que aconteceu depois disso?';
+  if (asksForAdvice && recentTopicText) return 'Pelo contexto, parece que você quer orientação sobre “'+recentTopicText+'”. Não quero tirar conclusões sem conhecer os detalhes. O que aconteceu depois disso?';
 
   // 6. Detecção de mensagens vagas e continuidade conversacional.
   if (words.length <= 3 && !greeting) return 'Pode falar do seu jeito, mesmo que seja só uma frase ou uma ideia pela metade. 💙 Você quer me contar algo que aconteceu, fazer uma pergunta ou pensar em alguma coisa comigo?';
