@@ -551,7 +551,7 @@ function SpaceNexusGame({onReward}){
  </section>
 }
 function FinanceFlapGame({onReward}){
- const modes=[{id:'easy',name:'Fácil',speed:2,desc:'Aprenda a controlar o voo'},{id:'normal',name:'Médio',speed:4,desc:'Um desafio equilibrado'},{id:'hard',name:'Difícil',speed:8,desc:'Obstáculos mais rápidos'},{id:'infinite',name:'Infinito',speed:2,desc:'A velocidade aumenta com os pontos'}];
+ const modes=[{id:'easy',name:'Fácil',speed:1,desc:'Aprenda a controlar o voo'},{id:'normal',name:'Normal',speed:2,desc:'Um desafio equilibrado'},{id:'medium',name:'Médio',speed:3,desc:'Exige reflexos e precisão'},{id:'hard',name:'Difícil',speed:4,desc:'Para quem domina o voo'},{id:'infinite',name:'Infinito',speed:2,desc:'A velocidade aumenta com os pontos'}];
  const [mode,setMode]=useState(null),[bestScore,setBestScore]=useState(()=>Number(window.localStorage.getItem('mf_flap_best')||0));
  const [infiniteBest,setInfiniteBest]=useState(()=>Number(window.localStorage.getItem('mf_flap_best_infinite')||0));
  const canvasRef=React.useRef(null),stateRef=React.useRef({pigY:190,velocity:0,obstacles:[],frame:0,score:0,rewarded:false,spawnTimer:0});
@@ -591,7 +591,7 @@ function FinanceFlapGame({onReward}){
   ctx.restore();
  };
  const loop=(timestamp)=>{if(!lastFrame)lastFrame=timestamp;const elapsed=timestamp-lastFrame;if(elapsed<1000/60){raf=requestAnimationFrame(loop);return}lastFrame=timestamp-(elapsed%(1000/60));const s=stateRef.current;s.frame++;s.velocity+=.34;s.pigY+=s.velocity;
-  const multiplier=mode.id==='infinite'?Math.min(10,2+s.score*.08):mode.speed;const speed=2.8*multiplier;const spawnEvery=Math.max(28,Math.round(105/(speed/2.8)));
+  const multiplier=mode.id==='infinite'?Math.min(10,2+s.score*.08):mode.speed;const speed=2.8*multiplier;const spawnEvery=Math.max(30,Math.round(150/multiplier));
   s.spawnTimer++;if(s.spawnTimer>=spawnEvery){s.spawnTimer=0;s.obstacles.push({x:W+10,gapY:85+Math.random()*190,passed:false})}
   s.obstacles.forEach(o=>{o.x-=speed;if(!o.passed&&o.x+48<67){o.passed=true;s.score++;setScore(s.score)}});s.obstacles=s.obstacles.filter(o=>o.x>-55);
   let hit=s.pigY<13||s.pigY>H-25;s.obstacles.forEach(o=>{const overlap=67+16>o.x&&67-16<o.x+48;if(overlap&&(s.pigY-14<o.gapY-68||s.pigY+14>o.gapY+68))hit=true});
@@ -609,7 +609,7 @@ function FinanceFlapGame({onReward}){
   raf=requestAnimationFrame(loop)};
  raf=requestAnimationFrame(loop);return()=>cancelAnimationFrame(raf)},[status,mode]);
  return <div className="flap-game">
- {status==='choose'?<div className="flap-mode-select"><div className="flap-mode-heading"><b>ESCOLHA SEU MODO</b><span>Supere os obstáculos e leve o Cofrinho Voador até 100 pontos</span></div><div className="flap-mode-grid">{modes.map(item=><button key={item.id} className={'flap-mode-card mode-'+item.id} onClick={()=>{setMode(item);setStatus('ready')}}><span className="flap-mode-icon">{item.id==='infinite'?'∞':item.id==='easy'?'🪽':item.id==='normal'?'⚡':'🔥'}</span><strong>{item.name}</strong><small>{item.id==='infinite'?'Recorde: '+infiniteBest+' pontos':'Velocidade: '+item.speed+'x'}</small><em>{item.desc}</em>{item.id!=='infinite'&&<span className="flap-mode-reward">🏆 Complete 100 pontos</span>}</button>)}</div></div>:<>
+ {status==='choose'?<div className="flap-mode-select"><div className="flap-mode-heading"><b>ESCOLHA SEU MODO</b><span>Supere os obstáculos e leve o Cofrinho Voador até 100 pontos</span></div><div className="flap-mode-grid">{modes.map(item=><button key={item.id} className={'flap-mode-card mode-'+item.id} onClick={()=>{setMode(item);setStatus('ready')}}><span className="flap-mode-icon">{item.id==='infinite'?'∞':item.id==='easy'?'🪽':item.id==='normal'?'⚡':item.id==='medium'?'🎯':'🔥'}</span><strong>{item.name}</strong><small>{item.id==='infinite'?'Recorde: '+infiniteBest+' pontos':'Velocidade: '+item.speed+'x'}</small><em>{item.desc}</em>{item.id!=='infinite'&&<span className="flap-mode-reward">🏆 Complete 100 pontos</span>}</button>)}</div></div>:<>
  <div className="flap-mode-top"><button className="text-button" onClick={backToModes}>← Modos</button><b>{mode?.name} {mode?.id==='infinite'?'∞':'· '+mode?.speed+'x'}</b><span>{mode?.id==='infinite'?'Recorde: '+infiniteBest:'Meta: 100 pontos'}</span></div>
  <div className="flap-game-stage"><canvas ref={canvasRef} width="320" height="420" onPointerDown={flap} aria-label="Asas da Fortuna: toque para fazer o porquinho-cofrinho voar."/>
  {status!=='playing'&&<div className="flap-overlay"><b>{status==='ready'?'Prepare o voo!':status==='won'?'COFRINHO LENDÁRIO! 🏆':'Ops! O porquinho bateu!'}</b><span>{status==='ready'?'Toque para começar e mantenha o porquinho no ar.':status==='won'?'Você alcançou 100 pontos e completou o desafio!':'Pontuação: '+score+' · Toque para tentar novamente.'}</span>{status==='won'?<button className="primary" onClick={backToModes}>Escolher outro modo <ChevronRight size={16}/></button>:<button className="primary" onClick={begin}>{status==='ready'?'Começar voo':'Tentar novamente'} <ChevronRight size={16}/></button>}</div>}
