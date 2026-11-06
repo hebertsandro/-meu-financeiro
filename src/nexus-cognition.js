@@ -185,10 +185,10 @@ export function parseLogicalStructure(text) {
   let cursor = 0;
   let previous = null;
   const addClause = raw => {
-    const value = raw.replace(/^[,;.\\s]+|[,;.\\s]+$/g, '').trim();
+    const value = raw.replace(/^[,;.\s]+|[,;.\s]+$/g, '').trim();
     if (!value) return null;
     const index = clauses.length;
-    clauses.push({ index, text: value, negated: /\\b(nao|nunca|jamais|nem)\\b/.test(value), question: /[?]$/.test(value) });
+    clauses.push({ index, text: value, negated: /\b(nao|nunca|jamais|nem)\b/.test(value), question: /[?]$/.test(value) });
     return index;
   };
   for (const marker of selected) {
@@ -227,7 +227,7 @@ export function parseLogicalStructure(text) {
     if (/[.;!?]/.test(source[cursor] || '')) cursor++;
   }
   const finalIndex = addClause(source.slice(cursor));
-  const negations = clauses.map(clause => ({ clauseIndex: clause.index, negated: clause.negated, markers: (clause.text.match(/\\b(nao|nunca|jamais|nem)\\b/g) || []) }));
+  const negations = clauses.map(clause => ({ clauseIndex: clause.index, negated: clause.negated, markers: (clause.text.match(/\b(nao|nunca|jamais|nem)\b/g) || []) }));
   return { clauses, relations, negations, hasMultiplePropositions: clauses.length > 1, relationTypes: [...new Set(relations.map(item => item.type))], causalChains: relations.filter(item => item.type === 'cause' || item.type === 'consequence').map(item => ({ causeClause: item.fromClause, effectClause: item.toClause })) };
 }
 function summarizeLogicalStructure(structure) {
@@ -296,7 +296,8 @@ function composeReply(text, frame, references) {
 // Retorna um quadro semântico que pode ser usado por outras partes do núcleo.
 export function analyzeNexusMessage(message, history = []) {
   const normalized = normalizeNexusText(message);
-  const frame = classify(normalized);\n  frame.logicalStructure = parseLogicalStructure(normalized);
+  const frame = classify(normalized);
+  frame.logicalStructure = parseLogicalStructure(normalized);
   const references = resolveReferences(normalized, history);
   return {
     original: String(message || ''),
@@ -305,7 +306,8 @@ export function analyzeNexusMessage(message, history = []) {
     entities: frame.entities,
     topic: frame.topic,
     emotion: frame.emotion,
-    discourseRelations: frame.discourseRelations,\n    logicalStructure: parseLogicalStructure(normalized),
+    discourseRelations: frame.discourseRelations,
+    logicalStructure: parseLogicalStructure(normalized),
     speechAct: frame.speechAct,
     isFollowUp: frame.isFollowUp,
     isNegated: frame.isNegated,
