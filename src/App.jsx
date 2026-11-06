@@ -85,8 +85,26 @@ function generateNexusReply(question, finance, history=[]) {
  if(/\b(meta|metas|objetivo|objetivos|guardar|juntar|poupar|reserva)\b/.test(q)) return goals.length?'Vamos olhar suas metas! 🎯\n\n'+goals.map(g=>'• '+g.name+': '+money(g.saved)+' guardados de '+money(g.target)+' ('+(Number(g.target)>0?Math.min(100,Number(g.saved||0)/Number(g.target)*100).toFixed(0):0)+'%). Faltam '+money(Math.max(0,Number(g.target)-Number(g.saved||0)))+'.').join('\n')+'\n\nUma estratégia é separar um valor possível assim que receber, sem comprometer contas essenciais.':'Você ainda não cadastrou metas. Que tal começar com um objetivo pequeno e um valor mensal que caiba no seu orçamento?';
  if(/\b(planejamento|planejar|orcamento|organizar|por onde comeco|me ajuda)\b/.test(q)) return 'Vamos por partes, sem complicar. 💙\n\n1. Garanta primeiro moradia, alimentação, transporte e contas essenciais.\n2. Separe as despesas fixas das variáveis.\n3. Veja quais dívidas têm juros ou vencem primeiro.\n4. Defina uma meta de economia realista, mesmo que pequena.\n\nCom seus registros atuais, neste mês entraram '+money(income)+' e saíram '+money(expenses)+'. Posso montar um plano mais específico se você me contar qual é sua prioridade.';
  if(/\b(triste|ansios|preocup|desanim|dificil|difícil|apertad|sem dinheiro)\b/.test(q)) return 'Poxa, sinto muito que esteja passando por isso. 💙 Não precisa resolver tudo de uma vez. Podemos olhar sua situação com calma, separar o que é urgente do que pode esperar e encontrar um próximo passo possível. Quer me contar o que está pesando mais agora?';
- if(q.endsWith('?')||q.length>12) return 'Entendi o que você está dizendo. Quero te ajudar da melhor forma. 😊 Neste momento, consigo conversar sobre organização financeira e analisar seus registros, mas ainda não tenho compreensão livre de qualquer assunto como um modelo de linguagem. Se sua pergunta envolve dinheiro, me dê um pouquinho mais de contexto ou diga se é sobre gastos, cartões, dívidas, parcelas ou metas.';
- return 'Estou aqui com você! 😊 Pode me contar um pouco mais? Posso ajudar a entender seus gastos, organizar dívidas, acompanhar cartões, planejar metas ou simplesmente pensar com você em um próximo passo.';
+ // A NEXUS também acolhe conversas que não são sobre dinheiro.
+ if(/\\b(namorad|namoro|relacionamento|termin|ficante|crush|casal|ciume|ciúme)\\b/.test(q))
+  return 'Relacionamentos podem mexer bastante com a gente. 💙 Se quiser, me conta o que aconteceu. Posso te ajudar a organizar os pensamentos, enxergar possibilidades e pensar no que você gostaria de fazer — sem te julgar.';
+ if(/\\b(familia|família|mae|mãe|pai|irma|irmã|irmao|irmão|pais|pais|casa)\\b/.test(q))
+  return 'Entendi. Assuntos de família às vezes são delicados e podem pesar muito. Estou aqui para te ouvir com respeito. O que aconteceu?';
+ if(/\\b(escola|faculdade|prova|estudo|estudar|professor|trabalho|emprego|chefe|carreira)\\b/.test(q))
+  return 'Essa parte da vida também pode trazer bastante pressão. 😊 Quer me contar melhor o que está acontecendo? Podemos pensar juntos em um próximo passo que faça sentido para você.';
+ if(/\\b(amigo|amiga|amizade|sozinho|sozinha|solitario|solitária|ninguem|ninguém|desabafar|desabafo)\\b/.test(q))
+  return 'Obrigado por confiar em mim para falar disso. 💙 Você não precisa fingir que está tudo bem aqui. Pode contar do seu jeito, no seu tempo. O que mais está passando pela sua cabeça agora?';
+ if(/\\b(filme|serie|série|musica|música|cantor|cantora|futebol|time|anime|livro|jogo|game|hobby)\\b/.test(q))
+  return 'Bora falar disso também! 😄 Me conta mais — o que você está assistindo, ouvindo ou curtindo ultimamente?';
+ if(/\\b(como voce ta|como você tá|tudo bem|tudo bom|como vai)\\b/.test(q))
+  return 'Estou por aqui, pronta para conversar com você! 😊 E você, como está de verdade hoje?';
+ if(/\\b(kkkk|haha|rsrs|que bom|legal|bacana|top|massa)\\b/.test(q))
+  return 'Hahaha 😄 Gosto quando a conversa fica leve também. Me conta, o que mais aconteceu?';
+ if(/\\b(nao sei|não sei|confuso|confusa|perdido|perdida|nao consigo|não consigo)\\b/.test(q))
+  return 'Tudo bem não ter as respostas agora. 💙 A gente pode começar pelo começo, sem pressa. O que está mais difícil de entender ou resolver neste momento?';
+ if(q.endsWith('?')||q.length>12)
+  return 'Quero entender melhor. 💙 Pode me contar um pouco mais sobre isso? Você pode falar comigo sobre dinheiro, sentimentos, família, relacionamento, estudos, trabalho, planos ou qualquer assunto do seu dia. Ainda estou aprendendo a lidar com conversas muito abertas, então, se eu não captar algo, pode me explicar de outro jeito — sem precisar mudar de assunto.';
+ return 'Estou aqui com você. 💙 Pode falar de qualquer assunto, não só de finanças. Como foi seu dia? Tem alguma coisa na cabeça ou só quer conversar um pouquinho?';
 }
 function App(){
   const [session,setSession]=useState(null), [loading,setLoading]=useState(true);
