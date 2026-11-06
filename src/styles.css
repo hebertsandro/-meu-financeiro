@@ -1801,3 +1801,20 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 @media(prefers-reduced-motion:reduce){
  .space-player-ship .ship-core,.enemy-reactor,.boss-reactor{animation:none}
 }
+
+/* SPACE NEXUS — arte vetorial original, com silhuetas desenhadas e leitura clara */
+.space-player-ship{width:76px!important;height:92px!important;filter:drop-shadow(0 0 7px #9cfaff) drop-shadow(0 0 18px #27bfff)!important}
+.space-art-ship{display:block;width:100%;height:100%;overflow:visible;animation:shipArtworkFloat 1.8s ease-in-out infinite}
+.space-enemy{width:68px!important;height:56px!important;filter:drop-shadow(0 0 9px #d67aff)!important}
+.space-art-enemy{display:block;width:100%;height:100%;overflow:visible}
+.space-enemy.scout{width:58px!important;height:47px!important;filter:drop-shadow(0 0 10px #51eaff)!important}
+.space-enemy.brute{width:78px!important;height:65px!important;filter:drop-shadow(0 0 12px #ff6387)!important}
+.space-boss> .space-art-boss{display:block;width:214px;height:124px;overflow:visible;filter:drop-shadow(0 0 12px #ff7da9) drop-shadow(0 0 24px #ff286b88);animation:bossArtworkFloat 2.6s ease-in-out infinite}
+.space-boss{width:230px!important;display:flex;align-items:center;flex-direction:column;gap:2px}
+.space-boss> b{margin-top:-2px;text-shadow:0 0 10px #ff5d93}
+.space-boss.phase-two>.space-art-boss{filter:hue-rotate(-12deg) saturate(1.4) drop-shadow(0 0 18px #ff315e) drop-shadow(0 0 32px #ff174e);animation:bossArtworkRage .22s ease-in-out infinite alternate}
+@keyframes shipArtworkFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-2px)}}
+@keyframes bossArtworkFloat{0%,100%{transform:translateY(0) rotate(-.5deg)}50%{transform:translateY(-4px) rotate(.5deg)}}
+@keyframes bossArtworkRage{to{transform:translateY(-2px) scale(1.025)}}
+@media(max-width:600px){.space-player-ship{width:66px!important;height:80px!important}.space-boss>.space-art-boss{width:180px;height:105px}.space-boss{width:195px!important}.space-enemy{width:59px!important;height:49px!important}.space-enemy.brute{width:69px!important;height:58px!important}}
+@media(prefers-reduced-motion:reduce){.space-art-ship,.space-boss>.space-art-boss{animation:none!important}}
