@@ -283,7 +283,7 @@ function summarizeLogicalStructure(structure) {
 
 // Respostas sociais têm prioridade sobre referências vagas e classificações de tópico.
 function composeConversationalReply(message) {
-  const social = normalizeNexusText(message).replace(/[,.!?]/g, ' ').replace(/\s+/g, ' ').trim();
+  const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' ')).replace(/\s+/g, ' ').trim();
   if (/^(estou|to) bem e voce$/.test(social)) {
     return 'Que bom saber que você está bem! 😊 Eu não tenho sentimentos como uma pessoa, mas estou funcionando direitinho e pronta para conversar com você. Como está sendo seu dia?';
   }
