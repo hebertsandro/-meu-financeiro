@@ -161,12 +161,12 @@ function resolveReferences(text, history) {
 
 
 const RELATION_PATTERNS = [
-  { type: 'condition', regex: /\\b(se|caso|desde que)\\b/g },
-  { type: 'contrast', regex: /\\b(mas|porem|contudo|entretanto|so que)\\b/g },
-  { type: 'cause', regex: /\\b(porque|pois|ja que|uma vez que|por causa de|devido a)\\b/g },
-  { type: 'consequence', regex: /\\b(por isso|portanto|entao|consequentemente|assim)\\b/g },
-  { type: 'addition', regex: /\\b(alem disso|tambem|alem do mais)\\b/g },
-  { type: 'time', regex: /\\b(depois que|antes que|quando|enquanto|assim que)\\b/g }
+  { type: 'condition', regex: /\b(se|caso|desde que)\b/g },
+  { type: 'contrast', regex: /\b(mas|porem|contudo|entretanto|so que)\b/g },
+  { type: 'cause', regex: /\b(porque|pois|ja que|uma vez que|por causa de|devido a)\b/g },
+  { type: 'consequence', regex: /\b(por isso|portanto|entao|consequentemente|assim)\b/g },
+  { type: 'addition', regex: /\b(alem disso|tambem|alem do mais)\b/g },
+  { type: 'time', regex: /\b(depois que|antes que|quando|enquanto|assim que)\b/g }
 ];
 
 // Divide a mensagem em proposições e preserva o conector que explica a relação.
@@ -185,12 +185,12 @@ export function parseLogicalStructure(text) {
   const clauses = [];
   let cursor = 0;
   for (const relation of unique) {
-    const before = source.slice(cursor, relation.index).replace(/^[,;\\s]+|[,;\\s]+$/g, '');
+    const before = source.slice(cursor, relation.index).replace(/^[,;\s]+|[,;\s]+$/g, '');
     if (before) clauses.push({ text: before, role: clauses.length === 0 ? 'initial' : 'context' });
     cursor = relation.end;
     relation.clauseIndex = clauses.length;
   }
-  const tail = source.slice(cursor).replace(/^[,;\\s]+|[,;\\s]+$/g, '');
+  const tail = source.slice(cursor).replace(/^[,;\s]+|[,;\s]+$/g, '');
   if (tail) clauses.push({ text: tail, role: clauses.length === 0 ? 'initial' : 'related' });
   const relations = unique.map((item, index) => ({
     type: item.type,
@@ -200,8 +200,8 @@ export function parseLogicalStructure(text) {
   }));
   const negations = clauses.map((clause, index) => ({
     clauseIndex: index,
-    negated: /\\b(nao|nunca|jamais|nem)\\b/.test(clause.text),
-    markers: (clause.text.match(/\\b(nao|nunca|jamais|nem)\\b/g) || [])
+    negated: /\b(nao|nunca|jamais|nem)\b/.test(clause.text),
+    markers: (clause.text.match(/\b(nao|nunca|jamais|nem)\b/g) || [])
   }));
   return {
     clauses: clauses.map((clause, index) => ({
