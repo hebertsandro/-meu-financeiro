@@ -171,7 +171,7 @@ const RELATION_PATTERNS = [
 
 // Divide a mensagem em proposições e preserva o conector que explica a relação.
 // É uma análise estrutural: não presume que a relação expressa pelo usuário seja um fato.
-function parseLogicalStructure(text) {
+export function parseLogicalStructure(text) {
   const source = normalizeNexusText(text);
   const matches = [];
   for (const pattern of RELATION_PATTERNS) {
