@@ -19,6 +19,7 @@ export const NEXUS_LEXICON = [
   { canonical:'obrigado', variants:['obg','obgd','obgda'], meanings:['agradecimento'], acts:['gratitude'], tone:'warm', ambiguity:'low' },
   { canonical:'por favor', variants:['pfv','pf'], meanings:['pedido educado'], acts:['request'], tone:'polite', ambiguity:'low' },
   { canonical:'estou', variants:['to','tô','tou'], meanings:['estado atual'], acts:[], tone:'casual', ambiguity:'low' },
+  { canonical:'esta', variants:['ta','tá'], meanings:['forma informal do verbo estar'], acts:[], tone:'casual', ambiguity:'low' },
   { canonical:'muito', variants:['mt','mto','mta'], meanings:['intensidade'], acts:[], tone:'casual', ambiguity:'low' },
   { canonical:'ninguém', variants:['ngm','nmg'], meanings:['ausência de pessoas'], acts:[], tone:'neutral', ambiguity:'low' },
   { canonical:'meu deus', variants:['mds'], meanings:['surpresa','espanto','ênfase'], acts:['surprise'], tone:'expressive', ambiguity:'high' },
