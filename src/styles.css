@@ -1303,7 +1303,7 @@ body:after{opacity:.16;background-image:radial-gradient(#8ba9ff 0.7px,transparen
 .space-nexus-arena{height:430px;max-height:65vh;min-height:340px;position:relative;overflow:hidden;border-radius:17px;border:1px solid #6d83df66;background:radial-gradient(ellipse at 50% 80%,#263c72 0%,#111a3d 38%,#070d20 100%);touch-action:pan-y;cursor:crosshair}
 .space-stars{position:absolute;inset:0;background-image:radial-gradient(2px 2px at 15% 20%,#fff 50%,transparent 70%),radial-gradient(1px 1px at 70% 15%,#b7d8ff 50%,transparent 70%),radial-gradient(2px 2px at 82% 58%,#fff 50%,transparent 70%),radial-gradient(1px 1px at 35% 75%,#a5b8ff 50%,transparent 70%),radial-gradient(1px 1px at 55% 42%,#fff 50%,transparent 70%);background-size:190px 170px;opacity:.8;animation:spaceDrift 18s linear infinite}
 .space-nebula{position:absolute;width:55%;height:50%;left:20%;top:25%;background:radial-gradient(ellipse,#7548d633,transparent 68%);filter:blur(18px);pointer-events:none}
-.space-player-ship{position:absolute;bottom:8%;transform:translateX(-50%);font-size:38px;filter:drop-shadow(0 0 12px #68eaff);z-index:4;transition:left .08s linear}
+.space-player-ship{position:absolute;top:84%;bottom:auto;transform:translate(-50%,-50%);font-size:38px;filter:drop-shadow(0 0 12px #68eaff);z-index:4;transition:left .06s linear,top .06s linear;pointer-events:none}
 .space-enemy{position:absolute;transform:translate(-50%,-50%);font-size:25px;filter:drop-shadow(0 0 9px #f46cff);z-index:3}
 .space-enemy.brute{font-size:36px;filter:drop-shadow(0 0 13px #ff667f)}
 .space-player-shot,.space-enemy-shot{position:absolute;width:4px;height:15px;border-radius:8px;transform:translateX(-50%);z-index:2}
