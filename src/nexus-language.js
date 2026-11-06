@@ -153,7 +153,8 @@ export function analyzeLanguage(message, history=[]) {
     if(contains(normalized,item)) ambiguousPhrases.push({phrase:item,needsContext:true});
   }
   const unknownTokens=normalized.split(' ').filter(token=>token.length>3&&!NEXUS_LEXICON.some(entry=>entry.canonical===token||entry.variants.includes(token)));
-  const priorAssistant=[...(Array.isArray(history)?history:[])].reverse().find(turn=>turn?.role==='assistant')?.content||'';
+  const priorAssistantTurn=[...(Array.isArray(history)?history:[])].reverse().find(turn=>turn?.role==='assistant');
+  const priorAssistant=String(priorAssistantTurn?.content||priorAssistantTurn?.text||'');
   const irony=detectIrony(normalized);
   const indirectness=detectIndirectness(normalized);
   const references=/(\b(ela|ele|eles|elas|isso|aquilo|essa|esse|dela|dele|la)\b)/.test(normalized);
@@ -176,7 +177,10 @@ export function getLanguageResponse(message,history=[]) {
   const t=a.normalized;
   const prev=fold(a.previousAssistant);
   const askedDay=/como esta sendo seu dia|como foi seu dia|como esta seu dia/.test(prev);
-  const askedHow=/como voce esta|como esta se sentindo/.test(prev);
+  const askedHow=/como voce esta|como esta se sentindo|como voce ta/.test(prev);
+  // Respostas espontâneas podem vir com "estou", abreviações e letras repetidas
+  // ("bemmm", "bemm"). Removemos o prefixo antes de interpretar o estado.
+  const answer= t.replace(/^(eu )?(estou|to|tou) /,'').replace(/m{2,}$/,'m');
   if(askedDay){
     if(/^(esta sendo bom|esta bom|esta otimo|esta legal|foi bom|foi legal)$/.test(t)) return 'Que bom saber disso! 😊 O que aconteceu de bom hoje?';
     if(/^(mais ou menos|assim assim|nem bom nem ruim|normal|nada demais)$/.test(t)) return 'Entendi! Tem dias que são mais neutros mesmo. Aconteceu algo específico ou foi só um dia comum?';
@@ -184,9 +188,9 @@ export function getLanguageResponse(message,history=[]) {
     if(/^(cansativo|foi cansativo|muito corrido)$/.test(t)) return 'Imagino que tenha sido puxado. O que mais tomou sua energia hoje?';
   }
   if(askedHow){
-    if(/^(bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|animado)$/.test(t)) return 'Que bom! 😊 O que te deixou assim hoje?';
-    if(/^(mais ou menos|assim assim|nao sei)$/.test(t)) return 'Tudo bem não saber explicar de primeira. Quer me contar como foi seu dia até agora?';
-    if(/^(mal|ruim|triste|cansado|cansada|ansioso|ansiosa)$/.test(t)) return 'Sinto muito que você esteja assim. Quer me contar o que aconteceu?';
+    if(/^(bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|animado|animada)$/.test(answer)) return 'Que bom! 😊 Fico feliz em saber. Como está sendo seu dia?';
+    if(/^(mais ou menos|assim assim|nao sei)$/.test(answer)) return 'Entendi. Tem dias que a gente fica assim mesmo. Aconteceu alguma coisa ou está tudo só meio normal hoje?';
+    if(/^(mal|ruim|triste|cansado|cansada|ansioso|ansiosa|preocupado|preocupada)$/.test(answer)) return 'Poxa, sinto muito. Quer me contar o que aconteceu? Estou aqui para te ouvir.';
   }
   if(a.changedTopic) return null; // deixa o motor principal responder ao novo assunto, sem forçar continuidade.
   if(a.irony.possible) return 'Pode ter ironia ou sarcasmo no que você escreveu, mas o tom depende do contexto. Você está falando literalmente ou quis dizer o contrário?';
