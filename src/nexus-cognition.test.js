@@ -672,3 +672,16 @@ test('mudança explícita de assunto limpa o tema ativo anterior', () => {
   assert.equal(state.activeTopic,null);
   assert.equal(state.topicChanged,true);
 });
+
+
+test('despedida composta encerra a conversa', () => {
+  const state = buildConversationState([{role:'user',content:'Falou, até mais!'}]);
+  assert.equal(state.conversationEnded,true);
+  const reply = improveNexusFallback('Falou, até mais!', [], 'fallback genérico');
+  assert.match(reply,/Até mais/);
+});
+
+test('verbo falou em relato não encerra a conversa', () => {
+  const state = buildConversationState([{role:'user',content:'Meu amigo falou comigo hoje.'}]);
+  assert.equal(state.conversationEnded,false);
+});
