@@ -507,7 +507,7 @@ export function buildReasoningPlan(message, history = []) {
     'trabalho e carreira': 'trabalho',
     financas: 'financas'
   };
-  const priorTopic = language.previousTopic || activeTopic;
+  const priorTopic = activeTopic;
   const topicMatches = Boolean(currentTopic && priorTopic &&
     (currentTopic === priorTopic || topicAliases[currentTopic] === priorTopic || topicAliases[priorTopic] === currentTopic));
   const relationshipSemanticMatch = priorTopic === 'relacionamento' &&
@@ -573,12 +573,10 @@ export function buildAdaptiveResponse(message, history = []) {
   const activeTopic = conversationState?.activeTopic || null;
   // O assunto ativo vem da linha do tempo, não da frequência de palavras antigas.
   // Uma referência curta pode continuar o assunto anterior; um tema explícito novo o substitui.
-  const hasConversationalReference = /\b(a gente|nos|nossa|nosso|isso|essa situacao|esse assunto|ela|ele|eles|elas|dela|dele|aquilo)\b/.test(normalized);
   const sameTopic = Boolean(activeTopic && (
     !frame.topic || frame.topic === activeTopic ||
     (frame.topic === 'relacionamento' && activeTopic === 'relacionamentos') ||
-    (frame.topic === 'estudos' && activeTopic === 'escola') ||
-    hasConversationalReference
+    (frame.topic === 'estudos' && activeTopic === 'escola')
   ));
   const rememberedEvents = reasoningPlan.memory.events || [];
   const eventLabels = {distanciamento:'o distanciamento que você percebeu',menos_conversa:'a diminuição das conversas',mudanca_escola:'a mudança de escola',mudanca_cidade:'a mudança de cidade',conflito:'o conflito que você contou',termino:'o término',contato_interrompido:'a interrupção do contato',reaproximacao:'a reaproximação'};
