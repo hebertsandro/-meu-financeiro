@@ -145,30 +145,32 @@ function getConversationContext(history=[]) {
   const userTurns=turns.filter(turn=>turn?.role==='user');
   const previousUser=userTurns.length>1?historyText(userTurns[userTurns.length-2]):'';
   const lastQuestion=historyText(lastAssistant);
-  const questionType=/como voce esta( hoje)?|como esta se sentindo|como voce se sente/.test(fold(lastQuestion))
+  const normalizedQuestion=fold(lastQuestion);
+  const questionType=/como voce esta( hoje)?|como esta se sentindo|como voce se sente/.test(normalizedQuestion)
     ? 'wellbeing'
-    : /como esta sendo seu dia|como foi seu dia|como esta seu dia/.test(fold(lastQuestion))
+    : /como esta sendo seu dia|como foi seu dia|como esta seu dia/.test(normalizedQuestion)
       ? 'day'
-      : /o que aconteceu|o que houve|quer me contar/.test(fold(lastQuestion))
+      : /o que aconteceu|o que houve|quer me contar/.test(normalizedQuestion)
         ? 'event'
-        : /qual deles|qual delas|de quem voce esta falando/.test(fold(lastQuestion))
+        : /qual deles|qual delas|de quem voce esta falando|qual pessoa/.test(normalizedQuestion)
           ? 'clarification'
-          : /pode explicar|pode dar um exemplo|o que voce quis dizer/.test(fold(lastQuestion))
+          : /pode explicar|pode dar um exemplo|o que voce quis dizer/.test(normalizedQuestion)
             ? 'clarification'
-            : /quer uma explicacao|quer uma orientacao|quer ajuda/.test(fold(lastQuestion))
+            : /quer uma explicacao|quer uma orientacao|quer ajuda/.test(normalizedQuestion)
               ? 'choice'
               : lastQuestion.includes('?') ? 'open_question' : null;
   const recentUserText=userTurns.slice(-12).map(historyText).join(' ');
   const recentTopics=topicsFor(recentUserText);
-  const currentUser=historyText(userTurns[userTurns.length-1]);
-  const priorUser=historyText(userTurns[userTurns.length-2]);
+  const currentUser=historyText(userTurns.at(-1));
+  const state=buildConversationState(turns);
   return {
     lastAssistant:lastQuestion,
-    previousUser:priorUser,
+    previousUser,
     currentUser,
     questionType,
-    activeTopic:recentTopics[0]?.topic||null,
+    activeTopic:state.activeTopic,
     recentTopics,
+    pendingQuestion:state.pendingQuestion,
     userTurnCount:userTurns.length,
     hasConversation:userTurns.length>1||Boolean(lastAssistant)
   };
@@ -177,68 +179,77 @@ function getConversationContext(history=[]) {
 // Estado conversacional explícito: resume o diálogo como uma situação em evolução,
 // em vez de tratar o histórico como um saco de mensagens sem ordem.
 export function buildConversationState(history=[]) {
-  const turns=(Array.isArray(history)?history:[]).filter(turn=>turn?.role==='user'||turn?.role==='assistant')
-    .map(turn=>({...turn,text:historyText(turn)})).filter(turn=>turn.text.trim()).slice(-60);
+  const turns=(Array.isArray(history)?history:[])
+    .filter(turn=>turn?.role==='user'||turn?.role==='assistant')
+    .map(turn=>({...turn,text:historyText(turn)}))
+    .filter(turn=>turn.text.trim()).slice(-60);
   const userTurns=turns.filter(turn=>turn.role==='user');
-  const assistantTurns=turns.filter(turn=>turn.role==='assistant');
   const lastUser=userTurns.at(-1)?.text||'';
-  const lastAssistant=assistantTurns.at(-1)?.text||'';
+  const lastAssistant=[...turns].reverse().find(turn=>turn.role==='assistant')?.text||'';
   const lastRole=turns.at(-1)?.role||null;
   const lastUserFold=fold(lastUser);
-  const lastAssistantFold=fold(lastAssistant);
-  const topicChange=/\b(muda(r)? de assunto|troca(r)? de assunto|vamos falar sobre outra coisa|outro assunto|deixa esse assunto|esquece esse assunto)\b/.test(lastUserFold);
-  const farewell=/^(tchau|ate mais|falou|fui|ate logo|boa noite|vou nessa|preciso ir)[!. ]*$/.test(lastUserFold);
-  const assistantFarewell=/\b(ate mais|quando quiser continuar|estarei por aqui|boa noite)\b/.test(lastAssistantFold);
+  const topicChangePattern=/\b(muda(r)? de assunto|troca(r)? de assunto|vamos mudar de assunto|vamos falar sobre outra coisa|vamos falar de outra coisa|outro assunto|deixa esse assunto|esquece esse assunto)\b/;
   const topicTrail=[];
+  let activeTopic=null;
+  let topicChanged=false;
   for(const turn of userTurns){
     const text=fold(turn.text);
-    if(/\b(muda(r)? de assunto|troca(r)? de assunto|vamos falar sobre outra coisa|outro assunto|deixa esse assunto)\b/.test(text)){
+    if(topicChangePattern.test(text)){
+      activeTopic=null;
+      topicChanged=turn===userTurns.at(-1);
       topicTrail.push({topic:null,action:'topic_change',source:turn.text});
-      continue;
     }
     const found=topicsFor(text)[0]?.topic||null;
-    if(found) topicTrail.push({topic:found,action:'topic_mentioned',source:turn.text});
+    if(found){
+      activeTopic=found;
+      topicTrail.push({topic:found,action:'topic_mentioned',source:turn.text});
+    }
   }
-  const activeTopic=topicChange?null:(topicTrail.at(-1)?.topic||null);
-  const lastAssistantQuestion=lastAssistant.includes('?')?lastAssistant:null;
-  const pendingQuestion=lastRole==='assistant'&&lastAssistantQuestion
-    ? {text:lastAssistantQuestion,status:'awaiting_user_response'}
-    : null;
+  const farewell=/\b(tchau|ate mais|falou|fui|ate logo|vou nessa|preciso ir)\b/.test(lastUserFold)
+    && lastUserFold.split(' ').length<=9;
+  const assistantQuestionIndex=[...turns].map((turn,index)=>({turn,index}))
+    .reverse().find(item=>item.turn.role==='assistant'&&item.turn.text.includes('?'));
+  let lastAssistantQuestion=null;
+  let pendingQuestion=null;
+  if(assistantQuestionIndex){
+    const userReplied=turns.slice(assistantQuestionIndex.index+1).some(turn=>turn.role==='user');
+    lastAssistantQuestion={
+      text:assistantQuestionIndex.turn.text,
+      status:userReplied?'response_received':'awaiting_user_response',
+      askedAt:assistantQuestionIndex.index
+    };
+    if(!userReplied) pendingQuestion={text:assistantQuestionIndex.turn.text,status:'awaiting_user_response'};
+  }
   const correctionTurn=[...userTurns].reverse().find(turn=>
     /\b(na verdade|quis dizer|me expressei mal|me confundi|corrigindo|o correto e|nao foi .* foi)\b/.test(fold(turn.text))
   );
   const references=/\b(ela|ele|eles|elas|isso|aquilo|essa|esse|dela|dele|la|de novo|como eu falei|aquilo que eu disse)\b/.test(lastUserFold);
-  const answeredAssistantQuestion=Boolean(lastAssistantQuestion&&lastRole==='user');
-  const status=farewell?'ended':assistantFarewell&&lastRole==='assistant'?'ended':'active';
   return {
-    status,
+    status:farewell?'ended':'active',
     activeTopic,
-    topicChanged:topicChange,
+    topicChanged,
     topicTrail:topicTrail.slice(-12),
     pendingQuestion,
-    lastAssistantQuestion:lastAssistantQuestion?{
-      text:lastAssistantQuestion,
-      status:answeredAssistantQuestion?'user_has_replied':'awaiting_user_response'
-    }:null,
+    lastAssistantQuestion,
     latestCorrection:correctionTurn?{text:correctionTurn.text,status:'latest_user_correction'}:null,
     references:{present:references,source:lastUser},
     lastUserMessage:lastUser,
     lastAssistantMessage:lastAssistant,
     turnCount:userTurns.length,
     lastSpeaker:lastRole,
-    conversationEnded:status==='ended',
-    endingEvidence:farewell?'user_farewell':assistantFarewell?'assistant_farewell':null
+    conversationEnded:farewell,
+    endingEvidence:farewell?'user_farewell':null
   };
 }
 
 // Memória semântica leve: registra fatos relatados e ordem temporal sem tratá-los
 // como verdades verificadas nem transformar sequência em causalidade.
 export function buildConversationMemory(history=[]) {
-  const turns=(Array.isArray(history)?history:[])
-    .filter(turn=>turn?.role==='user')
-    .map(historyText).filter(Boolean).slice(-30);
+  const allTurns=(Array.isArray(history)?history:[])
+    .filter(turn=>turn?.role==='user').map(historyText).filter(Boolean);
+  const turns=allTurns.slice(-30);
   const joined=turns.join(' ').toLocaleLowerCase('pt-BR');
-  const people=[
+  let people=[
     ['namorada',/\b(minha namorada|a namorada|minha parceira)\b/],
     ['namorado',/\b(meu namorado|o namorado|meu parceiro)\b/],
     ['amiga',/\b(minha amiga|a amiga)\b/],
@@ -248,6 +259,21 @@ export function buildConversationMemory(history=[]) {
     ['irmã',/\b(minha irma|minha irmã)\b/],
     ['irmão',/\b(meu irmao|meu irmão)\b/]
   ].filter(([,re])=>re.test(fold(joined))).map(([person])=>person);
+  const latestCorrection=[...turns].reverse().find(text=>
+    /\b(na verdade|quis dizer|me expressei mal|me confundi|corrigindo|o correto e)\b/.test(fold(text))
+  );
+  if(latestCorrection){
+    const corrected=fold(latestCorrection).match(/\b(meu|minha) (irmao|irma|namorado|namorada|amigo|amiga|pai|mae)\b/);
+    if(corrected){
+      const canonical=corrected[2]==='irmao'?'irmão':corrected[2]==='irma'?'irmã':
+        corrected[2]==='namorado'?'namorado':corrected[2]==='namorada'?'namorada':
+        corrected[2]==='amigo'?'amigo':corrected[2]==='amiga'?'amiga':
+        corrected[2]==='pai'?'pai':'mãe';
+      const opposite={irmão:'irmã',irmã:'irmão',namorado:'namorada',namorada:'namorado',amigo:'amiga',amiga:'amigo'}[canonical];
+      if(opposite) people=people.filter(person=>person!==opposite);
+      if(!people.includes(canonical)) people.push(canonical);
+    }
+  }
   const eventPatterns=[
     ['distanciamento',/\b(esta distante|anda distante|ficou distante|se afastou|esta mais fria|esta mais frio)\b/],
     ['menos_conversa',/\b(quase nao fala|nao conversa|parou de falar|fala menos|responde menos)\b/],
@@ -256,30 +282,34 @@ export function buildConversationMemory(history=[]) {
     ['conflito',/\b(brigou|brigamos|discutiu|discutimos|tivemos uma briga)\b/],
     ['termino',/\b(terminou comigo|terminamos|terminou o namoro)\b/],
     ['contato_interrompido',/\b(sumiu|parou de responder|me deixou no vacuo|nao respondeu)\b/],
-    ['reaproximacao',/\b voltou a falar|se reaproximou|voltamos a conversar\b/]
+    ['reaproximacao',/\b(voltou a falar|se reaproximou|voltamos a conversar)\b/]
   ];
   const events=eventPatterns.filter(([,re])=>re.test(fold(joined))).map(([event])=>event);
   const temporalMarkers=['depois que','depois de','desde que','a partir de','antes de','quando','naquela epoca','nesse periodo'];
   const temporalEvidence=turns.flatMap((text,index)=>{
     const normalized=fold(text);
     const marker=temporalMarkers.find(item=>normalized.includes(item));
-    return marker?[{turn:index+1,marker,text:text.trim()}]:[];
+    return marker?[{turn:allTurns.length-turns.length+index+1,marker,text:text.trim()}]:[];
   });
   const causalMarkers=['porque','por causa de','ja que','devido a'];
   const causalEvidence=turns.flatMap((text,index)=>{
     const normalized=fold(text);
     const marker=causalMarkers.find(item=>normalized.includes(item));
-    return marker?[{turn:index+1,marker,text:text.trim(),status:'relato_nao_verificado'}]:[];
+    return marker?[{turn:allTurns.length-turns.length+index+1,marker,text:text.trim(),status:'relato_nao_verificado'}]:[];
   });
-  const facts=turns.slice(-30).map((text,index)=>({text:text.trim(),sequence:Math.max(1,turns.length-7)+index}));
+  const offset=allTurns.length-turns.length;
+  const facts=turns.map((text,index)=>({text:text.trim(),sequence:offset+index+1,certainty:'user_reported'}));
+  const conversationState=buildConversationState(history);
   return {
     people:[...new Set(people)],
     events:[...new Set(events)],
     facts,
     temporalEvidence,
     causalEvidence,
-    activeTopic:topicsFor(joined)[0]?.topic||null,
-    turnCount:turns.length,
+    activeTopic:conversationState.activeTopic,
+    topicTrail:conversationState.topicTrail,
+    latestCorrection:conversationState.latestCorrection,
+    turnCount:allTurns.length,
     limitations:'Memória baseada apenas no que foi escrito; sequência temporal não comprova causa.'
   };
 }
@@ -424,13 +454,19 @@ function composeReasoningReply(message, reasoning) {
 export function analyzeLanguage(message, history=[]) {
   const original=String(message||'');
   const normalized=normalizeLanguageText(original);
-  const turns=getUserTurns(history);
+  const suppliedHistory=Array.isArray(history)?history:[];
+  const lastTurn=suppliedHistory.at(-1);
+  const lastTurnText=historyText(lastTurn);
+  const effectiveHistory=lastTurn?.role==='user'&&fold(lastTurnText)===fold(original)
+    ? suppliedHistory
+    : [...suppliedHistory,{role:'user',content:original}];
+  const turns=getUserTurns(effectiveHistory);
   const prior=turns.slice(-6);
-  const context=getConversationContext(history);
-  const conversationState=buildConversationState(history);
-  const memory=buildConversationMemory(history);
-  const situation=analyzeSituation(history);
-  const reasoning=analyzeContextualReasoning(message,history);
+  const context=getConversationContext(effectiveHistory);
+  const conversationState=buildConversationState(effectiveHistory);
+  const memory=buildConversationMemory(effectiveHistory);
+  const situation=analyzeSituation(effectiveHistory);
+  const reasoning=analyzeContextualReasoning(message,effectiveHistory);
   const currentTopics=topicsFor(normalized);
   const previousTopics=topicsFor(prior.slice(0,-1).join(' '));
   const currentTopic=currentTopics[0]?.topic||null;
@@ -518,9 +554,9 @@ export function getLanguageResponse(message,history=[]) {
   // Respostas curtas a perguntas anteriores devem ser interpretadas pelo papel
   // que exercem na conversa, não como frases isoladas.
   const correctionReply=composeCorrectionReply(message,a.situation);
+  if(correctionReply) return correctionReply;
   const reasoningReply=composeReasoningReply(message,a.reasoning);
   if(reasoningReply) return reasoningReply;
-  if(correctionReply) return correctionReply;
   const timelineReply=composeTimelineReply(message,history,a.memory);
   if(timelineReply) return timelineReply;
   if(a.context.questionType==='event' && /^(nada|nada nao|nao sei|foi isso|so isso)$/.test(t)) {
