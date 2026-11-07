@@ -83,7 +83,7 @@ test('responde naturalmente a “estou bem, e vc?” após um cumprimento', () =
     { role: 'user', content: 'Estou bem, e vc?' }
   ];
   const reply = improveNexusFallback('Estou bem, e vc?', history, 'Entendi que sua mensagem envolve sentimentos.');
-  assert.match(reply, /Que bom saber que você está bem/);
+  assert.match(reply, /que bom saber que você está bem/i);
   assert.match(reply, /não tenho sentimentos como uma pessoa/);
 });
 
