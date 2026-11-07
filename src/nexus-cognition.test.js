@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback } from './nexus-cognition.js';
+import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback, buildAdaptiveResponse } from './nexus-cognition.js';
 
 test('identifica causa e separa as duas proposições', () => {
   const result = parseLogicalStructure('Fui mal na prova porque não consegui estudar.');
@@ -250,4 +250,48 @@ test('trata comentário cotidiano como conversa, não como pedido de solução',
     assert.match(reply, /dia mais parado|rotina de sempre/);
     assert.doesNotMatch(reply, /base suficiente|estrutura da frase|dar um exemplo/);
   }
+});
+
+
+test('motor composicional aproveita conteúdo novo em vez de devolver acolhimento vazio', () => {
+  const reply = buildAdaptiveResponse('Hoje fiquei pensando muito no meu futuro e nas escolhas que preciso fazer.');
+  assert.ok(reply);
+  assert.match(reply, /futuro|escolhas/);
+  assert.match(reply, /Como isso apareceu no seu dia|O que fez isso ganhar importância/);
+  assert.doesNotMatch(reply, /não tenho base suficiente|explique melhor|reformule/);
+});
+
+test('motor composicional usa histórico para conectar uma nova mensagem ao assunto anterior', () => {
+  const history = [
+    {role:'user',content:'Eu e minha namorada estamos meio distantes ultimamente.'},
+    {role:'assistant',content:'O que mudou entre vocês?'},
+    {role:'user',content:'A gente quase não conversa durante o dia.'}
+  ];
+  const reply = buildAdaptiveResponse('Sinto falta de quando a gente conversava mais.');
+  // Sem histórico não deve inventar contexto; com histórico, a continuidade é explícita.
+  const contextual = buildAdaptiveResponse('Sinto falta de quando a gente conversava mais.', history);
+  assert.ok(reply);
+  assert.match(contextual, /se conecta ao que você já vinha contando/);
+  assert.match(contextual, /O que mudou desde a última vez/);
+});
+
+test('motor composicional preserva relações entre ideias sem tratar hipótese como fato', () => {
+  const reply = buildAdaptiveResponse('Quero sair com meus amigos, mas estou sem dinheiro.');
+  assert.match(reply, /duas coisas que podem coexistir/);
+  assert.match(reply, /Quero sair com meus amigos/);
+  assert.match(reply, /estou sem dinheiro/);
+});
+
+test('motor composicional pode desenvolver conversa sem transformar tudo em conselho', () => {
+  const reply = buildAdaptiveResponse('Hoje vi um cachorro muito engraçado na rua.');
+  assert.match(reply, /cachorro|engraçado/);
+  assert.match(reply, /Como isso apareceu no seu dia/);
+  assert.doesNotMatch(reply, /você deveria|recomendo que/);
+});
+
+test('integra motor adaptativo quando o núcleo antigo devolve fallback robótico', () => {
+  const message = 'Fiquei lembrando de uma conversa que tive ontem.';
+  const reply = improveNexusFallback(message,[{role:'user',content:message}],'Quero entender exatamente o que você quis comunicar.');
+  assert.match(reply,/lembrando|conversa/);
+  assert.doesNotMatch(reply,/Quero entender exatamente/);
 });
