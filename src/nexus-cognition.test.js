@@ -340,3 +340,14 @@ test('o plano registra contradições para conferir antes de concluir', () => {
   assert.ok(Array.isArray(plan.contradictions));
   assert.equal(plan.contradictions.length, 1);
 });
+
+
+test('resolve referência indireta usando semântica e memória do diálogo', () => {
+  const plan = buildReasoningPlan('Ela está menos presente e quase não responde.', [
+    {role:'user',content:'Minha namorada anda distante.'},
+    {role:'assistant',content:'O que você percebeu?'}
+  ]);
+  assert.equal(plan.sameTopic, true);
+  assert.ok(plan.semanticConcepts.includes('distante'));
+  assert.ok(plan.semanticConcepts.includes('comunicacao'));
+});
