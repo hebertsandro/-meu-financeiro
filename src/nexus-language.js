@@ -207,8 +207,7 @@ export function buildConversationState(history=[]) {
       topicTrail.push({topic:found,action:'topic_mentioned',source:turn.text});
     }
   }
-  const farewell=/\b(tchau|ate mais|falou|fui|ate logo|vou nessa|preciso ir)\b/.test(lastUserFold)
-    && lastUserFold.split(' ').length<=9;
+  const farewell=/^(?:tchau|ate mais|falou|fui|ate logo|vou nessa|preciso ir|tenho que ir)(?:[,! ]+(?:ate mais|tchau|falou|fui))?[.! ]*$/.test(lastUserFold);
   const assistantQuestionIndex=[...turns].map((turn,index)=>({turn,index}))
     .reverse().find(item=>item.turn.role==='assistant'&&item.turn.text.includes('?'));
   let lastAssistantQuestion=null;
