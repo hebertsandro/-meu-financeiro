@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback, buildAdaptiveResponse } from './nexus-cognition.js';
+import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback, buildAdaptiveResponse, buildReasoningPlan } from './nexus-cognition.js';
 
 test('identifica causa e separa as duas proposições', () => {
   const result = parseLogicalStructure('Fui mal na prova porque não consegui estudar.');
@@ -294,4 +294,49 @@ test('integra motor adaptativo quando o núcleo antigo devolve fallback robótic
   const reply = improveNexusFallback(message,[{role:'user',content:message}],'Quero entender exatamente o que você quis comunicar.');
   assert.match(reply,/lembrando|conversa/);
   assert.doesNotMatch(reply,/Quero entender exatamente/);
+});
+
+
+test('associa expressões diferentes ao mesmo conceito sem exigir palavra idêntica', () => {
+  const plan = buildReasoningPlan('Ela anda fria e quase não puxa papo comigo.', [
+    {role:'user',content:'Minha namorada está distante ultimamente.'},
+    {role:'assistant',content:'O que mudou entre vocês?'}
+  ]);
+  assert.ok(plan.semanticConcepts.includes('distante'));
+  assert.ok(plan.semanticConcepts.includes('comunicacao'));
+  assert.equal(plan.sameTopic, true);
+});
+
+test('memória de diálogo recupera acontecimentos relatados sem tratá-los como certeza', () => {
+  const history = [
+    {role:'user',content:'Minha namorada mudou de escola.'},
+    {role:'assistant',content:'Isso mudou a rotina de vocês?'},
+    {role:'user',content:'Depois disso ela quase não conversa comigo.'}
+  ];
+  const plan = buildReasoningPlan('Por que ela ficou assim?', history);
+  assert.ok(plan.memory.people.includes('namorada'));
+  assert.ok(plan.memory.events.includes('menos_conversa'));
+  assert.ok(plan.evidence.every(item => item.certainty === 'user_reported'));
+  assert.equal(plan.reasoning.avoidCertainty, true);
+});
+
+test('o plano distingue intenção atual de assunto antigo', () => {
+  const history = [
+    {role:'user',content:'Estou preocupado com minha namorada.'},
+    {role:'assistant',content:'Quer me contar o que aconteceu?'}
+  ];
+  const plan = buildReasoningPlan('Como funciona juros compostos?', history);
+  assert.equal(plan.currentTopic, 'financas');
+  assert.equal(plan.sameTopic, false);
+});
+
+test('o plano registra contradições para conferir antes de concluir', () => {
+  const history = [
+    {role:'user',content:'Eu gosto de conversar com ela.'},
+    {role:'assistant',content:'Entendi.'},
+    {role:'user',content:'Eu não gosto de conversar com ela.'}
+  ];
+  const plan = buildReasoningPlan('Eu não gosto de conversar com ela.', history);
+  assert.ok(Array.isArray(plan.contradictions));
+  assert.equal(plan.contradictions.length, 1);
 });
