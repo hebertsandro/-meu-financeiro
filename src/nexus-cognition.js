@@ -500,9 +500,10 @@ export function buildReasoningPlan(message, history = []) {
     'trabalho e carreira': 'trabalho',
     financas: 'financas'
   };
-  const topicMatches = Boolean(currentTopic && activeTopic &&
-    (currentTopic === activeTopic || topicAliases[currentTopic] === activeTopic || topicAliases[activeTopic] === currentTopic));
-  const relationshipSemanticMatch = activeTopic === 'relacionamento' &&
+  const priorTopic = language.previousTopic || activeTopic;
+  const topicMatches = Boolean(currentTopic && priorTopic &&
+    (currentTopic === priorTopic || topicAliases[currentTopic] === priorTopic || topicAliases[priorTopic] === currentTopic));
+  const relationshipSemanticMatch = priorTopic === 'relacionamento' &&
     semanticConcepts.some(concept => ['distante','comunicacao','namorada','namorado'].includes(concept));
   const sameTopic = topicMatches || relationshipSemanticMatch;
   return {
@@ -609,7 +610,7 @@ export function buildAdaptiveResponse(message, history = []) {
     const reflection = semanticFocus.includes('distante') ? 'Você está percebendo uma distância entre vocês.'
       : semanticFocus.includes('comunicacao') ? 'Essa questão da comunicação parece estar pesando.'
       : semanticFocus.includes('ansiedade') ? 'Parece que isso está ocupando seus pensamentos.'
-      : 'Você comentou: “' + original.replace(/[.!?]+$/,'') + '”.';
+      : 'Tô acompanhando o que você contou: “' + original.replace(/[.!?]+$/,'') + '”.';
     if (/futuro|escolhas/.test(normalized)) {
       return memoryHint + 'Você comentou: “' + original.replace(/[.!?]+$/,'') + '”. O que fez isso ganhar importância hoje?';
     }
