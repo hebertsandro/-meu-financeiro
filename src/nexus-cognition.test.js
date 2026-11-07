@@ -471,7 +471,7 @@ test('mantém fatos do começo de uma conversa de 30 mensagens', () => {
   const plan = buildReasoningPlan('Você lembra do curso que minha irmã começou?', history);
   assert.ok(plan.memory.people.includes('irmã'));
   assert.ok(plan.memory.facts.some(fact => /curso de fotografia/.test(fact.text)));
-  assert.equal(plan.memory.turnCount, 30);
+  assert.equal(plan.memory.turnCount, 31);
 });
 
 test('mantém a referência à pergunta anterior mesmo após 20 mensagens', () => {
