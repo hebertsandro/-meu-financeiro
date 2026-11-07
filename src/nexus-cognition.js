@@ -677,7 +677,7 @@ function composeReply(text, frame, references) {
   if (intent === 'comparison') return 'Para comparar com justiça, vou considerar objetivo, custo, benefícios, riscos, prazo e limitações. Quais são as opções que você quer colocar lado a lado?';
   if (intent === 'summary') return 'Claro — envie o texto ou indique o conteúdo que deseja resumir. Vou separar ideia central, pontos de apoio e conclusão.';
   if (intent === 'writing') return 'Posso ajudar a escrever de um jeito natural. Qual é o destinatário, o que precisa ser comunicado e qual tom você quer transmitir?';
-  if (intent === 'advice') return 'Eu começaria de um jeito simples: entender o que você quer alcançar, o que já tentou e quais opções realmente tem. Qual é a situação e que decisão você está tentando tomar?';
+  if (intent === 'advice') return 'Eu começaria de um jeito simples: entender o que você quer alcançar, o que já tentou e quais opções realmente tem. Qual é a situação e qual decisão você está tentando tomar?';
   if (intent === 'ideas') return 'Vamos gerar opções diferentes e depois filtrar pelas que são viáveis. Qual é o objetivo, para quem é a ideia e quais limites precisamos respeitar?';
   if (intent === 'planning') return 'Vamos montar um plano realista com objetivo, etapas, prazo, recursos e uma forma de acompanhar o progresso. O que você quer alcançar e até quando?';
   if (intent === 'translation') return 'Envie a frase e indique o idioma de destino. Vou preservar o sentido e adaptar a expressão ao contexto, não apenas traduzir palavra por palavra.';
