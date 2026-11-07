@@ -557,18 +557,22 @@ export function buildAdaptiveResponse(message, history = []) {
   const salient = [...new Set(meaningful)].slice(0, 5);
   const subject = clauses.length > 1 ? clauses.slice(0, 2).join(' — ') : (clauses[0] || original);
   const hasQuestion = /\?/.test(original);
-  const previousAsked = /\b(como|o que|qual|por que|quando|onde)\b/.test(context.lastAssistant) && /\?/.test(context.lastAssistant);
-  const recentUserText = (Array.isArray(history) ? history.filter(turn => turn?.role === 'user').slice(-15) : [])
-    .map(turn => normalizeNexusText(turn.content || turn.text || '')).join(' ');
-  const contextTopic = TOPICS.map(([topic, terms]) => ({
-    topic,
-    score: terms.reduce((score, term) => score + (recentUserText.includes(term) ? 1 : 0), 0)
-  })).sort((a, b) => b.score - a.score)[0];
-  const hasConversationalReference = /\b(a gente|nos|nossa|nosso|isso|essa situacao|esse assunto|ela|ele)\b/.test(normalized);
-  const sameTopic = reasoningPlan.sameTopic ||
-    (frame.topic
-      ? TOPICS.some(([topic, terms]) => topic === frame.topic && terms.some(term => recentUserText.includes(term)))
-      : Boolean(contextTopic?.score > 0 && hasConversationalReference));
+  const turns = Array.isArray(history) ? history : [];
+  const previousTurn = turns.length ? turns[turns.length - 1] : null;
+  const previousAsked = previousTurn?.role === 'assistant' &&
+    /\b(como|o que|qual|por que|quando|onde)\b/.test(context.lastAssistant) &&
+    /\?/.test(context.lastAssistant);
+  const conversationState = reasoningPlan.conversationState || null;
+  const activeTopic = conversationState?.activeTopic || null;
+  // O assunto ativo vem da linha do tempo, não da frequência de palavras antigas.
+  // Uma referência curta pode continuar o assunto anterior; um tema explícito novo o substitui.
+  const hasConversationalReference = /\b(a gente|nos|nossa|nosso|isso|essa situacao|esse assunto|ela|ele|eles|elas|dela|dele|aquilo)\b/.test(normalized);
+  const sameTopic = Boolean(activeTopic && (
+    !frame.topic || frame.topic === activeTopic ||
+    (frame.topic === 'relacionamento' && activeTopic === 'relacionamentos') ||
+    (frame.topic === 'estudos' && activeTopic === 'escola') ||
+    hasConversationalReference
+  ));
   const rememberedEvents = reasoningPlan.memory.events || [];
   const eventLabels = {distanciamento:'o distanciamento que você percebeu',menos_conversa:'a diminuição das conversas',mudanca_escola:'a mudança de escola',mudanca_cidade:'a mudança de cidade',conflito:'o conflito que você contou',termino:'o término',contato_interrompido:'a interrupção do contato',reaproximacao:'a reaproximação'};
   const semanticFocus = reasoningPlan.semanticConcepts.slice(0, 2);
@@ -740,19 +744,24 @@ export function improveNexusFallback(message, history, legacyReply) {
     return analysis.fallbackReply;
   }
 
-  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando|voce trouxe .{1,90} para a conversa|você trouxe .{1,90} para a conversa|entendi: o assunto sao seus|entendi: o assunto são seus/i.test(String(legacyReply || ''));
+  const legacyText = String(legacyReply || '');
+  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando|voce trouxe .{1,90} para a conversa|você trouxe .{1,90} para a conversa|entendi: o assunto sao seus|entendi: o assunto são seus|vamos localizar exatamente o que voce precisa|vamos localizar exatamente o que você precisa|me diga exatamente o que voce precisa/i.test(legacyText);
   const adaptive = buildAdaptiveResponse(message, history);
-  // A intenção vem antes do domínio: mencionar escola, dinheiro ou namoro não é
-  // automaticamente pedir uma aula, um cálculo ou um conselho.
   const explicitTask = ['definition','explanation','procedure','comparison','summary','writing','advice','ideas','planning','calculation','translation','opinion','topic_change'].includes(analysis.intent) || analysis.speechAct === 'request';
-  if (adaptive && analysis.speechAct === 'request') return adaptive;
-  if (adaptive && !explicitTask && ['statement','personal_disclosure','uncertainty'].includes(analysis.speechAct)) return adaptive;
-  if (adaptive && legacyIsGeneric) return adaptive;
+
+  // Prioridade do roteador:
+  // 1) conversa social; 2) pedidos explícitos; 3) relatos pessoais e continuidade;
+  // 4) conhecimento especializado do motor financeiro legado.
+  if (analysis.speechAct === 'request' && adaptive) return adaptive;
+  if (!explicitTask && adaptive && ['statement','personal_disclosure','uncertainty'].includes(analysis.speechAct)) return adaptive;
+  if (legacyIsGeneric && adaptive) return adaptive;
   if (legacyIsGeneric) return analysis.fallbackReply;
 
-  if (legacyIsGeneric || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
+  if (analysis.logicalStructure.relations.length) {
     const hypothesisReply = composeHypothesisReply(analyzeHypotheses(message, history));
-    return hypothesisReply || analysis.fallbackReply;
+    if (hypothesisReply) return hypothesisReply;
   }
+  // O motor legado só mantém prioridade quando entregou uma resposta realmente
+  // específica para uma tarefa ou domínio, não apenas porque mencionou um tópico.
   return legacyReply;
 }
