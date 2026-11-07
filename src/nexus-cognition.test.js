@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback, buildAdaptiveResponse, buildReasoningPlan } from './nexus-cognition.js';\nimport { buildConversationState } from './nexus-language.js';
+import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback, buildAdaptiveResponse, buildReasoningPlan } from './nexus-cognition.js';
+import { buildConversationState } from './nexus-language.js';
 
 test('identifica causa e separa as duas proposições', () => {
   const result = parseLogicalStructure('Fui mal na prova porque não consegui estudar.');
