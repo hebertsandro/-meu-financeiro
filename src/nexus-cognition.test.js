@@ -351,3 +351,25 @@ test('resolve referência indireta usando semântica e memória do diálogo', ()
   assert.ok(plan.semanticConcepts.includes('distante'));
   assert.ok(plan.semanticConcepts.includes('comunicacao'));
 });
+
+
+test('reconhece resposta positiva informal depois de perguntar como a pessoa está', () => {
+  const history = [
+    {role:'assistant',content:'Oii! 😊 Tudo bem por aqui! E você, como está hoje?'}
+  ];
+  const reply = improveNexusFallback('Estou bem simm', history, 'fallback genérico');
+  assert.match(reply, /Que bom saber disso/);
+  assert.doesNotMatch(reply, /Você mencionou|ideia que ficou na sua cabeça/);
+});
+
+test('entende correção explícita sem transformar a correção em outro assunto', () => {
+  const history = [
+    {role:'assistant',content:'Oii! 😊 Tudo bem por aqui! E você, como está hoje?'},
+    {role:'user',content:'Estou bem simm'},
+    {role:'assistant',content:'Entendi o que você está compartilhando: Você mencionou simm.'}
+  ];
+  const reply = improveNexusFallback('Eu disse q estou bem', history, 'fallback genérico');
+  assert.match(reply, /Você tem razão/);
+  assert.match(reply, /você respondeu que está bem/);
+  assert.doesNotMatch(reply, /Você mencionou|ideia que ficou na sua cabeça/);
+});
