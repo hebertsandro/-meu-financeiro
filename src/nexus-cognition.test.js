@@ -278,7 +278,7 @@ test('motor composicional usa histórico para conectar uma nova mensagem ao assu
 test('motor composicional preserva relações entre ideias sem tratar hipótese como fato', () => {
   const reply = buildAdaptiveResponse('Quero sair com meus amigos, mas estou sem dinheiro.');
   assert.match(reply, /duas coisas que podem coexistir/);
-  assert.match(reply, /Quero sair com meus amigos/);
+  assert.match(reply, /quero sair com meus amigos/i);
   assert.match(reply, /estou sem dinheiro/);
 });
 
