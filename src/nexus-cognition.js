@@ -57,7 +57,7 @@ const INTENTS = [
   ['comparison', /\b(qual e melhor|qual compensa|vale mais a pena|compare|comparar|diferenca entre)\b/],
   ['summary', /\b(resuma|resumir|faz um resumo|me resume|sintetiza)\b/],
   ['writing', /\b(escreva|escreve|redija|monta uma mensagem|me ajuda a responder|como responder|o que eu falo)\b/],
-  ['advice', /\b(o que eu faco|o que devo fazer|o que voce recomenda|o que voce recomendaria|oque voce recomenda|oque voce recomendaria|qual conselho|me aconselha|preciso de conselho|como lidar|como devo agir|o que voce faria|oque vc recomendaria)\b/],
+  ['advice', /\b(o que eu faco|o que eu devo fazer|oque eu devo fazer|o que devo fazer|oque devo fazer|o que fazer agora|o que voce recomenda|o que voce recomendaria|oque voce recomenda|oque voce recomendaria|qual conselho|me aconselha|preciso de conselho|como lidar|como devo agir|o que voce faria|oque vc recomendaria)\b/],
   ['ideas', /\b(me de ideias|me da ideias|sugestoes|ideias para|brainstorm)\b/],
   ['planning', /\b(monta um plano|me ajuda a planejar|organiza para mim|cria um cronograma|quero um plano)\b/],
   ['calculation', /\b(quanto e|calcule|calcula|qual o resultado|quanto sobra|quanto falta)\b/],
@@ -598,6 +598,9 @@ export function buildAdaptiveResponse(message, history = []) {
 
   // Pergunta curta que responde à pergunta anterior: interpretar a função no diálogo.
   if (previousAsked && /^(nada|nada nao|nao sei|normal|mais ou menos|sei la|de boa|bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|mal|triste|cansado|cansada)$/.test(normalized)) {
+    if (['bem','muito bem','otimo','otima','tranquilo','tranquila','feliz'].includes(normalized)) {
+      return 'Que bom saber disso! 😊 Como está sendo seu dia?';
+    }
     return normalized.startsWith('nada')
       ? 'Entendi. Então não teve nada específico que tenha marcado esse momento. Às vezes é só um dia comum mesmo. Quer continuar nesse assunto ou prefere que eu puxe outro?'
       : 'Tudo bem não ter uma resposta fechada. Podemos ir descobrindo enquanto conversamos; o que vem primeiro à sua cabeça quando pensa nisso?';
@@ -676,7 +679,7 @@ function composeReply(text, frame, references) {
   if (intent === 'comparison') return 'Para comparar com justiça, vou considerar objetivo, custo, benefícios, riscos, prazo e limitações. Quais são as opções que você quer colocar lado a lado?';
   if (intent === 'summary') return 'Claro — envie o texto ou indique o conteúdo que deseja resumir. Vou separar ideia central, pontos de apoio e conclusão.';
   if (intent === 'writing') return 'Posso ajudar a escrever de um jeito natural. Qual é o destinatário, o que precisa ser comunicado e qual tom você quer transmitir?';
-  if (intent === 'advice') return 'Vamos pensar nisso considerando o que você quer alcançar, o que já tentou e quais são os limites da situação. Não quero presumir que o assunto seja relacionamento nem te dar um conselho pronto sem contexto. O que aconteceu e qual decisão você está tentando tomar?';
+  if (intent === 'advice') return 'Eu começaria de um jeito simples: entender o que você quer alcançar, o que já tentou e quais opções realmente tem. Qual é a situação e que decisão você está tentando tomar?';
   if (intent === 'ideas') return 'Vamos gerar opções diferentes e depois filtrar pelas que são viáveis. Qual é o objetivo, para quem é a ideia e quais limites precisamos respeitar?';
   if (intent === 'planning') return 'Vamos montar um plano realista com objetivo, etapas, prazo, recursos e uma forma de acompanhar o progresso. O que você quer alcançar e até quando?';
   if (intent === 'translation') return 'Envie a frase e indique o idioma de destino. Vou preservar o sentido e adaptar a expressão ao contexto, não apenas traduzir palavra por palavra.';
@@ -743,7 +746,13 @@ export function improveNexusFallback(message, history, legacyReply) {
 
   const analysis = analyzeNexusMessage(message, history);
   // Pedidos de conselho não devem cair em um conselho romântico universal.
-  if (analysis.intent === 'advice') return analysis.fallbackReply;
+  if (analysis.intent === 'advice') {
+    const plan = buildReasoningPlan(message, history);
+    if (plan.activeTopic === 'relacionamento' || plan.activeTopic === 'relacionamentos') {
+      return 'Eu começaria chamando ela para conversar num momento tranquilo, sem começar cobrando ou acusando. Explica como você tem se sentido e pergunta como ela está vendo a situação. Depois, escuta o lado dela com calma, sem presumir a resposta. O que você quer que ela entenda nessa conversa?';
+    }
+    return analysis.fallbackReply;
+  }
   if (analysis.speechAct === 'request') {
     const requested = buildAdaptiveResponse(message, history);
     if (requested) return requested;
