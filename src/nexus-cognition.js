@@ -461,8 +461,11 @@ export function buildReasoningPlan(message, history = []) {
     'trabalho e carreira': 'trabalho',
     financas: 'financas'
   };
-  const sameTopic = Boolean(currentTopic && activeTopic &&
+  const topicMatches = Boolean(currentTopic && activeTopic &&
     (currentTopic === activeTopic || topicAliases[currentTopic] === activeTopic || topicAliases[activeTopic] === currentTopic));
+  const relationshipSemanticMatch = activeTopic === 'relacionamento' &&
+    semanticConcepts.some(concept => ['distante','comunicacao','namorada','namorado'].includes(concept));
+  const sameTopic = topicMatches || relationshipSemanticMatch;
   return {
     normalized,
     intent: language.primaryAct || 'statement',
