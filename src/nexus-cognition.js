@@ -155,18 +155,25 @@ function classify(text) {
 function resolveReferences(text, history) {
   const turns = Array.isArray(history) ? history.slice(-60) : [];
   const previousUser = turns.filter(m => m.role === 'user').map(m => normalizeNexusText(m.content || m.text || ''));
-  const combined = previousUser.slice(-5).join(' ');
+  // O histórico recebido pelo App já contém a mensagem atual; não a use como
+  // antecedente da própria referência.
+  if (previousUser.length && previousUser.at(-1) === text) previousUser.pop();
+  const combined = previousUser.slice(-12).join(' ');
   const hasReference = /\b(ela|ele|eles|elas|isso|isto|aquilo|essa|esse|aquele|aquela|la|dela|dele)\b/.test(text);
   if (!hasReference || !combined) return null;
   const recentEntities = extractEntities(combined);
   const people = recentEntities.filter(x => x.type === 'person');
-  const topics = TOPICS.map(([topic, terms]) => ({ topic, score: countHits(combined, terms) }))
-    .filter(x => x.score > 0).sort((a,b) => b.score-a.score);
+  const latestTopic = [...previousUser].reverse()
+    .map(turn => TOPICS.map(([topic, terms]) => ({topic,score:countHits(turn,terms)}))
+      .filter(item=>item.score>0).sort((a,b)=>b.score-a.score)[0])
+    .find(Boolean);
+  const distinctPeople=[...new Set(people.map(person=>person.value))];
   return {
     hasReference: true,
-    likelyPerson: people.at(-1)?.value || null,
-    likelyTopic: topics[0]?.topic || null,
-    ambiguous: people.length > 1 && people.at(-1).value !== people.at(-2)?.value,
+    likelyPerson: distinctPeople.length===1?distinctPeople[0]:people.at(-1)?.value||null,
+    likelyTopic: latestTopic?.topic || null,
+    ambiguous: distinctPeople.length > 1,
+    candidates: distinctPeople,
     previousUserMessage: previousUser.at(-1) || null
   };
 }
@@ -558,7 +565,7 @@ export function buildAdaptiveResponse(message, history = []) {
   const subject = clauses.length > 1 ? clauses.slice(0, 2).join(' — ') : (clauses[0] || original);
   const hasQuestion = /\?/.test(original);
   const turns = Array.isArray(history) ? history : [];
-  const previousTurn = turns.length ? turns[turns.length - 1] : null;
+  const previousTurn = turns.length >= 2 ? turns[turns.length - 2] : null;
   const previousAsked = previousTurn?.role === 'assistant' &&
     /\b(como|o que|qual|por que|quando|onde)\b/.test(context.lastAssistant) &&
     /\?/.test(context.lastAssistant);
