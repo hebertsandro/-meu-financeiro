@@ -89,24 +89,20 @@ const DISCOURSE_MARKERS = {
   time: ['antes','depois','ontem','hoje','amanha','agora','recentemente']
 };
 const SYNONYMS = {
-  'distante': ['fria', 'frio', 'afastada', 'afastado', 'sumida', 'sumido', 'menos presente'],
-  'comunicacao': ['conversa', 'papo', 'contato', 'responde', 'mensagem', 'direct'],
-  'triste': ['pra baixo', 'na pior', 'desanimado', 'sem animo', 'abatido'],
-  'feliz': ['contente', 'animado', 'empolgado', 'realizado', 'de bem com a vida'],
-  'ansiedade': ['nervosismo', 'apreensao', 'aflicao', 'preocupacao', 'inquietacao'],
-  'dinheiro': ['grana', 'dindin', 'verba', 'condicao financeira'],
-  'trabalho': ['trampo', 'servico', 'expediente', 'emprego'],
-  'amizade': ['parceria', 'coleguismo', 'vinculo de amizade'],
-  'namorada': ['parceira', 'minha garota', 'minha menina'],
-  'namorado': ['parceiro', 'meu garoto', 'meu menino'],
-  'estudar': ['revisar', 'aprender', 'se preparar', 'estou estudando'],
-  'medo': ['receio', 'temor', 'inseguranca'],
-  'briga': ['discussao', 'desentendimento', 'conflito', 'atrito'],
-  'namorada': ['parceira','minha garota'], 'namorado': ['parceiro','meu garoto'],
-  'triste': ['pra baixo','na pior','desanimado'], 'dinheiro': ['grana','dindin'],
-  'trabalho': ['trampo','servico'], 'amigo': ['parceiro','colega'],
-  'estudar': ['revisar','aprender','estou estudando'], 'medo': ['receio','temor'],
-  'briga': ['discussao','desentendimento','conflito']
+  distante: ['fria','frio','afastada','afastado','sumida','sumido','menos presente'],
+  comunicacao: ['conversa','papo','contato','responde','mensagem','direct'],
+  triste: ['pra baixo','na pior','desanimado','sem animo','abatido','chateado'],
+  feliz: ['contente','animado','empolgado','realizado','de bem com a vida'],
+  ansiedade: ['nervosismo','apreensao','aflicao','preocupacao','inquietacao','ansioso'],
+  dinheiro: ['grana','dindin','verba','condicao financeira'],
+  trabalho: ['trampo','servico','expediente','emprego'],
+  amizade: ['parceria','coleguismo','vinculo de amizade'],
+  namorada: ['parceira','minha garota','minha menina'],
+  namorado: ['parceiro','meu garoto','meu menino'],
+  amigo: ['parceiro','colega'],
+  estudar: ['revisar','aprender','se preparar','estou estudando'],
+  medo: ['receio','temor','inseguranca'],
+  briga: ['discussao','desentendimento','conflito','atrito']
 };
 function detectEmotion(text) {
   return Object.entries(EMOTION_LEXICON)
