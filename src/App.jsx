@@ -567,7 +567,29 @@ function App(){
   const [dailyGameXp,setDailyGameXp]=useState(()=>{const saved=JSON.parse(window.localStorage.getItem('mf_flap_daily')||'{}');return saved.day===new Date().toLocaleDateString('en-CA')?Number(saved.xp||0):0});
   const [playerProfile,setPlayerProfile]=useState(()=>{try{return JSON.parse(window.localStorage.getItem('mf_player_profile')||'{"name":"Meu jogador","avatar":"👾","frame":"violet","cardFrame":"cyan"}')}catch{return {name:'Meu jogador',avatar:'👾',frame:'violet',cardFrame:'cyan'}}});
   useEffect(()=>{window.localStorage.setItem('mf_player_profile',JSON.stringify(playerProfile))},[playerProfile]);
-  const [assistantMessages,setAssistantMessages]=useState([{role:'assistant',text:'Olá! Eu sou a NEXUS. ⚡ Estou aqui para conversar sobre sua vida, estudos, sentimentos, ideias e também ajudar com suas finanças. Pode falar naturalmente, sem medo de errar!'}]);
+  const nexusWelcomeMessage={role:'assistant',text:'Olá! Eu sou a NEXUS. ⚡ Estou aqui para conversar sobre sua vida, estudos, sentimentos, ideias e também ajudar com suas finanças. Pode falar naturalmente, sem medo de errar!'};
+  const nexusStorageKey='mf_nexus_messages:'+(session?.user?.id||'guest');
+  const nexusStorageSkipPersist=React.useRef(null);
+  const [assistantMessages,setAssistantMessages]=useState(()=>{
+    try{
+      const saved=JSON.parse(window.localStorage.getItem('mf_nexus_messages:guest')||'null');
+      return Array.isArray(saved)&&saved.length?saved:[nexusWelcomeMessage];
+    }catch{return [nexusWelcomeMessage]}
+  });
+  // Mantém a conversa no próprio navegador, separada por conta, sem enviar mensagens ao servidor.
+  useEffect(()=>{
+    let saved=null;
+    try{saved=JSON.parse(window.localStorage.getItem(nexusStorageKey)||'null')}catch{}
+    nexusStorageSkipPersist.current=nexusStorageKey;
+    setAssistantMessages(Array.isArray(saved)&&saved.length?saved:[nexusWelcomeMessage]);
+  },[nexusStorageKey]);
+  useEffect(()=>{
+    if(nexusStorageSkipPersist.current===nexusStorageKey){
+      nexusStorageSkipPersist.current=null;
+      return;
+    }
+    try{window.localStorage.setItem(nexusStorageKey,JSON.stringify(assistantMessages.slice(-120)))}catch{}
+  },[assistantMessages,nexusStorageKey]);
   const isAdmin=session?.user?.email?.toLowerCase()===ADMIN_EMAIL;
   useEffect(()=>{window.localStorage.setItem('mf_game_xp',String(gameXp));window.localStorage.setItem('mf_game_correct',String(gameCorrect));},[gameXp,gameCorrect]);
   useEffect(()=>{const timer=setInterval(()=>setQuizClock(Date.now()),30000);return ()=>clearInterval(timer)},[]);
