@@ -1,4 +1,4 @@
-import { getLanguageResponse } from './nexus-language.js';
+import { getLanguageResponse, analyzeLanguage } from './nexus-language.js';
 // NEXUS COGNITION — interpretador local composicional.
 // Este módulo não é um modelo de linguagem: usa análise linguística, contexto e estratégias
 // determinísticas para generalizar melhor sem enviar mensagens para serviços externos.
@@ -89,6 +89,19 @@ const DISCOURSE_MARKERS = {
   time: ['antes','depois','ontem','hoje','amanha','agora','recentemente']
 };
 const SYNONYMS = {
+  'distante': ['fria', 'frio', 'afastada', 'afastado', 'sumida', 'sumido', 'menos presente'],
+  'comunicacao': ['conversa', 'papo', 'contato', 'responde', 'mensagem', 'direct'],
+  'triste': ['pra baixo', 'na pior', 'desanimado', 'sem animo', 'abatido'],
+  'feliz': ['contente', 'animado', 'empolgado', 'realizado', 'de bem com a vida'],
+  'ansiedade': ['nervosismo', 'apreensao', 'aflicao', 'preocupacao', 'inquietacao'],
+  'dinheiro': ['grana', 'dindin', 'verba', 'condicao financeira'],
+  'trabalho': ['trampo', 'servico', 'expediente', 'emprego'],
+  'amizade': ['parceria', 'coleguismo', 'vinculo de amizade'],
+  'namorada': ['parceira', 'minha garota', 'minha menina'],
+  'namorado': ['parceiro', 'meu garoto', 'meu menino'],
+  'estudar': ['revisar', 'aprender', 'se preparar', 'estou estudando'],
+  'medo': ['receio', 'temor', 'inseguranca'],
+  'briga': ['discussao', 'desentendimento', 'conflito', 'atrito'],
   'namorada': ['parceira','minha garota'], 'namorado': ['parceiro','meu garoto'],
   'triste': ['pra baixo','na pior','desanimado'], 'dinheiro': ['grana','dindin'],
   'trabalho': ['trampo','servico'], 'amigo': ['parceiro','colega'],
@@ -427,6 +440,54 @@ function composeHypothesisReply(result) {
 }
 
 
+// Constrói um plano intermediário antes da resposta: conceitos associados,
+// fatos lembrados, intenção atual, evidências e lacunas. O plano evita que o tópico
+// antigo substitua o pedido que a pessoa acabou de fazer.
+export function buildReasoningPlan(message, history = []) {
+  const normalized = normalizeNexusText(message);
+  const language = analyzeLanguage(message, history);
+  const semanticConcepts = Object.entries(SYNONYMS)
+    .filter(([concept, variants]) => {
+      const terms = [concept, ...variants].map(normalizeNexusText);
+      return terms.some(term => term && (' ' + normalized + ' ').includes(' ' + term + ' '));
+    })
+    .map(([concept]) => concept);
+  const memory = language.memory || { people: [], events: [], facts: [], activeTopic: null };
+  const situation = language.situation || { currentFacts: [], corrections: [], topic: null };
+  const reasoning = language.reasoning || { reasoningType: 'reflection', evidence: [], unknowns: [] };
+  const contradiction = analyzeHypotheses(message, history).contradictions;
+  const currentTopic = language.topic || null;
+  const activeTopic = memory.activeTopic || situation.topic || null;
+  const topicAliases = {
+    relacionamentos: 'relacionamento',
+    amizades: 'amizade',
+    estudos: 'escola',
+    'trabalho e carreira': 'trabalho',
+    financas: 'financas'
+  };
+  const sameTopic = Boolean(currentTopic && activeTopic &&
+    (currentTopic === activeTopic || topicAliases[currentTopic] === activeTopic || topicAliases[activeTopic] === currentTopic));
+  return {
+    normalized,
+    intent: language.primaryAct || 'statement',
+    currentTopic,
+    activeTopic,
+    sameTopic,
+    semanticConcepts,
+    memory,
+    situation,
+    reasoning,
+    contradictions: contradiction,
+    evidence: reasoning.evidence || [],
+    unknowns: reasoning.unknowns || [],
+    confidence: Math.min(0.96,
+      (currentTopic ? 0.35 : 0.12) +
+      semanticConcepts.length * 0.12 +
+      (sameTopic ? 0.18 : 0) +
+      ((reasoning.evidence || []).length ? 0.12 : 0))
+  };
+}
+
 function recentConversation(history = []) {
   const turns = Array.isArray(history) ? history.slice(-12) : [];
   const lastUser = [...turns].reverse().find(turn => turn?.role === 'user');
@@ -447,6 +508,7 @@ export function buildAdaptiveResponse(message, history = []) {
   if (!normalized) return null;
   const frame = classify(normalized);
   const context = recentConversation(history);
+  const reasoningPlan = buildReasoningPlan(original, history);
   const structure = parseLogicalStructure(normalized);
   const clauses = structure.clauses.map(item => item.text).filter(Boolean);
   const meaningful = tokenize(normalized).filter(word =>
@@ -463,9 +525,12 @@ export function buildAdaptiveResponse(message, history = []) {
     score: terms.reduce((score, term) => score + (recentUserText.includes(term) ? 1 : 0), 0)
   })).sort((a, b) => b.score - a.score)[0];
   const hasConversationalReference = /\b(a gente|nos|nossa|nosso|isso|essa situacao|esse assunto|ela|ele)\b/.test(normalized);
-  const sameTopic = frame.topic
-    ? TOPICS.some(([topic, terms]) => topic === frame.topic && terms.some(term => recentUserText.includes(term)))
-    : Boolean(contextTopic?.score > 0 && hasConversationalReference);
+  const sameTopic = reasoningPlan.sameTopic ||
+    (frame.topic
+      ? TOPICS.some(([topic, terms]) => topic === frame.topic && terms.some(term => recentUserText.includes(term)))
+      : Boolean(contextTopic?.score > 0 && hasConversationalReference));
+  const rememberedEvents = reasoningPlan.memory.events || [];
+  const semanticFocus = reasoningPlan.semanticConcepts.slice(0, 2);
 
   // Pergunta curta que responde à pergunta anterior: interpretar a função no diálogo.
   if (previousAsked && /^(nada|nada nao|nao sei|normal|mais ou menos|sei la|de boa)$/.test(normalized)) {
@@ -498,14 +563,21 @@ export function buildAdaptiveResponse(message, history = []) {
               : 'Você está organizando esses fatos numa sequência';
       return opening + ' ' + bridge + ': “' + left + '” e “' + right + '”. Não vou reduzir isso a uma resposta pronta. Qual dessas partes está mais presente para você agora?';
     }
-    const reflection = salient.length
-      ? 'Você trouxe ' + salient.slice(0, 3).join(', ') + '.'
-      : 'Você não precisa transformar isso num problema para a gente conversar.';
+    const reflection = semanticFocus.length
+      ? 'Você está trazendo ideias ligadas a ' + semanticFocus.join(' e ') + '.'
+      : salient.length
+        ? 'Você trouxe ' + salient.slice(0, 3).join(', ') + '.'
+        : 'Você não precisa transformar isso num problema para a gente conversar.';
+    const memoryHint = rememberedEvents.length && sameTopic
+      ? 'Também estou considerando o que você já contou sobre ' + rememberedEvents.slice(-2).join(' e ') + '. '
+      : '';
     const followUp = sameTopic
-      ? 'Isso se conecta ao que você já vinha contando. O que mudou desde a última vez que falou disso?'
-      : frame.emotion
-        ? 'O que fez isso ganhar importância hoje?'
-        : 'Como isso apareceu no seu dia — foi algo que aconteceu ou uma ideia que ficou na sua cabeça?';
+      ? memoryHint + 'Isso se conecta ao que você já vinha contando. O que mudou desde a última vez que falou disso?'
+      : reasoningPlan.unknowns.length && reasoningPlan.reasoning.reasoningType !== 'reflection'
+        ? 'Tem um detalhe que ainda não sei e que pode mudar a interpretação: ' + reasoningPlan.unknowns[0] + '. O que você consegue me contar sobre isso?'
+        : frame.emotion
+          ? 'O que fez isso ganhar importância hoje?'
+          : 'Como isso apareceu no seu dia — foi algo que aconteceu ou uma ideia que ficou na sua cabeça?';
     return opening + ' ' + reflection + ' ' + followUp;
   }
 
