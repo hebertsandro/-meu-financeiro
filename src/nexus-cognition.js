@@ -318,6 +318,9 @@ function composeConversationalReply(message, history = []) {
   if (greeting) {
     return 'Oii! 😊 Tudo bem por aqui! E você, como está hoje?';
   }
+  if (/^(?:tchau|ate mais|falou|fui|ate logo|vou nessa|preciso ir|tenho que ir)(?: ate mais| tchau| falou| fui)?$/.test(socialText)) {
+    return 'Até mais! 😊 Gostei de conversar com você. Quando quiser continuar, é só me chamar.';
+  }
   const socialQuestion = /^(e voce|e vc|como voce esta|tudo bem com voce|tudo bem|tudo bom|como vai voce)$/.test(socialText);
   if (socialQuestion) {
     return 'Estou aqui, funcionando e pronta para conversar com você! 😊 Como está sendo seu dia?';
