@@ -669,7 +669,7 @@ function composeReply(text, frame, references) {
   if (intent === 'comparison') return 'Para comparar com justiça, vou considerar objetivo, custo, benefícios, riscos, prazo e limitações. Quais são as opções que você quer colocar lado a lado?';
   if (intent === 'summary') return 'Claro — envie o texto ou indique o conteúdo que deseja resumir. Vou separar ideia central, pontos de apoio e conclusão.';
   if (intent === 'writing') return 'Posso ajudar a escrever de um jeito natural. Qual é o destinatário, o que precisa ser comunicado e qual tom você quer transmitir?';
-  if (intent === 'advice') return 'Eu começaria de um jeito simples e sincero: chama ela para conversar num momento tranquilo, sem começar cobrando ou acusando. Você pode dizer: “Sinto que a gente está meio distante ultimamente e queria entender como você está se sentindo. Gosto de você e queria que a gente conversasse com calma.” Depois, escuta o lado dela sem preparar uma resposta enquanto ela fala. Evita tentar resolver tudo por mensagem se o assunto for delicado. E lembra: conversar é abrir espaço para os dois, não assumir sozinho a responsabilidade pelo relacionamento. Se quiser, posso te ajudar a adaptar essa abordagem ao jeito de vocês.';
+  if (intent === 'advice') return 'Vamos pensar nisso considerando o que você quer alcançar, o que já tentou e quais são os limites da situação. Não quero presumir que o assunto seja relacionamento nem te dar um conselho pronto sem contexto. O que aconteceu e qual decisão você está tentando tomar?';
   if (intent === 'ideas') return 'Vamos gerar opções diferentes e depois filtrar pelas que são viáveis. Qual é o objetivo, para quem é a ideia e quais limites precisamos respeitar?';
   if (intent === 'planning') return 'Vamos montar um plano realista com objetivo, etapas, prazo, recursos e uma forma de acompanhar o progresso. O que você quer alcançar e até quando?';
   if (intent === 'translation') return 'Envie a frase e indique o idioma de destino. Vou preservar o sentido e adaptar a expressão ao contexto, não apenas traduzir palavra por palavra.';
@@ -735,7 +735,6 @@ export function improveNexusFallback(message, history, legacyReply) {
   if (socialReply) return socialReply;
 
   const analysis = analyzeNexusMessage(message, history);
-  if (analysis.intent === 'advice') return analysis.fallbackReply;
   if (analysis.speechAct === 'request') {
     const requested = buildAdaptiveResponse(message, history);
     if (requested) return requested;
@@ -761,6 +760,7 @@ export function improveNexusFallback(message, history, legacyReply) {
   if (!explicitTask && adaptive && ['statement','personal_disclosure','uncertainty'].includes(analysis.speechAct)) return adaptive;
   if (legacyIsGeneric && adaptive) return adaptive;
   if (legacyIsGeneric) return analysis.fallbackReply;
+  if (analysis.intent === 'advice' && (!legacyText || /fallback generico|fallback genérico/i.test(legacyText))) return analysis.fallbackReply;
 
   if (analysis.logicalStructure.relations.length) {
     const hypothesisReply = composeHypothesisReply(analyzeHypotheses(message, history));
