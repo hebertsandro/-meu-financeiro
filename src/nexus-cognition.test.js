@@ -698,13 +698,13 @@ test('entende resposta positiva com pergunta recíproca informal e alongamento',
     history,
     'Quero ter certeza de que entendi o que você contou. Qual é a parte mais importante para você nessa situação?'
   );
-  assert.match(reply,/que bom que você está bem/i);
+  assert.match(reply,/que bom saber que você está bem/i);
   assert.match(reply,/não tenho sentimentos como uma pessoa/i);
   assert.doesNotMatch(reply,/qual é a parte mais importante|nessa situação|o que aconteceu/i);
 });
 
 test('reconhece resposta recíproca sem depender de histórico', () => {
   const reply = improveNexusFallback('Tô bem e vc?',[], 'fallback genérico');
-  assert.match(reply,/que bom que você está bem/i);
+  assert.match(reply,/que bom saber que você está bem/i);
   assert.match(reply,/não tenho sentimentos como uma pessoa/i);
 });
