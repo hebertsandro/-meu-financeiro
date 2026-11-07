@@ -314,7 +314,11 @@ function composeConversationalReply(message, history = []) {
   if (socialQuestion) {
     return 'Estou aqui, funcionando e pronta para conversar com você! 😊 Como está sendo seu dia?';
   }
-  const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' ')).replace(/\s+/g, ' ').trim();
+  const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' '))
+    .replace(/\bsim{2,}\b/g, 'sim')
+    .replace(/\bbem{2,}\b/g, 'bem')
+    .replace(/\b(otim|legal|tranquilo|tranquila)\1{1,}\b/g, '$1')
+    .replace(/\s+/g, ' ').trim();
 
   // Conversa cotidiana não é um pedido de solução. Trate mudança de assunto e
   // comentários sobre o dia como convites sociais, antes de classificadores genéricos.
@@ -335,10 +339,16 @@ function composeConversationalReply(message, history = []) {
   const assistantTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'assistant') : [];
   const previousAssistantTurn = assistantTurns[assistantTurns.length - 1];
   const previousAssistant = previousAssistantTurn?.content || previousAssistantTurn?.text || '';
-  const assistantAskedAboutUser = /como voce esta|como esta voce|como voce esta hoje|como esta sendo seu dia|como foi seu dia|como esta hoje/.test(normalizeNexusText(previousAssistant));
+  const previousAssistantNormalized = normalizeNexusText(previousAssistant);
+  const assistantAskedAboutUser = /(?:e voce )?como esta( hoje)?|como voce esta( hoje)?|como esta sendo seu dia|como foi seu dia|como esta hoje/.test(previousAssistantNormalized);
+
+  // Uma correção explícita deve ser reconhecida como correção, não como uma nova ideia.
+  if (assistantAskedAboutUser && /^(eu )?(disse|falei) que estou bem( sim)?$/.test(social)) {
+    return 'Você tem razão — perguntou como você estava e você respondeu que está bem. Desculpa por não ter acompanhado sua resposta. 😊 Que bom que você está bem!';
+  }
 
   // A resposta à pergunta anterior tem prioridade sobre classificadores genéricos.
-  if (assistantAskedAboutUser && /^(estou|to|tou)? ?(bem|otimo|otima|legal|tranquilo|tranquila|de boa)( tambem)?$/.test(social)) {
+  if (assistantAskedAboutUser && /^(estou|to|tou)? ?(bem|otimo|otima|legal|tranquilo|tranquila|de boa)( sim)?( tambem)?$/.test(social)) {
     return 'Que bom saber disso! 😊 E o que você está fazendo hoje? Está sendo um dia tranquilo ou aconteceu alguma coisa interessante?';
   }
   if (assistantAskedAboutUser && /^(mais ou menos|assim assim|nao muito bem|nao estou bem|to mal|estou mal|cansado|cansada|desanimado|desanimada)$/.test(social)) {
