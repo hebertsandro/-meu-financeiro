@@ -1,6 +1,6 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback, buildAdaptiveResponse, buildReasoningPlan } from './nexus-cognition.js';
+import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback, buildAdaptiveResponse, buildReasoningPlan } from './nexus-cognition.js';\nimport { buildConversationState } from './nexus-language.js';
 
 test('identifica causa e separa as duas proposições', () => {
   const result = parseLogicalStructure('Fui mal na prova porque não consegui estudar.');
@@ -481,4 +481,71 @@ test('mantém a referência à pergunta anterior mesmo após 20 mensagens', () =
   }
   const reply = buildAdaptiveResponse('Ela ficou distante de novo.', history);
   assert.match(reply, /distância|conversa|vocês|namorada/i);
+});
+
+
+test('estado conversacional identifica assunto ativo e trilha de tópicos', () => {
+  const state = buildConversationState([
+    {role:'user',content:'Minha namorada anda distante.'},
+    {role:'assistant',content:'O que mudou entre vocês?'},
+    {role:'user',content:'Ela responde bem menos.'}
+  ]);
+  assert.equal(state.activeTopic,'relacionamento');
+  assert.equal(state.status,'active');
+  assert.equal(state.references.present,true);
+  assert.equal(state.lastAssistantQuestion.status,'user_has_replied');
+});
+
+test('mudança explícita de assunto desativa o tópico anterior sem apagar a trilha', () => {
+  const state = buildConversationState([
+    {role:'user',content:'Estou preocupado com minha namorada.'},
+    {role:'assistant',content:'Quer me contar o que aconteceu?'},
+    {role:'user',content:'Vamos falar sobre música agora.'}
+  ]);
+  assert.equal(state.activeTopic,'lazer');
+  assert.equal(state.topicChanged,false);
+  const changed = buildConversationState([
+    {role:'user',content:'Estou preocupado com minha namorada.'},
+    {role:'assistant',content:'Quer me contar o que aconteceu?'},
+    {role:'user',content:'Vamos falar sobre outra coisa.'}
+  ]);
+  assert.equal(changed.activeTopic,null);
+  assert.equal(changed.topicChanged,true);
+  assert.ok(changed.topicTrail.some(item=>item.topic==='relacionamento'));
+});
+
+test('estado conversacional registra correção recente e não confunde pausa com encerramento', () => {
+  const state = buildConversationState([
+    {role:'user',content:'Minha irmã vai mudar de escola.'},
+    {role:'assistant',content:'Quando isso acontece?'},
+    {role:'user',content:'Na verdade, é meu irmão.'}
+  ]);
+  assert.equal(state.latestCorrection.status,'latest_user_correction');
+  assert.equal(state.conversationEnded,false);
+  assert.equal(state.status,'active');
+});
+
+test('estado conversacional reconhece despedida explícita', () => {
+  const state = buildConversationState([
+    {role:'user',content:'Gostei de conversar.'},
+    {role:'assistant',content:'Também gostei!'},
+    {role:'user',content:'Falou, até mais.'}
+  ]);
+  assert.equal(state.status,'ended');
+  assert.equal(state.conversationEnded,true);
+  assert.equal(state.endingEvidence,'user_farewell');
+});
+
+test('pergunta do assistente fica pendente somente quando a última fala é dele', () => {
+  const waiting = buildConversationState([
+    {role:'user',content:'Meu dia foi estranho.'},
+    {role:'assistant',content:'O que aconteceu?'}
+  ]);
+  assert.equal(waiting.pendingQuestion.status,'awaiting_user_response');
+  const replied = buildConversationState([
+    {role:'user',content:'Meu dia foi estranho.'},
+    {role:'assistant',content:'O que aconteceu?'},
+    {role:'user',content:'Briguei com um amigo.'}
+  ]);
+  assert.equal(replied.pendingQuestion,null);
 });
