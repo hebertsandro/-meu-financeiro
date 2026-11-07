@@ -353,6 +353,19 @@ test('resolve referência indireta usando semântica e memória do diálogo', ()
 });
 
 
+test('trata ida à escola como relato cotidiano, não como pedido de ajuda acadêmica', () => {
+  const reply = improveNexusFallback('Eu fui pra escola', [], 'Entendi: o assunto são seus estudos. Vamos localizar exatamente o que você precisa.');
+  assert.match(reply, /foi pra escola hoje/i);
+  assert.match(reply, /Como foi por lá/);
+  assert.doesNotMatch(reply, /matéria|prova|exercício|organização do tempo/i);
+});
+
+test('reconhece variação informal de relato sobre aula', () => {
+  const reply = improveNexusFallback('Hoje tive aula', [], 'fallback genérico');
+  assert.match(reply, /Como foi por lá/);
+  assert.doesNotMatch(reply, /qual matéria|qual exercício/i);
+});
+
 test('entende comentário cotidiano com marcador informal como "pior q"', () => {
   const reply = improveNexusFallback(
     'Pior q não aconteceu nada de interessante hoje',
