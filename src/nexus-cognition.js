@@ -329,7 +329,7 @@ function composeConversationalReply(message, history = []) {
   if (/^(aconteceu )?nada (de )?interessante (hoje|por aqui)?$/.test(social)
       || /^(hoje )?nao aconteceu nada (de )?interessante$/.test(social)
       || /^nao teve nada (de )?interessante hoje$/.test(social)) {
-    return 'Tem dia que é assim mesmo: nada marcante, só a rotina. 😄 Às vezes até é bom ter um dia tranquilo. Você ficou mais de boa em casa ou foi fazendo suas coisas normalmente?';
+    return 'Tem dia que é assim mesmo: nada marcante, só a rotina. 😄 Às vezes até é bom ter um dia tranquilo. Você ficou mais de boa em casa ou o dia foi mais parado, na rotina de sempre?';
   }
 
   const assistantTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'assistant') : [];
