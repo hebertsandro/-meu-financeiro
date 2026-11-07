@@ -201,7 +201,9 @@ export function buildConversationState(history=[]) {
     }
     const found=topicsFor(text)[0]?.topic||null;
     if(found){
-      activeTopic=found;
+      // Uma emoção relatada dentro de um assunto ativo não troca sozinha o tema.
+      // Ex.: "estou triste" depois de falar da namorada continua no contexto do relacionamento.
+      if(!activeTopic || found===activeTopic || found!=='sentimentos') activeTopic=found;
       topicTrail.push({topic:found,action:'topic_mentioned',source:turn.text});
     }
   }
@@ -247,7 +249,7 @@ export function buildConversationState(history=[]) {
 export function buildConversationMemory(history=[]) {
   const allTurns=(Array.isArray(history)?history:[])
     .filter(turn=>turn?.role==='user').map(historyText).filter(Boolean);
-  const turns=allTurns.slice(-30);
+  const turns=allTurns.slice(-60);
   const joined=turns.join(' ').toLocaleLowerCase('pt-BR');
   let people=[
     ['namorada',/\b(minha namorada|a namorada|minha parceira)\b/],
