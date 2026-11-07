@@ -327,7 +327,7 @@ function composeConversationalReply(message, history = []) {
     return 'Claro! 😄 Mudamos de assunto. Vamos deixar aquele assunto de lado e conversar sobre qualquer coisa. Quer que eu puxe um assunto aleatório ou tem algo em mente?';
   }
   if (/^(aconteceu )?nada (de )?interessante (hoje|por aqui)?$/.test(social)
-      || /^(hoje )?nao aconteceu nada (de )?interessante$/.test(social)
+      || /^(hoje )?nao aconteceu nada (de )?interessante( hoje)?$/.test(social)
       || /^nao teve nada (de )?interessante hoje$/.test(social)) {
     return 'Tem dia que é assim mesmo: nada marcante, só a rotina. 😄 Às vezes até é bom ter um dia tranquilo. Você ficou mais de boa em casa ou o dia foi mais parado, na rotina de sempre?';
   }
