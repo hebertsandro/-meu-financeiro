@@ -158,7 +158,7 @@ function getConversationContext(history=[]) {
             : /quer uma explicacao|quer uma orientacao|quer ajuda/.test(fold(lastQuestion))
               ? 'choice'
               : lastQuestion.includes('?') ? 'open_question' : null;
-  const recentUserText=userTurns.slice(-6).map(historyText).join(' ');
+  const recentUserText=userTurns.slice(-12).map(historyText).join(' ');
   const recentTopics=topicsFor(recentUserText);
   const currentUser=historyText(userTurns[userTurns.length-1]);
   const priorUser=historyText(userTurns[userTurns.length-2]);
@@ -179,7 +179,7 @@ function getConversationContext(history=[]) {
 export function buildConversationMemory(history=[]) {
   const turns=(Array.isArray(history)?history:[])
     .filter(turn=>turn?.role==='user')
-    .map(historyText).filter(Boolean).slice(-12);
+    .map(historyText).filter(Boolean).slice(-30);
   const joined=turns.join(' ').toLocaleLowerCase('pt-BR');
   const people=[
     ['namorada',/\b(minha namorada|a namorada|minha parceira)\b/],
@@ -214,7 +214,7 @@ export function buildConversationMemory(history=[]) {
     const marker=causalMarkers.find(item=>normalized.includes(item));
     return marker?[{turn:index+1,marker,text:text.trim(),status:'relato_nao_verificado'}]:[];
   });
-  const facts=turns.slice(-8).map((text,index)=>({text:text.trim(),sequence:Math.max(1,turns.length-7)+index}));
+  const facts=turns.slice(-30).map((text,index)=>({text:text.trim(),sequence:Math.max(1,turns.length-7)+index}));
   return {
     people:[...new Set(people)],
     events:[...new Set(events)],
@@ -243,7 +243,7 @@ function composeTimelineReply(message, history, memory) {
 // Modelo de situação: fatos relatados, estado atual, incertezas e correções.
 // Cada afirmação permanece atribuída ao relato do usuário, não como verdade objetiva.
 export function analyzeSituation(history=[]) {
-  const turns=(Array.isArray(history)?history:[]).filter(turn=>turn?.role==='user').map(historyText).filter(Boolean).slice(-16);
+  const turns=(Array.isArray(history)?history:[]).filter(turn=>turn?.role==='user').map(historyText).filter(Boolean).slice(-30);
   const facts=[];
   const corrections=[];
   const patterns=[
