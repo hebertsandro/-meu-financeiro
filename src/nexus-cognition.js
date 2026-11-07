@@ -491,7 +491,7 @@ export function buildReasoningPlan(message, history = []) {
   const reasoning = language.reasoning || { reasoningType: 'reflection', evidence: [], unknowns: [] };
   const contradiction = analyzeHypotheses(message, history).contradictions;
   const currentTopic = language.topic || null;
-  const activeTopic = memory.activeTopic || situation.topic || null;
+  const activeTopic = conversationState ? conversationState.activeTopic : (memory.activeTopic || situation.topic || null);
   const topicAliases = {
     relacionamentos: 'relacionamento',
     amizades: 'amizade',
@@ -509,6 +509,7 @@ export function buildReasoningPlan(message, history = []) {
     intent: language.primaryAct || 'statement',
     currentTopic,
     activeTopic,
+    conversationState,
     sameTopic,
     semanticConcepts,
     memory,
@@ -567,7 +568,15 @@ export function buildAdaptiveResponse(message, history = []) {
       ? TOPICS.some(([topic, terms]) => topic === frame.topic && terms.some(term => recentUserText.includes(term)))
       : Boolean(contextTopic?.score > 0 && hasConversationalReference));
   const rememberedEvents = reasoningPlan.memory.events || [];
+  const eventLabels = {distanciamento:'o distanciamento que você percebeu',menos_conversa:'a diminuição das conversas',mudanca_escola:'a mudança de escola',mudanca_cidade:'a mudança de cidade',conflito:'o conflito que você contou',termino:'o término',contato_interrompido:'a interrupção do contato',reaproximacao:'a reaproximação'};
   const semanticFocus = reasoningPlan.semanticConcepts.slice(0, 2);
+
+  if (frame.speechAct === 'request' && frame.intent === 'statement') {
+    if (/estudar|prova|matematica|materia|enem/.test(normalized)) {
+      return 'Claro! Vamos estudar isso juntos. Podemos revisar a matéria e depois praticar com questões. Qual conteúdo vai cair na prova?';
+    }
+    return 'Claro, posso te ajudar com isso. Me conta qual resultado você quer alcançar e eu acompanho com você, passo a passo.';
+  }
 
   // Pergunta curta que responde à pergunta anterior: interpretar a função no diálogo.
   if (previousAsked && /^(nada|nada nao|nao sei|normal|mais ou menos|sei la|de boa)$/.test(normalized)) {
@@ -583,7 +592,7 @@ export function buildAdaptiveResponse(message, history = []) {
       const relation = structure.relations[0];
       const left = clauses[relation.fromClause] || clauses[0] || subject;
       const right = clauses[relation.toClause] || clauses[1] || '';
-      const bridge = relation.type === 'contrast' ? 'Tem duas coisas acontecendo ao mesmo tempo'
+      const bridge = relation.type === 'contrast' ? 'São duas coisas que podem coexistir, mesmo criando um conflito'
         : relation.type === 'cause' ? 'Você está relacionando uma coisa à outra'
         : relation.type === 'condition' ? 'Então existe uma condição importante aí'
         : relation.type === 'addition' ? 'E ainda tem esse outro lado'
@@ -592,20 +601,19 @@ export function buildAdaptiveResponse(message, history = []) {
         (frame.emotion ? 'Imagino que isso possa mexer com você. ' : '') +
         'Qual parte ficou mais forte na sua cabeça?';
     }
-    const memoryHint = rememberedEvents.length && sameTopic
-      ? 'Isso também se conecta ao que você já tinha me contado sobre ' + rememberedEvents.slice(-1)[0] + '. '
+    const rememberedEvent = rememberedEvents.length ? rememberedEvents.at(-1) : null;
+    const memoryHint = rememberedEvent && sameTopic
+      ? 'Isso se conecta ao que você já tinha contado sobre ' + (eventLabels[rememberedEvent] || 'essa situação') + '. '
       : '';
-    const detail = salient.slice(0, 4).join(', ');
     const reflection = semanticFocus.includes('distante') ? 'Você está percebendo uma distância entre vocês.'
-      : semanticFocus.includes('comunicacao') ? 'Essa questão da conversa parece estar pesando.'
+      : semanticFocus.includes('comunicacao') ? 'Essa questão da comunicação parece estar pesando.'
       : semanticFocus.includes('ansiedade') ? 'Parece que isso está ocupando seus pensamentos.'
-      : detail ? 'Você trouxe ' + detail + ' para a conversa.'
-      : 'Tô acompanhando o que você está contando.';
+      : 'Você comentou: “' + original.replace(/[.!?]+$/,'') + '”.';
     const followUp = sameTopic
       ? 'O que aconteceu depois disso?'
       : frame.emotion ? 'Quer me contar o que aconteceu antes de você se sentir assim?'
       : previousAsked ? 'E como você se sentiu com isso?'
-      : 'E aí, como foi isso para você?';
+      : 'O que mais ficou na sua cabeça sobre isso?';
     return memoryHint + reflection + ' ' + followUp;
   }
 
@@ -723,13 +731,15 @@ export function improveNexusFallback(message, history, legacyReply) {
     return analysis.fallbackReply;
   }
 
-  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando/i.test(String(legacyReply || ''));
+  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando|voce trouxe .{1,90} para a conversa|você trouxe .{1,90} para a conversa|entendi: o assunto sao seus|entendi: o assunto são seus/i.test(String(legacyReply || ''));
   const adaptive = buildAdaptiveResponse(message, history);
   // A intenção vem antes do domínio: mencionar escola, dinheiro ou namoro não é
   // automaticamente pedir uma aula, um cálculo ou um conselho.
-  const explicitTask = ['definition','explanation','procedure','comparison','summary','writing','advice','ideas','planning','calculation','translation','opinion','topic_change'].includes(analysis.intent);
+  const explicitTask = ['definition','explanation','procedure','comparison','summary','writing','advice','ideas','planning','calculation','translation','opinion','topic_change'].includes(analysis.intent) || analysis.speechAct === 'request';
+  if (adaptive && analysis.speechAct === 'request') return adaptive;
   if (adaptive && !explicitTask && ['statement','personal_disclosure','uncertainty'].includes(analysis.speechAct)) return adaptive;
   if (adaptive && legacyIsGeneric) return adaptive;
+  if (legacyIsGeneric) return analysis.fallbackReply;
 
   if (legacyIsGeneric || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
     const hypothesisReply = composeHypothesisReply(analyzeHypotheses(message, history));
