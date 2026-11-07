@@ -152,7 +152,7 @@ function classify(text) {
 }
 
 function resolveReferences(text, history) {
-  const turns = Array.isArray(history) ? history.slice(-10) : [];
+  const turns = Array.isArray(history) ? history.slice(-60) : [];
   const previousUser = turns.filter(m => m.role === 'user').map(m => normalizeNexusText(m.content || m.text || ''));
   const combined = previousUser.slice(-5).join(' ');
   const hasReference = /\b(ela|ele|eles|elas|isso|isto|aquilo|essa|esse|aquele|aquela|la|dela|dele)\b/.test(text);
@@ -525,7 +525,7 @@ export function buildReasoningPlan(message, history = []) {
 }
 
 function recentConversation(history = []) {
-  const turns = Array.isArray(history) ? history.slice(-12) : [];
+  const turns = Array.isArray(history) ? history.slice(-60) : [];
   const lastUser = [...turns].reverse().find(turn => turn?.role === 'user');
   const lastAssistant = [...turns].reverse().find(turn => turn?.role === 'assistant');
   return {
@@ -554,7 +554,7 @@ export function buildAdaptiveResponse(message, history = []) {
   const subject = clauses.length > 1 ? clauses.slice(0, 2).join(' — ') : (clauses[0] || original);
   const hasQuestion = /\?/.test(original);
   const previousAsked = /\b(como|o que|qual|por que|quando|onde)\b/.test(context.lastAssistant) && /\?/.test(context.lastAssistant);
-  const recentUserText = (Array.isArray(history) ? history.filter(turn => turn?.role === 'user').slice(-5) : [])
+  const recentUserText = (Array.isArray(history) ? history.filter(turn => turn?.role === 'user').slice(-15) : [])
     .map(turn => normalizeNexusText(turn.content || turn.text || '')).join(' ');
   const contextTopic = TOPICS.map(([topic, terms]) => ({
     topic,
