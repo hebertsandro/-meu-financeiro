@@ -326,7 +326,7 @@ function composeConversationalReply(message, history = []) {
   const reciprocalWell = /^(?:(?:eu )?(?:estou|to|tou) )?bem(?: sim+)?(?: tambem)? e (?:voce|vc)$/.test(socialText)
     || /^(?:(?:eu )?(?:estou|to|tou) )?(?:otimo|otima|tranquilo|tranquila|de boa)(?: sim+)? e (?:voce|vc)$/.test(socialText);
   if (reciprocalWell) {
-    return 'Aaa, que bom que você está bemmm! 😄 Eu não tenho sentimentos como uma pessoa, mas estou funcionando direitinho e pronta para conversar com você. O que você está fazendo hoje?';
+    return 'Aaa, que bom saber que você está bemmm! 😄 Eu não tenho sentimentos como uma pessoa, mas estou funcionando direitinho e pronta para conversar com você. O que você está fazendo hoje?';
   }
   const socialQuestion = /^(e voce|e vc|como voce esta|tudo bem com voce|tudo bem|tudo bom|como vai voce)$/.test(socialText);
   if (socialQuestion) {
