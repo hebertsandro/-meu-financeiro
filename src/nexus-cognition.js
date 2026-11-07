@@ -115,9 +115,10 @@ function detectRelations(text) {
     .map(([relation]) => relation);
 }
 function inferSpeechAct(text, intent) {
+  // Pedidos explícitos têm prioridade mesmo quando terminam com interrogação.
+  if (/^(me ajuda|me ajude|pode me ajudar|me ajuda a|me ajude a|pode me|queria saber|quero saber|me explica|me ensina|preciso de ajuda|preciso que voce|quero que voce)\b/.test(text)) return 'request';
   if (intent !== 'statement') return intent;
   // Desejos narrados ("eu queria estudar") não são automaticamente pedidos ao assistente.
-  if (/^(me ajuda|me ajude|pode me|queria saber|quero saber|me explica|me ensina|preciso de ajuda|preciso que voce|quero que voce)\b/.test(text)) return 'request';
   if (/\b(aconteceu comigo|hoje eu|ontem eu|eu sinto|estou sentindo)\b/.test(text)) return 'personal_disclosure';
   if (/\b(nao sei|to perdido|estou perdido|estou confuso|estou confusa)\b/.test(text)) return 'uncertainty';
   return 'statement';
@@ -341,7 +342,7 @@ function composeConversationalReply(message, history = []) {
 
   // Relatos simples do cotidiano são compartilhamentos, não pedidos de suporte escolar.
   // O tópico "escola" só deve acionar ajuda acadêmica quando houver um pedido explícito.
-  if (/^(?:eu )?(?:fui|voltei|cheguei|saí|sai) (?:pra|para a|na) escola(?: hoje)?$/.test(social)
+  if (/^(?:eu )?(?:fui|voltei|cheguei|saí|sai) (?:pra|para|para a|na) escola(?: hoje)?$/.test(social)
       || /^(?:hoje )?(?:eu )?(?:tive|tenho) aula(?: hoje)?$/.test(social)) {
     return 'Aaa, foi pra escola hoje! 😄 Como foi por lá? Teve alguma coisa diferente ou foi um dia normal de aula? KKKK';
   }
@@ -571,7 +572,7 @@ export function buildAdaptiveResponse(message, history = []) {
   const eventLabels = {distanciamento:'o distanciamento que você percebeu',menos_conversa:'a diminuição das conversas',mudanca_escola:'a mudança de escola',mudanca_cidade:'a mudança de cidade',conflito:'o conflito que você contou',termino:'o término',contato_interrompido:'a interrupção do contato',reaproximacao:'a reaproximação'};
   const semanticFocus = reasoningPlan.semanticConcepts.slice(0, 2);
 
-  if (frame.speechAct === 'request' && frame.intent === 'statement') {
+  if (frame.speechAct === 'request') {
     if (/estudar|prova|matematica|materia|enem/.test(normalized)) {
       return 'Claro! Vamos estudar isso juntos. Podemos revisar a matéria e depois praticar com questões. Qual conteúdo vai cair na prova?';
     }
@@ -722,6 +723,10 @@ export function improveNexusFallback(message, history, legacyReply) {
 
   const analysis = analyzeNexusMessage(message, history);
   if (analysis.intent === 'advice') return analysis.fallbackReply;
+  if (analysis.speechAct === 'request') {
+    const requested = buildAdaptiveResponse(message, history);
+    if (requested) return requested;
+  }
 
   // Relações lógicas explícitas passam pela verificação de hipóteses antes
   // do motor conversacional, para não serem achatadas em uma reflexão genérica.
