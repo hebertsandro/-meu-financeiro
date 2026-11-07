@@ -339,6 +339,13 @@ function composeConversationalReply(message, history = []) {
     return 'Pior que tem dia que é assim mesmo KKKK. Parece que o dia passa e não acontece absolutamente nada. 😅 Mas foi um dia mais parado em casa ou você saiu e mesmo assim não rolou nada demais?';
   }
 
+  // Relatos simples do cotidiano são compartilhamentos, não pedidos de suporte escolar.
+  // O tópico "escola" só deve acionar ajuda acadêmica quando houver um pedido explícito.
+  if (/^(?:eu )?(?:fui|voltei|cheguei|saí|sai) (?:pra|para a|na) escola(?: hoje)?$/.test(social)
+      || /^(?:hoje )?(?:eu )?(?:tive|tenho) aula(?: hoje)?$/.test(social)) {
+    return 'Aaa, foi pra escola hoje! 😄 Como foi por lá? Teve alguma coisa diferente ou foi um dia normal de aula? KKKK';
+  }
+
   const assistantTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'assistant') : [];
   const previousAssistantTurn = assistantTurns[assistantTurns.length - 1];
   const previousAssistant = previousAssistantTurn?.content || previousAssistantTurn?.text || '';
