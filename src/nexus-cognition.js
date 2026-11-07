@@ -321,6 +321,13 @@ function composeConversationalReply(message, history = []) {
   if (/^(?:tchau|ate mais|falou|fui|ate logo|vou nessa|preciso ir|tenho que ir)(?: ate mais| tchau| falou| fui)?$/.test(socialText)) {
     return 'Até mais! 😊 Gostei de conversar com você. Quando quiser continuar, é só me chamar.';
   }
+  // Resposta recíproca completa: a pessoa respondeu como está e devolveu
+  // a pergunta ("e vc?"). Não trate isso como relato que exige investigação.
+  const reciprocalWell = /^(?:(?:eu )?(?:estou|to|tou) )?bem(?: sim+)?(?: tambem)? e (?:voce|vc)$/.test(socialText)
+    || /^(?:(?:eu )?(?:estou|to|tou) )?(?:otimo|otima|tranquilo|tranquila|de boa)(?: sim+)? e (?:voce|vc)$/.test(socialText);
+  if (reciprocalWell) {
+    return 'Aaa, que bom que você está bemmm! 😄 Eu não tenho sentimentos como uma pessoa, mas estou funcionando direitinho e pronta para conversar com você. O que você está fazendo hoje?';
+  }
   const socialQuestion = /^(e voce|e vc|como voce esta|tudo bem com voce|tudo bem|tudo bom|como vai voce)$/.test(socialText);
   if (socialQuestion) {
     return 'Estou aqui, funcionando e pronta para conversar com você! 😊 Como está sendo seu dia?';
@@ -378,7 +385,7 @@ function composeConversationalReply(message, history = []) {
   }
 
   // A resposta à pergunta anterior tem prioridade sobre classificadores genéricos.
-  if (assistantAskedAboutUser && /^(estou|to|tou)? ?(bem|otimo|otima|legal|tranquilo|tranquila|de boa)( sim)?( tambem)?$/.test(social)) {
+  if (assistantAskedAboutUser && /^(estou|to|tou)? ?(bem|otimo|otima|legal|tranquilo|tranquila|de boa)( sim+)?( tambem)?( e (voce|vc))?$/.test(social)) {
     return 'Que bom saber disso! 😊 E o que você está fazendo hoje? Está sendo um dia tranquilo ou aconteceu alguma coisa interessante?';
   }
   if (assistantAskedAboutUser && /^(mais ou menos|assim assim|nao muito bem|nao estou bem|to mal|estou mal|cansado|cansada|desanimado|desanimada)$/.test(social)) {
