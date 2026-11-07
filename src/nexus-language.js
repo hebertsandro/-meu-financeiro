@@ -174,6 +174,63 @@ function getConversationContext(history=[]) {
   };
 }
 
+// Estado conversacional explícito: resume o diálogo como uma situação em evolução,
+// em vez de tratar o histórico como um saco de mensagens sem ordem.
+export function buildConversationState(history=[]) {
+  const turns=(Array.isArray(history)?history:[]).filter(turn=>turn?.role==='user'||turn?.role==='assistant')
+    .map(turn=>({...turn,text:historyText(turn)})).filter(turn=>turn.text.trim()).slice(-60);
+  const userTurns=turns.filter(turn=>turn.role==='user');
+  const assistantTurns=turns.filter(turn=>turn.role==='assistant');
+  const lastUser=userTurns.at(-1)?.text||'';
+  const lastAssistant=assistantTurns.at(-1)?.text||'';
+  const lastRole=turns.at(-1)?.role||null;
+  const lastUserFold=fold(lastUser);
+  const lastAssistantFold=fold(lastAssistant);
+  const topicChange=/\b(muda(r)? de assunto|troca(r)? de assunto|vamos falar sobre outra coisa|outro assunto|deixa esse assunto|esquece esse assunto)\b/.test(lastUserFold);
+  const farewell=/^(tchau|ate mais|falou|fui|ate logo|boa noite|vou nessa|preciso ir)[!. ]*$/.test(lastUserFold);
+  const assistantFarewell=/\b(ate mais|quando quiser continuar|estarei por aqui|boa noite)\b/.test(lastAssistantFold);
+  const topicTrail=[];
+  for(const turn of userTurns){
+    const text=fold(turn.text);
+    if(/\b(muda(r)? de assunto|troca(r)? de assunto|vamos falar sobre outra coisa|outro assunto|deixa esse assunto)\b/.test(text)){
+      topicTrail.push({topic:null,action:'topic_change',source:turn.text});
+      continue;
+    }
+    const found=topicsFor(text)[0]?.topic||null;
+    if(found) topicTrail.push({topic:found,action:'topic_mentioned',source:turn.text});
+  }
+  const activeTopic=topicChange?null:(topicTrail.at(-1)?.topic||null);
+  const lastAssistantQuestion=lastAssistant.includes('?')?lastAssistant:null;
+  const pendingQuestion=lastRole==='assistant'&&lastAssistantQuestion
+    ? {text:lastAssistantQuestion,status:'awaiting_user_response'}
+    : null;
+  const correctionTurn=[...userTurns].reverse().find(turn=>
+    /\b(na verdade|quis dizer|me expressei mal|me confundi|corrigindo|o correto e|nao foi .* foi)\b/.test(fold(turn.text))
+  );
+  const references=/\b(ela|ele|eles|elas|isso|aquilo|essa|esse|dela|dele|la|de novo|como eu falei|aquilo que eu disse)\b/.test(lastUserFold);
+  const answeredAssistantQuestion=Boolean(lastAssistantQuestion&&lastRole==='user');
+  const status=farewell?'ended':assistantFarewell&&lastRole==='assistant'?'ended':'active';
+  return {
+    status,
+    activeTopic,
+    topicChanged:topicChange,
+    topicTrail:topicTrail.slice(-12),
+    pendingQuestion,
+    lastAssistantQuestion:lastAssistantQuestion?{
+      text:lastAssistantQuestion,
+      status:answeredAssistantQuestion?'user_has_replied':'awaiting_user_response'
+    }:null,
+    latestCorrection:correctionTurn?{text:correctionTurn.text,status:'latest_user_correction'}:null,
+    references:{present:references,source:lastUser},
+    lastUserMessage:lastUser,
+    lastAssistantMessage:lastAssistant,
+    turnCount:userTurns.length,
+    lastSpeaker:lastRole,
+    conversationEnded:status==='ended',
+    endingEvidence:farewell?'user_farewell':assistantFarewell?'assistant_farewell':null
+  };
+}
+
 // Memória semântica leve: registra fatos relatados e ordem temporal sem tratá-los
 // como verdades verificadas nem transformar sequência em causalidade.
 export function buildConversationMemory(history=[]) {
@@ -369,7 +426,7 @@ export function analyzeLanguage(message, history=[]) {
   const normalized=normalizeLanguageText(original);
   const turns=getUserTurns(history);
   const prior=turns.slice(-6);
-  const context=getConversationContext(history);
+  const context=getConversationContext(history);\n  const conversationState=buildConversationState(history);
   const memory=buildConversationMemory(history);
   const situation=analyzeSituation(history);
   const reasoning=analyzeContextualReasoning(message,history);
@@ -412,7 +469,7 @@ export function analyzeLanguage(message, history=[]) {
     :String(original).includes('?')?'question'
     :'statement';
   return {
-    original,normalized,tokens:normalized.split(' ').filter(Boolean),
+    original,normalized,tokens:normalized.split(' ').filter(Boolean),\n    conversationState,
     matchedEntries:NEXUS_LEXICON.filter(entry=>entry.variants.some(v=>contains(original,v))||contains(normalized,entry.canonical))
       .slice(0,30).map(({canonical,meanings,tone,ambiguity})=>({canonical,meanings,tone,ambiguity})),
     possibleActs:acts,primaryAct,emotions:detectEmotion(normalized),laughter,irony,indirectness,
