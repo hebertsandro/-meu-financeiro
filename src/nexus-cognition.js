@@ -456,9 +456,16 @@ export function buildAdaptiveResponse(message, history = []) {
   const subject = clauses.length > 1 ? clauses.slice(0, 2).join(' — ') : (clauses[0] || original);
   const hasQuestion = /\?/.test(original);
   const previousAsked = /\b(como|o que|qual|por que|quando|onde)\b/.test(context.lastAssistant) && /\?/.test(context.lastAssistant);
-  const sameTopic = frame.topic && context.lastUser && TOPICS.some(([topic, terms]) =>
-    topic === frame.topic && terms.some(term => context.lastUser.includes(term))
-  );
+  const recentUserText = (Array.isArray(history) ? history.filter(turn => turn?.role === 'user').slice(-5) : [])
+    .map(turn => normalizeNexusText(turn.content || turn.text || '')).join(' ');
+  const contextTopic = TOPICS.map(([topic, terms]) => ({
+    topic,
+    score: terms.reduce((score, term) => score + (recentUserText.includes(term) ? 1 : 0), 0)
+  })).sort((a, b) => b.score - a.score)[0];
+  const hasConversationalReference = /\\b(a gente|nos|nossa|nosso|isso|essa situacao|esse assunto|ela|ele)\\b/.test(normalized);
+  const sameTopic = frame.topic
+    ? TOPICS.some(([topic, terms]) => topic === frame.topic && terms.some(term => recentUserText.includes(term)))
+    : Boolean(contextTopic?.score > 0 && hasConversationalReference);
 
   // Pergunta curta que responde à pergunta anterior: interpretar a função no diálogo.
   if (previousAsked && /^(nada|nada nao|nao sei|normal|mais ou menos|sei la|de boa)$/.test(normalized)) {
