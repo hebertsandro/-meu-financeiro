@@ -526,6 +526,7 @@ export function buildReasoningPlan(message, history = []) {
     currentTopic,
     activeTopic,
     conversationState,
+    previousConversationState,
     sameTopic,
     semanticConcepts,
     memory,
@@ -572,10 +573,7 @@ export function buildAdaptiveResponse(message, history = []) {
   const subject = clauses.length > 1 ? clauses.slice(0, 2).join(' — ') : (clauses[0] || original);
   const hasQuestion = /\?/.test(original);
   const turns = Array.isArray(history) ? history : [];
-  const previousTurn = turns.length >= 2 ? turns[turns.length - 2] : null;
-  const previousAsked = previousTurn?.role === 'assistant' &&
-    /\b(como|o que|qual|por que|quando|onde)\b/.test(context.lastAssistant) &&
-    /\?/.test(context.lastAssistant);
+  const previousAsked = Boolean(reasoningPlan.previousConversationState?.pendingQuestion);
   const conversationState = reasoningPlan.conversationState || null;
   const activeTopic = conversationState?.activeTopic || null;
   // O assunto ativo vem da linha do tempo, não da frequência de palavras antigas.
