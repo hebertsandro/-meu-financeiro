@@ -342,8 +342,10 @@ function composeConversationalReply(message, history = []) {
   const previousAssistantNormalized = normalizeNexusText(previousAssistant);
   const userTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'user') : [];
   // O histórico recebido inclui a mensagem atual; a anterior ajuda a interpretar correções.
-  const previousUserMessage = userTurns.length > 1
-    ? normalizeNexusText(userTurns[userTurns.length - 2]?.content || userTurns[userTurns.length - 2]?.text || '')
+  const lastHistoryTurn = Array.isArray(history) ? history[history.length - 1] : null;
+  const previousUserIndex = lastHistoryTurn?.role === 'user' ? userTurns.length - 2 : userTurns.length - 1;
+  const previousUserMessage = previousUserIndex >= 0
+    ? normalizeNexusText(userTurns[previousUserIndex]?.content || userTurns[previousUserIndex]?.text || '')
     : '';
   const assistantAskedAboutUser = /(?:e voce )?como esta( hoje)?|como voce esta( hoje)?|como esta sendo seu dia|como foi seu dia|como esta hoje/.test(previousAssistantNormalized);
   const userPreviouslySaidTheyWereWell = /^(eu )?(estou|to|tou) bem( sim+)?$/.test(previousUserMessage);
