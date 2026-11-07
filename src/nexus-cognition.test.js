@@ -606,3 +606,48 @@ test('relato simples sobre escola aceita a forma normalizada para escola', () =>
   const reply = improveNexusFallback('Eu fui pra escola', [], 'Entendi: o assunto são seus estudos. Vamos localizar exatamente o que você precisa.');
   assert.match(reply,/Como foi por lá/);
 });
+
+
+test('roteador prefere compreensão contextual a fallback antigo aparentemente específico', () => {
+  const reply = improveNexusFallback(
+    'Hoje fui ao mercado e encontrei um amigo antigo.',
+    [],
+    'Entendi: o assunto são suas compras. Vamos localizar exatamente o que você precisa.'
+  );
+  assert.match(reply,/Hoje fui ao mercado|encontrei um amigo antigo/i);
+  assert.doesNotMatch(reply,/vamos localizar exatamente/i);
+});
+
+test('resposta curta responde à pergunta imediatamente anterior', () => {
+  const history = [
+    {role:'assistant',content:'Como você está hoje?'},
+    {role:'user',content:'Bem'}
+  ];
+  const reply = buildAdaptiveResponse('Bem',history);
+  assert.match(reply,/Que bom|bom saber/i);
+  assert.doesNotMatch(reply,/Como isso apareceu no seu dia/);
+});
+
+test('mensagem atual não é usada como antecedente da própria referência', () => {
+  const analysis = analyzeNexusMessage('Ela mudou mesmo?',[
+    {role:'user',content:'Minha namorada mudou de escola.'},
+    {role:'assistant',content:'Como foi essa mudança?'},
+    {role:'user',content:'Ela mudou mesmo?'}
+  ]);
+  assert.equal(analysis.references?.previousUserMessage,'minha namorada mudou de escola');
+});
+
+test('assunto ativo segue a mudança recente mesmo após muitas mensagens de outro tema', () => {
+  const history = [
+    {role:'user',content:'Minha namorada está distante.'},
+    {role:'assistant',content:'O que aconteceu?'},
+    ...Array.from({length:10},(_,i)=>[
+      {role:'user',content:'Ela quase não conversa comigo.'},
+      {role:'assistant',content:'Entendi.'}
+    ]).flat(),
+    {role:'user',content:'Quero falar de música agora.'},
+    {role:'assistant',content:'Qual estilo você gosta?'},
+    {role:'user',content:'Gosto de rock.'}
+  ];
+  assert.equal(buildReasoningPlan('Gosto de rock.',history).activeTopic,'lazer');
+});
