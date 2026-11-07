@@ -353,6 +353,24 @@ test('resolve referência indireta usando semântica e memória do diálogo', ()
 });
 
 
+test('entende comentário cotidiano com marcador informal como "pior q"', () => {
+  const reply = improveNexusFallback(
+    'Pior q não aconteceu nada de interessante hoje',
+    [],
+    'Quero responder ao que você realmente quis dizer. O que é mais importante nessa mensagem?'
+  );
+  assert.match(reply, /tem dia que é assim mesmo/i);
+  assert.match(reply, /KKKK/);
+  assert.doesNotMatch(reply, /resolver uma situação|tomar uma decisão|ser ouvido/);
+  assert.doesNotMatch(reply, /Você mencionou|como isso apareceu no seu dia/);
+});
+
+test('entende a mesma fala sem exigir escrita formal ou abreviação específica', () => {
+  const reply = improveNexusFallback('Pior que não aconteceu nada de interessante hoje', [], 'fallback genérico');
+  assert.match(reply, /tem dia que é assim mesmo/i);
+  assert.doesNotMatch(reply, /questionário|o que é mais importante/i);
+});
+
 test('reconhece resposta positiva informal depois de perguntar como a pessoa está', () => {
   const history = [
     {role:'assistant',content:'Oii! 😊 Tudo bem por aqui! E você, como está hoje?'}
