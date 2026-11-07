@@ -329,7 +329,7 @@ function composeConversationalReply(message, history = []) {
   if (/^(aconteceu )?nada (de )?interessante (hoje|por aqui)?$/.test(social)
       || /^(hoje )?nao aconteceu nada (de )?interessante$/.test(social)
       || /^nao teve nada (de )?interessante hoje$/.test(social)) {
-    return 'Tem dia que é assim mesmo, tudo meio comum. 😄 Às vezes até é bom ter um dia tranquilo. Você ficou mais de boa em casa ou foi fazendo suas coisas normalmente?';
+    return 'Tem dia que é assim mesmo: nada marcante, só a rotina. 😄 Às vezes até é bom ter um dia tranquilo. Você ficou mais de boa em casa ou foi fazendo suas coisas normalmente?';
   }
 
   const assistantTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'assistant') : [];
@@ -449,10 +449,11 @@ function composeHypothesisReply(result) {
 export function buildReasoningPlan(message, history = []) {
   const normalized = normalizeNexusText(message);
   const language = analyzeLanguage(message, history);
+  const semanticText = normalized.replace(/[!?.,:;]+/g, ' ').replace(/\\s+/g, ' ').trim();
   const semanticConcepts = Object.entries(SYNONYMS)
     .filter(([concept, variants]) => {
       const terms = [concept, ...variants].map(normalizeNexusText);
-      return terms.some(term => term && (' ' + normalized + ' ').includes(' ' + term + ' '));
+      return terms.some(term => term && (' ' + semanticText + ' ').includes(' ' + term + ' '));
     })
     .map(([concept]) => concept);
   const memory = language.memory || { people: [], events: [], facts: [], activeTopic: null };
