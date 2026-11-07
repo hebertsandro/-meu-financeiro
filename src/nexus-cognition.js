@@ -190,7 +190,13 @@ export function parseLogicalStructure(text) {
     for (const match of source.matchAll(pattern.regex)) markers.push({ type: pattern.type, connector: match[0], start: match.index, end: match.index + match[0].length });
   }
   markers.sort((a, b) => a.start - b.start);
-  const selected = markers.filter((item, i) => !markers.slice(0, i).some(prev => item.start < prev.end && item.end > prev.start));
+  const selected = markers
+    .filter(item => {
+      if (item.type !== 'time') return true;
+      const before = source.slice(Math.max(0, item.start - 28), item.start);
+      return !/\b(sinto falta de|tenho saudade de|lembro de|me recordo de|gosto de)\s*$/.test(before);
+    })
+    .filter((item, i, list) => !list.slice(0, i).some(prev => item.start < prev.end && item.end > prev.start));
   const clauses = [];
   const relations = [];
   let cursor = 0;
@@ -318,12 +324,12 @@ function composeConversationalReply(message, history = []) {
     .trim();
   if (/^(vamos|bora|podemos|quero) (falar|conversar|trocar|mudar) (sobre )?(uma )?(outra coisa|outro assunto|outro tema|de assunto)$/.test(socialWithoutVocative)
       || /^(muda|troca) (de )?assunto$/.test(socialWithoutVocative)) {
-    return 'Claro! 😄 Vamos deixar aquele assunto de lado. Podemos falar de qualquer coisa, até jogar conversa fora. Tem alguma coisa passando pela sua cabeça ou quer que eu puxe um assunto aleatório?';
+    return 'Claro! 😄 Mudamos de assunto. Vamos deixar aquele assunto de lado e conversar sobre qualquer coisa. Quer que eu puxe um assunto aleatório ou tem algo em mente?';
   }
   if (/^(aconteceu )?nada (de )?interessante (hoje|por aqui)?$/.test(social)
       || /^(hoje )?nao aconteceu nada (de )?interessante$/.test(social)
       || /^nao teve nada (de )?interessante hoje$/.test(social)) {
-    return 'Ah, daqueles dias bem comuns, né? 😅 Às vezes não acontece nada marcante mesmo. Foi um dia mais parado ou você só ficou na rotina de sempre?';
+    return 'Tem dia que é assim mesmo, tudo meio comum. 😄 Às vezes até é bom ter um dia tranquilo. Você ficou mais de boa em casa ou foi fazendo suas coisas normalmente?';
   }
 
   const assistantTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'assistant') : [];
@@ -349,9 +355,10 @@ function composeConversationalReply(message, history = []) {
   const emotionalDisclosure = emotionPatterns.map(item => ({ ...item, match: social.match(item.re) })).find(item => item.match);
   if (emotionalDisclosure) {
     const reason = String(message || '').match(/\b(?:porque|pois|já que|depois que|quando)\b\s+(.+)/i)?.[1]?.replace(/[.!?]+$/, '');
+    const naturalReason = reason?.replace(/^passei\b/i, 'você passou').replace(/^consegui\b/i, 'você conseguiu').replace(/^ganhei\b/i, 'você ganhou');
     if (emotionalDisclosure.kind === 'joy') {
       return reason
-        ? 'Que notícia boa! 😊 Você está feliz porque ' + reason + '. O que isso significa para você?'
+        ? 'Que notícia boa! 😊 Você está feliz porque ' + naturalReason + '. O que isso significa para você?'
         : 'Que bom ler isso! 😊 Fico contente que você esteja vivendo um momento feliz. Aconteceu alguma coisa especial ou é uma felicidade que já vinha crescendo?';
     }
     if (emotionalDisclosure.kind === 'sadness') return reason
@@ -511,7 +518,7 @@ export function buildAdaptiveResponse(message, history = []) {
   const structure = parseLogicalStructure(normalized);
   const clauses = structure.clauses.map(item => item.text).filter(Boolean);
   const meaningful = tokenize(normalized).filter(word =>
-    word.length > 3 && !['estou','estava','muito','hoje','tambem','porque','entao','assim','sobre','coisa','isso','aquela','aquele','minha','meu','para','mais','menos'].includes(word)
+    word.length > 3 && !['estou','estava','muito','hoje','tambem','porque','entao','assim','sobre','coisa','isso','aquela','aquele','minha','meu','para','mais','menos','aconteceu','diferente','comigo','coisa','alguma','algum','tive','hoje'].includes(word)
   );
   const salient = [...new Set(meaningful)].slice(0, 5);
   const subject = clauses.length > 1 ? clauses.slice(0, 2).join(' — ') : (clauses[0] || original);
@@ -540,7 +547,7 @@ export function buildAdaptiveResponse(message, history = []) {
 
   if (frame.speechAct === 'personal_disclosure' || frame.speechAct === 'statement' || frame.speechAct === 'uncertainty') {
     const openingParts = [
-      'Tá, quero pegar o ponto principal do que você trouxe:',
+      'Entendi o que você está compartilhando:'
       'Deixa eu acompanhar essa ideia:',
       'Entendi o caminho do que você está dizendo:',
       'Certo, tem uma coisa importante no que você comentou:'
@@ -562,11 +569,16 @@ export function buildAdaptiveResponse(message, history = []) {
               : 'Você está organizando esses fatos numa sequência';
       return opening + ' ' + bridge + ': “' + left + '” e “' + right + '”. Não vou reduzir isso a uma resposta pronta. Qual dessas partes está mais presente para você agora?';
     }
-    const reflection = semanticFocus.length
-      ? 'Você está trazendo ideias ligadas a ' + semanticFocus.join(' e ') + '.'
-      : salient.length
-        ? 'Você trouxe ' + salient.slice(0, 3).join(', ') + '.'
-        : 'Você não precisa transformar isso num problema para a gente conversar.';
+    const semanticReflection = semanticFocus.includes('comunicacao') && /lembr\w*/.test(normalized)
+      ? 'Parece que essa conversa ficou voltando à sua cabeça.'
+      : semanticFocus.includes('distante')
+        ? 'Você está descrevendo um afastamento e uma mudança no contato.'
+        : semanticFocus.includes('ansiedade')
+          ? 'Você está falando de uma preocupação que parece estar ocupando espaço.'
+          : null;
+    const reflection = semanticReflection || (salient.length
+      ? 'Você mencionou ' + salient.slice(0, 3).join(', ') + '.'
+      : 'Você não precisa transformar isso num problema para a gente conversar.');
     const memoryHint = rememberedEvents.length && sameTopic
       ? 'Também estou considerando o que você já contou sobre ' + rememberedEvents.slice(-2).join(' e ') + '. '
       : '';
@@ -612,6 +624,7 @@ function composeReply(text, frame, references) {
   }
   if (intent === 'opinion') return 'Posso te dar uma opinião fundamentada, mas quero considerar os detalhes em vez de concordar automaticamente. Qual parte você quer que eu avalie?';
   if (intent === 'definition') return 'Vou explicar de forma direta: para definir isso corretamente, preciso identificar o conceito exato que você está perguntando. Pode me dizer o termo ou a expressão que quer entender?';
+  if (intent === 'explanation' && !topic) return 'Boa pergunta. Muitas coisas parecem difíceis porque envolvem várias partes ao mesmo tempo, consequências que ainda não conhecemos ou escolhas que importam para nós. Qual dessas possibilidades chega mais perto do que você está pensando?';
   if (intent === 'explanation') return 'Quero explicar o mecanismo, não só repetir uma definição. Ainda não tenho informação suficiente para responder com segurança sobre esse ponto específico. Se você indicar o fenômeno ou colar o trecho, consigo analisar melhor.';
   if (intent === 'procedure') return 'Vamos transformar isso em etapas claras. Primeiro identificamos o objetivo, depois os recursos e as restrições, e então montamos um procedimento verificável. O que exatamente você está tentando fazer?';
   if (intent === 'comparison') return 'Para comparar com justiça, vou considerar objetivo, custo, benefícios, riscos, prazo e limitações. Quais são as opções que você quer colocar lado a lado?';
@@ -678,18 +691,26 @@ export function analyzeNexusMessage(message, history = []) {
 // Só intervém quando a resposta antiga seria o fallback genérico, evitando sobrescrever
 // respostas específicas já existentes (cálculos, finanças e conhecimento curado).
 export function improveNexusFallback(message, history, legacyReply) {
-  // Primeiro resolve a intenção social explícita, antes de tentar inferir tópicos ou referências.
+  // Intenções sociais explícitas e mudanças de assunto são resolvidas primeiro.
   const socialReply = composeConversationalReply(message, history);
   if (socialReply) return socialReply;
 
-  const adaptive = buildAdaptiveResponse(message, history);
-  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando/i.test(String(legacyReply || ''));
-  if (adaptive && legacyIsGeneric) return adaptive;
-
   const analysis = analyzeNexusMessage(message, history);
   if (analysis.intent === 'advice') return analysis.fallbackReply;
-  const generic = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando/i.test(String(legacyReply || ''));
-  if (generic || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
+
+  // Relações lógicas explícitas passam pela verificação de hipóteses antes
+  // do motor conversacional, para não serem achatadas em uma reflexão genérica.
+  if (analysis.logicalStructure.relations.length) {
+    const hypothesisReply = composeHypothesisReply(analyzeHypotheses(message, history));
+    if (hypothesisReply) return hypothesisReply;
+    return analysis.fallbackReply;
+  }
+
+  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando/i.test(String(legacyReply || ''));
+  const adaptive = buildAdaptiveResponse(message, history);
+  if (adaptive && legacyIsGeneric) return adaptive;
+
+  if (legacyIsGeneric || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
     const hypothesisReply = composeHypothesisReply(analyzeHypotheses(message, history));
     return hypothesisReply || analysis.fallbackReply;
   }
