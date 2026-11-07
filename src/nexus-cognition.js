@@ -49,6 +49,7 @@ const TOPICS = [
 ];
 
 const INTENTS = [
+  ['topic_change', /^(vamos|bora|quero|podemos) (falar|conversar|trocar|mudar) (sobre )?(outra coisa|outro assunto|outro tema|de assunto)|^(muda|troca) de assunto\b/],
   ['greeting', /^(oi|ola|opa|e ai|bom dia|boa tarde|boa noite|tudo bem|tudo bom)\b/],
   ['definition', /^(o que e|oq e|o que significa|que significa|o que quer dizer|define|defina)\b/],
   ['explanation', /^(por que|porque|como funciona|como acontece|me explica|explique|explica|qual a causa|qual o motivo)\b/],
@@ -412,6 +413,10 @@ function composeReply(text, frame, references) {
   const clean = text.trim();
   const { topic, intent, emotion, speechAct, discourseRelations = [], logicalStructure } = frame;
   const logicalSummary = summarizeLogicalStructure(logicalStructure);
+  if (intent === 'topic_change') return 'Claro! 😊 Mudamos de assunto. Sobre o que você está com vontade de conversar agora? Pode ser qualquer coisa — algo divertido, uma curiosidade, música, planos ou simplesmente jogar conversa fora.';
+  if (/^(aconteceu )?nada de interessante (hoje|por aqui)?$|^hoje nao aconteceu nada de interessante$/.test(text)) {
+    return 'Tem dia que é assim mesmo, tudo meio comum. 😄 Às vezes até é bom ter um dia tranquilo. Você ficou mais de boa em casa ou foi fazendo suas coisas normalmente?';
+  }
   if (intent === 'greeting') return 'Oii! 😊 Estou aqui para conversar. Como você está hoje?';
   if (logicalSummary && ['statement', 'personal_disclosure'].includes(speechAct)) {
     return logicalSummary + '\n\nQual parte dessa ligação você quer que eu analise primeiro?';
