@@ -601,3 +601,8 @@ test('resposta cotidiana não enumera palavras soltas da mensagem', () => {
   assert.doesNotMatch(reply,/Você trouxe peguei|Você trouxe hoje|onibus, lotado, cheguei/i);
   assert.match(reply,/Hoje peguei um ônibus lotado e cheguei atrasado|ônibus lotado/i);
 });
+
+test('relato simples sobre escola aceita a forma normalizada para escola', () => {
+  const reply = improveNexusFallback('Eu fui pra escola', [], 'Entendi: o assunto são seus estudos. Vamos localizar exatamente o que você precisa.');
+  assert.match(reply,/Como foi por lá/);
+});
