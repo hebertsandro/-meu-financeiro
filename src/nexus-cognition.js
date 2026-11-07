@@ -426,6 +426,91 @@ function composeHypothesisReply(result) {
     '\\n\\nPara avaliar melhor, precisamos conferir se essa relação realmente explica o resultado e se houve outros fatores envolvidos. O que mais aconteceu nesse período?';
 }
 
+
+function recentConversation(history = []) {
+  const turns = Array.isArray(history) ? history.slice(-12) : [];
+  const lastUser = [...turns].reverse().find(turn => turn?.role === 'user');
+  const lastAssistant = [...turns].reverse().find(turn => turn?.role === 'assistant');
+  return {
+    lastUser: normalizeNexusText(lastUser?.content || lastUser?.text || ''),
+    lastAssistant: normalizeNexusText(lastAssistant?.content || lastAssistant?.text || ''),
+    userTurns: turns.filter(turn => turn?.role === 'user').length
+  };
+}
+
+// Motor composicional: extrai o núcleo semântico da mensagem e escolhe um movimento
+// conversacional a partir do ato de fala, das relações e do histórico. As frases são
+// montadas com partes da mensagem atual; não são respostas integrais cadastradas.
+export function buildAdaptiveResponse(message, history = []) {
+  const original = String(message || '').trim();
+  const normalized = normalizeNexusText(original);
+  if (!normalized) return null;
+  const frame = classify(normalized);
+  const context = recentConversation(history);
+  const structure = parseLogicalStructure(normalized);
+  const clauses = structure.clauses.map(item => item.text).filter(Boolean);
+  const meaningful = tokenize(normalized).filter(word =>
+    word.length > 3 && !['estou','estava','muito','hoje','tambem','porque','entao','assim','sobre','coisa','isso','aquela','aquele','minha','meu','para','mais','menos'].includes(word)
+  );
+  const salient = [...new Set(meaningful)].slice(0, 5);
+  const subject = clauses.length > 1 ? clauses.slice(0, 2).join(' — ') : (clauses[0] || original);
+  const hasQuestion = /\?/.test(original);
+  const previousAsked = /\b(como|o que|qual|por que|quando|onde)\b/.test(context.lastAssistant) && /\?/.test(context.lastAssistant);
+  const sameTopic = frame.topic && context.lastUser && TOPICS.some(([topic, terms]) =>
+    topic === frame.topic && terms.some(term => context.lastUser.includes(term))
+  );
+
+  // Pergunta curta que responde à pergunta anterior: interpretar a função no diálogo.
+  if (previousAsked && /^(nada|nada nao|nao sei|normal|mais ou menos|sei la|de boa)$/.test(normalized)) {
+    return normalized.startsWith('nada')
+      ? 'Entendi. Então não teve nada específico que tenha marcado esse momento. Às vezes é só um dia comum mesmo. Quer continuar nesse assunto ou prefere que eu puxe outro?'
+      : 'Tudo bem não ter uma resposta fechada. Podemos ir descobrindo enquanto conversamos; o que vem primeiro à sua cabeça quando pensa nisso?';
+  }
+
+  if (frame.speechAct === 'personal_disclosure' || frame.speechAct === 'statement' || frame.speechAct === 'uncertainty') {
+    const openingParts = [
+      'Tá, quero pegar o ponto principal do que você trouxe:',
+      'Deixa eu acompanhar essa ideia:',
+      'Entendi o caminho do que você está dizendo:',
+      'Certo, tem uma coisa importante no que você comentou:'
+    ];
+    const index = salient.join('').length % openingParts.length;
+    const opening = openingParts[index];
+    if (structure.relations.length) {
+      const relation = structure.relations[0];
+      const left = clauses[relation.fromClause] || clauses[0] || subject;
+      const right = clauses[relation.toClause] || clauses[1] || '';
+      const bridge = relation.type === 'contrast'
+        ? 'Você está juntando duas coisas que podem coexistir'
+        : relation.type === 'cause'
+          ? 'Você está ligando esses acontecimentos como causa e consequência'
+          : relation.type === 'condition'
+            ? 'Você está colocando uma condição para o que vem depois'
+            : relation.type === 'addition'
+              ? 'Você está acrescentando uma segunda parte importante'
+              : 'Você está organizando esses fatos numa sequência';
+      return opening + ' ' + bridge + ': “' + left + '” e “' + right + '”. Não vou reduzir isso a uma resposta pronta. Qual dessas partes está mais presente para você agora?';
+    }
+    const reflection = salient.length
+      ? 'Você trouxe ' + salient.slice(0, 3).join(', ') + '.'
+      : 'Você não precisa transformar isso num problema para a gente conversar.';
+    const followUp = sameTopic
+      ? 'Isso se conecta ao que você já vinha contando. O que mudou desde a última vez que falou disso?'
+      : frame.emotion
+        ? 'O que fez isso ganhar importância hoje?'
+        : 'Como isso apareceu no seu dia — foi algo que aconteceu ou uma ideia que ficou na sua cabeça?';
+    return opening + ' ' + reflection + ' ' + followUp;
+  }
+
+  if (hasQuestion && frame.intent === 'question') {
+    const priorContext = context.lastUser && sameTopic
+      ? ' Considerando o que você comentou antes,'
+      : '';
+    return 'Boa, vamos pensar nisso.' + priorContext + ' A pergunta é sobre “' + subject + '”. Posso começar separando o que sabemos do que ainda é hipótese: qual aspecto dessa questão você considera mais importante?';
+  }
+  return null;
+}
+
 function composeReply(text, frame, references) {
   const clean = text.trim();
   const { topic, intent, emotion, speechAct, discourseRelations = [], logicalStructure } = frame;
@@ -518,6 +603,10 @@ export function improveNexusFallback(message, history, legacyReply) {
   // Primeiro resolve a intenção social explícita, antes de tentar inferir tópicos ou referências.
   const socialReply = composeConversationalReply(message, history);
   if (socialReply) return socialReply;
+
+  const adaptive = buildAdaptiveResponse(message, history);
+  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando/i.test(String(legacyReply || ''));
+  if (adaptive && legacyIsGeneric) return adaptive;
 
   const analysis = analyzeNexusMessage(message, history);
   if (analysis.intent === 'advice') return analysis.fallbackReply;
