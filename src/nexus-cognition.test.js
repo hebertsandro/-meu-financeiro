@@ -213,3 +213,23 @@ test('reconhece pedido de recomendação mesmo com abreviação e erro informal'
   const reply = improveNexusFallback('oque vc recomendaria?', [], 'fallback genérico');
   assert.match(reply,/Eu começaria de um jeito simples/);
 });
+
+test('aceita naturalmente quando a pessoa quer mudar de assunto', () => {
+  const reply = improveNexusFallback('Vamos falar sobre outra coisa nexus', [], 'Quero entender exatamente o que você quis comunicar.');
+  assert.match(reply,/Claro!/);
+  assert.match(reply,/Mudamos de assunto/);
+  assert.doesNotMatch(reply,/base suficiente|dar um exemplo|qual parte desse assunto/);
+});
+
+test('responde com naturalidade quando a pessoa diz que nada interessante aconteceu hoje', () => {
+  const reply = improveNexusFallback('Aconteceu nada de interessante hoje', [], 'Quero entender exatamente o que você quis comunicar.');
+  assert.match(reply,/Tem dia que é assim mesmo/);
+  assert.match(reply,/dia tranquilo|suas coisas normalmente/);
+  assert.doesNotMatch(reply,/base suficiente|estrutura da frase/);
+});
+
+test('reconhece outras formas comuns de pedir mudança de assunto', () => {
+  const reply = improveNexusFallback('Bora trocar de assunto', [], 'fallback genérico');
+  assert.match(reply,/Claro!/);
+  assert.match(reply,/Mudamos de assunto/);
+});
