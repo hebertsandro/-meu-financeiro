@@ -1,7 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseLogicalStructure, analyzeNexusMessage, analyzeHypotheses, improveNexusFallback, buildAdaptiveResponse, buildReasoningPlan } from './nexus-cognition.js';
-import { buildConversationState } from './nexus-language.js';
+import { buildConversationState, buildConversationMemory } from './nexus-language.js';
 
 test('identifica causa e separa as duas proposições', () => {
   const result = parseLogicalStructure('Fui mal na prova porque não consegui estudar.');
@@ -549,4 +549,55 @@ test('pergunta do assistente fica pendente somente quando a última fala é dele
     {role:'user',content:'Briguei com um amigo.'}
   ]);
   assert.equal(replied.pendingQuestion,null);
+});
+
+
+test('estado cronológico troca o assunto ativo sem deixar a frequência antiga dominar', () => {
+  const history = [
+    {role:'user',content:'Minha namorada está distante.'},
+    {role:'assistant',content:'O que aconteceu?'},
+    {role:'user',content:'Ela quase não conversa comigo.'},
+    {role:'assistant',content:'Isso deve estar sendo difícil.'},
+    {role:'user',content:'A gente já conversou sobre isso várias vezes.'},
+    {role:'assistant',content:'Entendi.'},
+    {role:'user',content:'Agora quero falar de música.'},
+    {role:'assistant',content:'Qual música você está ouvindo?'},
+    {role:'user',content:'Essa música é muito boa.'}
+  ];
+  assert.equal(buildConversationState(history).activeTopic,'lazer');
+  assert.equal(buildReasoningPlan('Essa música é muito boa.',history).activeTopic,'lazer');
+});
+
+test('despedida do assistente não encerra a conversa por conta própria', () => {
+  const state = buildConversationState([
+    {role:'user',content:'Obrigado pela conversa.'},
+    {role:'assistant',content:'Por nada! Quando quiser continuar, estarei por aqui.'}
+  ]);
+  assert.equal(state.conversationEnded,false);
+  assert.equal(state.status,'active');
+});
+
+test('correção de parentesco substitui a entidade anterior na memória', () => {
+  const memory = buildConversationMemory([
+    {role:'user',content:'Minha irmã vai mudar de escola.'},
+    {role:'assistant',content:'Entendi.'},
+    {role:'user',content:'Na verdade, é meu irmão.'}
+  ]);
+  assert.ok(memory.people.includes('irmão'));
+  assert.ok(!memory.people.includes('irmã'));
+});
+
+test('pedido explícito com interrogação continua sendo pedido', () => {
+  const reply = improveNexusFallback(
+    'Me ajuda a estudar matemática para a prova de amanhã?',
+    [],
+    'fallback genérico'
+  );
+  assert.match(reply,/vamos estudar|revisar a matéria|questões/i);
+});
+
+test('resposta cotidiana não enumera palavras soltas da mensagem', () => {
+  const reply = buildAdaptiveResponse('Hoje peguei um ônibus lotado e cheguei atrasado.');
+  assert.doesNotMatch(reply,/Você trouxe peguei|Você trouxe hoje|onibus, lotado, cheguei/i);
+  assert.match(reply,/Hoje peguei um ônibus lotado e cheguei atrasado|ônibus lotado/i);
 });
