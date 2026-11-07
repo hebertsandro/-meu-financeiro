@@ -215,7 +215,7 @@ export function buildConversationState(history=[]) {
     const userReplied=turns.slice(assistantQuestionIndex.index+1).some(turn=>turn.role==='user');
     lastAssistantQuestion={
       text:assistantQuestionIndex.turn.text,
-      status:userReplied?'response_received':'awaiting_user_response',
+      status:userReplied?'user_has_replied':'awaiting_user_response',
       askedAt:assistantQuestionIndex.index
     };
     if(!userReplied) pendingQuestion={text:assistantQuestionIndex.turn.text,status:'awaiting_user_response'};
