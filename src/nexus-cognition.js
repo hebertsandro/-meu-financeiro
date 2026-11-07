@@ -576,50 +576,36 @@ export function buildAdaptiveResponse(message, history = []) {
   }
 
   if (frame.speechAct === 'personal_disclosure' || frame.speechAct === 'statement' || frame.speechAct === 'uncertainty') {
-    const openingParts = [
-      'Entendi o que você está compartilhando:',
-      'Deixa eu acompanhar essa ideia:',
-      'Entendi o caminho do que você está dizendo:',
-      'Certo, tem uma coisa importante no que você comentou:'
-    ];
-    const index = salient.join('').length % openingParts.length;
-    const opening = openingParts[index];
+    // Primeiro acompanha o que a pessoa contou; só oferece solução quando ela pede.
+    // A resposta usa o conteúdo da fala, não um formulário de interpretação.
     if (structure.relations.length) {
       const relation = structure.relations[0];
       const left = clauses[relation.fromClause] || clauses[0] || subject;
       const right = clauses[relation.toClause] || clauses[1] || '';
-      const bridge = relation.type === 'contrast'
-        ? 'Você está juntando duas coisas que podem coexistir'
-        : relation.type === 'cause'
-          ? 'Você está ligando esses acontecimentos como causa e consequência'
-          : relation.type === 'condition'
-            ? 'Você está colocando uma condição para o que vem depois'
-            : relation.type === 'addition'
-              ? 'Você está acrescentando uma segunda parte importante'
-              : 'Você está organizando esses fatos numa sequência';
-      return opening + ' ' + bridge + ': “' + left + '” e “' + right + '”. Não vou reduzir isso a uma resposta pronta. Qual dessas partes está mais presente para você agora?';
+      const bridge = relation.type === 'contrast' ? 'Tem duas coisas acontecendo ao mesmo tempo'
+        : relation.type === 'cause' ? 'Você está relacionando uma coisa à outra'
+        : relation.type === 'condition' ? 'Então existe uma condição importante aí'
+        : relation.type === 'addition' ? 'E ainda tem esse outro lado'
+        : 'Você está contando como uma coisa levou à outra';
+      return bridge + ': “' + left + '” e “' + right + '”. ' +
+        (frame.emotion ? 'Imagino que isso possa mexer com você. ' : '') +
+        'Qual parte ficou mais forte na sua cabeça?';
     }
-    const semanticReflection = semanticFocus.includes('comunicacao') && /lembr\w*/.test(normalized)
-      ? 'Parece que essa conversa ficou voltando à sua cabeça.'
-      : semanticFocus.includes('distante')
-        ? 'Você está descrevendo um afastamento e uma mudança no contato.'
-        : semanticFocus.includes('ansiedade')
-          ? 'Você está falando de uma preocupação que parece estar ocupando espaço.'
-          : null;
-    const reflection = semanticReflection || (salient.length
-      ? 'Você mencionou ' + salient.slice(0, 3).join(', ') + '.'
-      : 'Você não precisa transformar isso num problema para a gente conversar.');
     const memoryHint = rememberedEvents.length && sameTopic
-      ? 'Também estou considerando o que você já contou sobre ' + rememberedEvents.slice(-2).join(' e ') + '. '
+      ? 'Isso também se conecta ao que você já tinha me contado sobre ' + rememberedEvents.slice(-1)[0] + '. '
       : '';
+    const detail = salient.slice(0, 4).join(', ');
+    const reflection = semanticFocus.includes('distante') ? 'Você está percebendo uma distância entre vocês.'
+      : semanticFocus.includes('comunicacao') ? 'Essa questão da conversa parece estar pesando.'
+      : semanticFocus.includes('ansiedade') ? 'Parece que isso está ocupando seus pensamentos.'
+      : detail ? 'Você trouxe ' + detail + ' para a conversa.'
+      : 'Tô acompanhando o que você está contando.';
     const followUp = sameTopic
-      ? memoryHint + 'Isso se conecta ao que você já vinha contando. O que mudou desde a última vez que falou disso?'
-      : reasoningPlan.unknowns.length && reasoningPlan.reasoning.reasoningType !== 'reflection'
-        ? 'Tem um detalhe que ainda não sei e que pode mudar a interpretação: ' + reasoningPlan.unknowns[0] + '. O que você consegue me contar sobre isso?'
-        : frame.emotion
-          ? 'O que fez isso ganhar importância hoje?'
-          : 'Como isso apareceu no seu dia — foi algo que aconteceu ou uma ideia que ficou na sua cabeça?';
-    return opening + ' ' + reflection + ' ' + followUp;
+      ? 'O que aconteceu depois disso?'
+      : frame.emotion ? 'Quer me contar o que aconteceu antes de você se sentir assim?'
+      : previousAsked ? 'E como você se sentiu com isso?'
+      : 'E aí, como foi isso para você?';
+    return memoryHint + reflection + ' ' + followUp;
   }
 
   if (hasQuestion && frame.intent === 'question') {
@@ -738,6 +724,10 @@ export function improveNexusFallback(message, history, legacyReply) {
 
   const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando/i.test(String(legacyReply || ''));
   const adaptive = buildAdaptiveResponse(message, history);
+  // A intenção vem antes do domínio: mencionar escola, dinheiro ou namoro não é
+  // automaticamente pedir uma aula, um cálculo ou um conselho.
+  const explicitTask = ['definition','explanation','procedure','comparison','summary','writing','advice','ideas','planning','calculation','translation','opinion','topic_change'].includes(analysis.intent);
+  if (adaptive && !explicitTask && ['statement','personal_disclosure','uncertainty'].includes(analysis.speechAct)) return adaptive;
   if (adaptive && legacyIsGeneric) return adaptive;
 
   if (legacyIsGeneric || (!analysis.topic && analysis.intent !== 'statement' && analysis.confidence < 0.5)) {
