@@ -340,10 +340,17 @@ function composeConversationalReply(message, history = []) {
   const previousAssistantTurn = assistantTurns[assistantTurns.length - 1];
   const previousAssistant = previousAssistantTurn?.content || previousAssistantTurn?.text || '';
   const previousAssistantNormalized = normalizeNexusText(previousAssistant);
+  const userTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'user') : [];
+  // O histórico recebido inclui a mensagem atual; a anterior ajuda a interpretar correções.
+  const previousUserMessage = userTurns.length > 1
+    ? normalizeNexusText(userTurns[userTurns.length - 2]?.content || userTurns[userTurns.length - 2]?.text || '')
+    : '';
   const assistantAskedAboutUser = /(?:e voce )?como esta( hoje)?|como voce esta( hoje)?|como esta sendo seu dia|como foi seu dia|como esta hoje/.test(previousAssistantNormalized);
+  const userPreviouslySaidTheyWereWell = /^(eu )?(estou|to|tou) bem( sim+)?$/.test(previousUserMessage);
 
-  // Uma correção explícita deve ser reconhecida como correção, não como uma nova ideia.
-  if (assistantAskedAboutUser && /^(eu )?(disse|falei) que estou bem( sim)?$/.test(social)) {
+  // Uma correção explícita é reconhecida mesmo se a resposta errada da NEXUS
+  // tiver substituído, no histórico imediato, a pergunta que iniciou a sequência.
+  if ((assistantAskedAboutUser || userPreviouslySaidTheyWereWell) && /^(eu )?(disse|falei) que estou bem( sim)?$/.test(social)) {
     return 'Você tem razão — perguntou como você estava e você respondeu que está bem. Desculpa por não ter acompanhado sua resposta. 😊 Que bom que você está bem!';
   }
 
