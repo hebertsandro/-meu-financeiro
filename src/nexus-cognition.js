@@ -289,7 +289,7 @@ function composeConversationalReply(message, history = []) {
   // Não depende da classificação temática nem do fallback do motor financeiro.
   const socialText = normalizeNexusText(message)
     .replace(/[!?.,:;]+/g, ' ')
-    .replace(/\\s+/g, ' ')
+    .replace(/\s+/g, ' ')
     .trim();
   const greeting = /^(oi+|ola+|opa|e ai|bom dia|boa tarde|boa noite|fala|salve|hey)( nexus)?( tudo bem| tudo bom| tudo certo| como voce esta| como esta| como vai)?$/.test(socialText);
   if (greeting) {
@@ -304,8 +304,8 @@ function composeConversationalReply(message, history = []) {
   // Conversa cotidiana não é um pedido de solução. Trate mudança de assunto e
   // comentários sobre o dia como convites sociais, antes de classificadores genéricos.
   const socialWithoutVocative = social
-    .replace(/\\b(nexus|nexos)\\b$/i, '')
-    .replace(/\\s+/g, ' ')
+    .replace(/\b(nexus|nexos)\b$/i, '')
+    .replace(/\s+/g, ' ')
     .trim();
   if (/^(vamos|bora|podemos|quero) (falar|conversar|trocar|mudar) (sobre )?(uma )?(outra coisa|outro assunto|outro tema|de assunto)$/.test(socialWithoutVocative)
       || /^(muda|troca) (de )?assunto$/.test(socialWithoutVocative)) {
