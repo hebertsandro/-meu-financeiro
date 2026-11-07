@@ -651,3 +651,24 @@ test('assunto ativo segue a mudança recente mesmo após muitas mensagens de out
   ];
   assert.equal(buildReasoningPlan('Gosto de rock.',history).activeTopic,'lazer');
 });
+
+
+test('pedido genérico de conselho não recebe conselho romântico fora de contexto', () => {
+  const reply = improveNexusFallback(
+    'O que eu devo fazer agora?',
+    [],
+    'fallback genérico'
+  );
+  assert.match(reply,/qual decisão|o que aconteceu|limites da situação/i);
+  assert.doesNotMatch(reply,/chama ela|relacionamento|vocês/i);
+});
+
+test('mudança explícita de assunto limpa o tema ativo anterior', () => {
+  const state = buildConversationState([
+    {role:'user',content:'Minha namorada está distante.'},
+    {role:'assistant',content:'O que aconteceu?'},
+    {role:'user',content:'Vamos falar de outra coisa.'}
+  ]);
+  assert.equal(state.activeTopic,null);
+  assert.equal(state.topicChanged,true);
+});
