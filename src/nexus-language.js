@@ -426,7 +426,8 @@ export function analyzeLanguage(message, history=[]) {
   const normalized=normalizeLanguageText(original);
   const turns=getUserTurns(history);
   const prior=turns.slice(-6);
-  const context=getConversationContext(history);\n  const conversationState=buildConversationState(history);
+  const context=getConversationContext(history);
+  const conversationState=buildConversationState(history);
   const memory=buildConversationMemory(history);
   const situation=analyzeSituation(history);
   const reasoning=analyzeContextualReasoning(message,history);
@@ -469,7 +470,8 @@ export function analyzeLanguage(message, history=[]) {
     :String(original).includes('?')?'question'
     :'statement';
   return {
-    original,normalized,tokens:normalized.split(' ').filter(Boolean),\n    conversationState,
+    original,normalized,tokens:normalized.split(' ').filter(Boolean),
+    conversationState,
     matchedEntries:NEXUS_LEXICON.filter(entry=>entry.variants.some(v=>contains(original,v))||contains(normalized,entry.canonical))
       .slice(0,30).map(({canonical,meanings,tone,ambiguity})=>({canonical,meanings,tone,ambiguity})),
     possibleActs:acts,primaryAct,emotions:detectEmotion(normalized),laughter,irony,indirectness,
