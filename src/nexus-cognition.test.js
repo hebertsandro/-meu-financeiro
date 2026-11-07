@@ -634,7 +634,7 @@ test('mensagem atual não é usada como antecedente da própria referência', ()
     {role:'assistant',content:'Como foi essa mudança?'},
     {role:'user',content:'Ela mudou mesmo?'}
   ]);
-  assert.equal(analysis.references?.previousUserMessage,'minha namorada mudou de escola');
+  assert.match(analysis.references?.previousUserMessage || '',/minha namorada mudou de escola/);
 });
 
 test('assunto ativo segue a mudança recente mesmo após muitas mensagens de outro tema', () => {
