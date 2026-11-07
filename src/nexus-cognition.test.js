@@ -456,3 +456,29 @@ test('responde a uma continuação curta usando a pergunta imediatamente anterio
   assert.match(reply, /provas|cansativo/i);
   assert.doesNotMatch(reply, /qual matéria você precisa de ajuda/i);
 });
+
+
+// Conversas longas: a memória precisa sobreviver a 10, 20 e 30 mensagens do usuário.
+test('mantém fatos do começo de uma conversa de 30 mensagens', () => {
+  const history = [];
+  for (let i = 1; i <= 30; i++) {
+    history.push({ role: 'user', content: i === 1
+      ? 'Minha irmã começou um curso de fotografia em janeiro.'
+      : 'Mensagem cotidiana número ' + i + ' sobre minha rotina.' });
+    history.push({ role: 'assistant', content: 'Entendi. E o que aconteceu depois?' });
+  }
+  const plan = buildReasoningPlan('Você lembra do curso que minha irmã começou?', history);
+  assert.ok(plan.memory.people.includes('irmã'));
+  assert.ok(plan.memory.facts.some(fact => /curso de fotografia/.test(fact.text)));
+  assert.equal(plan.memory.turnCount, 30);
+});
+
+test('mantém a referência à pergunta anterior mesmo após 20 mensagens', () => {
+  const history = [];
+  for (let i = 1; i <= 20; i++) {
+    history.push({ role: 'user', content: i === 1 ? 'Estou preocupado com minha namorada.' : 'Outra mensagem ' + i });
+    history.push({ role: 'assistant', content: i === 20 ? 'O que aconteceu entre vocês?' : 'Estou acompanhando.' });
+  }
+  const reply = buildAdaptiveResponse('Ela ficou distante de novo.', history);
+  assert.match(reply, /distância|conversa|vocês|namorada/i);
+});
