@@ -462,7 +462,7 @@ export function buildAdaptiveResponse(message, history = []) {
     topic,
     score: terms.reduce((score, term) => score + (recentUserText.includes(term) ? 1 : 0), 0)
   })).sort((a, b) => b.score - a.score)[0];
-  const hasConversationalReference = /\\b(a gente|nos|nossa|nosso|isso|essa situacao|esse assunto|ela|ele)\\b/.test(normalized);
+  const hasConversationalReference = /\b(a gente|nos|nossa|nosso|isso|essa situacao|esse assunto|ela|ele)\b/.test(normalized);
   const sameTopic = frame.topic
     ? TOPICS.some(([topic, terms]) => topic === frame.topic && terms.some(term => recentUserText.includes(term)))
     : Boolean(contextTopic?.score > 0 && hasConversationalReference);
