@@ -300,6 +300,23 @@ function composeConversationalReply(message, history = []) {
     return 'Estou aqui, funcionando e pronta para conversar com você! 😊 Como está sendo seu dia?';
   }
   const social = normalizeNexusText(String(message || '').replace(/[,.!?]/g, ' ')).replace(/\s+/g, ' ').trim();
+
+  // Conversa cotidiana não é um pedido de solução. Trate mudança de assunto e
+  // comentários sobre o dia como convites sociais, antes de classificadores genéricos.
+  const socialWithoutVocative = social
+    .replace(/\\b(nexus|nexos)\\b$/i, '')
+    .replace(/\\s+/g, ' ')
+    .trim();
+  if (/^(vamos|bora|podemos|quero) (falar|conversar|trocar|mudar) (sobre )?(uma )?(outra coisa|outro assunto|outro tema|de assunto)$/.test(socialWithoutVocative)
+      || /^(muda|troca) (de )?assunto$/.test(socialWithoutVocative)) {
+    return 'Claro! 😄 Vamos deixar aquele assunto de lado. Podemos falar de qualquer coisa, até jogar conversa fora. Tem alguma coisa passando pela sua cabeça ou quer que eu puxe um assunto aleatório?';
+  }
+  if (/^(aconteceu )?nada (de )?interessante (hoje|por aqui)?$/.test(social)
+      || /^(hoje )?nao aconteceu nada (de )?interessante$/.test(social)
+      || /^nao teve nada (de )?interessante hoje$/.test(social)) {
+    return 'Ah, daqueles dias bem comuns, né? 😅 Às vezes não acontece nada marcante mesmo. Foi um dia mais parado ou você só ficou na rotina de sempre?';
+  }
+
   const assistantTurns = Array.isArray(history) ? history.filter(turn => turn?.role === 'assistant') : [];
   const previousAssistantTurn = assistantTurns[assistantTurns.length - 1];
   const previousAssistant = previousAssistantTurn?.content || previousAssistantTurn?.text || '';
