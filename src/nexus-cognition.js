@@ -1,4 +1,4 @@
-import { getLanguageResponse, analyzeLanguage } from './nexus-language.js';
+import { getLanguageResponse, analyzeLanguage, buildConversationState } from './nexus-language.js';
 // NEXUS COGNITION — interpretador local composicional.
 // Este módulo não é um modelo de linguagem: usa análise linguística, contexto e estratégias
 // determinísticas para generalizar melhor sem enviar mensagens para serviços externos.
@@ -495,6 +495,13 @@ export function buildReasoningPlan(message, history = []) {
     .map(([concept]) => concept);
   const memory = language.memory || { people: [], events: [], facts: [], activeTopic: null };
   const conversationState = language.conversationState || null;
+  const suppliedHistory = Array.isArray(history) ? history : [];
+  const lastHistoryTurn = suppliedHistory.at(-1);
+  const lastHistoryText = normalizeNexusText(lastHistoryTurn?.content || lastHistoryTurn?.text || '');
+  const historyIncludesCurrent = lastHistoryTurn?.role === 'user' && lastHistoryText === normalized;
+  const previousConversationState = buildConversationState(
+    historyIncludesCurrent ? suppliedHistory.slice(0, -1) : suppliedHistory
+  );
   const situation = language.situation || { currentFacts: [], corrections: [], topic: null };
   const reasoning = language.reasoning || { reasoningType: 'reflection', evidence: [], unknowns: [] };
   const contradiction = analyzeHypotheses(message, history).contradictions;
@@ -507,12 +514,12 @@ export function buildReasoningPlan(message, history = []) {
     'trabalho e carreira': 'trabalho',
     financas: 'financas'
   };
-  const priorTopic = activeTopic;
+  const priorTopic = previousConversationState.activeTopic;
   const topicMatches = Boolean(currentTopic && priorTopic &&
     (currentTopic === priorTopic || topicAliases[currentTopic] === priorTopic || topicAliases[priorTopic] === currentTopic));
   const relationshipSemanticMatch = priorTopic === 'relacionamento' &&
     semanticConcepts.some(concept => ['distante','comunicacao','namorada','namorado'].includes(concept));
-  const sameTopic = topicMatches || relationshipSemanticMatch;
+  const sameTopic = topicMatches || relationshipSemanticMatch || (!currentTopic && Boolean(previousConversationState.activeTopic && /\\b(ela|ele|eles|elas|isso|aquilo|dela|dele)\\b/.test(normalized)));
   return {
     normalized,
     intent: language.primaryAct || 'statement',
@@ -590,7 +597,7 @@ export function buildAdaptiveResponse(message, history = []) {
   }
 
   // Pergunta curta que responde à pergunta anterior: interpretar a função no diálogo.
-  if (previousAsked && /^(nada|nada nao|nao sei|normal|mais ou menos|sei la|de boa)$/.test(normalized)) {
+  if (previousAsked && /^(nada|nada nao|nao sei|normal|mais ou menos|sei la|de boa|bem|muito bem|otimo|otima|tranquilo|tranquila|feliz|mal|triste|cansado|cansada)$/.test(normalized)) {
     return normalized.startsWith('nada')
       ? 'Entendi. Então não teve nada específico que tenha marcado esse momento. Às vezes é só um dia comum mesmo. Quer continuar nesse assunto ou prefere que eu puxe outro?'
       : 'Tudo bem não ter uma resposta fechada. Podemos ir descobrindo enquanto conversamos; o que vem primeiro à sua cabeça quando pensa nisso?';
