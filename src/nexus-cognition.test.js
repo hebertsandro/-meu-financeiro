@@ -233,3 +233,21 @@ test('reconhece outras formas comuns de pedir mudança de assunto', () => {
   assert.match(reply,/Claro!/);
   assert.match(reply,/Mudamos de assunto/);
 });
+
+
+test('entende mudança de assunto mesmo com Nexus no fim da frase', () => {
+  for (const message of ['Vamos falar sobre outra coisa nexus', 'Bora trocar de assunto, Nexus', 'Vamos mudar de assunto Nexus']) {
+    const reply = improveNexusFallback(message, [{role:'user',content:message}], 'Quero entender exatamente o que você quis comunicar.');
+    assert.match(reply, /Vamos deixar aquele assunto de lado/);
+    assert.doesNotMatch(reply, /qual parte desse assunto|base suficiente|dar um exemplo/);
+  }
+});
+
+test('trata comentário cotidiano como conversa, não como pedido de solução', () => {
+  for (const message of ['Aconteceu nada de interessante hoje', 'Não aconteceu nada de interessante hoje', 'Hoje não aconteceu nada interessante']) {
+    const reply = improveNexusFallback(message, [{role:'user',content:message}], 'Quero entender exatamente o que você quis comunicar.');
+    assert.match(reply, /dias bem comuns|nada marcante/);
+    assert.match(reply, /dia mais parado|rotina de sempre/);
+    assert.doesNotMatch(reply, /base suficiente|estrutura da frase|dar um exemplo/);
+  }
+});
