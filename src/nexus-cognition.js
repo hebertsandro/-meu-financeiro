@@ -547,7 +547,7 @@ export function buildAdaptiveResponse(message, history = []) {
 
   if (frame.speechAct === 'personal_disclosure' || frame.speechAct === 'statement' || frame.speechAct === 'uncertainty') {
     const openingParts = [
-      'Entendi o que você está compartilhando:'
+      'Entendi o que você está compartilhando:',
       'Deixa eu acompanhar essa ideia:',
       'Entendi o caminho do que você está dizendo:',
       'Certo, tem uma coisa importante no que você comentou:'
