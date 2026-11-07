@@ -608,14 +608,14 @@ export function buildAdaptiveResponse(message, history = []) {
       ? 'Isso se conecta ao que você já vinha contando sobre ' + (eventLabels[rememberedEvent] || 'essa situação') + '. '
       : '';
     const reflection = semanticFocus.includes('distante') ? 'Você está percebendo uma distância entre vocês.'
-      : semanticFocus.includes('comunicacao') ? 'Essa questão da comunicação parece estar pesando.'
+      : semanticFocus.includes('comunicacao') ? 'Essa conversa parece ter ficado na sua cabeça.'
       : semanticFocus.includes('ansiedade') ? 'Parece que isso está ocupando seus pensamentos.'
       : 'Tô acompanhando o que você contou: “' + original.replace(/[.!?]+$/,'') + '”.';
     if (/futuro|escolhas/.test(normalized)) {
       return memoryHint + 'Você comentou: “' + original.replace(/[.!?]+$/,'') + '”. O que fez isso ganhar importância hoje?';
     }
     const followUp = sameTopic
-      ? 'O que aconteceu depois disso?'
+      ? 'O que mudou desde a última vez?'
       : frame.emotion ? 'Quer me contar o que aconteceu antes de você se sentir assim?'
       : previousAsked ? 'E como você se sentiu com isso?'
       : 'Como isso apareceu no seu dia?';
