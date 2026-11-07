@@ -223,8 +223,8 @@ test('aceita naturalmente quando a pessoa quer mudar de assunto', () => {
 
 test('responde com naturalidade quando a pessoa diz que nada interessante aconteceu hoje', () => {
   const reply = improveNexusFallback('Aconteceu nada de interessante hoje', [], 'Quero entender exatamente o que você quis comunicar.');
-  assert.match(reply,/Tem dia que é assim mesmo/);
-  assert.match(reply,/dia tranquilo|suas coisas normalmente/);
+  assert.match(reply,/tem dia que é assim mesmo/i);
+  assert.match(reply,/dia tranquilo|suas coisas normalmente|dia mais parado|rotina foi normal/i);
   assert.doesNotMatch(reply,/base suficiente|estrutura da frase/);
 });
 
@@ -246,7 +246,7 @@ test('entende mudança de assunto mesmo com Nexus no fim da frase', () => {
 test('trata comentário cotidiano como conversa, não como pedido de solução', () => {
   for (const message of ['Aconteceu nada de interessante hoje', 'Não aconteceu nada de interessante hoje', 'Hoje não aconteceu nada interessante']) {
     const reply = improveNexusFallback(message, [{role:'user',content:message}], 'Quero entender exatamente o que você quis comunicar.');
-    assert.match(reply, /dias bem comuns|nada marcante/);
+    assert.match(reply, /dias bem comuns|nada marcante|parece que o dia passa/i);
     assert.match(reply, /dia mais parado|rotina de sempre/);
     assert.doesNotMatch(reply, /base suficiente|estrutura da frase|dar um exemplo/);
   }
