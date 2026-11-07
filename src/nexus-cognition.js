@@ -735,6 +735,8 @@ export function improveNexusFallback(message, history, legacyReply) {
   if (socialReply) return socialReply;
 
   const analysis = analyzeNexusMessage(message, history);
+  // Pedidos de conselho não devem cair em um conselho romântico universal.
+  if (analysis.intent === 'advice') return analysis.fallbackReply;
   if (analysis.speechAct === 'request') {
     const requested = buildAdaptiveResponse(message, history);
     if (requested) return requested;
@@ -749,7 +751,7 @@ export function improveNexusFallback(message, history, legacyReply) {
   }
 
   const legacyText = String(legacyReply || '');
-  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando|voce trouxe .{1,90} para a conversa|você trouxe .{1,90} para a conversa|entendi: o assunto sao seus|entendi: o assunto são seus|vamos localizar exatamente o que voce precisa|vamos localizar exatamente o que você precisa|me diga exatamente o que voce precisa/i.test(legacyText);
+  const legacyIsGeneric = /quero entender direito|quero entender exatamente|estou aqui para conversar|pode falar do seu dia|pode falar do seu jeito|quer me contar|quer uma explicacao|quer uma explicação|nao entendi sua mensagem|não entendi sua mensagem|estou relacionando isso ao assunto|qual parte desse assunto voce esta retomando|voce trouxe .{1,90} para a conversa|você trouxe .{1,90} para a conversa|entendi: o assunto sao seus|entendi: o assunto são seus|vamos localizar exatamente o que voce precisa|vamos localizar exatamente o que você precisa|me diga exatamente o que voce precisa|fallback generico|fallback genérico/i.test(legacyText);
   const adaptive = buildAdaptiveResponse(message, history);
   const explicitTask = ['definition','explanation','procedure','comparison','summary','writing','advice','ideas','planning','calculation','translation','opinion','topic_change'].includes(analysis.intent) || analysis.speechAct === 'request';
 
