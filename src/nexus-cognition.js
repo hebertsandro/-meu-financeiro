@@ -485,7 +485,8 @@ export function buildReasoningPlan(message, history = []) {
       return terms.some(term => term && (' ' + semanticText + ' ').includes(' ' + term + ' '));
     })
     .map(([concept]) => concept);
-  const memory = language.memory || { people: [], events: [], facts: [], activeTopic: null };\n  const conversationState = language.conversationState || null;
+  const memory = language.memory || { people: [], events: [], facts: [], activeTopic: null };
+  const conversationState = language.conversationState || null;
   const situation = language.situation || { currentFacts: [], corrections: [], topic: null };
   const reasoning = language.reasoning || { reasoningType: 'reflection', evidence: [], unknowns: [] };
   const contradiction = analyzeHypotheses(message, history).contradictions;
