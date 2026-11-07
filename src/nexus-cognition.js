@@ -336,7 +336,7 @@ function composeConversationalReply(message, history = []) {
   if (/^(aconteceu )?nada (de )?interessante (hoje|por aqui)?$/.test(socialCore)
       || /^(hoje )?nao aconteceu nada (de )?interessante( hoje)?$/.test(socialCore)
       || /^nao teve nada (de )?interessante hoje$/.test(socialCore)) {
-    return 'Pior que tem dia que é assim mesmo KKKK. Parece que o dia passa e não acontece absolutamente nada. 😅 Mas foi um dia mais parado em casa ou você saiu e mesmo assim não rolou nada demais?';
+    return 'Tem dia que é assim mesmo KKKK. São aqueles dias bem comuns, sem nada marcante; parece que o relógio anda e nada acontece. 😅 Foi um dia mais parado em casa ou você saiu e a rotina foi normal?';
   }
 
   // Relatos simples do cotidiano são compartilhamentos, não pedidos de suporte escolar.
