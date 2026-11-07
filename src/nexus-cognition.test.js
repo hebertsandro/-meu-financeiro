@@ -404,3 +404,55 @@ test('entende correção explícita sem transformar a correção em outro assunt
   assert.match(reply, /você respondeu que está bem/);
   assert.doesNotMatch(reply, /Você mencionou|ideia que ficou na sua cabeça/);
 });
+
+
+test('prioriza intenção de compartilhar em relatos inéditos sobre qualquer tema', () => {
+  const cases = [
+    ['Hoje peguei um ônibus lotado e cheguei atrasado.', /ônibus|atrasado/i],
+    ['Meu irmão apareceu aqui do nada ontem.', /irmão|apareceu/i],
+    ['Passei a tarde ouvindo música e pensando na vida.', /música|pensando/i],
+    ['Comprei um lanche diferente na saída.', /lanche|diferente/i]
+  ];
+  for (const [message, expected] of cases) {
+    const reply = improveNexusFallback(message, [], 'Entendi que o assunto são seus estudos. Como posso ajudar?');
+    assert.match(reply, expected);
+    assert.doesNotMatch(reply, /qual matéria|como posso ajudar|o que você precisa resolver/i);
+  }
+});
+
+test('não transforma relato cotidiano em pedido de conselho só por citar namoro', () => {
+  const reply = improveNexusFallback(
+    'Ontem eu e minha namorada fomos dar uma volta no shopping.',
+    [],
+    'Vou dar algumas dicas para melhorar seu relacionamento.'
+  );
+  assert.match(reply, /namorada|shopping|volta/i);
+  assert.doesNotMatch(reply, /você deveria|recomendo|conselho/i);
+});
+
+test('mantém ajuda explícita quando a pessoa realmente pede', () => {
+  const reply = improveNexusFallback(
+    'Me ajuda a estudar matemática para a prova de amanhã?',
+    [],
+    'fallback genérico'
+  );
+  assert.match(reply, /etapas|estudar|explicar/i);
+});
+
+test('muda de assunto sem carregar o tema anterior para a resposta', () => {
+  const history = [
+    {role:'user',content:'Estou preocupado com minha namorada.'},
+    {role:'assistant',content:'Quer me contar o que aconteceu?'}
+  ];
+  const reply = improveNexusFallback('Agora quero falar de música.', history, 'fallback genérico');
+  assert.doesNotMatch(reply, /namorada|relacionamento/i);
+});
+
+test('responde a uma continuação curta usando a pergunta imediatamente anterior', () => {
+  const history = [
+    {role:'assistant',content:'Como foi seu dia na escola?'}
+  ];
+  const reply = improveNexusFallback('Foi cansativo, tive duas provas.', history, 'fallback genérico');
+  assert.match(reply, /provas|cansativo/i);
+  assert.doesNotMatch(reply, /qual matéria você precisa de ajuda/i);
+});
