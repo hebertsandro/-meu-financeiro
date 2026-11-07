@@ -745,7 +745,7 @@ function App(){
   async function sendAssistantMessage(value=assistantInput){
     const question=String(value||'').trim();
     if(!question||assistantBusy)return;
-    const previous=assistantMessages.filter(m=>m.role==='user'||m.role==='assistant').slice(-12);
+    const previous=assistantMessages.filter(m=>m.role==='user'||m.role==='assistant').slice(-60);
     const nextHistory=[...previous.map(m=>({role:m.role,content:m.text})),{role:'user',content:question}];
     const financeContext={
       transactions:(data.transactions||[]).map(t=>({date:t.date,type:t.type,category:t.category,description:t.description,amount:t.amount})),
