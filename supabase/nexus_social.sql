@@ -40,6 +40,7 @@ drop policy if exists "Authenticated users can discover social profiles" on publ
 create policy "Authenticated users can discover social profiles" on public.social_profiles for select to authenticated using(true);
 drop policy if exists "Users manage their own social profile" on public.social_profiles;
 create policy "Users manage their own social profile" on public.social_profiles for insert to authenticated with check(auth.uid()=user_id);
+drop policy if exists "Users update their own social profile" on public.social_profiles;
 create policy "Users update their own social profile" on public.social_profiles for update to authenticated using(auth.uid()=user_id) with check(auth.uid()=user_id);
 
 drop policy if exists "Participants read friend requests" on public.social_friend_requests;
