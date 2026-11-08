@@ -94,3 +94,40 @@ create policy "Authenticated users can discover social profiles"
 revoke insert, update on public.social_profiles from authenticated;
 grant insert (user_id, username, display_name, bio, avatar, updated_at) on public.social_profiles to authenticated;
 grant update (username, display_name, bio, avatar, updated_at) on public.social_profiles to authenticated;
+
+
+-- Perfil público do jogador: progresso e cosméticos da Central do Jogador.
+alter table public.social_profiles
+ add column if not exists avatar_frame text not null default 'violet',
+ add column if not exists card_frame text not null default 'cyan',
+ add column if not exists equipped_gems text[] not null default '{}',
+ add column if not exists game_xp integer not null default 0 check(game_xp >= 0),
+ add column if not exists game_correct integer not null default 0 check(game_correct >= 0),
+ add column if not exists username_changed_at timestamptz not null default now();
+
+-- O intervalo de 30 dias é validado no banco, não apenas na interface.
+create or replace function public.social_enforce_username_cooldown()
+returns trigger language plpgsql set search_path=public as $$
+begin
+ if tg_op='INSERT' then
+  new.username_changed_at:=coalesce(new.username_changed_at,now());
+ elsif new.username is distinct from old.username then
+  if old.username_changed_at is not null and old.username_changed_at > now()-interval '30 days' then
+   raise exception 'O nome de usuário só pode ser alterado a cada 30 dias.';
+  end if;
+  new.username_changed_at:=now();
+ else
+  new.username_changed_at:=old.username_changed_at;
+ end if;
+ return new;
+end;
+$$;
+drop trigger if exists social_username_cooldown on public.social_profiles;
+create trigger social_username_cooldown
+ before insert or update of username on public.social_profiles
+ for each row execute function public.social_enforce_username_cooldown();
+
+-- Reaplica permissões de colunas após a ampliação do perfil.
+revoke insert, update on public.social_profiles from authenticated;
+grant insert (user_id, username, display_name, bio, avatar, avatar_frame, card_frame, equipped_gems, game_xp, game_correct, updated_at) on public.social_profiles to authenticated;
+grant update (username, display_name, bio, avatar, avatar_frame, card_frame, equipped_gems, game_xp, game_correct, updated_at) on public.social_profiles to authenticated;
