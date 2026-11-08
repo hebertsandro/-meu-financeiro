@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
   if (authData.user.email?.toLowerCase() !== adminEmail) return respond({ error: "Acesso restrito ao administrador autorizado." }, 403);
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  let body: { action?: string; user_id?: string; enabled?: boolean; message?: string };
+  let body: { action?: string; user_id?: string; enabled?: boolean; message?: string; suspended?: boolean };
   try { body = await req.json(); } catch { return respond({ error: "Corpo da solicitação inválido." }, 400); }
 
   if (body.action === "get_maintenance") {
@@ -47,6 +47,33 @@ Deno.serve(async (req) => {
     const { error } = await admin.from("app_settings").upsert({ id: true, maintenance_mode: enabled, maintenance_message: message, updated_at: new Date().toISOString() });
     if (error) return respond({ error: "Falha ao salvar manutenção: " + error.message }, 500);
     return respond({ success: true, maintenance_mode: enabled });
+  }
+
+  if (body.action === "list_social_profiles") {
+    const { data: profiles, error } = await admin.from("social_profiles")
+      .select("user_id,username,display_name,bio,avatar,is_suspended,moderation_note,created_at,updated_at")
+      .order("created_at", { ascending: false }).limit(500);
+    if (error) return respond({ error: "Não foi possível listar perfis sociais: " + error.message }, 500);
+    const { data: authUsers } = await admin.auth.admin.listUsers({ page: 1, perPage: 1000 });
+    const emails = new Map((authUsers?.users ?? []).map((u) => [u.id, u.email ?? ""]));
+    return respond({ profiles: (profiles ?? []).map((p) => ({ ...p, email: emails.get(p.user_id) ?? "" })) });
+  }
+
+  if (body.action === "moderate_social_profile" || body.action === "delete_social_profile") {
+    if (!body.user_id) return respond({ error: "Informe o perfil social." }, 400);
+    if (body.user_id === authData.user.id) return respond({ error: "O administrador não pode moderar o próprio perfil por este painel." }, 400);
+    if (body.action === "delete_social_profile") {
+      const { error } = await admin.from("social_profiles").delete().eq("user_id", body.user_id);
+      if (error) return respond({ error: "Não foi possível remover o perfil social: " + error.message }, 500);
+      return respond({ success: true, deleted: true });
+    }
+    const suspended = body.suspended === true;
+    const { error } = await admin.from("social_profiles").update({
+      is_suspended: suspended, moderation_note: suspended ? "Suspenso pela administração" : null,
+      moderated_at: new Date().toISOString(), moderated_by: authData.user.id, updated_at: new Date().toISOString(),
+    }).eq("user_id", body.user_id);
+    if (error) return respond({ error: "Não foi possível alterar a moderação: " + error.message }, 500);
+    return respond({ success: true, is_suspended: suspended });
   }
 
   if (body.action === "list_users") {
