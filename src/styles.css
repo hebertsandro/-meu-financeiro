@@ -2200,3 +2200,118 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
 .assistant-popover-title small i{display:inline-block;width:6px;height:6px;border-radius:50%;background:#57e4b2;box-shadow:0 0 9px #57e4b2;animation:nexusOnlinePulse 1.8s ease-in-out infinite}
 @keyframes nexusOnlinePulse{50%{opacity:.35;transform:scale(.75)}}
 @media(prefers-reduced-motion:reduce){.assistant-popover-icon.nexus-avatar,.assistant-popover-icon.nexus-avatar:before,.assistant-popover-icon.nexus-avatar:after,.assistant-popover-title small i{animation:none!important}}
+
+
+/* Biblioteca de jogos — inspiração arcade premium, com trilho horizontal e capas imersivas */
+.gamer-world .games-welcome{
+  align-items:flex-end;
+  padding:8px 2px 22px;
+  margin:0 0 22px;
+  border:0;
+  border-bottom:1px solid rgba(255,255,255,.09);
+  border-radius:0;
+  background:transparent;
+  box-shadow:none;
+}
+.gamer-world .games-welcome>div:first-child>span{color:#b9a3ff;font-size:10px;letter-spacing:1.8px}
+.gamer-world .games-welcome h2{font-size:clamp(23px,4vw,32px);letter-spacing:-1.1px}
+.gamer-world .games-welcome p{max-width:520px;font-size:13px;color:#aeb4c8;line-height:1.6}
+.arcade-library-heading{margin:10px 0 16px}
+.arcade-library-heading h3{font-size:20px;letter-spacing:-.5px}
+.arcade-library-heading>small{color:#9da2b6;font-size:9px;letter-spacing:.1em}
+.arcade-library-rail{
+  display:flex;
+  gap:18px;
+  overflow-x:auto;
+  overflow-y:hidden;
+  padding:2px 2px 20px;
+  margin:0 -2px 8px;
+  scroll-snap-type:x mandatory;
+  scrollbar-width:thin;
+  scrollbar-color:#6f4bb0 transparent;
+  -webkit-overflow-scrolling:touch;
+}
+.arcade-library-rail .arcade-library-card{
+  position:relative;
+  flex:0 0 clamp(245px,31vw,310px);
+  min-width:0;
+  border:1px solid rgba(255,255,255,.17);
+  border-radius:25px;
+  background:#171421;
+  box-shadow:0 15px 35px rgba(0,0,0,.25);
+  scroll-snap-align:start;
+}
+.arcade-library-rail .arcade-library-art{
+  height:clamp(205px,27vw,275px);
+  border-radius:24px 24px 0 0;
+}
+.arcade-library-rail .arcade-library-art>span{
+  font-size:clamp(82px,10vw,112px);
+  filter:drop-shadow(0 16px 18px rgba(0,0,0,.35));
+  transform:translateY(-5px);
+}
+.arcade-library-rail .arcade-library-art>b{
+  left:18px;bottom:14px;font-size:10px;letter-spacing:.16em;color:#ffffffd9
+}
+.arcade-library-rail .arcade-library-art>i{font-size:28px;right:20px;top:15px}
+.arcade-library-rail .arcade-library-info{padding:15px 17px 18px;gap:7px}
+.arcade-library-rail .arcade-library-info strong{font-size:14px;letter-spacing:.025em}
+.arcade-library-rail .arcade-library-info small{font-size:11px;min-height:0;color:#c1bdcd}
+.arcade-library-rail .arcade-library-play{margin-top:10px;min-height:40px}
+.space-library-card .arcade-library-art{
+ background:radial-gradient(ellipse at 50% 45%,#688ee9 0%,#343e86 36%,#171b45 75%,#11132a 100%);
+}
+.space-library-card .arcade-library-art:after{
+ content:"";position:absolute;inset:0;
+ background:radial-gradient(circle at 20% 20%,#fff 0 1px,transparent 2px),radial-gradient(circle at 76% 28%,#fff 0 1px,transparent 2px),radial-gradient(circle at 64% 70%,#d9c7ff 0 1px,transparent 2px);
+ background-size:73px 67px,91px 83px,59px 71px;opacity:.65
+}
+.quiz-library-card .arcade-library-art{
+ background:radial-gradient(ellipse at 50% 35%,#d3b5ff 0%,#8061bb 38%,#46336f 72%,#261b43 100%);
+}
+.flap-library-card .arcade-library-art{
+ background:radial-gradient(ellipse at 50% 38%,#ffe6a8 0%,#c88c58 38%,#76503f 72%,#332638 100%);
+}
+.arcade-coming-card{filter:saturate(.7)}
+.arcade-detail-cover{
+ position:relative;isolation:isolate;overflow:hidden;
+ display:flex;align-items:center;gap:clamp(18px,4vw,46px);
+ min-height:245px;margin:0 0 22px;padding:30px;
+ border:1px solid rgba(255,255,255,.16);border-radius:28px;
+ background:linear-gradient(145deg,#d8c5ef,#9a86aa 65%,#77677f);
+ color:#fff;
+}
+.arcade-detail-cover:before,.arcade-detail-cover:after{
+ content:"";position:absolute;z-index:-1;border-radius:50%;filter:blur(2px)
+}
+.arcade-detail-cover:before{width:310px;height:310px;right:4%;top:-150px;background:#ffffff45}
+.arcade-detail-cover:after{width:250px;height:250px;left:20%;bottom:-190px;background:#5b2c9850}
+.arcade-detail-glow{position:absolute;z-index:-1;inset:0;background:linear-gradient(90deg,transparent,#ffffff20)}
+.arcade-detail-emoji{
+ flex:0 0 auto;display:grid;place-items:center;width:clamp(120px,20vw,190px);height:clamp(120px,20vw,190px);
+ border-radius:38%;font-size:clamp(72px,12vw,112px);
+ background:radial-gradient(circle at 35% 25%,#ffffffd9,#ffffff55 48%,#ffffff18);
+ box-shadow:0 25px 55px #39224b38,inset 0 2px 10px #ffffffa6;
+ transform:rotate(-7deg)
+}
+.arcade-detail-copy{max-width:540px}
+.arcade-detail-copy>span{font-size:9px;font-weight:900;letter-spacing:.17em;color:#fffD}
+.arcade-detail-copy h2{margin:10px 0 8px;font-size:clamp(26px,4vw,42px);letter-spacing:-1.5px;color:#fff}
+.arcade-detail-copy p{max-width:440px;margin:0;color:#fffE;font-size:14px;line-height:1.65}
+.arcade-detail-cover.cover-quiz{background:linear-gradient(140deg,#d8c8f2,#9b83b5 58%,#5c3c7d)}
+.arcade-detail-cover.cover-flap{background:linear-gradient(140deg,#ffe0b5,#c58c8d 55%,#765a86)}
+.arcade-detail-cover.cover-space{background:linear-gradient(140deg,#8cc8ee,#586dbb 55%,#282e68)}
+@media(max-width:650px){
+ .gamer-world .games-welcome{align-items:flex-start;gap:10px;padding-bottom:18px}
+ .gamer-world .games-welcome h2{font-size:24px;max-width:260px}
+ .gamer-world .games-welcome p{font-size:11px}
+ .gamer-world .games-welcome-xp{min-width:66px;padding:10px 8px}
+ .arcade-library-rail{gap:14px;padding-bottom:16px}
+ .arcade-library-rail .arcade-library-card{flex-basis:76vw;max-width:330px;border-radius:23px}
+ .arcade-library-rail .arcade-library-art{height:clamp(215px,64vw,270px)}
+ .arcade-library-rail .arcade-library-info{padding:14px 15px 16px}
+ .arcade-detail-cover{min-height:0;flex-direction:column;align-items:flex-start;gap:19px;padding:23px;border-radius:24px}
+ .arcade-detail-emoji{width:125px;height:125px;font-size:75px}
+ .arcade-detail-copy h2{font-size:29px}
+ .arcade-detail-copy p{font-size:12px}
+}
