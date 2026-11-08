@@ -74,3 +74,16 @@ grant execute on function public.social_respond_friend_request(uuid,boolean) to 
 grant select,insert,update on public.social_profiles to authenticated;
 grant select,insert,update on public.social_friend_requests to authenticated;
 grant select on public.social_friendships to authenticated;
+
+
+-- Moderação administrativa do NEXUS SOCIAL (migração segura e reexecutável).
+alter table public.social_profiles
+ add column if not exists is_suspended boolean not null default false,
+ add column if not exists moderation_note text,
+ add column if not exists moderated_at timestamptz,
+ add column if not exists moderated_by uuid references auth.users(id) on delete set null;
+
+drop policy if exists "Authenticated users can discover social profiles" on public.social_profiles;
+create policy "Authenticated users can discover social profiles"
+ on public.social_profiles for select to authenticated
+ using (auth.uid() = user_id or is_suspended = false);
