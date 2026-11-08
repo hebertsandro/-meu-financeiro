@@ -20,7 +20,8 @@ export default function NexusSocial({session,playerProfile,onPlayerProfileChange
     supabase.from('social_friend_requests').select('id,sender_id,receiver_id,created_at').eq('sender_id',userId).eq('status','pending').order('created_at',{ascending:false})
    ]);
    for(const r of [p,f,inc,out])if(r.error)throw r.error;
-   const prof=p.data;setProfile(prof);setName(prof?.display_name||playerProfile?.name||session.user.user_metadata?.name||'');setUsername(prof?.username||'');setBio(prof?.bio||'');
+   const prof=p.data;setProfile(prof);setName(prof?.display_name||playerProfile?.name||session.user.user_metadata?.name||'');setUsername(prof?.username||playerProfile?.username||'');setBio(prof?.bio||playerProfile?.bio||'');
+   if(prof)onPlayerProfileChange(p=>({...p,name:prof.display_name||p.name,avatar:prof.avatar||p.avatar,username:prof.username||p.username,bio:prof.bio??p.bio}));
    if(prof?.display_name&&prof.display_name!==playerProfile?.name)onPlayerProfileChange(p=>({...p,name:prof.display_name}));
    if(prof?.avatar&&prof.avatar!==playerProfile?.avatar)onPlayerProfileChange(p=>({...p,avatar:prof.avatar}));
    const ids=[...new Set([...(f.data||[]).map(x=>x.user_a===userId?x.user_b:x.user_a),...(inc.data||[]).map(x=>x.sender_id),...(out.data||[]).map(x=>x.receiver_id)])];
@@ -41,7 +42,7 @@ export default function NexusSocial({session,playerProfile,onPlayerProfileChange
   setBusy(true);setError('');
   const syncedName=name.trim().slice(0,40);const syncedAvatar=playerProfile?.avatar||'👾';
   const {error:e1}=await supabase.from('social_profiles').upsert({user_id:userId,username:clean,display_name:syncedName,bio:bio.trim().slice(0,160),avatar:syncedAvatar,updated_at:new Date().toISOString()},{onConflict:'user_id'});
-  if(e1)setError(e1.code==='23505'?'Esse nome de usuário já está em uso.':e1.message);else{onPlayerProfileChange(p=>({...p,name:syncedName,avatar:syncedAvatar}));onToast('Perfil do jogador e perfil social sincronizados!');load();}
+  if(e1)setError(e1.code==='23505'?'Esse nome de usuário já está em uso.':e1.message);else{onPlayerProfileChange(p=>({...p,name:syncedName,avatar:syncedAvatar,username:clean,bio:bio.trim().slice(0,160)}));onToast('Perfil do jogador e perfil social sincronizados!');load();}
   setBusy(false);
  }
  async function searchPeople(e){
