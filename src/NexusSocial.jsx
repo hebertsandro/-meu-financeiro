@@ -4,7 +4,7 @@ import {supabase} from './supabase';
 
 const initials=(name='')=>String(name).trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'NX';
 
-export default function NexusSocial({session,onToast=()=>{}}){
+export default function NexusSocial({session,playerProfile,onPlayerProfileChange=()=>{},onToast=()=>{}}){
  const userId=session?.user?.id;
  const [profile,setProfile]=useState(null),[name,setName]=useState(''),[username,setUsername]=useState(''),[bio,setBio]=useState('');
  const [query,setQuery]=useState(''),[results,setResults]=useState([]),[friends,setFriends]=useState([]),[incoming,setIncoming]=useState([]),[outgoing,setOutgoing]=useState([]);
@@ -20,7 +20,9 @@ export default function NexusSocial({session,onToast=()=>{}}){
     supabase.from('social_friend_requests').select('id,sender_id,receiver_id,created_at').eq('sender_id',userId).eq('status','pending').order('created_at',{ascending:false})
    ]);
    for(const r of [p,f,inc,out])if(r.error)throw r.error;
-   const prof=p.data;setProfile(prof);setName(prof?.display_name||session.user.user_metadata?.name||'');setUsername(prof?.username||'');setBio(prof?.bio||'');
+   const prof=p.data;setProfile(prof);setName(prof?.display_name||playerProfile?.name||session.user.user_metadata?.name||'');setUsername(prof?.username||'');setBio(prof?.bio||'');
+   if(prof?.display_name&&prof.display_name!==playerProfile?.name)onPlayerProfileChange(p=>({...p,name:prof.display_name}));
+   if(prof?.avatar&&prof.avatar!==playerProfile?.avatar)onPlayerProfileChange(p=>({...p,avatar:prof.avatar}));
    const ids=[...new Set([...(f.data||[]).map(x=>x.user_a===userId?x.user_b:x.user_a),...(inc.data||[]).map(x=>x.sender_id),...(out.data||[]).map(x=>x.receiver_id)])];
    const people=ids.length?await supabase.from('social_profiles').select('user_id,username,display_name,bio,avatar').in('user_id',ids):{data:[],error:null};
    if(people.error)throw people.error;
@@ -30,15 +32,16 @@ export default function NexusSocial({session,onToast=()=>{}}){
    setOutgoing((out.data||[]).map(x=>({...x,person:map[x.receiver_id]})).filter(x=>x.person));
   }catch(e){setError(e.message||'Não foi possível carregar o NEXUS Social.');}
   finally{setLoading(false);}
- },[userId,session]);
+ },[userId,session,playerProfile?.name,playerProfile?.avatar,onPlayerProfileChange]);
  useEffect(()=>{load()},[load]);
  async function saveProfile(e){
   e.preventDefault();if(!userId)return;
   const clean=username.toLowerCase().trim();
   if(!/^[a-z0-9_]{3,20}$/.test(clean)){setError('O usuário deve ter de 3 a 20 caracteres: letras, números ou _.');return;}
   setBusy(true);setError('');
-  const {error:e1}=await supabase.from('social_profiles').upsert({user_id:userId,username:clean,display_name:name.trim().slice(0,40),bio:bio.trim().slice(0,160),updated_at:new Date().toISOString()},{onConflict:'user_id'});
-  if(e1)setError(e1.code==='23505'?'Esse nome de usuário já está em uso.':e1.message);else{onToast('Perfil social atualizado!');load();}
+  const syncedName=name.trim().slice(0,40);const syncedAvatar=playerProfile?.avatar||'👾';
+  const {error:e1}=await supabase.from('social_profiles').upsert({user_id:userId,username:clean,display_name:syncedName,bio:bio.trim().slice(0,160),avatar:syncedAvatar,updated_at:new Date().toISOString()},{onConflict:'user_id'});
+  if(e1)setError(e1.code==='23505'?'Esse nome de usuário já está em uso.':e1.message);else{onPlayerProfileChange(p=>({...p,name:syncedName,avatar:syncedAvatar}));onToast('Perfil do jogador e perfil social sincronizados!');load();}
   setBusy(false);
  }
  async function searchPeople(e){
