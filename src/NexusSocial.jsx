@@ -29,7 +29,7 @@ function PublicPlayerProfile({person,onClose}){
   <footer className="social-public-footer"><ShieldCheck size={16}/> Perfil público somente para visualização. Ninguém pode alterar os dados deste jogador por aqui.</footer>
  </section></div>;
 }
-export default function NexusSocial({session,playerProfile,onPlayerProfileChange=()=>{},onToast=()=>{}}){
+export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=0,onPlayerProfileChange=()=>{},onToast=()=>{}}){
  const userId=session?.user?.id;
  const [profile,setProfile]=useState(null),[username,setUsername]=useState(''),[bio,setBio]=useState('');
  const [query,setQuery]=useState(''),[results,setResults]=useState([]),[friends,setFriends]=useState([]),[incoming,setIncoming]=useState([]),[outgoing,setOutgoing]=useState([]);
@@ -69,7 +69,7 @@ export default function NexusSocial({session,playerProfile,onPlayerProfileChange
   const syncedName=String(playerProfile?.name||session.user.user_metadata?.name||'Jogador').trim().slice(0,40);
   const syncedAvatar=playerProfile?.avatar||'👾';
   const cleanBio=bio.trim().slice(0,160);
-  const {data,error:e1}=await supabase.from('social_profiles').upsert({user_id:userId,username:clean,display_name:syncedName,bio:cleanBio,avatar:syncedAvatar,avatar_frame:playerProfile?.frame||'violet',card_frame:playerProfile?.cardFrame||'cyan',equipped_gems:Array.isArray(playerProfile?.gems)?playerProfile.gems:[],game_xp:Number(playerProfile?.gameXp||0),updated_at:new Date().toISOString()},{onConflict:'user_id'}).select('*').single();
+  const {data,error:e1}=await supabase.from('social_profiles').upsert({user_id:userId,username:clean,display_name:syncedName,bio:cleanBio,avatar:syncedAvatar,avatar_frame:playerProfile?.frame||'violet',card_frame:playerProfile?.cardFrame||'cyan',equipped_gems:Array.isArray(playerProfile?.gems)?playerProfile.gems:[],game_xp:Number(gameXp||0),game_correct:Number(gameCorrect||0),updated_at:new Date().toISOString()},{onConflict:'user_id'}).select('*').single();
   if(e1)setError(e1.message.includes('30 dias')?'O @ só pode ser alterado a cada 30 dias.':e1.code==='23505'?'Esse @ já está em uso.':e1.message);
   else{setProfile(data);setUsername(data.username);onPlayerProfileChange(p=>({...p,username:data.username,bio:data.bio}));onToast('Seu perfil social foi atualizado!');}
   setBusy(false);
