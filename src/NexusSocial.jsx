@@ -32,7 +32,7 @@ export default function NexusSocial({session,playerProfile,onPlayerProfileChange
    setOutgoing((out.data||[]).map(x=>({...x,person:map[x.receiver_id]})).filter(x=>x.person));
   }catch(e){setError(e.message||'Não foi possível carregar o NEXUS Social.');}
   finally{setLoading(false);}
- },[userId,session,playerProfile?.name,playerProfile?.avatar,onPlayerProfileChange]);
+ },[userId,session]);
  useEffect(()=>{load()},[load]);
  async function saveProfile(e){
   e.preventDefault();if(!userId)return;
