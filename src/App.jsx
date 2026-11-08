@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase, isConfigured } from './supabase';
 import { improveNexusFallback } from './nexus-cognition';
+import NexusSocial from './NexusSocial';
 import {
   Activity, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined,
   Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock, Bot, Sparkles, Send,
@@ -19,7 +20,7 @@ const ADMIN_EMAIL = 'hebertsandro877@gmail.com'; // Apenas controla a exibição
 const menu = [
   ['Visão geral',LayoutDashboard,'overview'],['Cartões e compromissos',CreditCard,'cards'],
   ['Movimentações',Activity,'transactions'],['Planejamento',Target,'planning'],
-  ['Relatórios',ChartNoAxesCombined,'reports'],['Jogos',Gamepad2,'games'],['Oportunidades',Gift,'opportunities']
+  ['Relatórios',ChartNoAxesCombined,'reports'],['NEXUS Social',Users,'social'],['Jogos',Gamepad2,'games'],['Oportunidades',Gift,'opportunities']
 ];
 
 
@@ -865,7 +866,9 @@ function App(){
     {mobileMenu&&<div className="scrim" onClick={()=>setMobileMenu(false)}/>}
     <main className="main-area"><header className="topbar"><button className="icon-btn menu-toggle" onClick={()=>setMobileMenu(true)}><Menu size={22}/></button><div className="crumb">Meu espaço <ChevronRight size={14}/><b>{[...menu,...(isAdmin?[['Painel ADM',ShieldCheck,'admin']]:[])].find(x=>x[2]===page)?.[0]|| (page==='notifications'?'Notificações':'Visão geral')}</b></div><div className="top-actions"><button className="xp-header-chip" aria-label={`Jogador nível ${Math.floor(gameXp/500)+1}, ${gameXp} XP. Abrir oportunidades`} onClick={()=>setPage("opportunities")}><Zap size={15}/><span><b>{gameXp} XP</b><small>NÍVEL {Math.floor(gameXp/500)+1}</small></span></button><button className="notification-bell" aria-label="Abrir notificações" onClick={()=>setPage("notifications")}><Bell size={18}/>{unreadCount>0&&<i>{unreadCount>9?"9+":unreadCount}</i>}</button><span className="today"><CalendarDays size={15}/>{new Date().toLocaleDateString('pt-BR',{day:'2-digit',month:'short',year:'numeric'})}</span><button className={`avatar profile-avatar-button frame-${playerProfile.frame} ${(playerProfile.gems||[]).length===4?"frame-chromatic":""}`} aria-label="Abrir meu perfil" title="Meu perfil" onClick={()=>setPage('profile')}><span>{playerProfile.avatar}</span></button></div></header>
     <div className="content">
-      <div className="page-heading"><div><div className="eyebrow">SEU DINHEIRO, MAIS CLARO</div><h1>{page==='overview'?'Visão geral':page==='admin'?'Painel administrativo':page==='notifications'?'Notificações':page==='profile'?'Meu perfil':menu.find(x=>x[2]===page)?.[0]}</h1><p>{page==='admin'?'Gerencie contas com acesso administrativo protegido no servidor.':page==='overview'?'Aqui está um resumo da sua vida financeira.':page==='transactions'?'Entradas, gastos e contas a pagar em um só lugar.':page==='cards'?'Cartões, limites, faturas e compromissos futuros.':page==='planning'?'Metas e organização dos seus próximos passos.':page==='opportunities'?'Missões e oportunidades para evoluir.':page==='games'?'Jogos, desafios e XP em uma central exclusiva.':page==='profile'?'Seu jogador, suas conquistas e sua personalização.':'Entenda seus hábitos financeiros.'}</p></div>{['transactions','cards','planning'].includes(page)&&<button className="primary" onClick={()=>setModal(page==='planning'?'goals':page)}><Plus size={18}/>{page==='cards'?' Adicionar cartão':page==='planning'?' Nova meta':' Nova movimentação'}</button>}</div>
+      <div className="page-heading"><div><div className="eyebrow">SEU DINHEIRO, MAIS CLARO</div><h1>{page==='overview'?'Visão geral':page==='admin'?'Painel administrativo':page==='notifications'?'Notificações':page==='profile'?'Meu perfil':page==='social'?'NEXUS Social':menu.find(x=>x[2]===page)?.[0]}</h1><p>{page==='admin'?'Gerencie contas com acesso administrativo protegido no servidor.':page==='overview'?'Aqui está um resumo da sua vida financeira.':page==='transactions'?'Entradas, gastos e contas a pagar em um só lugar.':page==='cards'?'Cartões, limites, faturas e compromissos futuros.':page==='planning'?'Metas e organização dos seus próximos passos.':page==='opportunities'?'Missões e oportunidades para evoluir.':page==='games'?'Jogos, desafios e XP em uma central exclusiva.':page==='social'?'Amizades e comunidade em um espaço seguro.':page==='profile'?'Seu jogador, suas conquistas e sua personalização.':'Entenda seus hábitos financeiros.'}</p></div>{['transactions','cards','planning'].includes(page)&&<button className="primary" onClick={()=>setModal(page==='planning'?'goals':page)}><Plus size={18}/>{page==='cards'?' Adicionar cartão':page==='planning'?' Nova meta':' Nova movimentação'}</button>}</div>
+
+      {page==='social'&&<NexusSocial session={session} onToast={setToast}/>}
 
       {page==='admin'&&isAdmin&&<section className="panel admin-panel">
         <div className="panel-head"><div><h3>Administração de contas</h3><p>Área exclusiva do administrador · ações verificadas pela Edge Function</p></div><div className="item-actions"><button className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('get_maintenance')}>Consultar manutenção</button><button className="primary" disabled={adminBusy} onClick={()=>adminAction('list_users')}><RefreshCw size={16}/> Atualizar contas</button></div></div>
