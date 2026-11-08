@@ -87,3 +87,10 @@ drop policy if exists "Authenticated users can discover social profiles" on publ
 create policy "Authenticated users can discover social profiles"
  on public.social_profiles for select to authenticated
  using (auth.uid() = user_id or is_suspended = false);
+
+
+-- Usuários só podem escrever os campos do próprio perfil; campos de moderação
+-- ficam reservados ao service role usado pela Edge Function administrativa.
+revoke insert, update on public.social_profiles from authenticated;
+grant insert (user_id, username, display_name, bio, avatar) on public.social_profiles to authenticated;
+grant update (username, display_name, bio, avatar, updated_at) on public.social_profiles to authenticated;
