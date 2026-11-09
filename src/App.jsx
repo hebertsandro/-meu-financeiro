@@ -555,6 +555,7 @@ function App(){
   const [modal,setModal]=useState(null), [toast,setToast]=useState('');
   const [payModal,setPayModal]=useState(false),[payBusy,setPayBusy]=useState(false);
   const [email,setEmail]=useState(''), [password,setPassword]=useState(''), [authError,setAuthError]=useState(''), [authMode,setAuthMode]=useState('login'), [authNotice,setAuthNotice]=useState('');
+  const [signupUsername,setSignupUsername]=useState(''),[signupBio,setSignupBio]=useState(''),[playerBioBusy,setPlayerBioBusy]=useState(false);
   const [busy,setBusy]=useState(false);
   const [adminUsers,setAdminUsers]=useState([]),[adminSocialProfiles,setAdminSocialProfiles]=useState([]),[adminBusy,setAdminBusy]=useState(false),[adminError,setAdminError]=useState(''),[adminMessage,setAdminMessage]=useState(''),[maintenance,setMaintenance]=useState(false),[maintenanceMessage,setMaintenanceMessage]=useState('Estamos realizando uma manutenção. Voltaremos em breve.');
   const [adminTestMode,setAdminTestMode]=useState(()=>window.localStorage.getItem('mf_admin_test_mode')==='true');
@@ -605,6 +606,23 @@ function App(){
   },[]);
   useEffect(()=>{if(session) loadData()},[session]);
   useEffect(()=>{
+    const user=session?.user;if(!user?.id||!supabase)return;
+    let active=true;
+    (async()=>{
+      const {data:existing,error}=await supabase.from('social_profiles').select('*').eq('user_id',user.id).maybeSingle();
+      if(!active)return;
+      if(error){console.warn('NEXUS Social profile load:',error.message);return;}
+      if(existing){setPlayerProfile(p=>({...p,username:existing.username||'',bio:existing.bio||''}));return;}
+      const metadata=user.user_metadata||{};const username=String(metadata.social_username||'').trim().toLowerCase();
+      if(!/^[a-z0-9_]{3,20}$/.test(username))return;
+      const {data:created,error:createError}=await supabase.from('social_profiles').insert({user_id:user.id,username,display_name:String(playerProfile.name||metadata.name||'Meu jogador').trim().slice(0,40)||'Meu jogador',bio:String(metadata.social_bio||'').trim().slice(0,160),avatar:playerProfile.avatar||'👾',avatar_frame:playerProfile.frame||'violet',card_frame:playerProfile.cardFrame||'cyan',equipped_gems:Array.isArray(playerProfile.gems)?playerProfile.gems:[],game_xp:Number(gameXp||0),game_correct:Number(gameCorrect||0)}).select('*').single();
+      if(!active)return;
+      if(createError){console.warn('NEXUS Social profile creation:',createError.message);return;}
+      if(created)setPlayerProfile(p=>({...p,username:created.username,bio:created.bio}));
+    })();
+    return()=>{active=false;};
+  },[session?.user?.id]);
+  useEffect(()=>{
     if(!isConfigured){setMaintenanceCheckDone(true);return}
     let active=true;
     supabase.from('app_settings').select('maintenance_mode,maintenance_message').eq('id',true).maybeSingle()
@@ -624,10 +642,16 @@ function App(){
     e.preventDefault();setBusy(true);setAuthError('');setAuthNotice('');
     const cleanEmail=email.trim();
     if(authMode==='signup'){
+      const cleanUsername=signupUsername.trim().toLowerCase();
+      const cleanBio=signupBio.trim().slice(0,160);
+      if(!/^[a-z0-9_]{3,20}$/.test(cleanUsername)){setAuthError('O @ deve ter de 3 a 20 caracteres: letras, números ou _.');setBusy(false);return;}
+      const {data:usernameTaken,error:usernameCheckError}=await supabase.from('social_profiles').select('user_id').eq('username',cleanUsername).maybeSingle();
+      if(usernameCheckError){setAuthError('Não foi possível verificar esse @. Tente novamente.');setBusy(false);return;}
+      if(usernameTaken){setAuthError('Esse @ já está em uso. Escolha outro.');setBusy(false);return;}
       const {data,error}=await supabase.auth.signUp({
         email:cleanEmail,
         password,
-        options:{emailRedirectTo:window.location.origin}
+        options:{emailRedirectTo:window.location.origin,data:{social_username:cleanUsername,social_bio:cleanBio}}
       });
       if(error){
         setAuthError(error.message.includes('Password')?'Use uma senha mais forte, com pelo menos 6 caracteres.':'Não foi possível criar a conta. Confira os dados e tente novamente.');
@@ -641,6 +665,14 @@ function App(){
       if(error)setAuthError('Não foi possível entrar. Confira o e-mail e a senha.');
     }
     setBusy(false);
+  }
+  async function savePlayerBio(e){
+    e.preventDefault();if(!session?.user?.id||!supabase)return;
+    const cleanBio=String(playerProfile.bio||'').trim().slice(0,160);setPlayerBioBusy(true);
+    const {data,error}=await supabase.from('social_profiles').update({bio:cleanBio,updated_at:new Date().toISOString()}).eq('user_id',session.user.id).select('username,bio').maybeSingle();
+    if(error||!data){notify(error?.message||'Seu perfil social ainda não foi criado. Saia e entre novamente ou conclua seu cadastro social.');}
+    else{setPlayerProfile(p=>({...p,username:data.username,bio:data.bio}));notify('Biografia atualizada na Central do Jogador!');}
+    setPlayerBioBusy(false);
   }
   async function loadData(){
     const tables=['transactions','cards','debts','goals','installments','subscriptions','card_limit_history','goal_movements','notifications'];
@@ -863,7 +895,8 @@ function App(){
   if(loading||!maintenanceCheckDone)return <div className="loading"><div className="spinner"/><span>Preparando seu espaço financeiro…</span></div>;
   if(!isConfigured)return <SetupScreen/>;
   if(maintenance&&!isAdmin)return <div className="setup-shell"><div className="setup-card"><div className="brand"><div className="brand-icon"><Wallet size={22}/></div><span>meu<span className="brand-accent">financeiro</span></span></div><div className="setup-symbol"><LockKeyhole size={28}/></div><h1>Estamos em manutenção</h1><p>{maintenanceMessage}</p><p>Estamos trabalhando para melhorar sua experiência. Tente novamente mais tarde.</p></div></div>;
-  if(!session)return <div className="auth-shell"><div className="auth-art"><div className="brand"><div className="brand-icon"><Wallet size={22}/></div><span>meu<span className="brand-accent">financeiro</span></span></div><div className="auth-message"><div className="eyebrow"><ShieldCheck size={15}/> SEU ESPAÇO PESSOAL</div><h1>Cuide do seu dinheiro.<br/><span>Do seu jeito.</span></h1><p>Um lugar só seu para organizar suas finanças, acompanhar seus objetivos e tomar decisões melhores.</p><div className="auth-mini-stats"><div><span>Controle</span><b>em suas mãos</b></div><div><span>Acesso</span><b>protegido</b></div></div></div><div className="auth-foot">FINANÇAS MAIS CLARAS, UM DIA DE CADA VEZ.</div></div><div className="auth-form-wrap"><form className="auth-form" onSubmit={handleAuth}><div className="lock-circle"><LockKeyhole size={25}/></div><h2>{authMode==='login'?'Bem-vindo de volta':'Crie sua conta'}</h2><p>{authMode==='login'?'Entre para acessar seu painel privado.':'Comece a organizar suas finanças em seu espaço particular.'}</p><label>E-mail<input type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@exemplo.com"/></label><label>Senha<input type="password" autoComplete={authMode==='login'?'current-password':'new-password'} minLength="6" required value={password} onChange={e=>setPassword(e.target.value)} placeholder={authMode==='login'?'Sua senha':'Crie uma senha (mín. 6 caracteres)'}/></label>{authError&&<div className="error">{authError}</div>}{authNotice&&<div className="auth-notice">{authNotice}</div>}<button className="primary wide" disabled={busy}>{busy?(authMode==='login'?'Entrando…':'Criando conta…'):(authMode==='login'?'Entrar na minha conta':'Criar minha conta')} <ChevronRight size={18}/></button><button type="button" className="auth-switch" onClick={()=>{setAuthMode(authMode==='login'?'signup':'login');setAuthError('');setAuthNotice('')}}>{authMode==='login'?'Ainda não tem conta? Criar cadastro':'Já tem uma conta? Entrar'}</button><div className="secure-note"><ShieldCheck size={15}/> Área privada • Conexão segura</div></form></div></div>;
+  if(!session)return <div className="auth-shell"><div className="auth-art"><div className="brand"><div className="brand-icon"><Wallet size={22}/></div><span>meu<span className="brand-accent">financeiro</span></span></div><div className="auth-message"><div className="eyebrow"><ShieldCheck size={15}/> SEU ESPAÇO PESSOAL</div><h1>Cuide do seu dinheiro.<br/><span>Do seu jeito.</span></h1><p>Um lugar só seu para organizar suas finanças, acompanhar seus objetivos e tomar decisões melhores.</p><div className="auth-mini-stats"><div><span>Controle</span><b>em suas mãos</b></div><div><span>Acesso</span><b>protegido</b></div></div></div><div className="auth-foot">FINANÇAS MAIS CLARAS, UM DIA DE CADA VEZ.</div></div><div className="auth-form-wrap"><form className="auth-form" onSubmit={handleAuth}><div className="lock-circle"><LockKeyhole size={25}/></div><h2>{authMode==='login'?'Bem-vindo de volta':'Crie sua conta'}</h2><p>{authMode==='login'?'Entre para acessar seu painel privado.':'Comece a organizar suas finanças em seu espaço particular.'}</p>{authMode==='signup'&&<><label>@ do NEXUS Social<input type="text" autoComplete="username" required minLength="3" maxLength="20" value={signupUsername} onChange={e=>setSignupUsername(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,''))} placeholder="seu_usuario"/><small>De 3 a 20 caracteres · letras, números e _ · único na comunidade.</small></label><label>Biografia inicial<textarea maxLength={160} rows={3} value={signupBio} onChange={e=>setSignupBio(e.target.value)} placeholder="Conte um pouco sobre você..."/><small>{signupBio.length}/160 · Você poderá editar depois na Central do Jogador.</small></label></>}
+<label>E-mail<input type="email" autoComplete="email" required value={email} onChange={e=>setEmail(e.target.value)} placeholder="voce@exemplo.com"/></label><label>Senha<input type="password" autoComplete={authMode==='login'?'current-password':'new-password'} minLength="6" required value={password} onChange={e=>setPassword(e.target.value)} placeholder={authMode==='login'?'Sua senha':'Crie uma senha (mín. 6 caracteres)'}/></label>{authError&&<div className="error">{authError}</div>}{authNotice&&<div className="auth-notice">{authNotice}</div>}<button className="primary wide" disabled={busy}>{busy?(authMode==='login'?'Entrando…':'Criando conta…'):(authMode==='login'?'Entrar na minha conta':'Criar minha conta')} <ChevronRight size={18}/></button><button type="button" className="auth-switch" onClick={()=>{setAuthMode(authMode==='login'?'signup':'login');setAuthError('');setAuthNotice('')}}>{authMode==='login'?'Ainda não tem conta? Criar cadastro':'Já tem uma conta? Entrar'}</button><div className="secure-note"><ShieldCheck size={15}/> Área privada • Conexão segura</div></form></div></div>;
 
 
 
@@ -964,6 +997,7 @@ function App(){
         
 <div className="profile-editor panel"><div className="panel-head"><div><h3>Personalize seu jogador</h3><p>Seu nome, avatar e moldura aparecem no perfil.</p></div></div>
 <label className="profile-name-field">Nome do jogador<input maxLength={24} value={playerProfile.name} onChange={e=>setPlayerProfile(p=>({...p,name:e.target.value}))} placeholder="Como quer ser chamado no jogo?"/></label>
+<div className="profile-social-bio-editor"><div><b>Biografia do NEXUS Social</b><small>Essa descrição aparece no seu perfil público. Seu @ é {playerProfile.username?'@'+playerProfile.username:'definido no cadastro social'}.</small></div><form onSubmit={savePlayerBio}><textarea maxLength={160} rows={3} value={playerProfile.bio||''} onChange={e=>setPlayerProfile(p=>({...p,bio:e.target.value}))} placeholder="Conte um pouco sobre você..."/><div className="profile-bio-footer"><small>{(playerProfile.bio||'').length}/160 caracteres</small><button className="primary" disabled={playerBioBusy||!playerProfile.username}>{playerBioBusy?'Salvando...':'Salvar biografia'}</button></div></form></div>
 
 <div className="profile-choice-group"><b>Avatar <small> · desbloqueie jogando</small></b><div className="profile-avatar-choices">{[{v:'👾',xp:0},{v:'🎮',xp:0},{v:'🦊',xp:100},{v:'🐱',xp:150},{v:'🐼',xp:250},{v:'🐸',xp:350},{v:'🐲',xp:500},{v:'🤖',xp:750},{v:'🦁',xp:1000},{v:'🐯',xp:1250},{v:'🐧',xp:1500},{v:'🐙',xp:2000}].map(a=><button key={a.v} disabled={gameXp<a.xp} title={gameXp<a.xp?'Desbloqueia com '+a.xp+' XP':'Avatar disponível'} className={(playerProfile.avatar===a.v?'selected ':'')+(gameXp<a.xp?'avatar-locked':'')} onClick={()=>setPlayerProfile(p=>({...p,avatar:a.v}))}><span>{gameXp>=a.xp?a.v:'🔒'}</span>{gameXp<a.xp&&<small>{a.xp} XP</small>}</button>)}</div></div>
 <div className="profile-choice-group"><b>Molduras do avatar</b><div className="profile-frame-choices">{[{id:'violet',label:'Neon violeta',unlock:0},{id:'cyan',label:'Cyber ciano',unlock:150},{id:'gold',label:'Elite dourada',unlock:500},{id:'ruby',label:'Rubí arcano',unlock:1000},{id:'chrome',label:'Chrome cósmico',unlock:4500}].map(fr=><button key={fr.id} disabled={gameXp<fr.unlock} className={'profile-frame-option frame-'+fr.id+(playerProfile.frame===fr.id?' selected':'')} onClick={()=>setPlayerProfile(p=>({...p,frame:fr.id}))}><div className={'player-avatar frame-thumbnail-avatar frame-'+fr.id}><span>{playerProfile.avatar}</span></div><span>{fr.label}</span><small>{gameXp>=fr.unlock?'DESBLOQUEADA':fr.unlock+' XP'}</small></button>)}</div></div>
