@@ -3674,3 +3674,16 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
   color:#f5eaff!important;
   box-shadow:0 8px 24px rgba(130,88,190,.24)!important;
 }
+
+
+/* NEXUS Social — push notification settings */
+.nexus-push-settings{display:flex;align-items:center;gap:12px;margin:14px 0 18px;padding:14px 16px;border:1px solid rgba(167,139,250,.28);border-radius:16px;background:linear-gradient(120deg,rgba(76,29,149,.24),rgba(17,24,39,.92));box-shadow:0 8px 26px rgba(76,29,149,.12);color:#f5f3ff}
+.nexus-push-icon{width:38px;height:38px;display:grid;place-items:center;flex:0 0 38px;border-radius:12px;background:rgba(139,92,246,.2);color:#c4b5fd}
+.nexus-push-copy{display:flex;flex:1;min-width:0;flex-direction:column;gap:4px}
+.nexus-push-copy b,.nexus-push-settings>div>b{font-size:13px;font-weight:800;color:#f5f3ff}
+.nexus-push-copy small,.nexus-push-settings>div>small{font-size:11px;line-height:1.45;color:#b9b3d0}
+.nexus-push-copy .nexus-push-hint{color:#c4b5fd}
+.nexus-push-copy .nexus-push-error{color:#fda4af}
+.nexus-push-settings>button{border:1px solid rgba(196,181,253,.42);border-radius:11px;padding:9px 14px;background:linear-gradient(135deg,#7c3aed,#6d28d9);color:#fff;font-size:12px;font-weight:800;white-space:nowrap}
+.nexus-push-settings>button:disabled{opacity:.55}
+@media(max-width:560px){.nexus-push-settings{align-items:flex-start;gap:10px;padding:12px}.nexus-push-settings>button{align-self:center;padding:9px 11px}.nexus-push-copy small{font-size:10px}}
