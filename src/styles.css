@@ -2674,3 +2674,12 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
  .nexus-social .social-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
  .nexus-social .social-tabs button{min-height:38px}
 }
+
+
+/* NEXUS Social V2: salas privadas, convites e missões de clã */
+.social-room-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding:8px 0}
+.social-room-tools select{flex:1;min-width:150px;padding:10px;border:1px solid #34435b;border-radius:10px;background:#111c2d;color:#eaf0fc;font-size:12px}
+.social-community-card .social-add-button{width:100%}
+.social-community-card small{display:block;color:#b6a1ff;font-size:10px;margin:5px 0 9px}
+.social-create-form label{display:flex;align-items:center;gap:8px;color:#b8c5da;font-size:12px}
+.social-create-form label input{width:auto;accent-color:#8b68d3}
