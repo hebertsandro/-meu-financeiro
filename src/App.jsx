@@ -645,9 +645,6 @@ function App(){
       const cleanUsername=signupUsername.trim().toLowerCase();
       const cleanBio=signupBio.trim().slice(0,160);
       if(!/^[a-z0-9_]{3,20}$/.test(cleanUsername)){setAuthError('O @ deve ter de 3 a 20 caracteres: letras, números ou _.');setBusy(false);return;}
-      const {data:usernameTaken,error:usernameCheckError}=await supabase.from('social_profiles').select('user_id').eq('username',cleanUsername).maybeSingle();
-      if(usernameCheckError){setAuthError('Não foi possível verificar esse @. Tente novamente.');setBusy(false);return;}
-      if(usernameTaken){setAuthError('Esse @ já está em uso. Escolha outro.');setBusy(false);return;}
       const {data,error}=await supabase.auth.signUp({
         email:cleanEmail,
         password,
