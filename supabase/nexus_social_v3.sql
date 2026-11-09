@@ -70,6 +70,7 @@ alter table public.social_room_duels add column if not exists current_round inte
 alter table public.social_room_duels add column if not exists game_state jsonb not null default '{}'::jsonb;
 alter table public.social_room_duels add column if not exists challenger_score integer not null default 0;
 alter table public.social_room_duels add column if not exists opponent_score integer not null default 0;
+drop function if exists public.social_start_room_duel(uuid);
 create or replace function public.social_start_room_duel(target_duel uuid)
 returns timestamptz language plpgsql security definer set search_path=public as $nexus$
 declare scheduled timestamptz;
