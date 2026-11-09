@@ -26,8 +26,9 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
   if(!userId||!supabase)return;
   setLoading(true);setError('');
   try{
-   const allowedAuthors=[userId,...friends.map(f=>f.person?.user_id).filter(Boolean)];
-   const {data:rows,error:e}=await supabase.from('social_posts').select('id,author_id,body,image_path,created_at,updated_at').in('author_id',allowedAuthors).order('created_at',{ascending:false}).limit(40);
+   // O feed é comunitário: carrega publicações de todos os perfis ativos do NEXUS Social.
+   // A política RLS do banco continua respeitando bloqueios e suspensões.
+   const {data:rows,error:e}=await supabase.from('social_posts').select('id,author_id,body,image_path,created_at,updated_at').order('created_at',{ascending:false}).limit(40);
    if(e)throw e;
    const ids=[...new Set((rows||[]).map(p=>p.author_id))];
    const prof=ids.length?await supabase.from('social_profiles').select('user_id,username,display_name,avatar,avatar_frame,card_frame,equipped_gems,is_suspended').in('user_id',ids):{data:[],error:null};
