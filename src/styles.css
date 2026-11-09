@@ -2668,3 +2668,9 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
  .social-community-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
  .social-community-tabs button{justify-content:center}
 }
+
+
+@media(max-width:560px){
+ .nexus-social .social-tabs{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .nexus-social .social-tabs button{min-height:38px}
+}
