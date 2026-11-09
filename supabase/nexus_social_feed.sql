@@ -33,7 +33,7 @@ create table if not exists public.social_post_comments (
 create index if not exists social_post_comments_post_idx on public.social_post_comments(post_id,created_at asc);
 
 create or replace function public.social_validate_comment_parent()
-returns trigger language plpgsql security definer set search_path=public as $
+returns trigger language plpgsql set search_path=public as $nexus$
 declare parent_post uuid;
 begin
  if new.parent_comment_id is not null then
@@ -44,7 +44,7 @@ begin
  end if;
  return new;
 end;
-$;
+$nexus$;
 drop trigger if exists social_validate_comment_parent_trigger on public.social_post_comments;
 create trigger social_validate_comment_parent_trigger before insert or update of post_id,parent_comment_id
 on public.social_post_comments for each row execute function public.social_validate_comment_parent();
