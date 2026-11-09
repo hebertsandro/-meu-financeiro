@@ -1,0 +1,186 @@
+/* NEXUS SOCIAL — redesign 2026: clean, editorial, mobile-first */
+.nexus-social{
+  --nx-bg:#101019;--nx-surface:#191923;--nx-surface-2:#20202c;
+  --nx-line:rgba(220,211,255,.10);--nx-line-strong:rgba(190,164,255,.24);
+  --nx-text:#f6f4fb;--nx-muted:#a7a3b5;--nx-accent:#b99aff;--nx-accent-2:#8d6be0;
+  width:100%;max-width:1440px;margin-inline:auto;gap:18px!important;color:var(--nx-text)!important;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+}
+.nexus-social *{box-sizing:border-box}
+.nexus-social>.social-hero{
+  min-height:132px!important;padding:24px 27px!important;border:1px solid rgba(205,187,255,.16)!important;
+  border-radius:22px!important;background:
+   radial-gradient(ellipse at 82% 0%,rgba(158,123,232,.16),transparent 38%),
+   linear-gradient(115deg,#201d2c 0%,#171720 58%,#211b2e 100%)!important;
+  box-shadow:0 16px 42px rgba(0,0,0,.18)!important;display:flex;align-items:center;justify-content:space-between;
+}
+.nexus-social>.social-hero:before{content:"";position:absolute;right:13%;top:-125px;width:280px;height:280px;border:1px solid rgba(208,189,255,.08);border-radius:50%;box-shadow:0 0 0 34px rgba(190,164,255,.025),0 0 0 70px rgba(190,164,255,.018);pointer-events:none}
+.nexus-social>.social-hero>div:first-child>span{font-size:9px!important;letter-spacing:2px!important;color:#c2b2e7!important}
+.nexus-social>.social-hero h2{font-size:clamp(27px,3.2vw,35px)!important;letter-spacing:-1.5px!important;margin:7px 0 4px!important}
+.nexus-social>.social-hero h2 em{color:#c3a7ff!important}
+.nexus-social>.social-hero p{font-size:11px!important;color:#aaa5b7!important;line-height:1.6!important}
+.nexus-social>.social-hero .social-hero-icon{width:58px!important;height:58px!important;border-radius:18px!important;background:rgba(177,145,245,.12)!important;border:1px solid rgba(204,182,255,.2)!important;color:#d4c0ff!important;box-shadow:none!important}
+.nexus-social .nexus-push-settings{display:flex;align-items:center;gap:12px;padding:12px 15px!important;border:1px solid var(--nx-line)!important;border-radius:15px!important;background:#191923!important;box-shadow:none!important}
+.nexus-social .nexus-push-settings button{border-radius:10px!important;background:#9474d2!important;color:white!important;padding:9px 14px!important}
+.nexus-social .social-layout{grid-template-columns:minmax(0,1fr) 285px!important;gap:18px!important;align-items:start}
+.nexus-social .social-main,.nexus-social .social-side{min-width:0}
+.nexus-social .social-tabs{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px!important;padding:5px!important;margin:0 0 14px!important;
+ border:1px solid var(--nx-line)!important;border-radius:15px!important;background:#171720!important;box-shadow:none!important;
+}
+.nexus-social .social-tabs button{
+ min-width:0;min-height:43px!important;justify-content:center!important;gap:7px!important;padding:9px 10px!important;
+ border:1px solid transparent!important;border-radius:11px!important;background:transparent!important;color:#aaa6b7!important;
+ font-size:11px!important;font-weight:700!important;transition:background .18s,border-color .18s,color .18s!important;
+}
+.nexus-social .social-tabs button.active{background:#2a2438!important;border-color:rgba(192,164,255,.22)!important;color:#f7f1ff!important;box-shadow:inset 0 -2px #b89aff!important}
+.nexus-social .social-tabs button b{min-width:18px;height:18px;display:inline-grid;place-items:center;border-radius:20px;background:#9b7bdb!important;color:#fff!important;font-size:9px!important}
+.nexus-social .social-panel,.nexus-social .social-profile-editor{
+ padding:17px!important;border:1px solid var(--nx-line)!important;border-radius:17px!important;
+ background:#191923!important;box-shadow:0 8px 25px rgba(0,0,0,.12)!important;
+}
+.nexus-social .social-panel-heading{padding-bottom:13px!important;border-bottom:1px solid var(--nx-line)!important}
+.nexus-social .social-panel-heading h3{font-size:15px!important;letter-spacing:-.35px!important;color:#f5f2fb!important}
+.nexus-social .social-panel-heading p{font-size:10px!important;line-height:1.55!important;color:#a7a2b3!important}
+.nexus-social .social-section-kicker{font-size:9px!important;letter-spacing:1.6px!important;color:#bda5f2!important}
+.nexus-social .social-profile-editor .social-editor-identity{display:flex;gap:11px;align-items:center;padding:12px!important;margin-top:13px;border:1px solid var(--nx-line)!important;border-radius:14px!important;background:#20202b!important}
+.nexus-social .social-editor-identity>div:last-child{min-width:0}
+.nexus-social .social-editor-identity b{font-size:12px!important;color:#f7f3ff!important}
+.nexus-social .social-editor-identity span{color:#c2a8f4!important;font-size:10px!important}
+.nexus-social .social-editor-identity small{color:#928da0!important;font-size:9px!important;line-height:1.45!important}
+.nexus-social .social-bio-readonly{padding:12px!important;margin-top:11px;border:1px solid var(--nx-line)!important;border-radius:13px!important;background:#15151e!important}
+.nexus-social .social-bio-readonly span{font-size:10px!important;color:#d2c1f3!important}
+.nexus-social .social-bio-readonly p,.nexus-social .social-bio-readonly small{font-size:10px!important;color:#a6a1b1!important;line-height:1.55!important}
+.nexus-social .social-safety-note{padding:12px!important;border:1px solid rgba(111,190,158,.16)!important;border-radius:14px!important;background:rgba(56,126,97,.08)!important}
+.nexus-social .social-safety-note b{font-size:10px!important}.nexus-social .social-safety-note p{font-size:9px!important;line-height:1.5!important}
+.nexus-social .social-person{display:flex;align-items:center;gap:12px;padding:12px!important;border:1px solid var(--nx-line)!important;border-radius:14px!important;background:#20202b!important;box-shadow:none!important}
+.nexus-social .social-person-info b{font-size:12px!important;color:#f6f2fc!important}
+.nexus-social .social-person-info small{font-size:10px!important;color:#aaa3b8!important}
+.nexus-social .social-person-info p{font-size:10px!important;color:#aaa5b3!important}
+.nexus-social .social-person-progress{color:#c2a8f4!important}
+.nexus-social .social-view-button{border:1px solid var(--nx-line-strong)!important;border-radius:10px!important;background:#292435!important;color:#e0d2fa!important;font-size:10px!important;padding:8px 10px!important}
+.nexus-social .social-add-button,.nexus-social .social-primary{border:1px solid rgba(207,187,255,.18)!important;border-radius:10px!important;background:#9474d2!important;color:white!important;box-shadow:none!important;font-size:10px!important;padding:9px 12px!important}
+.nexus-social .social-search{display:flex;align-items:center;gap:9px;padding:7px 9px 7px 12px!important;border:1px solid var(--nx-line)!important;border-radius:12px!important;background:#13131c!important}
+.nexus-social .social-search input{min-width:0;color:#f5f0ff!important;background:transparent!important}
+.nexus-social .social-search button{border-radius:9px!important;background:#8f70ce!important}
+.nexus-social .social-empty-inline,.nexus-social .social-empty{border:1px dashed rgba(190,164,238,.2)!important;border-radius:15px!important;background:#171720!important;color:#aaa4b5!important}
+.nexus-social .social-error,.nexus-social .nxf-error{border-radius:12px!important}
+
+/* Feed: one clear publishing action, quieter post cards, readable rhythm */
+.nexus-social .nexus-feed{gap:13px!important}
+.nexus-social .nxf-heading{align-items:center!important;padding:5px 2px 12px!important;border-bottom:1px solid var(--nx-line)!important}
+.nexus-social .nxf-eyebrow{font-size:9px!important;letter-spacing:1.7px!important;color:#bda5f2!important}
+.nexus-social .nxf-heading h2{font-size:27px!important;letter-spacing:-1.1px!important;color:#f7f4fb!important}
+.nexus-social .nxf-heading h2 em{color:#c4a9ff!important}
+.nexus-social .nxf-heading p{font-size:10px!important;color:#a6a1b1!important}
+.nexus-social .nxf-live{padding:7px 9px!important;border:1px solid rgba(104,202,165,.16)!important;border-radius:30px!important;background:rgba(62,143,108,.1)!important;color:#91d9ba!important;font-size:8px!important}
+.nexus-social .nxf-composer{padding:14px!important;border:1px solid var(--nx-line)!important;border-radius:16px!important;background:#191923!important;box-shadow:none!important}
+.nexus-social .nxf-compose-top{gap:10px!important}
+.nexus-social .nxf-compose-avatar{width:39px!important;height:39px!important;border-radius:13px!important}
+.nexus-social .nxf-compose-top textarea{min-height:58px!important;font-size:12px!important;color:#f5f1fa!important}
+.nexus-social .nxf-compose-bottom{margin-top:8px!important;padding-top:9px!important;border-color:var(--nx-line)!important}
+.nexus-social .nxf-photo-pick{padding:8px 10px!important;border:1px solid var(--nx-line)!important;border-radius:9px!important;background:#242331!important;color:#c9b5f1!important;font-size:10px!important}
+.nexus-social .nxf-publish{padding:9px 13px!important;border:0!important;border-radius:9px!important;background:#9271d0!important;box-shadow:none!important;font-size:10px!important}
+.nexus-social .nxf-post-list{gap:10px!important}
+.nexus-social .nxf-post{padding:15px!important;border:1px solid var(--nx-line)!important;border-radius:16px!important;background:#191923!important;box-shadow:none!important}
+.nexus-social .nxf-post:hover{transform:none!important;border-color:rgba(193,166,255,.25)!important;box-shadow:0 8px 20px rgba(0,0,0,.12)!important}
+.nexus-social .nxf-post-head{padding-bottom:10px!important;border-color:var(--nx-line)!important}
+.nexus-social .nxf-avatar{width:39px!important;height:39px!important;border-radius:13px!important}
+.nexus-social .nxf-author-copy b{font-size:11px!important;color:#f4f0fa!important}
+.nexus-social .nxf-author-copy small{font-size:9px!important;color:#a7a0b4!important}
+.nexus-social .nxf-post-meta{font-size:9px!important;color:#9691a3!important}
+.nexus-social .nxf-post-body{margin:12px 1px!important;font-size:12px!important;line-height:1.75!important;color:#e5e0eb!important}
+.nexus-social .nxf-post-image{border:1px solid var(--nx-line)!important;border-radius:13px!important}
+.nexus-social .nxf-actions{gap:5px!important;margin-top:10px!important;padding-top:9px!important;border-color:var(--nx-line)!important}
+.nexus-social .nxf-actions button{min-height:35px!important;padding:7px 9px!important;border-radius:9px!important;color:#aaa4b5!important;font-size:10px!important}
+.nexus-social .nxf-actions button:hover{background:#292434!important}
+.nexus-social .nxf-actions button.liked{color:#ff91b2!important;background:rgba(255,105,153,.08)!important}
+.nexus-social .nxf-comments{border-color:var(--nx-line)!important}
+.nexus-social .nxf-comment-content{border:1px solid var(--nx-line)!important;border-radius:0 12px 12px 12px!important;background:#242330!important}
+.nexus-social .nxf-comment-content p{font-size:10px!important;color:#e9e3f0!important}
+.nexus-social .nxf-comment-form input{border:1px solid var(--nx-line)!important;border-radius:10px!important;background:#13131c!important;color:white!important}
+.nexus-social .nxf-comment-form button{border-radius:10px!important;background:#9271d0!important}
+
+/* Community: inbox, chats, private rooms, clans and challenges share one system */
+.nexus-social .social-community{gap:13px!important}
+.nexus-social .social-community .social-community-tabs{display:flex!important;flex-wrap:wrap;gap:6px!important;margin-bottom:12px!important}
+.nexus-social .social-community .social-community-tabs button{min-height:37px!important;padding:8px 11px!important;border:1px solid var(--nx-line)!important;border-radius:10px!important;background:#1b1b26!important;color:#aaa5b6!important;font-size:10px!important;font-weight:700!important}
+.nexus-social .social-community .social-community-tabs button.active{background:#30283e!important;border-color:rgba(194,166,255,.25)!important;color:#f5efff!important;box-shadow:inset 0 -2px #b99aff!important}
+.nexus-social .social-community .social-community-grid{display:grid!important;grid-template-columns:minmax(190px,.72fr) minmax(0,1.55fr)!important;gap:10px!important;padding:9px!important;border:1px solid var(--nx-line)!important;border-radius:16px!important;background:#171720!important}
+.nexus-social .social-community .social-community-list{display:grid!important;align-content:start;gap:6px!important;padding:0!important;background:transparent!important;border:0!important}
+.nexus-social .social-community .social-community-row{display:flex;align-items:center;gap:9px;min-height:58px!important;padding:9px!important;border:1px solid transparent!important;border-radius:12px!important;background:transparent!important;color:#f1edf6!important}
+.nexus-social .social-community .social-community-row:hover{background:#22212d!important}
+.nexus-social .social-community .social-community-row.selected{border-color:rgba(190,164,255,.18)!important;background:#292435!important;box-shadow:inset 2px 0 #b99aff!important}
+.nexus-social .social-community .social-community-avatar{width:39px!important;height:39px!important;border-radius:12px!important;border:1px solid rgba(204,183,255,.22)!important}
+.nexus-social .social-community .social-community-chat{min-width:0;min-height:430px!important;display:flex;flex-direction:column;border:1px solid var(--nx-line)!important;border-radius:14px!important;background:#13131c!important;overflow:hidden}
+.nexus-social .social-community .social-chat-head{min-height:58px;padding:11px 14px!important;background:#1c1b27!important;border-bottom:1px solid var(--nx-line)!important}
+.nexus-social .social-community .social-chat-head b{font-size:11px!important;color:#f7f2fb!important}
+.nexus-social .social-community .social-chat-head small{font-size:9px!important;color:#aaa2b6!important}
+.nexus-social .social-community .social-chat-messages{flex:1;min-height:260px;padding:15px!important;gap:10px!important;background:#14141d!important}
+.nexus-social .social-community .social-chat-bubble{max-width:min(84%,520px)!important;padding:10px 12px!important;border:1px solid var(--nx-line)!important;border-radius:14px 14px 14px 5px!important;background:#282633!important;color:#f0ebf5!important;font-size:11px!important;line-height:1.6!important;box-shadow:none!important}
+.nexus-social .social-community .social-chat-bubble.mine{border-color:rgba(195,169,255,.18)!important;border-radius:14px 14px 5px 14px!important;background:#403451!important}
+.nexus-social .social-community .social-chat-compose{display:flex;gap:8px!important;padding:10px!important;background:#1b1a25!important;border-top:1px solid var(--nx-line)!important}
+.nexus-social .social-community .social-chat-compose input{min-height:42px!important;border:1px solid var(--nx-line)!important;border-radius:11px!important;background:#12121b!important;color:#f6f0fb!important;font-size:11px!important}
+.nexus-social .social-community .social-chat-compose button{min-width:42px!important;border-radius:11px!important;background:#9271d0!important}
+.nexus-social .social-community .social-community-card,.nexus-social .social-community .social-create-form,.nexus-social .social-community .social-inbox-requests,.nexus-social .social-community .social-room-tools{
+ padding:15px!important;border:1px solid var(--nx-line)!important;border-radius:15px!important;background:#191923!important;box-shadow:none!important
+}
+.nexus-social .social-community .social-community-card>b{font-size:12px!important;color:#f5f0fa!important}
+.nexus-social .social-community .social-community-card p{font-size:10px!important;color:#aaa4b4!important;line-height:1.6!important}
+.nexus-social .social-community .social-inbox-request{padding:11px!important;border-bottom:1px solid var(--nx-line)!important}
+.nexus-social .social-community .social-request-category{color:#c8b3f2!important}
+.nexus-social .social-community .social-clan-detail{padding:16px!important;border:1px solid var(--nx-line)!important;border-radius:17px!important;background:#191923!important;box-shadow:none!important}
+.nexus-social .social-community .social-clan-banner{min-height:130px!important;border:1px solid rgba(200,178,255,.2)!important;border-radius:14px!important;box-shadow:none!important}
+.nexus-social .social-community .social-clan-detail>h4{margin:16px 0 10px!important;padding-bottom:9px!important;border-bottom:1px solid var(--nx-line)!important;color:#f5f0fa!important;font-size:12px!important}
+.nexus-social .social-community .social-clan-members{gap:8px!important}
+.nexus-social .social-community .social-clan-rewards{gap:8px!important}
+.nexus-social .social-community .social-clan-reward,.nexus-social .social-community .social-duel-card{padding:12px!important;border:1px solid var(--nx-line)!important;border-radius:13px!important;background:#22212d!important}
+.nexus-social .social-community .social-clan-edit-toggle,.nexus-social .social-community .social-icon-button{border-radius:10px!important}
+.nexus-social .social-community .social-community-empty{border:1px dashed var(--nx-line-strong)!important;border-radius:14px!important;background:#171720!important}
+.nexus-social .social-community .social-challenge-type{border-radius:8px!important;background:#2a2536!important;color:#d6c5f5!important}
+.nexus-social .social-community .social-friend-tag{border-radius:20px!important;background:#292438!important;color:#d6c4f6!important}
+.nexus-social .social-community .social-error{border-radius:12px!important}
+
+/* Public player profile modal */
+.nexus-social .social-profile-modal-backdrop{backdrop-filter:blur(12px)!important;background:rgba(5,5,10,.78)!important}
+.nexus-social .social-public-profile{border:1px solid var(--nx-line-strong)!important;border-radius:21px!important;background:#171720!important;box-shadow:0 24px 80px rgba(0,0,0,.5)!important}
+.nexus-social .social-public-head{border-bottom:1px solid var(--nx-line)!important}
+.nexus-social .social-public-section{border-top:1px solid var(--nx-line)!important}
+.nexus-social button:not(:disabled){transition:background .18s,border-color .18s,transform .18s!important}
+.nexus-social button:focus-visible,.nexus-social input:focus-visible,.nexus-social textarea:focus-visible,.nexus-social select:focus-visible{outline:2px solid #c4a8ff!important;outline-offset:2px}
+@media(max-width:980px){.nexus-social .social-layout{grid-template-columns:1fr!important}.nexus-social .social-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.nexus-social .social-profile-editor{grid-column:1/-1}}
+@media(max-width:680px){
+ .nexus-social{gap:12px!important}
+ .nexus-social>.social-hero{min-height:112px!important;padding:17px 16px!important;border-radius:17px!important}
+ .nexus-social>.social-hero h2{font-size:25px!important}.nexus-social>.social-hero p{max-width:235px;font-size:9px!important}
+ .nexus-social>.social-hero .social-hero-icon{width:45px!important;height:45px!important;border-radius:14px!important}
+ .nexus-social .social-layout{gap:12px!important}
+ .nexus-social .social-tabs{gap:3px!important;padding:4px!important;border-radius:12px!important;margin-bottom:10px!important}
+ .nexus-social .social-tabs button{min-height:40px!important;padding:7px 3px!important;gap:4px!important;font-size:9px!important}
+ .nexus-social .social-tabs button svg{width:14px;height:14px}
+ .nexus-social .social-panel,.nexus-social .social-profile-editor{padding:13px!important;border-radius:14px!important}
+ .nexus-social .social-side{grid-template-columns:1fr!important}
+ .nexus-social .social-profile-editor{grid-column:auto}
+ .nexus-social .nxf-heading{align-items:flex-start!important}
+ .nexus-social .nxf-heading h2{font-size:24px!important}
+ .nexus-social .nxf-heading p{max-width:245px;font-size:9px!important}
+ .nexus-social .nxf-live{font-size:7px!important}
+ .nexus-social .nxf-composer,.nexus-social .nxf-post{padding:12px!important;border-radius:14px!important}
+ .nexus-social .nxf-compose-top textarea{min-height:54px!important;font-size:11px!important}
+ .nexus-social .nxf-photo-pick{padding:7px!important;font-size:9px!important}
+ .nexus-social .nxf-publish{padding:8px 10px!important;font-size:9px!important}
+ .nexus-social .nxf-actions{justify-content:space-between!important}
+ .nexus-social .nxf-actions button{padding:7px 5px!important;font-size:9px!important}
+ .nexus-social .social-community .social-community-tabs{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .nexus-social .social-community .social-community-tabs button{min-width:0;padding:7px 5px!important;font-size:9px!important}
+ .nexus-social .social-community .social-community-grid{grid-template-columns:1fr!important;padding:7px!important}
+ .nexus-social .social-community .social-community-list{grid-template-columns:repeat(2,minmax(0,1fr))!important;max-height:215px!important;overflow:auto!important;padding-bottom:8px!important;border-bottom:1px solid var(--nx-line)!important}
+ .nexus-social .social-community .social-community-row{min-width:0;min-height:55px!important;padding:7px!important}
+ .nexus-social .social-community .social-community-chat{min-height:365px!important}
+ .nexus-social .social-community .social-chat-messages{min-height:220px!important;padding:11px!important}
+ .nexus-social .social-community .social-chat-bubble{max-width:92%!important;font-size:10px!important}
+ .nexus-social .social-community .social-clan-detail{padding:12px!important}
+ .nexus-social .social-person{align-items:flex-start;flex-wrap:wrap}
+ .nexus-social .social-person-actions{width:100%;display:flex;justify-content:flex-end;gap:7px}
+}
+@media(prefers-reduced-motion:reduce){.nexus-social *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
