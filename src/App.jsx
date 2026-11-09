@@ -617,7 +617,7 @@ function App(){
   },[]);
   const notify=(s)=>{setToast(s);setTimeout(()=>setToast(''),3200)};
   const unreadCount=data.notifications.filter(n=>!n.is_read).length;
-  async function addNotification(title,message,category='geral'){if(!session?.user?.id)return;const {error}=await supabase.from('notifications').insert({user_id:session.user.id,title,message,category});if(!error){await loadData();const {error:pushError}=await supabase.functions.invoke('send-push',{body:{title,body:message,url:'/',tag:category||'meu-financeiro'}});if(pushError)console.warn('Push notification:',pushError.message)}}
+  async function addNotification(title,message,category='geral'){if(!session?.user?.id)return;const {error}=await supabase.from('notifications').insert({user_id:session.user.id,title,message,category});if(!error){await loadData();supabase.functions.invoke('send-push',{body:{title,body:message,url:'/',tag:category||'meu-financeiro'}}).then(({error:pushError})=>{if(pushError)console.warn('Push notification:',pushError.message)}).catch(error=>console.warn('Push notification:',error))}}
   async function markNotificationRead(id){const {error}=await supabase.from('notifications').update({is_read:true}).eq('id',id);if(!error)await loadData()}
   async function markAllNotificationsRead(){const {error}=await supabase.from('notifications').update({is_read:true}).eq('is_read',false);if(!error){await loadData();notify('Todas as notificações foram marcadas como lidas.')}}
   async function handleAuth(e){
