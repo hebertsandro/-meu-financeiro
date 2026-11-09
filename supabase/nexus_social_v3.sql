@@ -138,3 +138,14 @@ do $nexus$
 begin
  if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='social_room_duel_answers') then alter publication supabase_realtime add table public.social_room_duel_answers; end if;
 end; $nexus$;
+
+
+create or replace function public.social_get_player_clan(target_user uuid default auth.uid())
+returns table(clan_id uuid,clan_name text,clan_tag text,clan_emblem text,clan_role text,clan_level integer)
+language sql stable security definer set search_path=public as $nexus$
+ select c.id,c.name,c.tag,c.emblem,m.role,c.level
+ from public.social_clan_members m join public.social_clans c on c.id=m.clan_id
+ where m.user_id=target_user order by case m.role when 'leader' then 0 when 'officer' then 1 else 2 end,m.joined_at limit 1;
+$nexus$;
+revoke all on function public.social_get_player_clan(uuid) from public;
+grant execute on function public.social_get_player_clan(uuid) to authenticated;
