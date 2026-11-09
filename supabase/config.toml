@@ -3,3 +3,6 @@ verify_jwt = true
 
 [functions.nexus-chat]
 verify_jwt = true
+
+[functions.nexus-push]
+verify_jwt = true
