@@ -17,7 +17,7 @@ const timeAgo=value=>{
 const initials=name=>String(name||'NX').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase();
 const profileName=p=>p?.display_name||p?.username||'Jogador';
 
-export default function NexusFeed({userId,onToast=()=>{},onOpenProfile=()=>{}}){
+export default function NexusFeed({userId,playerProfile=null,onToast=()=>{},onOpenProfile=()=>{}}){
  const [posts,setPosts]=useState([]),[draft,setDraft]=useState(''),[photo,setPhoto]=useState(null),[photoPreview,setPhotoPreview]=useState('');
  const [busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [expanded,setExpanded]=useState({}),[comments,setComments]=useState({}),[commentDraft,setCommentDraft]=useState('');
@@ -145,7 +145,7 @@ export default function NexusFeed({userId,onToast=()=>{},onOpenProfile=()=>{}}){
  return <section className="nexus-feed">
   <header className="nxf-heading"><div><span className="nxf-eyebrow">NEXUS SOCIAL · COMUNIDADE</span><h2>Feed <em>da galera</em></h2><p>Compartilhe conquistas, ideias e momentos da sua jornada.</p></div><span className="nxf-live"><i/> AO VIVO</span></header>
   <form className="nxf-composer" onSubmit={publish}>
-   <div className="nxf-compose-top"><span className="nxf-compose-avatar">{'👾'}</span><textarea value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} rows={3} placeholder="O que está acontecendo na sua jornada?"/></div>
+   <div className="nxf-compose-top"><span className={'nxf-compose-avatar frame-'+(playerProfile?.frame||'violet')}>{playerProfile?.avatar||'👾'}</span><textarea value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} rows={3} placeholder="O que está acontecendo na sua jornada?"/></div>
    {photoPreview&&<div className="nxf-preview"><img src={photoPreview} alt="Prévia da publicação"/><button type="button" onClick={()=>{setPhoto(null);URL.revokeObjectURL(photoPreview);setPhotoPreview('')}} aria-label="Remover foto"><X size={17}/></button></div>}
    <div className="nxf-compose-bottom"><label className="nxf-photo-pick"><ImagePlus size={17}/> Foto <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>choosePhoto(e.target.files?.[0])}/></label><span>{draft.length}/2000</span><button className="nxf-publish" disabled={busy||(!draft.trim()&&!photo)}>{busy?<LoaderCircle size={16} className="nxf-spin"/>:<Send size={16}/>} Publicar</button></div>
   </form>
