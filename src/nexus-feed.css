@@ -9,7 +9,7 @@
 .nxf-composer{padding:16px;border:1px solid #293851;border-radius:18px;background:linear-gradient(145deg,#17263a,#111b2b);box-shadow:0 12px 28px #050b1640}
 .nxf-compose-top{display:flex;gap:11px;align-items:flex-start}
 .nxf-compose-avatar{display:grid;place-items:center;flex:none;width:39px;height:39px;border-radius:13px;background:linear-gradient(145deg,#32466a,#202b42);font-size:21px}
-.nxf-compose-top textarea{width:100%;min-width:0;resize:vertical;border:0;outline:0;background:transparent;color:#f3f6ff;font:500 13px/1.6 inherit;padding:5px 0}
+.nxf-compose-top textarea{width:100%;min-width:0;resize:vertical;border:0;outline:0;background:transparent;color:#f3f6ff;font-family:inherit;font-size:13px;font-weight:500;line-height:1.6;padding:5px 0}
 .nxf-compose-top textarea::placeholder{color:#8292aa}
 .nxf-compose-bottom{display:flex;align-items:center;gap:12px;border-top:1px solid #29374c;margin-top:12px;padding-top:12px}
 .nxf-compose-bottom>span{margin-left:auto;color:#71829c;font-size:10px}
