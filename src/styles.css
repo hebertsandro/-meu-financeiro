@@ -2394,3 +2394,97 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
 @media(max-width:640px){.social-profile-modal-backdrop{padding:8px;align-items:flex-end}.social-public-profile{max-height:94vh;border-radius:22px 22px 12px 12px;padding:15px}.social-public-head h2{font-size:18px}.social-public-card{padding:14px}.social-public-card .player-identity{gap:10px;flex-wrap:wrap}.social-public-card .profile-big-avatar{width:64px;height:64px;flex:0 0 64px}.social-public-card .player-info{min-width:calc(100% - 90px)}.social-public-card .player-xp-total{margin-left:auto}.social-public-card .player-info h2{font-size:19px}.social-public-card .world-stats>div{flex:1 1 42%;font-size:10px}.social-public-achievements{grid-template-columns:1fr}.social-person-actions{flex-direction:column;align-items:flex-end}.social-person-actions>*{max-width:100%}.social-editor-identity{padding:12px}}
 
 .social-own-preview{width:100%;justify-content:center;padding:11px 13px;margin:-5px 0 2px}
+
+
+/* PERFIL DO JOGADOR + NEXUS SOCIAL — hierarquia, respiro e leitura mobile */
+.player-profile-page{display:flex!important;flex-direction:column;gap:28px!important;width:100%;max-width:1120px;margin-inline:auto;padding-bottom:36px}
+.player-profile-page .game-world-hero{width:100%;margin:0!important;padding:clamp(20px,3vw,32px)!important;border-radius:24px!important}
+.player-profile-page .game-world-top{margin-bottom:clamp(22px,3vw,34px)!important;gap:14px;flex-wrap:wrap}
+.player-profile-page .player-identity{gap:clamp(14px,2.5vw,26px)!important;align-items:center}
+.player-profile-page .player-info{display:flex;flex-direction:column;gap:8px;min-width:0}
+.player-profile-page .player-info h2{margin:2px 0!important;line-height:1.18}
+.player-profile-page .player-info .player-social-identity,.player-profile-page .player-info .player-social-bio{margin:0!important}
+.player-profile-page .player-level-line{margin-top:7px}
+.player-profile-page .player-xp-track{margin-top:3px}
+.player-profile-page .world-stats{display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px!important;margin-top:26px!important}
+.player-profile-page .world-stats>div{min-width:0;justify-content:flex-start;padding:13px!important;line-height:1.45}
+.player-profile-page .profile-editor{width:100%;margin:0!important;padding:clamp(20px,3vw,30px)!important;border-radius:22px!important;display:flex;flex-direction:column;gap:24px}
+.player-profile-page .profile-editor .panel-head{margin:0 0 2px!important;padding-bottom:18px;border-bottom:1px solid rgba(143,164,205,.17)}
+.player-profile-page .profile-editor .panel-head h3{font-size:20px;margin:0 0 7px}
+.player-profile-page .profile-editor .panel-head p{margin:0;line-height:1.55}
+.player-profile-page .profile-name-field{display:grid;gap:10px;margin:0!important}
+.player-profile-page .profile-choice-group{display:flex;flex-direction:column;gap:13px;margin:0!important;padding-top:21px;border-top:1px solid rgba(143,164,205,.14)}
+.player-profile-page .profile-choice-group>b{font-size:15px;line-height:1.4}
+.player-profile-page .profile-choice-group>b small{font-size:11px}
+.player-profile-page .profile-choice-group>.muted{margin:-5px 0 2px;line-height:1.55}
+.player-profile-page .profile-avatar-choices,.player-profile-page .profile-frame-choices{gap:12px!important}
+.player-profile-page .gem-mission-grid{gap:13px!important}
+.player-profile-page .gamer-section-heading{margin:8px 0 -10px!important;padding:0 2px}
+.player-profile-page .achievement-grid,.player-profile-page .level-reward-grid{gap:14px!important}
+.player-profile-page>.gamer-section-heading:not(:first-child){padding-top:12px;border-top:1px solid rgba(143,164,205,.14)}
+.player-profile-page .achievement-card,.player-profile-page .level-reward{min-width:0}
+.nexus-social{display:flex;flex-direction:column;gap:24px;width:100%;max-width:1180px;margin-inline:auto;padding-bottom:34px}
+.nexus-social .social-hero{margin:0!important;padding:clamp(20px,3vw,30px)!important;border-radius:22px!important}
+.nexus-social .social-layout{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(320px,.8fr);align-items:start;gap:22px!important}
+.nexus-social .social-main,.nexus-social .social-side{display:flex;flex-direction:column;gap:18px;min-width:0}
+.nexus-social .social-tabs{margin:0!important;padding:6px;gap:7px!important;border-radius:14px}
+.nexus-social .social-tabs button{min-height:43px;justify-content:center}
+.nexus-social .social-panel{padding:clamp(17px,2.2vw,23px)!important;border-radius:19px!important}
+.nexus-social .social-panel-heading{margin:0 0 20px!important;padding-bottom:15px;border-bottom:1px solid rgba(143,164,205,.14)}
+.nexus-social .social-panel-heading h3{font-size:17px!important;line-height:1.3;margin:0 0 6px!important}
+.nexus-social .social-panel-heading p{font-size:12px!important;line-height:1.5}
+.nexus-social .social-profile-editor{gap:0!important;padding:clamp(18px,2.5vw,25px)!important}
+.nexus-social .social-editor-identity{margin:4px 0 17px!important;padding:15px!important;gap:14px!important}
+.nexus-social .social-editor-identity>div:last-child{gap:6px}
+.nexus-social .social-editor-identity small{line-height:1.45}
+.nexus-social .social-own-preview{margin:0 0 22px!important;min-height:44px}
+.nexus-social .social-profile-editor form{gap:19px!important}
+.nexus-social .social-field-label{gap:9px!important;font-size:12px!important}
+.nexus-social .social-field-label>span{line-height:1.4}
+.nexus-social .social-field-label input,.nexus-social .social-field-label textarea{padding:14px 15px!important;border-radius:13px!important;font-size:15px!important;line-height:1.45}
+.nexus-social .social-field-label textarea{min-height:130px}
+.nexus-social .social-username-lock{padding:13px 14px!important;line-height:1.6!important}
+.nexus-social .social-hint{line-height:1.65!important;margin:0!important}
+.nexus-social .social-save-button{min-height:50px!important;margin-top:2px}
+.nexus-social .social-safety-note{margin:0!important;padding:17px!important;border-radius:16px!important;line-height:1.55}
+.nexus-social .social-empty-inline{padding:44px 20px!important;gap:13px!important}
+.nexus-social .social-person{padding:14px!important;gap:12px!important}
+.nexus-social .social-person-info{gap:5px!important}
+@media(max-width:850px){
+ .nexus-social .social-layout{grid-template-columns:minmax(0,1fr)!important;gap:20px!important}
+ .nexus-social .social-main{order:1}.nexus-social .social-side{order:2}
+ .nexus-social .social-side{display:flex!important;grid-template-columns:none!important}
+}
+@media(max-width:640px){
+ .player-profile-page{gap:22px!important;padding-inline:0!important}
+ .player-profile-page .game-world-hero{padding:19px 16px!important;border-radius:19px!important}
+ .player-profile-page .game-world-top{align-items:flex-start;margin-bottom:23px!important}
+ .player-profile-page .season-pill{max-width:100%;white-space:normal;text-align:center;line-height:1.4}
+ .player-profile-page .player-identity{display:grid!important;grid-template-columns:68px minmax(0,1fr)!important;align-items:center!important;gap:13px!important}
+ .player-profile-page .player-avatar.profile-big-avatar{grid-row:1;grid-column:1;width:64px;height:64px}
+ .player-profile-page .player-info{grid-row:1;grid-column:2;gap:7px!important}
+ .player-profile-page .player-info h2{font-size:20px!important;overflow-wrap:anywhere}
+ .player-profile-page .player-info .player-social-identity{font-size:13px}
+ .player-profile-page .player-xp-total{grid-column:1/-1;grid-row:2;justify-self:end;margin-top:4px}
+ .player-profile-page .player-level-line{display:flex;flex-wrap:wrap;gap:5px 12px}
+ .player-profile-page .world-stats{grid-template-columns:1fr!important;gap:9px!important;margin-top:20px!important}
+ .player-profile-page .world-stats>div{width:100%;min-height:48px}
+ .player-profile-page .profile-editor{padding:19px 16px!important;gap:20px!important}
+ .player-profile-page .profile-choice-group{padding-top:18px}
+ .player-profile-page .profile-avatar-choices{grid-template-columns:repeat(4,minmax(0,1fr))!important}
+ .player-profile-page .profile-frame-choices{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .player-profile-page .gem-mission-grid{grid-template-columns:1fr!important}
+ .player-profile-page .achievement-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .player-profile-page .level-reward-grid{grid-template-columns:1fr!important}
+ .nexus-social{gap:18px!important}
+ .nexus-social .social-layout{gap:17px!important}
+ .nexus-social .social-panel{padding:17px 14px!important}
+ .nexus-social .social-tabs{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .nexus-social .social-tabs button{font-size:11px!important;padding:10px 5px!important}
+ .nexus-social .social-editor-identity{align-items:flex-start!important}
+ .nexus-social .social-editor-avatar{width:54px;height:54px;flex-basis:54px}
+ .nexus-social .social-profile-editor form{gap:17px!important}
+ .nexus-social .social-person{align-items:flex-start!important;flex-wrap:wrap}
+ .nexus-social .social-person-info{flex:1 1 calc(100% - 58px)}
+ .nexus-social .social-person-actions{width:100%;flex-direction:row!important;justify-content:flex-end!important;padding-left:48px}
+}
