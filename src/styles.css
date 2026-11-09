@@ -2803,3 +2803,5 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
  .social-chat-head{gap:6px;padding:9px}
  .social-chat-head b{font-size:11px}
 }
+
+.social-inbox-actions{display:grid;grid-template-columns:1fr;gap:7px;padding:10px;border-bottom:1px solid #293951}.social-request-category{display:block;margin:4px 0;color:#9fb0ca;font-size:10px;font-weight:800;text-transform:uppercase;letter-spacing:.7px}.social-group-create{padding:10px;margin:0;border-bottom:1px solid #293951}.social-group-create small{color:#aab8cc;font-size:11px;line-height:1.5}@media(max-width:640px){.social-inbox-actions{grid-template-columns:1fr 1fr}.social-group-create{max-width:none}}
