@@ -1,4 +1,5 @@
 import React,{useCallback,useEffect,useMemo,useState} from 'react';
+import './nexus-social-refined.css';
 import {Search,Users,UserPlus,Check,X,RefreshCw,ShieldCheck,UserRound,AtSign,Lock,Eye,CalendarClock,Trophy,Zap,Star,Flame,MessageCircle} from 'lucide-react';
 import {supabase} from './supabase';
 import NexusCommunity from './NexusCommunity';
