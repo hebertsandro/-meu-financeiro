@@ -3409,3 +3409,243 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
   .nexus-social .social-community-list{border-bottom-color:rgba(177,145,239,.2)!important}
   .nexus-social .social-chat-compose{padding:10px!important}
 }
+
+
+/* NEXUS SOCIAL — V8: paleta violeta unificada em todas as áreas */
+.nexus-social .social-community{
+  --ns-purple:#9b78dc;
+  --ns-purple-bright:#b99af3;
+  --ns-purple-soft:#d9c7ff;
+  --ns-panel:#1d1730;
+  --ns-panel-deep:#151126;
+  --ns-line:rgba(183,151,239,.2);
+  color:#f3edff!important;
+}
+.nexus-social .social-community .social-panel,
+.nexus-social .social-community .social-community-grid,
+.nexus-social .social-community .social-community-list,
+.nexus-social .social-community .social-community-chat,
+.nexus-social .social-community .social-chat-messages,
+.nexus-social .social-community .social-clan-chat{
+  color:#f3edff!important;
+  border-color:var(--ns-line)!important;
+}
+.nexus-social .social-community .social-panel{
+  background:linear-gradient(150deg,#201832 0%,#171329 58%,#1c1530 100%)!important;
+  border:1px solid var(--ns-line)!important;
+  border-radius:20px!important;
+  box-shadow:0 14px 38px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.025)!important;
+}
+.nexus-social .social-community .social-panel-heading{
+  border-color:var(--ns-line)!important;
+}
+.nexus-social .social-community .social-panel-heading h3,
+.nexus-social .social-community h4{
+  color:#f0e7ff!important;
+}
+.nexus-social .social-community .social-panel-heading p,
+.nexus-social .social-community .social-muted,
+.nexus-social .social-community .social-community-empty span{
+  color:#ad9fc4!important;
+}
+.nexus-social .social-community .social-tabs,
+.nexus-social .social-community .social-community-tabs{
+  gap:8px!important;
+}
+.nexus-social .social-community .social-tabs button,
+.nexus-social .social-community .social-community-tabs button{
+  min-height:42px!important;padding:9px 13px!important;
+  border:1px solid rgba(177,145,239,.19)!important;border-radius:12px!important;
+  color:#c8b9df!important;background:linear-gradient(145deg,#211a34,#19152a)!important;
+}
+.nexus-social .social-community .social-tabs button.active,
+.nexus-social .social-community .social-community-tabs button.active{
+  color:#fff!important;border-color:rgba(195,164,255,.72)!important;
+  background:linear-gradient(135deg,#8864c3,#65499b)!important;
+  box-shadow:0 5px 17px rgba(135,93,202,.27),inset 0 1px rgba(255,255,255,.12)!important;
+}
+.nexus-social .social-community .social-community-grid{
+  background:#171329!important;
+  border:1px solid var(--ns-line)!important;border-radius:17px!important;
+  overflow:hidden;
+}
+.nexus-social .social-community .social-community-list{
+  background:linear-gradient(180deg,#1d1730,#171329)!important;
+  border-right:1px solid var(--ns-line)!important;
+}
+.nexus-social .social-community .social-community-row{
+  color:#eee6ff!important;background:rgba(39,29,59,.56)!important;
+  border:1px solid rgba(177,145,239,.13)!important;border-radius:13px!important;
+  transition:background .18s ease,border-color .18s ease,transform .18s ease!important;
+}
+.nexus-social .social-community .social-community-row:hover{
+  background:rgba(115,82,164,.2)!important;border-color:rgba(187,153,244,.36)!important;
+  transform:translateY(-1px);
+}
+.nexus-social .social-community .social-community-row.selected{
+  background:linear-gradient(100deg,rgba(135,94,196,.29),rgba(74,55,112,.2))!important;
+  border-color:rgba(192,158,250,.45)!important;
+  box-shadow:inset 3px 0 #b18be9,0 5px 15px rgba(0,0,0,.12)!important;
+}
+.nexus-social .social-community .social-community-row b{color:#f3edff!important}
+.nexus-social .social-community .social-community-row small{color:#ad9fc4!important}
+.nexus-social .social-community .social-community-chat{
+  background:radial-gradient(ellipse at 50% 0%,rgba(133,91,195,.13),transparent 58%),#151126!important;
+}
+.nexus-social .social-community .social-chat-head{
+  background:linear-gradient(100deg,#261d3b,#1d1730)!important;
+  border-bottom:1px solid var(--ns-line)!important;
+}
+.nexus-social .social-community .social-chat-head b{color:#f5efff!important}
+.nexus-social .social-community .social-chat-head small{color:#b9a5df!important}
+.nexus-social .social-community .social-chat-head button,
+.nexus-social .social-community .social-icon-button{
+  color:#e9ddff!important;background:#34264d!important;
+  border:1px solid rgba(183,151,239,.28)!important;border-radius:10px!important;
+}
+.nexus-social .social-community .social-chat-messages{
+  background:radial-gradient(ellipse at 50% 0%,rgba(123,82,183,.1),transparent 60%),#151126!important;
+}
+.nexus-social .social-community .social-chat-bubble{
+  color:#f1eaff!important;background:linear-gradient(145deg,#2b2340,#241d37)!important;
+  border:1px solid rgba(177,145,239,.2)!important;border-radius:15px 15px 15px 5px!important;
+}
+.nexus-social .social-community .social-chat-bubble.mine{
+  background:linear-gradient(145deg,#594078,#422f61)!important;
+  border-color:rgba(196,162,255,.42)!important;border-radius:15px 15px 5px 15px!important;
+}
+.nexus-social .social-community .social-message-sender{color:#d0b4ff!important}
+.nexus-social .social-community .social-chat-bubble small{color:#c0b1d5!important}
+.nexus-social .social-community .social-chat-compose{
+  background:linear-gradient(100deg,#211a34,#281e3d)!important;
+  border:1px solid var(--ns-line)!important;border-radius:13px!important;
+}
+.nexus-social .social-community .social-chat-compose input{
+  background:#171329!important;border-color:rgba(183,151,239,.23)!important;
+}
+.nexus-social .social-community .social-inbox-actions button,
+.nexus-social .social-community button.social-primary,
+.nexus-social .social-community button.social-add-button{
+  color:#fff!important;background:linear-gradient(135deg,#8962c5,#654895)!important;
+  border:1px solid rgba(202,174,255,.4)!important;border-radius:11px!important;
+  box-shadow:0 5px 14px rgba(113,76,172,.2)!important;
+}
+.nexus-social .social-community button.social-view-button{
+  color:#e5d8ff!important;background:linear-gradient(145deg,#302443,#261d39)!important;
+  border:1px solid rgba(177,145,239,.26)!important;border-radius:11px!important;
+}
+.nexus-social .social-community button:disabled{
+  opacity:.48!important;filter:saturate(.65);
+}
+.nexus-social .social-community .social-inbox-requests,
+.nexus-social .social-community .social-create-form,
+.nexus-social .social-community .social-room-tools{
+  background:linear-gradient(145deg,#211a34,#19152a)!important;
+  border:1px solid var(--ns-line)!important;border-radius:15px!important;
+}
+.nexus-social .social-community .social-inbox-request{
+  border-top-color:rgba(177,145,239,.14)!important;
+}
+.nexus-social .social-community .social-inbox-request button{
+  color:#e8dcff!important;background:#392a53!important;
+  border:1px solid rgba(185,151,239,.3)!important;border-radius:9px!important;
+}
+.nexus-social .social-community .social-request-category{color:#c3a7f3!important}
+.nexus-social .social-community input,
+.nexus-social .social-community textarea,
+.nexus-social .social-community select{
+  color:#f3edff!important;background:#171329!important;
+  border:1px solid rgba(177,145,239,.27)!important;border-radius:11px!important;
+  accent-color:#a982e8;
+}
+.nexus-social .social-community input:focus,
+.nexus-social .social-community textarea:focus,
+.nexus-social .social-community select:focus{
+  outline:none!important;border-color:#b99af3!important;
+  box-shadow:0 0 0 3px rgba(169,130,232,.16)!important;
+}
+.nexus-social .social-community input::placeholder,
+.nexus-social .social-community textarea::placeholder{color:#9585ad!important}
+.nexus-social .social-community .social-community-empty{
+  color:#d6c5f3!important;background:radial-gradient(circle at 50% 35%,rgba(129,91,190,.13),transparent 55%)!important;
+}
+.nexus-social .social-community .social-community-cards{
+  gap:13px!important;
+}
+.nexus-social .social-community .social-community-card{
+  color:#eee6ff!important;
+  background:linear-gradient(145deg,#2a2040 0%,#201932 62%,#19152b 100%)!important;
+  border:1px solid rgba(177,145,239,.22)!important;border-radius:17px!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.17),inset 0 1px rgba(255,255,255,.035)!important;
+}
+.nexus-social .social-community .social-community-card>b{color:#f5efff!important}
+.nexus-social .social-community .social-community-card p{color:#b6a8ca!important}
+.nexus-social .social-community .social-community-card>small{color:#b9a6d8!important}
+.nexus-social .social-community .social-clan-emblem{
+  color:#eadbff!important;background:linear-gradient(145deg,#493467,#2e2347)!important;
+  border:1px solid rgba(193,159,255,.35)!important;border-radius:16px!important;
+  box-shadow:0 5px 15px rgba(111,74,168,.2);
+}
+.nexus-social .social-community .social-challenge-type{
+  color:#d7bdff!important;background:rgba(134,95,193,.17)!important;
+  border:1px solid rgba(181,145,239,.23)!important;border-radius:30px!important;
+}
+.nexus-social .social-community .social-friend-tag{
+  color:#e5d5ff!important;background:rgba(130,91,188,.2)!important;
+  border:1px solid rgba(181,145,239,.28)!important;border-radius:9px!important;
+}
+.nexus-social .social-community .social-clan-detail{
+  background:radial-gradient(ellipse at 90% 0%,rgba(135,91,195,.16),transparent 38%),linear-gradient(155deg,#211832,#171329 68%,#1c1630)!important;
+  border:1px solid rgba(177,145,239,.25)!important;border-radius:20px!important;
+}
+.nexus-social .social-community .social-clan-banner:before{
+  background:linear-gradient(105deg,rgba(27,17,45,.94),rgba(38,27,62,.78) 58%,rgba(32,25,55,.45))!important;
+}
+.nexus-social .social-community .social-clan-banner:after{
+  border-color:rgba(195,164,255,.23)!important;
+  box-shadow:0 0 0 25px rgba(171,132,230,.05),0 0 0 52px rgba(171,132,230,.035)!important;
+}
+.nexus-social .social-community .social-clan-banner>span{
+  color:#f0e5ff!important;background:linear-gradient(145deg,rgba(151,111,211,.35),rgba(78,60,119,.4))!important;
+  border-color:rgba(196,165,255,.43)!important;
+}
+.nexus-social .social-community .social-clan-banner>div>small{
+  color:#dfcaff!important;background:rgba(119,81,172,.24)!important;
+  border-color:rgba(190,155,255,.3)!important;
+}
+.nexus-social .social-community .social-clan-members .social-community-row{
+  background:linear-gradient(135deg,#302443,#211a34)!important;
+  border-color:rgba(177,145,239,.18)!important;
+}
+.nexus-social .social-community .social-clan-reward{
+  color:#f1eaff!important;background:linear-gradient(145deg,#2b2140,#201a32)!important;
+  border-color:rgba(177,145,239,.22)!important;
+}
+.nexus-social .social-community .social-clan-reward.unlocked{
+  background:linear-gradient(145deg,rgba(119,83,171,.38),rgba(48,37,71,.95))!important;
+  border-color:rgba(194,161,255,.48)!important;
+}
+.nexus-social .social-community .social-clan-reward>small,
+.nexus-social .social-community .social-clan-reward.unlocked>small{color:#d1b8f5!important}
+.nexus-social .social-community .social-clan-edit-toggle button{
+  color:#eadfff!important;background:linear-gradient(145deg,#392a53,#2a203f)!important;
+  border-color:rgba(190,155,255,.35)!important;
+}
+.nexus-social .social-community .social-error{
+  color:#ffdce7!important;background:rgba(123,42,77,.2)!important;
+  border:1px solid rgba(255,123,161,.3)!important;
+}
+.nexus-social .social-community .social-profile-modal-backdrop{
+  background:rgba(10,7,18,.78)!important;backdrop-filter:blur(8px);
+}
+.nexus-social .social-community .social-report-dialog{
+  background:linear-gradient(145deg,#2a2040,#19152b)!important;
+  border:1px solid rgba(190,155,255,.28)!important;border-radius:18px!important;
+}
+@media(max-width:760px){
+  .nexus-social .social-community .social-panel{padding:13px!important}
+  .nexus-social .social-community .social-community-list{background:#1b1530!important}
+  .nexus-social .social-community .social-community-chat{background:#151126!important}
+  .nexus-social .social-community .social-community-card{padding:15px!important}
+  .nexus-social .social-community .social-tabs button{min-height:40px!important}
+}
