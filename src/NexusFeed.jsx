@@ -59,10 +59,10 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
   const channel=supabase.channel('nexus-feed-'+userId)
    .on('postgres_changes',{event:'*',schema:'public',table:'social_posts'},load)
    .on('postgres_changes',{event:'*',schema:'public',table:'social_post_likes'},load)
-   .on('postgres_changes',{event:'*',schema:'public',table:'social_post_comments'},load)
+   .on('postgres_changes',{event:'*',schema:'public',table:'social_post_comments'},()=>{load();Object.keys(expanded).filter(id=>expanded[id]).forEach(id=>loadComments(id));})
    .subscribe();
   return()=>{supabase.removeChannel(channel);};
- },[userId,load]);
+ },[userId,load,expanded]);
  useEffect(()=>()=>{if(photoPreview)URL.revokeObjectURL(photoPreview);},[photoPreview]);
  function choosePhoto(file){
   if(!file)return;
@@ -170,6 +170,6 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
     </div>}
    </article>)}</div>
   }
-  <footer className="nxf-footer">Publicações suas e dos seus amigos · Até 40 por carregamento</footer>
+  <footer className="nxf-footer">Publicações suas e dos seus amigos · 40 mais recentes</footer>
  </section>;
 }
