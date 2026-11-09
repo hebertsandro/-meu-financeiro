@@ -1,6 +1,6 @@
 import React,{useCallback,useEffect,useState} from 'react';
 import {supabase} from './supabase';
-import {Heart,MessageCircle,Send,ImagePlus,MoreHorizontal,Trash2,Flag,X,CornerUpLeft,LoaderCircle} from 'lucide-react';
+import {Heart,MessageCircle,Send,ImagePlus,MoreHorizontal,Trash2,Flag,X,CornerUpLeft,LoaderCircle,Pencil,Check} from 'lucide-react';
 import './nexus-feed.css';
 
 const MAX_IMAGE=5*1024*1024;
@@ -21,7 +21,7 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
  const [posts,setPosts]=useState([]),[draft,setDraft]=useState(''),[photo,setPhoto]=useState(null),[photoPreview,setPhotoPreview]=useState('');
  const [busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [expanded,setExpanded]=useState({}),[comments,setComments]=useState({}),[commentDraft,setCommentDraft]=useState('');
- const [replyTo,setReplyTo]=useState(null),[menuPost,setMenuPost]=useState(null);
+ const [replyTo,setReplyTo]=useState(null),[menuPost,setMenuPost]=useState(null),[editingComment,setEditingComment]=useState(null),[editDraft,setEditDraft]=useState('');
  const load=useCallback(async()=>{
   if(!userId||!supabase)return;
   setLoading(true);setError('');
@@ -119,6 +119,12 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
   if(e1)setError(e1.message);else{setCommentDraft('');setReplyTo(null);await loadComments(postId);await load();}
   setBusy(false);
  }
+ async function saveCommentEdit(comment){
+  const body=editDraft.trim();
+  if(!body){setError('O comentário não pode ficar vazio.');return;}
+  const {error:e}=await supabase.from('social_post_comments').update({body}).eq('id',comment.id).eq('author_id',userId);
+  if(e)setError(e.message);else{setEditingComment(null);setEditDraft('');await loadComments(comment.post_id);onToast('Comentário atualizado.');}
+ }
  async function deleteComment(comment){
   const {error:e}=await supabase.from('social_post_comments').update({deleted_at:new Date().toISOString()}).eq('id',comment.id).eq('author_id',userId);
   if(e)setError(e.message);else{await loadComments(comment.post_id);await load();}
@@ -158,7 +164,7 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
     {post.imageUrl&&<img className="nxf-post-image" src={post.imageUrl} alt="Imagem da publicação" loading="lazy"/>}
     <div className="nxf-actions"><button className={post.liked?'liked':''} onClick={()=>toggleLike(post)}><Heart size={19} fill={post.liked?'currentColor':'none'}/><b>{post.likeCount}</b> Curtir</button><button onClick={()=>toggleComments(post.id)}><MessageCircle size={19}/><b>{post.commentCount}</b> Comentários</button></div>
     {expanded[post.id]&&<div className="nxf-comments">
-     <div className="nxf-comment-list">{(comments[post.id]||[]).map(c=><div className={'nxf-comment '+(c.parent_comment_id?'is-reply':'')} key={c.id}>{authorButton(c.author)}<div className="nxf-comment-content"><p>{c.body}</p><div className="nxf-comment-tools"><time>{timeAgo(c.created_at)}</time><button onClick={()=>setReplyTo({id:c.id,postId:post.id,name:profileName(c.author)})}><CornerUpLeft size={13}/> Responder</button>{c.author_id===userId&&<button onClick={()=>deleteComment(c)}><Trash2 size={13}/></button>}{c.author_id!==userId&&<button onClick={()=>reportComment(c)}><Flag size={13}/></button>}</div></div></div>)}</div>
+     <div className="nxf-comment-list">{(comments[post.id]||[]).map(c=><div className={'nxf-comment '+(c.parent_comment_id?'is-reply':'')} key={c.id}>{authorButton(c.author)}<div className="nxf-comment-content">{editingComment===c.id?<><textarea className="nxf-edit-comment" value={editDraft} maxLength={1000} onChange={e=>setEditDraft(e.target.value)}/><div className="nxf-comment-tools"><button onClick={()=>saveCommentEdit(c)}><Check size={13}/> Salvar</button><button onClick={()=>setEditingComment(null)}><X size={13}/> Cancelar</button></div></>:<><p>{c.body}</p><div className="nxf-comment-tools"><time>{timeAgo(c.created_at)}</time><button onClick={()=>setReplyTo({id:c.id,postId:post.id,name:profileName(c.author)})}><CornerUpLeft size={13}/> Responder</button>{c.author_id===userId&&<><button onClick={()=>{setEditingComment(c.id);setEditDraft(c.body)}}><Pencil size={13}/> Editar</button><button onClick={()=>deleteComment(c)}><Trash2 size={13}/></button></>}{c.author_id!==userId&&<button onClick={()=>reportComment(c)}><Flag size={13}/></button>}</div></>}</div></div>)}</div>
      {replyTo?.postId===post.id&&<div className="nxf-replying">Respondendo a {replyTo.name}<button onClick={()=>setReplyTo(null)}><X size={13}/></button></div>}
      <form className="nxf-comment-form" onSubmit={e=>sendComment(post.id,e)}><input value={commentDraft} onChange={e=>setCommentDraft(e.target.value)} maxLength={1000} placeholder="Escreva um comentário..."/><button disabled={busy||!commentDraft.trim()}><Send size={16}/></button></form>
     </div>}
