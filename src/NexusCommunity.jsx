@@ -1,0 +1,83 @@
+import React,{useCallback,useEffect,useState} from 'react';
+import {supabase} from './supabase';
+import {MessageCircle,Send,Shield,Flag,Users,Plus,RefreshCw,Swords,Handshake,DoorOpen,Lock,ChevronLeft} from 'lucide-react';
+
+const errText=e=>e?.message||'Não foi possível concluir esta ação.';
+export default function NexusCommunity({userId,friends=[],onToast=()=>{}}){
+ const [section,setSection]=useState('chat'),[busy,setBusy]=useState(false),[error,setError]=useState('');
+ const [chats,setChats]=useState([]),[activeChat,setActiveChat]=useState(null),[messages,setMessages]=useState([]),[draft,setDraft]=useState('');
+ const [rooms,setRooms]=useState([]),[activeRoom,setActiveRoom]=useState(null),[roomMessages,setRoomMessages]=useState([]),[roomDraft,setRoomDraft]=useState('');
+ const [clans,setClans]=useState([]),[challenges,setChallenges]=useState([]);
+ const [showCreate,setShowCreate]=useState(false),[form,setForm]=useState({name:'',description:'',tag:'',emblem:'🛡️',title:'',kind:'duel',goal:'1'});
+ const [reportTarget,setReportTarget]=useState(null),[reportDetails,setReportDetails]=useState('');
+ const friendList=friends.map(x=>x.person).filter(Boolean);
+
+ const loadChats=useCallback(async()=>{
+  const {data,error:e}=await supabase.from('social_conversation_members').select('conversation_id').eq('user_id',userId);
+  if(e)throw e;
+  const ids=(data||[]).map(x=>x.conversation_id);
+  if(!ids.length){setChats([]);return;}
+  const [members,msgs]=await Promise.all([
+   supabase.from('social_conversation_members').select('conversation_id,user_id').in('conversation_id',ids).neq('user_id',userId),
+   supabase.from('social_messages').select('conversation_id,body,created_at,sender_id').in('conversation_id',ids).order('created_at',{ascending:false})
+  ]);
+  if(members.error)throw members.error;if(msgs.error)throw msgs.error;
+  const people=members.data?.length?await supabase.from('social_profiles').select('user_id,username,display_name,avatar').in('user_id',members.data.map(x=>x.user_id)):{data:[],error:null};
+  if(people.error)throw people.error;
+  const pm=Object.fromEntries((people.data||[]).map(p=>[p.user_id,p]));
+  setChats(ids.map(id=>({id,person:pm[members.data.find(m=>m.conversation_id===id)?.user_id],last:msgs.data.find(m=>m.conversation_id===id)})).filter(x=>x.person));
+ },[userId]);
+ const loadRooms=useCallback(async()=>{const {data,error:e}=await supabase.from('social_rooms').select('*').order('created_at',{ascending:false}).limit(50);if(e)throw e;setRooms(data||[]);},[]);
+ const loadClans=useCallback(async()=>{const {data,error:e}=await supabase.from('social_clans').select('*').order('created_at',{ascending:false}).limit(50);if(e)throw e;setClans(data||[]);},[]);
+ const loadChallenges=useCallback(async()=>{const {data,error:e}=await supabase.from('social_challenges').select('*').in('status',['open','active']).order('created_at',{ascending:false}).limit(50);if(e)throw e;setChallenges(data||[]);},[]);
+ const refresh=useCallback(async()=>{setError('');try{await Promise.all([loadChats(),loadRooms(),loadClans(),loadChallenges()]);}catch(e){setError(errText(e));}},[loadChats,loadRooms,loadClans,loadChallenges]);
+ useEffect(()=>{refresh();},[refresh]);
+ useEffect(()=>{
+  if(!activeChat)return;
+  let channel;
+  const fetch=async()=>{const {data,error:e}=await supabase.from('social_messages').select('*').eq('conversation_id',activeChat.id).order('created_at',{ascending:true}).limit(200);if(e)setError(errText(e));else setMessages(data||[]);};
+  fetch();
+  channel=supabase.channel('social-chat-'+activeChat.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'social_messages',filter:'conversation_id=eq.'+activeChat.id},payload=>setMessages(prev=>prev.some(m=>m.id===payload.new.id)?prev:[...prev,payload.new])).subscribe();
+  return()=>{if(channel)supabase.removeChannel(channel);};
+ },[activeChat?.id]);
+ useEffect(()=>{
+  if(!activeRoom)return;
+  let channel;
+  const fetch=async()=>{const {data,error:e}=await supabase.from('social_room_messages').select('*').eq('room_id',activeRoom.id).order('created_at',{ascending:true}).limit(200);if(e)setError(errText(e));else setRoomMessages(data||[]);};
+  fetch();
+  channel=supabase.channel('social-room-'+activeRoom.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'social_room_messages',filter:'room_id=eq.'+activeRoom.id},payload=>setRoomMessages(prev=>prev.some(m=>m.id===payload.new.id)?prev:[...prev,payload.new])).subscribe();
+  return()=>{if(channel)supabase.removeChannel(channel);};
+ },[activeRoom?.id]);
+ async function run(action){setBusy(true);setError('');try{await action();}catch(e){setError(errText(e));}finally{setBusy(false);}}
+ async function startChat(person){await run(async()=>{const {data,error:e}=await supabase.rpc('social_start_private_chat',{target_user:person.user_id});if(e)throw e;await loadChats();setActiveChat({id:data,person});setSection('chat');});}
+ async function sendMessage(e){e.preventDefault();const body=draft.trim();if(!body||!activeChat)return;await run(async()=>{const {error:e1}=await supabase.from('social_messages').insert({conversation_id:activeChat.id,sender_id:userId,body});if(e1)throw e1;setDraft('');});}
+ async function blockUser(person){if(!confirm('Bloquear @'+person.username+'? A pessoa não poderá iniciar ou continuar conversas com você.'))return;await run(async()=>{const {error:e}=await supabase.from('social_blocks').insert({blocker_id:userId,blocked_id:person.user_id});if(e&&e.code!=='23505')throw e;setActiveChat(null);await loadChats();onToast('Jogador bloqueado.');});}
+ async function submitReport(e){e.preventDefault();if(!reportTarget)return;await run(async()=>{const {error:e1}=await supabase.from('social_reports').insert({reporter_id:userId,reported_id:reportTarget.user_id,category:'other',details:reportDetails.trim()});if(e1)throw e1;setReportTarget(null);setReportDetails('');onToast('Denúncia enviada para análise.');});}
+ async function createRoom(e){e.preventDefault();await run(async()=>{const {data,error:e1}=await supabase.rpc('social_create_room',{room_name:form.name,room_description:form.description});if(e1)throw e1;setShowCreate(false);setForm({...form,name:'',description:''});await loadRooms();setActiveRoom(rooms.find(x=>x.id===data)||null);});}
+ async function joinRoom(room){await run(async()=>{const {error:e}=await supabase.from('social_room_members').insert({room_id:room.id,user_id:userId});if(e&&e.code!=='23505')throw e;setActiveRoom(room);});}
+ async function sendRoomMessage(e){e.preventDefault();const body=roomDraft.trim();if(!body||!activeRoom)return;await run(async()=>{const {error:e1}=await supabase.from('social_room_messages').insert({room_id:activeRoom.id,sender_id:userId,body});if(e1)throw e1;setRoomDraft('');});}
+ async function createClan(e){e.preventDefault();await run(async()=>{const {error:e1}=await supabase.rpc('social_create_clan',{clan_name:form.name,clan_tag:form.tag,clan_description:form.description,clan_emblem:form.emblem});if(e1)throw e1;setShowCreate(false);setForm({...form,name:'',tag:'',description:''});await loadClans();onToast('Clã criado!');});}
+ async function joinClan(clan){await run(async()=>{const {error:e}=await supabase.from('social_clan_members').insert({clan_id:clan.id,user_id:userId});if(e&&e.code!=='23505')throw e;onToast('Você entrou no clã '+clan.name+'.');});}
+ async function createChallenge(e){e.preventDefault();await run(async()=>{const {error:e1}=await supabase.rpc('social_create_challenge',{challenge_title:form.title,challenge_description:form.description,kind:form.kind,target_goal:Number(form.goal)||1,finish_at:null});if(e1)throw e1;setShowCreate(false);setForm({...form,title:'',description:'',goal:'1'});await loadChallenges();onToast('Desafio publicado!');});}
+ async function joinChallenge(item){await run(async()=>{const {error:e}=await supabase.from('social_challenge_members').insert({challenge_id:item.id,user_id:userId});if(e&&e.code!=='23505')throw e;onToast('Você entrou no desafio!');});}
+ const tabs=[['chat','Chat',MessageCircle],['rooms','Salas',Users],['clans','Clãs',Shield],['challenges','Duelos e missões',Swords]];
+ return <section className="social-community">
+  <div className="social-tabs social-community-tabs">{tabs.map(([id,label,Icon])=><button key={id} className={section===id?'active':''} onClick={()=>{setSection(id);setShowCreate(false);}}><Icon size={15}/>{label}</button>)}</div>
+  {error&&<div className="social-error" role="alert">{error}</div>}
+  <div className="social-panel">
+   <div className="social-panel-heading"><div><h3>{tabs.find(x=>x[0]===section)?.[1]}</h3><p>Comunidade NEXUS · respeite os outros jogadores.</p></div><button className="social-icon-button" onClick={refresh} aria-label="Atualizar"><RefreshCw size={16}/></button></div>
+   {section==='chat'&&<div className="social-community-grid">
+    <div className="social-community-list">
+     {chats.map(c=><button key={c.id} className={'social-community-row '+(activeChat?.id===c.id?'selected':'')} onClick={()=>setActiveChat(c)}><span className="social-community-avatar">{c.person.avatar||'👾'}</span><span><b>{c.person.display_name||c.person.username}</b><small>@{c.person.username}</small><small>{c.last?.body||'Conversa privada'}</small></span></button>)}
+     {!chats.length&&<p className="social-muted">Você ainda não tem conversas. Inicie um chat com um amigo:</p>}
+     {friendList.map(p=><button key={p.user_id} className="social-community-row" onClick={()=>startChat(p)}><span className="social-community-avatar">{p.avatar||'👾'}</span><span><b>{p.display_name||p.username}</b><small>@{p.username}</small></span><MessageCircle size={16}/></button>)}
+    </div>
+    <div className="social-community-chat">{activeChat?<><div className="social-chat-head"><button onClick={()=>setActiveChat(null)}><ChevronLeft size={17}/></button><b>{activeChat.person.display_name||activeChat.person.username}</b><small>@{activeChat.person.username}</small><button onClick={()=>setReportTarget(activeChat.person)} title="Denunciar"><Flag size={15}/></button><button onClick={()=>blockUser(activeChat.person)} title="Bloquear"><Lock size={15}/></button></div><div className="social-chat-messages">{messages.map(m=><div key={m.id} className={'social-chat-bubble '+(m.sender_id===userId?'mine':'')}>{m.body}<small>{new Date(m.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</small></div>)}</div><form className="social-chat-compose" onSubmit={sendMessage}><input value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} placeholder="Escreva uma mensagem..." /><button disabled={busy||!draft.trim()}><Send size={17}/></button></form></>:<div className="social-community-empty"><MessageCircle size={28}/><b>Suas conversas privadas</b><span>Escolha um amigo para começar. O histórico fica salvo na sua conta.</span></div>}</div>
+   </div>}
+   {section==='rooms'&&<>{!showCreate?<><button className="social-primary" onClick={()=>setShowCreate(true)}><Plus size={16}/> Criar sala</button><div className="social-community-cards">{rooms.map(r=><article className="social-community-card" key={r.id}><b>{r.name}</b><p>{r.description||'Sala da comunidade NEXUS'}</p><button className="social-add-button" onClick={()=>joinRoom(r)}>Entrar na sala</button></article>)}</div>{activeRoom&&<div className="social-room-chat"><h4>{activeRoom.name}</h4><div className="social-chat-messages">{roomMessages.map(m=><div className={'social-chat-bubble '+(m.sender_id===userId?'mine':'')} key={m.id}>{m.body}</div>)}</div><form className="social-chat-compose" onSubmit={sendRoomMessage}><input value={roomDraft} onChange={e=>setRoomDraft(e.target.value)} placeholder="Mensagem na sala..." maxLength={2000}/><button disabled={busy||!roomDraft.trim()}><Send size={17}/></button></form></div>}</>:<form className="social-create-form" onSubmit={createRoom}><input required minLength={3} maxLength={50} placeholder="Nome da sala" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/><textarea maxLength={240} placeholder="Descrição" value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/><button className="social-primary" disabled={busy}>Criar sala</button></form>}</>}
+   {section==='clans'&&<>{!showCreate?<><button className="social-primary" onClick={()=>setShowCreate(true)}><Plus size={16}/> Criar clã</button><div className="social-community-cards">{clans.map(c=><article className="social-community-card" key={c.id}><span className="social-clan-emblem">{c.emblem}</span><b>{c.name} <small>[{c.tag}]</small></b><p>{c.description||'Clã NEXUS'}</p><button className="social-add-button" onClick={()=>joinClan(c)}>Entrar no clã</button></article>)}</div></>:<form className="social-create-form" onSubmit={createClan}><input required minLength={3} maxLength={32} placeholder="Nome do clã" value={form.name} onChange={e=>setForm({...form,name:e.target.value})}/><input required minLength={2} maxLength={6} pattern="[A-Za-z0-9]{2,6}" placeholder="TAG (2–6 letras/números)" value={form.tag} onChange={e=>setForm({...form,tag:e.target.value.toUpperCase()})}/><textarea maxLength={300} placeholder="Identidade e descrição do clã" value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/><button className="social-primary" disabled={busy}>Fundar clã</button></form>}</>}
+   {section==='challenges'&&<>{!showCreate?<><button className="social-primary" onClick={()=>setShowCreate(true)}><Plus size={16}/> Criar duelo ou missão</button><div className="social-community-cards">{challenges.map(c=><article className="social-community-card" key={c.id}><span className="social-challenge-type">{c.challenge_type==='duel'?'⚔️ DUELO':'🤝 MISSÃO COLETIVA'}</span><b>{c.title}</b><p>{c.description||'Desafio da comunidade'} · Meta: {c.goal}</p><button className="social-add-button" onClick={()=>joinChallenge(c)}>Participar</button></article>)}</div></>:<form className="social-create-form" onSubmit={createChallenge}><input required minLength={3} maxLength={70} placeholder="Nome do desafio" value={form.title} onChange={e=>setForm({...form,title:e.target.value})}/><select value={form.kind} onChange={e=>setForm({...form,kind:e.target.value})}><option value="duel">Duelo</option><option value="mission">Missão coletiva</option></select><input type="number" min="1" max="100000" value={form.goal} onChange={e=>setForm({...form,goal:e.target.value})} placeholder="Meta"/><textarea maxLength={300} placeholder="Descrição" value={form.description} onChange={e=>setForm({...form,description:e.target.value})}/><button className="social-primary" disabled={busy}>Publicar desafio</button></form>}</>}
+  </div>
+  {reportTarget&&<div className="social-profile-modal-backdrop"><form className="social-create-form social-report-dialog" onSubmit={submitReport}><h3>Denunciar @{reportTarget.username}</h3><p>Explique o que aconteceu. A denúncia será encaminhada para análise.</p><textarea required minLength={5} maxLength={1000} value={reportDetails} onChange={e=>setReportDetails(e.target.value)} placeholder="Descreva o motivo..."/><div className="social-dialog-actions"><button type="button" className="social-view-button" onClick={()=>setReportTarget(null)}>Cancelar</button><button className="social-primary" disabled={busy}>Enviar denúncia</button></div></form></div>}
+ </section>;
+}
