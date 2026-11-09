@@ -12,8 +12,8 @@ Deno.serve(async (req) => {
   const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
   const vapidPublic = Deno.env.get("VAPID_PUBLIC_KEY")!;
   const vapidPrivate = Deno.env.get("VAPID_PRIVATE_KEY")!;
-  const vapidSubject = Deno.env.get("VAPID_SUBJECT") || "mailto:admin@meufinanceiro.app";
-  if (!url || !anon || !serviceKey || !vapidPublic || !vapidPrivate) return json({ error: "Push secrets are not configured." }, 500);
+  const vapidSubject = Deno.env.get("VAPID_SUBJECT") || "";
+  if (!url || !anon || !serviceKey || !vapidPublic || !vapidPrivate || !vapidSubject) return json({ error: "Push secrets are not configured." }, 500);
   const authHeader = req.headers.get("Authorization") || "";
   const authClient = createClient(url, anon, { global: { headers: { Authorization: authHeader } }, auth: { persistSession: false } });
   const { data: authData, error: authError } = await authClient.auth.getUser();
