@@ -113,7 +113,7 @@ export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=
     <div className="social-tabs"><button className={tab==='feed'?'active':''} onClick={()=>setTab('feed')}><MessageCircle size={16}/> Feed</button><button className={tab==='community'?'active':''} onClick={()=>setTab('community')}><Users size={16}/> Conversas {incoming.length>0&&<b>{incoming.length}</b>}</button><button className={tab==='discover'?'active':''} onClick={()=>setTab('discover')}><UserPlus size={16}/> Adicionar amigos</button></div>
     {loading?<div className="social-loading"><span className="spinner"/> Carregando comunidade...</div>:<>
      
-     {tab==='feed'&&<NexusFeed userId={userId} playerProfile={playerProfile} onToast={onToast} onOpenProfile={openPerson}/>}
+     {tab==='feed'&&<NexusFeed userId={userId} playerProfile={playerProfile} friends={friends} onToast={onToast} onOpenProfile={openPerson}/>}
      {tab==='discover'&&<div className="social-panel"><div className="social-panel-heading"><div><h3>Encontrar pessoas</h3><p>Busque pelo @usuário e abra a Central do Jogador.</p></div></div><form className="social-search" onSubmit={searchPeople}><AtSign size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Digite um @usuário"/><button disabled={busy||query.trim().length<2}><Search size={16}/> Buscar</button></form><div className="social-people">{results.map(p=>personRow(p,<button className="social-add-button" disabled={busy} onClick={e=>{e.stopPropagation();requestFriend(p.user_id)}}><UserPlus size={15}/> Adicionar</button>))}</div>{!results.length&&<div className="social-empty-inline"><Search size={26}/><p>Pesquise um nome de usuário para encontrar pessoas.</p></div>}</div>}
      
     </>}
