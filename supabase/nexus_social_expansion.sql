@@ -103,6 +103,19 @@ create table if not exists public.social_challenge_members (
   primary key (challenge_id, user_id)
 );
 
+create or replace function public.social_is_conversation_member(target_conversation uuid, target_user uuid default auth.uid())
+returns boolean language sql stable security definer set search_path=public as $
+ select exists(select 1 from public.social_conversation_members where conversation_id=target_conversation and user_id=target_user);
+$;
+create or replace function public.social_is_room_member(target_room uuid, target_user uuid default auth.uid())
+returns boolean language sql stable security definer set search_path=public as $
+ select exists(select 1 from public.social_room_members where room_id=target_room and user_id=target_user);
+$;
+revoke all on function public.social_is_conversation_member(uuid,uuid) from public;
+revoke all on function public.social_is_room_member(uuid,uuid) from public;
+grant execute on function public.social_is_conversation_member(uuid,uuid) to authenticated;
+grant execute on function public.social_is_room_member(uuid,uuid) to authenticated;
+
 alter table public.social_blocks enable row level security;
 alter table public.social_reports enable row level security;
 alter table public.social_conversations enable row level security;
@@ -128,15 +141,15 @@ create policy "Users read own reports" on public.social_reports for select to au
 
 drop policy if exists "Members read conversations" on public.social_conversations;
 create policy "Members read conversations" on public.social_conversations for select to authenticated
- using (exists(select 1 from public.social_conversation_members m where m.conversation_id=id and m.user_id=auth.uid()));
+ using (public.social_is_conversation_member(id,auth.uid()));
 drop policy if exists "Authenticated create conversations" on public.social_conversations;
 create policy "Authenticated create conversations" on public.social_conversations for insert to authenticated with check (auth.uid()=created_by);
 drop policy if exists "Members read conversation members" on public.social_conversation_members;
 create policy "Members read conversation members" on public.social_conversation_members for select to authenticated
- using (exists(select 1 from public.social_conversation_members mine where mine.conversation_id=conversation_id and mine.user_id=auth.uid()));
+ using (public.social_is_conversation_member(conversation_id,auth.uid()));
 drop policy if exists "Members read messages" on public.social_messages;
 create policy "Members read messages" on public.social_messages for select to authenticated
- using (exists(select 1 from public.social_conversation_members m where m.conversation_id=social_messages.conversation_id and m.user_id=auth.uid()));
+ using (public.social_is_conversation_member(social_messages.conversation_id,auth.uid()));
 drop policy if exists "Members send messages without blocks" on public.social_messages;
 create policy "Members send messages without blocks" on public.social_messages for insert to authenticated
  with check (
@@ -151,18 +164,18 @@ create policy "Members send messages without blocks" on public.social_messages f
 
 drop policy if exists "Discover public rooms" on public.social_rooms;
 create policy "Discover public rooms" on public.social_rooms for select to authenticated
- using (not is_private or created_by=auth.uid() or exists(select 1 from public.social_room_members m where m.room_id=id and m.user_id=auth.uid()));
+ using (not is_private or created_by=auth.uid() or public.social_is_room_member(id,auth.uid()));
 drop policy if exists "Create rooms" on public.social_rooms;
 create policy "Create rooms" on public.social_rooms for insert to authenticated with check (created_by=auth.uid());
 drop policy if exists "Read room members" on public.social_room_members;
 create policy "Read room members" on public.social_room_members for select to authenticated
- using (exists(select 1 from public.social_rooms r where r.id=room_id and (not r.is_private or exists(select 1 from public.social_room_members me where me.room_id=r.id and me.user_id=auth.uid()))));
+ using (exists(select 1 from public.social_rooms r where r.id=room_id and (not r.is_private or public.social_is_room_member(r.id,auth.uid()))));
 drop policy if exists "Join public rooms" on public.social_room_members;
 create policy "Join public rooms" on public.social_room_members for insert to authenticated
  with check (user_id=auth.uid() and exists(select 1 from public.social_rooms r where r.id=room_id and not r.is_private));
 drop policy if exists "Room members read messages" on public.social_room_messages;
 create policy "Room members read messages" on public.social_room_messages for select to authenticated
- using (exists(select 1 from public.social_room_members m where m.room_id=social_room_messages.room_id and m.user_id=auth.uid()));
+ using (public.social_is_room_member(social_room_messages.room_id,auth.uid()));
 drop policy if exists "Room members send messages" on public.social_room_messages;
 create policy "Room members send messages" on public.social_room_messages for insert to authenticated
  with check (sender_id=auth.uid() and exists(select 1 from public.social_room_members m where m.room_id=social_room_messages.room_id and m.user_id=auth.uid()));
