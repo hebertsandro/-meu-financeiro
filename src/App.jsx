@@ -556,6 +556,7 @@ function App(){
   const [payModal,setPayModal]=useState(false),[payBusy,setPayBusy]=useState(false);
   const [email,setEmail]=useState(''), [password,setPassword]=useState(''), [authError,setAuthError]=useState(''), [authMode,setAuthMode]=useState('login'), [authNotice,setAuthNotice]=useState('');
   const [signupUsername,setSignupUsername]=useState(''),[signupBio,setSignupBio]=useState(''),[playerBioBusy,setPlayerBioBusy]=useState(false);
+   const [usernameDraft,setUsernameDraft]=useState(''),[usernameBusy,setUsernameBusy]=useState(false),[usernameChangedAt,setUsernameChangedAt]=useState(null);
   const [busy,setBusy]=useState(false);
   const [adminUsers,setAdminUsers]=useState([]),[adminSocialProfiles,setAdminSocialProfiles]=useState([]),[adminBusy,setAdminBusy]=useState(false),[adminError,setAdminError]=useState(''),[adminMessage,setAdminMessage]=useState(''),[maintenance,setMaintenance]=useState(false),[maintenanceMessage,setMaintenanceMessage]=useState('Estamos realizando uma manutenção. Voltaremos em breve.');
   const [adminTestMode,setAdminTestMode]=useState(()=>window.localStorage.getItem('mf_admin_test_mode')==='true');
@@ -612,13 +613,13 @@ function App(){
       const {data:existing,error}=await supabase.from('social_profiles').select('*').eq('user_id',user.id).maybeSingle();
       if(!active)return;
       if(error){console.warn('NEXUS Social profile load:',error.message);return;}
-      if(existing){setPlayerProfile(p=>({...p,username:existing.username||'',bio:existing.bio||''}));return;}
+      if(existing){setPlayerProfile(p=>({...p,username:existing.username||'',bio:existing.bio||''}));setUsernameDraft(existing.username||'');setUsernameChangedAt(existing.username_changed_at||null);return;}
       const metadata=user.user_metadata||{};const username=String(metadata.social_username||'').trim().toLowerCase();
       if(!/^[a-z0-9_]{3,20}$/.test(username))return;
       const {data:created,error:createError}=await supabase.from('social_profiles').insert({user_id:user.id,username,display_name:String(playerProfile.name||metadata.name||'Meu jogador').trim().slice(0,40)||'Meu jogador',bio:String(metadata.social_bio||'').trim().slice(0,160),avatar:playerProfile.avatar||'👾',avatar_frame:playerProfile.frame||'violet',card_frame:playerProfile.cardFrame||'cyan',equipped_gems:Array.isArray(playerProfile.gems)?playerProfile.gems:[],game_xp:Number(gameXp||0),game_correct:Number(gameCorrect||0)}).select('*').single();
       if(!active)return;
       if(createError){console.warn('NEXUS Social profile creation:',createError.message);if(createError.code==='23505')notify('Esse @ já está em uso. Abra o NEXUS Social e escolha outro identificador.');else notify('Não foi possível criar seu perfil social: '+createError.message);return;}
-      if(created)setPlayerProfile(p=>({...p,username:created.username,bio:created.bio}));
+      if(created){setPlayerProfile(p=>({...p,username:created.username,bio:created.bio}));setUsernameDraft(created.username||'');setUsernameChangedAt(created.username_changed_at||null);}
     })();
     return()=>{active=false;};
   },[session?.user?.id]);
@@ -671,6 +672,28 @@ function App(){
     if(error||!data){notify(error?.message||'Seu perfil social ainda não foi criado. Saia e entre novamente ou conclua seu cadastro social.');}
     else{setPlayerProfile(p=>({...p,username:data.username,bio:data.bio}));notify('Biografia atualizada na Central do Jogador!');}
     setPlayerBioBusy(false);
+  }
+  async function savePlayerUsername(e){
+    e.preventDefault();if(!session?.user?.id||!supabase)return;
+    const clean=String(usernameDraft||'').trim().toLowerCase();
+    if(!/^[a-z0-9_]{3,20}$/.test(clean)){notify('O @ deve ter de 3 a 20 caracteres: letras, números ou _.');return;}
+    if(clean===String(playerProfile.username||'').toLowerCase()){notify('Esse já é seu @ atual.');return;}
+    if(usernameChangedAt&&Date.now()-new Date(usernameChangedAt).getTime()<30*86400000){
+      const days=Math.ceil((30*86400000-(Date.now()-new Date(usernameChangedAt).getTime()))/86400000);
+      notify('Você poderá alterar seu @ novamente em '+days+' dia(s).');return;
+    }
+    setUsernameBusy(true);
+    const {data,error}=await supabase.from('social_profiles').update({username:clean,updated_at:new Date().toISOString()}).eq('user_id',session.user.id).select('username,username_changed_at').maybeSingle();
+    if(error||!data){
+      const message=String(error?.message||'').toLowerCase();
+      notify(error?.code==='23505'||message.includes('duplicate')?'Esse @ já está em uso.':message.includes('30 dias')?'O @ só pode ser alterado uma vez a cada 30 dias.':error?.message||'Não foi possível alterar seu @.');
+    }else{
+      setPlayerProfile(p=>({...p,username:data.username}));
+      setUsernameDraft(data.username);
+      setUsernameChangedAt(data.username_changed_at||new Date().toISOString());
+      notify('Seu @ do NEXUS Social foi atualizado!');
+    }
+    setUsernameBusy(false);
   }
   async function loadData(){
     const tables=['transactions','cards','debts','goals','installments','subscriptions','card_limit_history','goal_movements','notifications'];
@@ -995,7 +1018,7 @@ function App(){
         
 <div className="profile-editor panel"><div className="panel-head"><div><h3>Personalize seu jogador</h3><p>Seu nome, avatar e moldura aparecem no perfil.</p></div></div>
 <label className="profile-name-field">Nome do jogador<input maxLength={24} value={playerProfile.name} onChange={e=>setPlayerProfile(p=>({...p,name:e.target.value}))} placeholder="Como quer ser chamado no jogo?"/></label>
-<div className="profile-social-bio-editor"><div><b>Biografia do NEXUS Social</b><small>Essa descrição aparece no seu perfil público. Seu @ é {playerProfile.username?'@'+playerProfile.username:'definido no cadastro social'}.</small></div><form onSubmit={savePlayerBio}><textarea maxLength={160} rows={3} value={playerProfile.bio||''} onChange={e=>setPlayerProfile(p=>({...p,bio:e.target.value}))} placeholder="Conte um pouco sobre você..."/><div className="profile-bio-footer"><small>{(playerProfile.bio||'').length}/160 caracteres</small><button className="primary" disabled={playerBioBusy||!playerProfile.username}>{playerBioBusy?'Salvando...':'Salvar biografia'}</button></div></form></div>
+<div className="profile-social-bio-editor"><div><b>Seu @ do NEXUS Social</b><small>Seu identificador público. Você pode alterá-lo uma vez a cada 30 dias.</small></div><form onSubmit={savePlayerUsername}><label className="profile-username-label">@ <input maxLength={20} value={usernameDraft} onChange={e=>setUsernameDraft(e.target.value.toLowerCase().replace(/[^a-z0-9_]/g,''))} placeholder="seu_usuario" disabled={!playerProfile.username||usernameBusy}/></label><div className="profile-bio-footer"><small>{usernameChangedAt&&Date.now()-new Date(usernameChangedAt).getTime()<30*86400000?('Próxima alteração em '+Math.ceil((30*86400000-(Date.now()-new Date(usernameChangedAt).getTime()))/86400000)+' dia(s).'):'3–20 caracteres · letras, números e _'}</small><button className="primary" disabled={usernameBusy||!playerProfile.username||usernameDraft.trim().toLowerCase()===String(playerProfile.username||'').toLowerCase()||(usernameChangedAt&&Date.now()-new Date(usernameChangedAt).getTime()<30*86400000)}>{usernameBusy?'Salvando...':'Salvar @'}</button></div></form></div><div className="profile-social-bio-editor"><div><b>Biografia do NEXUS Social</b><small>Essa descrição aparece no seu perfil público. Seu @ é {playerProfile.username?'@'+playerProfile.username:'definido no cadastro social'}.</small></div><form onSubmit={savePlayerBio}><textarea maxLength={160} rows={3} value={playerProfile.bio||''} onChange={e=>setPlayerProfile(p=>({...p,bio:e.target.value}))} placeholder="Conte um pouco sobre você..."/><div className="profile-bio-footer"><small>{(playerProfile.bio||'').length}/160 caracteres</small><button className="primary" disabled={playerBioBusy||!playerProfile.username}>{playerBioBusy?'Salvando...':'Salvar biografia'}</button></div></form></div>
 
 <div className="profile-choice-group"><b>Avatar <small> · desbloqueie jogando</small></b><div className="profile-avatar-choices">{[{v:'👾',xp:0},{v:'🎮',xp:0},{v:'🦊',xp:100},{v:'🐱',xp:150},{v:'🐼',xp:250},{v:'🐸',xp:350},{v:'🐲',xp:500},{v:'🤖',xp:750},{v:'🦁',xp:1000},{v:'🐯',xp:1250},{v:'🐧',xp:1500},{v:'🐙',xp:2000}].map(a=><button key={a.v} disabled={gameXp<a.xp} title={gameXp<a.xp?'Desbloqueia com '+a.xp+' XP':'Avatar disponível'} className={(playerProfile.avatar===a.v?'selected ':'')+(gameXp<a.xp?'avatar-locked':'')} onClick={()=>setPlayerProfile(p=>({...p,avatar:a.v}))}><span>{gameXp>=a.xp?a.v:'🔒'}</span>{gameXp<a.xp&&<small>{a.xp} XP</small>}</button>)}</div></div>
 <div className="profile-choice-group"><b>Molduras do avatar</b><div className="profile-frame-choices">{[{id:'violet',label:'Neon violeta',unlock:0},{id:'cyan',label:'Cyber ciano',unlock:150},{id:'gold',label:'Elite dourada',unlock:500},{id:'ruby',label:'Rubí arcano',unlock:1000},{id:'chrome',label:'Chrome cósmico',unlock:4500}].map(fr=><button key={fr.id} disabled={gameXp<fr.unlock} className={'profile-frame-option frame-'+fr.id+(playerProfile.frame===fr.id?' selected':'')} onClick={()=>setPlayerProfile(p=>({...p,frame:fr.id}))}><div className={'player-avatar frame-thumbnail-avatar frame-'+fr.id}><span>{playerProfile.avatar}</span></div><span>{fr.label}</span><small>{gameXp>=fr.unlock?'DESBLOQUEADA':fr.unlock+' XP'}</small></button>)}</div></div>
