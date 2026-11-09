@@ -2706,3 +2706,10 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
 .social-duel-question{display:grid;gap:9px}.social-duel-question>b{font-size:15px;margin:4px 0}.social-duel-question button{padding:11px;border-radius:10px;border:1px solid #475778;background:#182640;color:#f1f4ff;text-align:left}.social-duel-question button:disabled{opacity:.5}
 .social-duel-finished{display:block;text-align:center;padding:18px;color:#8fe0bf}
 @media(max-width:520px){.social-room-code-entry>div{flex-direction:column}.social-room-code-entry .social-add-button{width:100%}.social-duel-scoreboard strong{font-size:25px}}
+
+
+.player-clan-badge{display:inline-flex;align-items:center;gap:6px;margin:7px 0;padding:6px 10px;border:1px solid #7255a9;border-radius:9px;background:rgba(107,72,166,.18);color:#d8c4ff;font-size:11px;font-weight:700}
+.social-clan-rewards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.social-clan-reward{display:grid;gap:5px;padding:11px;border-radius:12px;border:1px solid #38445d;background:#111d30}
+.social-clan-reward>span{font-size:23px}.social-clan-reward b{font-size:11px}.social-clan-reward small{font-size:9px;color:#a9b5c9}
+.social-clan-reward.unlocked{border-color:#9270d2;background:rgba(102,73,153,.2)}.social-clan-reward.locked{opacity:.62}
