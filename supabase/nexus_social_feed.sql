@@ -67,7 +67,14 @@ alter table public.social_post_reports enable row level security;
 
 create or replace function public.social_feed_can_view_author(target_author uuid)
 returns boolean language sql stable security definer set search_path=public as $
- select not exists(
+ select (
+  target_author=auth.uid()
+  or exists(
+   select 1 from public.social_friendships f
+   where f.user_a=least(auth.uid(),target_author)
+     and f.user_b=greatest(auth.uid(),target_author)
+  )
+ ) and not exists(
   select 1 from public.social_blocks b
   where (b.blocker_id=auth.uid() and b.blocked_id=target_author)
      or (b.blocker_id=target_author and b.blocked_id=auth.uid())
@@ -90,7 +97,7 @@ create policy "Authors delete own posts" on public.social_posts for delete to au
  using (author_id=auth.uid());
 
 drop policy if exists "Feed members read likes" on public.social_post_likes;
-create policy "Feed members read likes" on public.social_post_likes for select to authenticated using (true);
+create policy "Feed members read likes" on public.social_post_likes for select to authenticated using (exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
 drop policy if exists "Users like as themselves" on public.social_post_likes;
 create policy "Users like as themselves" on public.social_post_likes for insert to authenticated
  with check (user_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
@@ -109,7 +116,7 @@ create policy "Authors remove own comments" on public.social_post_comments for u
 
 drop policy if exists "Users submit post reports" on public.social_post_reports;
 create policy "Users submit post reports" on public.social_post_reports for insert to authenticated
- with check (reporter_id=auth.uid() and ((post_id is not null and exists(select 1 from public.social_posts p where p.id=post_id and p.author_id<>auth.uid())) or (comment_id is not null and exists(select 1 from public.social_post_comments c where c.id=comment_id and c.author_id<>auth.uid()))));
+ with check (reporter_id=auth.uid() and ((post_id is not null and exists(select 1 from public.social_posts p where p.id=post_id and p.author_id<>auth.uid() and public.social_feed_can_view_author(p.author_id))) or (comment_id is not null and exists(select 1 from public.social_post_comments c where c.id=comment_id and c.author_id<>auth.uid()))));
 drop policy if exists "Users read own post reports" on public.social_post_reports;
 create policy "Users read own post reports" on public.social_post_reports for select to authenticated using (reporter_id=auth.uid());
 
