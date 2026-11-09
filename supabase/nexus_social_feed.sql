@@ -32,6 +32,23 @@ create table if not exists public.social_post_comments (
 );
 create index if not exists social_post_comments_post_idx on public.social_post_comments(post_id,created_at asc);
 
+create or replace function public.social_validate_comment_parent()
+returns trigger language plpgsql security definer set search_path=public as $
+declare parent_post uuid;
+begin
+ if new.parent_comment_id is not null then
+  select post_id into parent_post from public.social_post_comments where id=new.parent_comment_id and deleted_at is null;
+  if parent_post is null or parent_post<>new.post_id then
+   raise exception 'A resposta precisa pertencer à mesma publicação do comentário.';
+  end if;
+ end if;
+ return new;
+end;
+$;
+drop trigger if exists social_validate_comment_parent_trigger on public.social_post_comments;
+create trigger social_validate_comment_parent_trigger before insert or update of post_id,parent_comment_id
+on public.social_post_comments for each row execute function public.social_validate_comment_parent();
+
 create table if not exists public.social_post_reports (
  id uuid primary key default gen_random_uuid(),
  reporter_id uuid not null references auth.users(id) on delete cascade,
@@ -76,16 +93,16 @@ drop policy if exists "Feed members read likes" on public.social_post_likes;
 create policy "Feed members read likes" on public.social_post_likes for select to authenticated using (true);
 drop policy if exists "Users like as themselves" on public.social_post_likes;
 create policy "Users like as themselves" on public.social_post_likes for insert to authenticated
- with check (user_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id));
+ with check (user_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
 drop policy if exists "Users remove own likes" on public.social_post_likes;
 create policy "Users remove own likes" on public.social_post_likes for delete to authenticated using (user_id=auth.uid());
 
 drop policy if exists "Feed members read comments" on public.social_post_comments;
 create policy "Feed members read comments" on public.social_post_comments for select to authenticated
- using (exists(select 1 from public.social_posts p where p.id=post_id));
+ using (exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
 drop policy if exists "Users create own comments" on public.social_post_comments;
 create policy "Users create own comments" on public.social_post_comments for insert to authenticated
- with check (author_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id));
+ with check (author_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
 drop policy if exists "Authors remove own comments" on public.social_post_comments;
 create policy "Authors remove own comments" on public.social_post_comments for update to authenticated
  using (author_id=auth.uid()) with check (author_id=auth.uid());
