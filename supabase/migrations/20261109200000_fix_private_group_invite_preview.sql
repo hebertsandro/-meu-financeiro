@@ -19,5 +19,5 @@ begin
 end;
 $function$;
 
-revoke all on function public.social_get_my_pending_room_invites() from public;
+revoke all on function public.social_get_my_pending_room_invites() from anon, public;
 grant execute on function public.social_get_my_pending_room_invites() to authenticated;
