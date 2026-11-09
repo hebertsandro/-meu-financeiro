@@ -2713,3 +2713,33 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
 .social-clan-reward{display:grid;gap:5px;padding:11px;border-radius:12px;border:1px solid #38445d;background:#111d30}
 .social-clan-reward>span{font-size:23px}.social-clan-reward b{font-size:11px}.social-clan-reward small{font-size:9px;color:#a9b5c9}
 .social-clan-reward.unlocked{border-color:#9270d2;background:rgba(102,73,153,.2)}.social-clan-reward.locked{opacity:.62}
+
+
+/* NEXUS SOCIAL V4 — conversation layout, message identity and clan controls */
+.social-message-sender{display:block;margin:0 0 4px;color:#c8b3ff;font-size:10px;font-weight:800;letter-spacing:.15px}
+.social-message-avatar{display:inline-grid;place-items:center;width:25px;height:25px;float:left;margin:0 7px 4px 0;border-radius:9px;background:#202d45;font-size:14px;box-shadow:0 0 0 1px #53617d}
+.social-chat-bubble.mine .social-message-avatar{float:right;margin:0 0 4px 7px}
+.social-chat-bubble{min-width:80px;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.social-chat-bubble small{clear:both;text-align:right}
+.social-chat-messages{scroll-behavior:smooth;background:linear-gradient(180deg,rgba(7,14,26,.42),rgba(10,19,34,.18))}
+.social-chat-compose{position:sticky;bottom:0;background:#0d1829}
+.social-community-grid{grid-template-columns:minmax(220px,.78fr) minmax(0,1.7fr);gap:0;overflow:hidden;border:1px solid #293951;border-radius:15px;background:#0b1525}
+.social-community-list{border-right:1px solid #293951;background:#0d192b}
+.social-community-row{border-bottom:1px solid rgba(54,72,101,.5);border-radius:0}
+.social-community-row.selected{background:rgba(116,88,184,.18);box-shadow:inset 3px 0 #9b7be0}
+.social-community-avatar{display:grid;place-items:center;flex:0 0 38px;width:38px;height:38px;border-radius:13px;background:#202c43;font-size:20px;box-shadow:0 0 0 1px #485b79}
+.social-community-avatar[class*="frame-"]{border:2px solid #9a79d5}
+.social-clan-edit-toggle{display:flex;justify-content:flex-end;margin:12px 0}
+.social-clan-edit-toggle button{display:inline-flex;align-items:center;gap:7px}
+.social-clan-members .social-community-row{display:flex;align-items:center;gap:10px}
+.social-clan-members .social-community-row>span:nth-child(2){flex:1;min-width:0}
+.social-clan-members .social-community-row small{display:flex;align-items:center;gap:4px;flex-wrap:wrap}
+.social-clan-members .social-community-row small svg{display:inline}
+.social-clan-detail .social-create-form label{display:flex;align-items:center;gap:8px;padding:8px 0}
+.social-clan-detail .social-create-form label input{width:17px;height:17px;flex:0 0 17px}
+@media(max-width:640px){
+ .social-community-grid{border-radius:12px}
+ .social-community-list{border-right:0;border-bottom:1px solid #293951}
+ .social-chat-bubble{max-width:90%}
+ .social-chat-messages{max-height:48vh}
+}
