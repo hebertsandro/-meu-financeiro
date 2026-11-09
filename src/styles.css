@@ -3649,3 +3649,28 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
   .nexus-social .social-community .social-community-card{padding:15px!important}
   .nexus-social .social-community .social-tabs button{min-height:40px!important}
 }
+
+
+/* Correção final: banner principal do NEXUS Social (remove override verde antigo) */
+.nexus-social > .social-hero{
+  border:1px solid rgba(190,155,255,.32)!important;
+  background:
+    radial-gradient(ellipse at 88% 0%,rgba(164,123,230,.22),transparent 43%),
+    radial-gradient(ellipse at 0% 100%,rgba(116,83,174,.18),transparent 48%),
+    linear-gradient(125deg,#241936,#211a36 58%,#302044)!important;
+  box-shadow:0 16px 42px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.035)!important;
+}
+.nexus-social > .social-hero:after{
+  border-color:rgba(194,164,255,.2)!important;
+  box-shadow:0 0 0 28px rgba(171,132,230,.045),0 0 0 58px rgba(171,132,230,.025)!important;
+}
+.nexus-social > .social-hero>div:first-child>span{color:#cbb2ff!important}
+.nexus-social > .social-hero h2{color:#f4edff!important}
+.nexus-social > .social-hero h2 em{color:#c4a5ff!important}
+.nexus-social > .social-hero p{color:#c0b2d5!important}
+.nexus-social > .social-hero .social-hero-icon{
+  background:linear-gradient(145deg,#9871cf,#654a96)!important;
+  border:1px solid rgba(211,185,255,.48)!important;
+  color:#f5eaff!important;
+  box-shadow:0 8px 24px rgba(130,88,190,.24)!important;
+}
