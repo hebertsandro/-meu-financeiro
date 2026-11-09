@@ -141,3 +141,33 @@ begin
 end; $nexus$;
 revoke all on function public.social_create_room_duel(uuid,uuid,text) from public;
 grant execute on function public.social_create_room_duel(uuid,uuid,text) to authenticated;
+
+
+create or replace function public.social_respond_room_duel(target_duel uuid, accept_duel boolean)
+returns void language plpgsql security definer set search_path=public as $nexus$
+declare d public.social_room_duels%rowtype;
+begin
+ select * into d from public.social_room_duels where id=target_duel for update;
+ if not found or d.opponent_id<>auth.uid() or d.status<>'pending' then raise exception 'Este convite de duelo não está disponível.'; end if;
+ update public.social_room_duels set status=case when accept_duel then 'accepted' else 'declined' end where id=target_duel;
+end; $nexus$;
+revoke all on function public.social_respond_room_duel(uuid,boolean) from public;
+grant execute on function public.social_respond_room_duel(uuid,boolean) to authenticated;
+
+create or replace function public.social_start_room_duel(target_duel uuid)
+returns void language plpgsql security definer set search_path=public as $nexus$
+begin
+ update public.social_room_duels set status='live',started_at=now()
+ where id=target_duel and created_by=auth.uid() and status='accepted';
+ if not found then raise exception 'O duelo precisa ser aceito pelo amigo antes de começar.'; end if;
+end; $nexus$;
+revoke all on function public.social_start_room_duel(uuid) from public;
+grant execute on function public.social_start_room_duel(uuid) to authenticated;
+
+alter table public.social_room_duels replica identity full;
+do $nexus$
+begin
+ if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='social_room_duels') then
+  alter publication supabase_realtime add table public.social_room_duels;
+ end if;
+end; $nexus$;
