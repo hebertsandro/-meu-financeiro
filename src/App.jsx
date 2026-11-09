@@ -617,7 +617,7 @@ function App(){
       if(!/^[a-z0-9_]{3,20}$/.test(username))return;
       const {data:created,error:createError}=await supabase.from('social_profiles').insert({user_id:user.id,username,display_name:String(playerProfile.name||metadata.name||'Meu jogador').trim().slice(0,40)||'Meu jogador',bio:String(metadata.social_bio||'').trim().slice(0,160),avatar:playerProfile.avatar||'👾',avatar_frame:playerProfile.frame||'violet',card_frame:playerProfile.cardFrame||'cyan',equipped_gems:Array.isArray(playerProfile.gems)?playerProfile.gems:[],game_xp:Number(gameXp||0),game_correct:Number(gameCorrect||0)}).select('*').single();
       if(!active)return;
-      if(createError){console.warn('NEXUS Social profile creation:',createError.message);return;}
+      if(createError){console.warn('NEXUS Social profile creation:',createError.message);if(createError.code==='23505')notify('Esse @ já está em uso. Abra o NEXUS Social e escolha outro identificador.');else notify('Não foi possível criar seu perfil social: '+createError.message);return;}
       if(created)setPlayerProfile(p=>({...p,username:created.username,bio:created.bio}));
     })();
     return()=>{active=false;};
