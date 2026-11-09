@@ -651,7 +651,8 @@ function App(){
         options:{emailRedirectTo:window.location.origin,data:{social_username:cleanUsername,social_bio:cleanBio}}
       });
       if(error){
-        setAuthError(error.message.includes('Password')?'Use uma senha mais forte, com pelo menos 6 caracteres.':'Não foi possível criar a conta. Confira os dados e tente novamente.');
+        const detail=String(error.message||'').toLowerCase();
+        setAuthError(detail.includes('social_profiles_username_key')||detail.includes('duplicate key')?'Esse @ já está em uso. Escolha outro identificador.':error.message.includes('Password')?'Use uma senha mais forte, com pelo menos 6 caracteres.':'Não foi possível criar a conta. Confira os dados e tente novamente.');
       } else if(data.session){
         setAuthNotice('Conta criada! Seu espaço financeiro já está pronto.');
       } else {
