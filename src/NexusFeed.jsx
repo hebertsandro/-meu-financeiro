@@ -151,14 +151,14 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
  }
  const authorButton=(person)=> <button className="nxf-author" onClick={()=>onOpenProfile(person)}><span className={'nxf-avatar frame-'+(person?.avatar_frame||'violet')+((person?.equipped_gems||[]).length===4?' frame-chromatic':'')}>{person?.avatar||initials(profileName(person))}</span><span className="nxf-author-copy"><b>{profileName(person)}</b><small>@{person?.username||'jogador'}</small></span></button>;
  return <section className="nexus-feed">
-  <header className="nxf-heading"><div><span className="nxf-eyebrow">NEXUS SOCIAL · COMUNIDADE</span><h2>Feed <em>da galera</em></h2><p>Veja o que seus amigos estão compartilhando e mostre sua jornada.</p></div><span className="nxf-live"><i/> AO VIVO</span></header>
+  <header className="nxf-heading"><div><span className="nxf-eyebrow">NEXUS SOCIAL · COMUNIDADE</span><h2>Feed <em>da galera</em></h2><p>Veja o que toda a comunidade está compartilhando e mostre sua jornada.</p></div><span className="nxf-live"><i/> AO VIVO</span></header>
   <form className="nxf-composer" onSubmit={publish}>
    <div className="nxf-compose-top"><span className={'nxf-compose-avatar frame-'+(playerProfile?.frame||'violet')+((playerProfile?.gems||[]).length===4?' frame-chromatic':'')}>{playerProfile?.avatar||'👾'}</span><textarea value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} rows={3} placeholder="O que está acontecendo na sua jornada?"/></div>
    {photoPreview&&<div className="nxf-preview"><img src={photoPreview} alt="Prévia da publicação"/><button type="button" onClick={()=>{setPhoto(null);URL.revokeObjectURL(photoPreview);setPhotoPreview('')}} aria-label="Remover foto"><X size={17}/></button></div>}
    <div className="nxf-compose-bottom"><label className="nxf-photo-pick"><ImagePlus size={17}/> Foto <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>choosePhoto(e.target.files?.[0])}/></label><span>{draft.length}/2000</span><button className="nxf-publish" disabled={busy||(!draft.trim()&&!photo)}>{busy?<LoaderCircle size={16} className="nxf-spin"/>:<Send size={16}/>} Publicar</button></div>
   </form>
   {error&&<div className="nxf-error" role="alert">{error}<button onClick={()=>setError('')} aria-label="Fechar"><X size={14}/></button></div>}
-  {loading?<div className="nxf-loading"><LoaderCircle className="nxf-spin"/> Carregando publicações...</div>:posts.length===0?<div className="nxf-empty"><span>✦</span><h3>O feed começa com você</h3><p>Publique algo ou adicione amigos para acompanhar as novidades deles.</p></div>:
+  {loading?<div className="nxf-loading"><LoaderCircle className="nxf-spin"/> Carregando publicações...</div>:posts.length===0?<div className="nxf-empty"><span>✦</span><h3>A comunidade está começando</h3><p>Seja o primeiro a publicar e acompanhe as novidades de todos os jogadores do NEXUS Social.</p></div>:
    <div className="nxf-post-list">{posts.map(post=><article className="nxf-post" key={post.id}>
     <div className="nxf-post-head">{authorButton(post.author)}<div className="nxf-post-meta"><time>{timeAgo(post.created_at)}</time><button aria-label="Mais opções" onClick={()=>setMenuPost(menuPost===post.id?null:post.id)}><MoreHorizontal size={20}/></button>{menuPost===post.id&&<div className="nxf-menu">{post.author_id===userId?<button onClick={()=>deletePost(post)}><Trash2 size={14}/> Excluir publicação</button>:<button onClick={()=>reportPost(post)}><Flag size={14}/> Denunciar</button>}</div>}</div></div>
     {post.body&&<p className="nxf-post-body">{post.body}</p>}
@@ -171,6 +171,6 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
     </div>}
    </article>)}</div>
   }
-  <footer className="nxf-footer">Publicações suas e dos seus amigos · 40 mais recentes</footer>
+  <footer className="nxf-footer">Publicações de toda a comunidade · 40 mais recentes</footer>
  </section>;
 }
