@@ -2683,3 +2683,26 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
 .social-community-card small{display:block;color:#b6a1ff;font-size:10px;margin:5px 0 9px}
 .social-create-form label{display:flex;align-items:center;gap:8px;color:#b8c5da;font-size:12px}
 .social-create-form label input{width:auto;accent-color:#8b68d3}
+
+
+/* NEXUS SOCIAL V3 — private rooms, clan identity and duel arena */
+.social-room-code-entry,.social-duel-arena,.social-clan-detail{margin:14px 0;padding:15px;border:1px solid #34415c;border-radius:16px;background:rgba(12,22,39,.92)}
+.social-room-code-entry p{color:#9eabc1;font-size:12px;line-height:1.5}
+.social-room-code-entry>div{display:flex;gap:8px}
+.social-room-code-entry input{flex:1;min-width:0;background:#0a1425;color:#edf2ff;border:1px solid #394966;border-radius:10px;padding:12px}
+.social-room-code{display:flex;align-items:center;gap:9px;flex-wrap:wrap;margin:10px 0;color:#9cabc3;font-size:10px}
+.social-room-code strong{font-size:17px;letter-spacing:3px;color:#c5adff}
+.social-room-code button{border:1px solid #5a4c87;background:#282044;color:#e8ddff;border-radius:8px;padding:6px 10px}
+.social-clan-banner{display:flex;align-items:center;gap:14px;min-height:118px;padding:18px;border-radius:14px;background:linear-gradient(120deg,#39245e,#142b49);background-size:cover;background-position:center}
+.social-clan-banner>span{font-size:40px}.social-clan-banner h4{margin:0 0 5px}.social-clan-banner p{margin:3px 0;color:#d0d9ec}.social-clan-banner small{color:#c5b4ff}
+.social-clan-banner.theme-cyan{box-shadow:inset 0 0 0 1px #4bbed0}.social-clan-banner.theme-gold{box-shadow:inset 0 0 0 1px #d4aa4e}.social-clan-banner.theme-crimson{box-shadow:inset 0 0 0 1px #c35b70}.social-clan-banner.theme-emerald{box-shadow:inset 0 0 0 1px #46b78c}
+.social-clan-members{display:grid;gap:6px}.social-clan-admin{font-size:10px;color:#ffd27a;border:1px solid #886c37;border-radius:7px;padding:4px 7px}
+.social-clan-chat{max-height:260px;min-height:100px}.social-clan-detail h4{margin:18px 0 10px}
+.social-duel-card{margin:12px 0;padding:12px;border:1px solid #384867;border-radius:14px;background:#0d182a}
+.social-duel-scoreboard{display:flex;align-items:center;justify-content:space-around;text-align:center;margin:6px 0 14px}
+.social-duel-scoreboard>div{display:grid;gap:4px}.social-duel-scoreboard small,.social-duel-countdown small,.social-duel-question small{font-size:9px;letter-spacing:1.4px;color:#9baac3}
+.social-duel-scoreboard strong{font-size:30px;color:#c6a7ff;font-variant-numeric:tabular-nums}.social-duel-scoreboard>b{color:#7889a5}
+.social-duel-countdown{display:grid;justify-items:center;gap:4px;padding:15px}.social-duel-countdown strong{font-size:54px;line-height:1;color:#d5baff;text-shadow:0 0 24px #8959e8}
+.social-duel-question{display:grid;gap:9px}.social-duel-question>b{font-size:15px;margin:4px 0}.social-duel-question button{padding:11px;border-radius:10px;border:1px solid #475778;background:#182640;color:#f1f4ff;text-align:left}.social-duel-question button:disabled{opacity:.5}
+.social-duel-finished{display:block;text-align:center;padding:18px;color:#8fe0bf}
+@media(max-width:520px){.social-room-code-entry>div{flex-direction:column}.social-room-code-entry .social-add-button{width:100%}.social-duel-scoreboard strong{font-size:25px}}
