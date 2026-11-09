@@ -9,15 +9,17 @@ Deno.serve(async(req)=>{
   if(req.method!=="POST")return reply({error:"Method not allowed"},405);
   try{
     const authHeader=req.headers.get("Authorization")||"";
-    const supabase=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_ANON_KEY")!,{global:{headers:{Authorization:authHeader}}});
+    const publishableKeys=JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS")||"{}");
+    const anonKey=Deno.env.get("SUPABASE_ANON_KEY")||publishableKeys.default;
+    const supabase=createClient(Deno.env.get("SUPABASE_URL")!,anonKey,{global:{headers:{Authorization:authHeader}}});
     const {data:{user},error:userError}=await supabase.auth.getUser();
     if(userError||!user)return reply({error:"Unauthorized"},401);
     const {title,body,url="/",tag="meu-financeiro"}=await req.json();
     if(!title||!body)return reply({error:"title and body are required"},400);
-    const publicKey=Deno.env.get("VAPID_PUBLIC_KEY");
+    const publicKey="BCay49BvqxHdAPmTOEwxxyUhU7Brg0ElRvU9QdLMEwIorYHa7uOutg9DVZu9HiBGxftBr0VZwfKk9n12YdTD8Cs";
     const privateKey=Deno.env.get("VAPID_PRIVATE_KEY");
-    if(!publicKey||!privateKey)return reply({error:"Push service is not configured"},503);
-    webpush.setVapidDetails("mailto:suporte@meufinanceiro.app",publicKey,privateKey);
+    if(!privateKey)return reply({error:"Push service is not configured"},503);
+    webpush.setVapidDetails("https://meu-financeiro.hebertsandro877.workers.dev",publicKey,privateKey);
     const admin=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
     const {data:subscriptions,error}=await admin.from("push_subscriptions").select("id,endpoint,p256dh,auth").eq("user_id",user.id);
     if(error)throw error;
