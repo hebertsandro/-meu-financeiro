@@ -48,8 +48,8 @@ Deno.serve(async (req) => {
     recipients = [request.receiver_id]; title = "Solicitação de amizade"; body = "Alguém quer ser seu amigo no NEXUS Social."; tag = "nexus-friend-" + request.id;
   } else if (input.type === "room_invite") {
     if (input.inviter_id !== senderId || typeof input.room_id !== "string" || typeof input.invited_user_id !== "string") return json({ error: "Forbidden." }, 403);
-    const [{ data: room }, { data: member }] = await Promise.all([admin.from("social_rooms").select("name").eq("id", input.room_id).maybeSingle(), admin.from("social_room_members").select("user_id").eq("room_id", input.room_id).eq("user_id", senderId).maybeSingle()]);
-    if (!room || !member) return json({ error: "Room or membership not found." }, 404);
+    const [{ data: room }, { data: member }, { data: invite }] = await Promise.all([admin.from("social_rooms").select("name").eq("id", input.room_id).maybeSingle(), admin.from("social_room_members").select("user_id").eq("room_id", input.room_id).eq("user_id", senderId).maybeSingle(), admin.from("social_room_invites").select("room_id").eq("room_id", input.room_id).eq("invited_user_id", input.invited_user_id).eq("invited_by", senderId).eq("status", "pending").maybeSingle()]);
+    if (!room || !member || !invite) return json({ error: "Room, membership, or pending invite not found." }, 404);
     recipients = [input.invited_user_id]; title = "Convite para grupo"; body = "Você foi convidado para " + room.name + "."; tag = "nexus-room-invite-" + input.room_id;
   } else return json({ error: "Unsupported notification type." }, 400);
 
