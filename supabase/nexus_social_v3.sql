@@ -130,7 +130,7 @@ begin
  challenger_score=(select coalesce(sum(points),0) from public.social_room_duel_answers where duel_id=target_duel and user_id=d.created_by),
  opponent_score=(select coalesce(sum(points),0) from public.social_room_duel_answers where duel_id=target_duel and user_id=d.opponent_id)
  where id=target_duel;
- return query select challenger_score,opponent_score from public.social_room_duels where id=target_duel;
+ return query select d2.challenger_score,d2.opponent_score from public.social_room_duels d2 where d2.id=target_duel;
 end; $nexus$;
 revoke all on function public.social_submit_duel_score(uuid,integer,integer) from public;
 grant execute on function public.social_submit_duel_score(uuid,integer,integer) to authenticated;
