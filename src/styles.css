@@ -3275,3 +3275,137 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
   .nexus-social .social-community-avatar[class*="frame-"]{width:40px;height:40px;flex-basis:40px}
   .nexus-social .social-message-avatar[class*="frame-"]{width:26px;height:26px}
 }
+
+
+/* NEXUS SOCIAL V7 — identidade roxa restaurada e acabamento visual */
+.nexus-social{
+  --ns-accent:#b58aff!important;
+  --ns-accent-2:#8d78e8!important;
+  --ns-violet:#c5a7ff!important;
+  --ns-surface:#17132a!important;
+  --ns-surface-2:#211a38!important;
+  --ns-border:rgba(177,145,239,.2)!important;
+  color:#f2edff!important;
+  background:
+    radial-gradient(ellipse at 12% 0%,rgba(126,83,205,.16),transparent 38%),
+    radial-gradient(ellipse at 100% 35%,rgba(91,64,153,.12),transparent 34%),
+    linear-gradient(145deg,#100d1d 0%,#151127 48%,#100e1d 100%)!important;
+}
+.nexus-social .social-community-grid,
+.nexus-social .social-community-list{
+  background:#171329!important;border-color:rgba(177,145,239,.19)!important;
+}
+.nexus-social .social-community-grid{box-shadow:0 16px 42px rgba(0,0,0,.24),inset 0 1px rgba(255,255,255,.025)}
+.nexus-social .social-community-row{border-color:rgba(177,145,239,.11)!important}
+.nexus-social .social-community-row:hover,
+.nexus-social .social-community-row.selected{
+  background:linear-gradient(100deg,rgba(139,99,213,.2),rgba(91,70,145,.1))!important;
+  box-shadow:inset 3px 0 #a77bed!important;
+}
+.nexus-social .social-community-row b{color:#f1eaff!important}
+.nexus-social .social-community-row small{color:#a99abd!important}
+.nexus-social .social-community-avatar{
+  background:linear-gradient(145deg,#49316f,#282044)!important;
+  box-shadow:0 0 0 1px rgba(185,151,255,.2),0 5px 14px rgba(0,0,0,.22)!important;
+}
+.nexus-social .social-community-chat{
+  background:radial-gradient(ellipse at 50% 0%,rgba(119,78,190,.13),transparent 58%),#100e1d!important;
+}
+.nexus-social .social-chat-head{
+  background:linear-gradient(100deg,#211936,#19152b)!important;
+  border-color:rgba(177,145,239,.17)!important;
+}
+.nexus-social .social-chat-head b{color:#f2eaff!important}
+.nexus-social .social-chat-head small{color:#bca4e8!important}
+.nexus-social .social-chat-head button{
+  color:#e5d8ff!important;background:#302447!important;border-color:#5a477b!important;
+}
+.nexus-social .social-chat-messages{
+  background:radial-gradient(ellipse at 50% 0%,rgba(113,76,176,.09),transparent 60%),#100e1d!important;
+}
+.nexus-social .social-chat-bubble{
+  color:#f0eaff!important;background:linear-gradient(145deg,#28213d,#211b34)!important;
+  border-color:rgba(173,143,229,.2)!important;
+  box-shadow:0 5px 16px rgba(0,0,0,.16)!important;
+}
+.nexus-social .social-chat-bubble.mine{
+  background:linear-gradient(145deg,#49336d,#35264f)!important;
+  border-color:rgba(190,153,255,.38)!important;
+}
+.nexus-social .social-message-sender{color:#c5a4ff!important}
+.nexus-social .social-chat-bubble small{color:#b5a6ca!important}
+.nexus-social .social-chat-compose{
+  background:linear-gradient(100deg,#1b1630,#211936)!important;
+  border-color:rgba(177,145,239,.17)!important;
+}
+.nexus-social .social-chat-compose input,
+.nexus-social input,.nexus-social textarea,.nexus-social select{
+  color:#f2edff!important;background:#211a34!important;
+  border:1px solid rgba(177,145,239,.24)!important;
+}
+.nexus-social input::placeholder,.nexus-social textarea::placeholder{color:#9586ad!important}
+.nexus-social button{
+  transition:background .18s ease,border-color .18s ease,transform .18s ease,box-shadow .18s ease;
+}
+.nexus-social button:not(:disabled):hover{
+  border-color:rgba(190,155,255,.55)!important;
+  box-shadow:0 5px 18px rgba(119,78,190,.16);
+}
+.nexus-social .social-tabs button,
+.nexus-social .social-community-tabs button{
+  color:#c7b9dc!important;background:#201a32!important;
+  border-color:rgba(177,145,239,.17)!important;
+}
+.nexus-social .social-tabs button.active,
+.nexus-social .social-community-tabs button.active,
+.nexus-social .social-tabs button[aria-selected="true"],
+.nexus-social .social-community-tabs button[aria-selected="true"]{
+  color:#fff!important;background:linear-gradient(135deg,#7651ad,#594083)!important;
+  border-color:#a986df!important;box-shadow:0 5px 16px rgba(122,80,184,.24)!important;
+}
+.nexus-social .social-clan-detail{
+  border-color:rgba(177,145,239,.23)!important;
+  background:
+    radial-gradient(ellipse at 92% 0%,rgba(143,99,211,.16),transparent 38%),
+    linear-gradient(155deg,#211832 0%,#171329 65%,#1c1630 100%)!important;
+  box-shadow:0 16px 40px rgba(0,0,0,.22),inset 0 1px rgba(255,255,255,.035)!important;
+}
+.nexus-social .social-clan-banner{
+  border-color:rgba(190,155,255,.3)!important;
+  background-color:#34234e!important;
+  background-image:linear-gradient(110deg,rgba(69,43,103,.92),rgba(30,31,66,.86))!important;
+  box-shadow:inset 0 0 35px rgba(172,127,255,.09),0 8px 22px rgba(0,0,0,.16)!important;
+}
+.nexus-social .social-clan-banner h4{color:#fff!important}
+.nexus-social .social-clan-banner p{color:#e0d4f1!important}
+.nexus-social .social-clan-banner small{color:#d0b5ff!important}
+.nexus-social .social-clan-detail>h4{color:#e9ddff!important;border-color:rgba(177,145,239,.16)!important}
+.nexus-social .social-clan-members .social-community-row,
+.nexus-social .social-community-card{
+  background:linear-gradient(140deg,rgba(48,36,72,.88),rgba(30,25,49,.94))!important;
+  border-color:rgba(177,145,239,.17)!important;
+}
+.nexus-social .social-clan-members .social-community-row b{color:#f0e9ff!important}
+.nexus-social .social-clan-members .social-community-row small{color:#ae9fc4!important}
+.nexus-social .social-clan-reward,
+.nexus-social .social-duel-card{
+  background:linear-gradient(145deg,#28203e,#1d1930)!important;
+  border-color:rgba(177,145,239,.2)!important;
+}
+.nexus-social .social-clan-admin{
+  color:#e8ceff!important;background:rgba(139,99,194,.13)!important;
+  border-color:rgba(190,155,255,.32)!important;
+}
+.nexus-social .social-clan-edit-toggle button{
+  color:#e7d8ff!important;background:#33254b!important;border-color:#705394!important;
+}
+.nexus-social .social-clan-detail .social-create-form{
+  background:rgba(20,15,34,.78)!important;border-color:rgba(177,145,239,.2)!important;
+}
+.nexus-social .social-error{border-color:rgba(255,115,145,.35)!important}
+@media(max-width:640px){
+  .nexus-social{border-radius:16px}
+  .nexus-social .social-community-grid{border-color:rgba(177,145,239,.2)!important}
+  .nexus-social .social-community-list{border-bottom-color:rgba(177,145,239,.2)!important}
+  .nexus-social .social-chat-compose{padding:10px!important}
+}
