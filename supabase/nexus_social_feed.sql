@@ -65,9 +65,10 @@ alter table public.social_post_likes enable row level security;
 alter table public.social_post_comments enable row level security;
 alter table public.social_post_reports enable row level security;
 
-create or replace function public.social_feed_can_view_author(target_author uuid)
-returns boolean language sql stable security definer set search_path=public as $nexus$
- select (
+create schema if not exists private;
+create or replace function private.social_feed_can_view_author(target_author uuid)
+returns boolean language sql stable security definer set search_path=public,private as $nexus$
+ select auth.uid() is not null and (
   target_author=auth.uid()
   or exists(
    select 1 from public.social_friendships f
@@ -80,12 +81,13 @@ returns boolean language sql stable security definer set search_path=public as $
      or (b.blocker_id=target_author and b.blocked_id=auth.uid())
  );
 $nexus$;
-revoke all on function public.social_feed_can_view_author(uuid) from public;
-grant execute on function public.social_feed_can_view_author(uuid) to authenticated;
+revoke all on function private.social_feed_can_view_author(uuid) from public,anon;
+grant usage on schema private to authenticated;
+grant execute on function private.social_feed_can_view_author(uuid) to authenticated;
 
 drop policy if exists "Feed members read posts" on public.social_posts;
 create policy "Feed members read posts" on public.social_posts for select to authenticated
- using (public.social_feed_can_view_author(author_id));
+ using (private.social_feed_can_view_author(author_id));
 drop policy if exists "Users create own posts" on public.social_posts;
 create policy "Users create own posts" on public.social_posts for insert to authenticated
  with check (author_id=auth.uid());
@@ -97,26 +99,26 @@ create policy "Authors delete own posts" on public.social_posts for delete to au
  using (author_id=auth.uid());
 
 drop policy if exists "Feed members read likes" on public.social_post_likes;
-create policy "Feed members read likes" on public.social_post_likes for select to authenticated using (exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
+create policy "Feed members read likes" on public.social_post_likes for select to authenticated using (exists(select 1 from public.social_posts p where p.id=post_id and private.social_feed_can_view_author(p.author_id)));
 drop policy if exists "Users like as themselves" on public.social_post_likes;
 create policy "Users like as themselves" on public.social_post_likes for insert to authenticated
- with check (user_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
+ with check (user_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id and private.social_feed_can_view_author(p.author_id)));
 drop policy if exists "Users remove own likes" on public.social_post_likes;
 create policy "Users remove own likes" on public.social_post_likes for delete to authenticated using (user_id=auth.uid());
 
 drop policy if exists "Feed members read comments" on public.social_post_comments;
 create policy "Feed members read comments" on public.social_post_comments for select to authenticated
- using (exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
+ using (exists(select 1 from public.social_posts p where p.id=post_id and private.social_feed_can_view_author(p.author_id)));
 drop policy if exists "Users create own comments" on public.social_post_comments;
 create policy "Users create own comments" on public.social_post_comments for insert to authenticated
- with check (author_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id and public.social_feed_can_view_author(p.author_id)));
+ with check (author_id=auth.uid() and exists(select 1 from public.social_posts p where p.id=post_id and private.social_feed_can_view_author(p.author_id)));
 drop policy if exists "Authors remove own comments" on public.social_post_comments;
 create policy "Authors remove own comments" on public.social_post_comments for update to authenticated
  using (author_id=auth.uid()) with check (author_id=auth.uid());
 
 drop policy if exists "Users submit post reports" on public.social_post_reports;
 create policy "Users submit post reports" on public.social_post_reports for insert to authenticated
- with check (reporter_id=auth.uid() and ((post_id is not null and exists(select 1 from public.social_posts p where p.id=post_id and p.author_id<>auth.uid() and public.social_feed_can_view_author(p.author_id))) or (comment_id is not null and exists(select 1 from public.social_post_comments c where c.id=comment_id and c.author_id<>auth.uid()))));
+ with check (reporter_id=auth.uid() and ((post_id is not null and exists(select 1 from public.social_posts p where p.id=post_id and p.author_id<>auth.uid() and private.social_feed_can_view_author(p.author_id))) or (comment_id is not null and exists(select 1 from public.social_post_comments c where c.id=comment_id and c.author_id<>auth.uid()))));
 drop policy if exists "Users read own post reports" on public.social_post_reports;
 create policy "Users read own post reports" on public.social_post_reports for select to authenticated using (reporter_id=auth.uid());
 
@@ -131,7 +133,12 @@ values('nexus-posts','nexus-posts',false,5242880,array['image/jpeg','image/png',
 on conflict(id) do update set public=false,file_size_limit=5242880,allowed_mime_types=array['image/jpeg','image/png','image/webp'];
 
 drop policy if exists "Authenticated read feed images" on storage.objects;
-create policy "Authenticated read feed images" on storage.objects for select to authenticated using(bucket_id='nexus-posts');
+create policy "Friends read attached feed images" on storage.objects for select to authenticated
+ using(bucket_id='nexus-posts' and exists(
+  select 1 from public.social_posts p
+  where p.image_path=name
+    and private.social_feed_can_view_author(p.author_id)
+ ));
 drop policy if exists "Users upload own feed images" on storage.objects;
 create policy "Users upload own feed images" on storage.objects for insert to authenticated
  with check(bucket_id='nexus-posts' and (storage.foldername(name))[1]=auth.uid()::text);
