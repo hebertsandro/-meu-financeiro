@@ -66,7 +66,7 @@ alter table public.social_post_comments enable row level security;
 alter table public.social_post_reports enable row level security;
 
 create or replace function public.social_feed_can_view_author(target_author uuid)
-returns boolean language sql stable security definer set search_path=public as $
+returns boolean language sql stable security definer set search_path=public as $nexus$
  select (
   target_author=auth.uid()
   or exists(
@@ -79,7 +79,7 @@ returns boolean language sql stable security definer set search_path=public as $
   where (b.blocker_id=auth.uid() and b.blocked_id=target_author)
      or (b.blocker_id=target_author and b.blocked_id=auth.uid())
  );
-$;
+$nexus$;
 revoke all on function public.social_feed_can_view_author(uuid) from public;
 grant execute on function public.social_feed_can_view_author(uuid) to authenticated;
 
