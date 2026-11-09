@@ -288,3 +288,30 @@ grant select,insert on public.social_clans to authenticated;
 grant select,insert on public.social_clan_members to authenticated;
 grant select,insert on public.social_challenges to authenticated;
 grant select,insert on public.social_challenge_members to authenticated;
+
+
+-- Progresso dos duelos e missões: cada jogador registra apenas a própria participação.
+create or replace function public.social_increment_challenge_progress(target_challenge uuid, increment_by integer default 1)
+returns table(my_progress integer, challenge_status text, total_progress bigint)
+language plpgsql security definer set search_path=public as $$
+declare ch public.social_challenges%rowtype; current_progress integer; total bigint;
+begin
+ select * into ch from public.social_challenges where id=target_challenge for update;
+ if not found or ch.status not in ('open','active') then raise exception 'Este desafio não está ativo.'; end if;
+ update public.social_challenge_members
+ set progress=least(ch.goal,progress+greatest(1,least(coalesce(increment_by,1),100)))
+ where challenge_id=target_challenge and user_id=auth.uid()
+ returning progress into current_progress;
+ if not found then raise exception 'Entre no desafio antes de registrar progresso.'; end if;
+ select coalesce(sum(progress),0) into total from public.social_challenge_members where challenge_id=target_challenge;
+ if ch.challenge_type='mission' then
+  if total>=ch.goal then update public.social_challenges set status='completed' where id=target_challenge;
+  else update public.social_challenges set status='active' where id=target_challenge; end if;
+ else
+  if current_progress>=ch.goal then update public.social_challenges set status='completed' where id=target_challenge;
+  else update public.social_challenges set status='active' where id=target_challenge; end if;
+ end if;
+ return query select current_progress,(select status from public.social_challenges where id=target_challenge),total;
+end; $$;
+revoke all on function public.social_increment_challenge_progress(uuid,integer) from public;
+grant execute on function public.social_increment_challenge_progress(uuid,integer) to authenticated;
