@@ -13,7 +13,7 @@ function isIos(){return /iphone|ipad|ipod/i.test(navigator.userAgent);}
 function isInstalled(){return window.matchMedia('(display-mode: standalone)').matches || navigator.standalone===true;}
 function iosVersion(){
   const match=navigator.userAgent.match(/OS (\d+)[._](\d+)/i);
-  return match?Number(match[1])+Number(match[2])/100:0;
+  return match?{major:Number(match[1]),minor:Number(match[2])}:null;
 }
 
 export default function PushNotifications({session,onToast}){
@@ -42,7 +42,8 @@ export default function PushNotifications({session,onToast}){
     if(!session?.user?.id || busy)return;
     setBusy(true);setMessage('');
     try{
-      if(isIos() && iosVersion()>0 && iosVersion()<16.4){
+      const version=isIos()?iosVersion():null;
+      if(version && (version.major<16 || (version.major===16 && version.minor<4))){
         setStatus('unsupported');setMessage('Este iPhone precisa do iOS 16.4 ou superior para receber notificações do site.');return;
       }
       if(isIos() && !isInstalled()){
