@@ -3180,3 +3180,98 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
   .nexus-social .social-clan-banner p{font-size:10px!important}
   .nexus-social .social-clan-rewards{gap:7px}
 }
+
+
+/* NEXUS SOCIAL — molduras reais nos avatares de conversas, grupos e clãs */
+.nexus-social .social-community-avatar[class*="frame-"],
+.nexus-social .social-message-avatar[class*="frame-"]{
+  position:relative!important;isolation:isolate;overflow:visible!important;
+  box-sizing:border-box!important;flex-shrink:0;
+  z-index:1;
+}
+.nexus-social .social-community-avatar[class*="frame-"]{
+  width:43px;height:43px;flex-basis:43px;
+}
+.nexus-social .social-message-avatar[class*="frame-"]{
+  width:27px;height:27px;display:inline-grid;place-items:center;
+  border-width:2px!important;border-style:solid!important;
+  border-radius:9px!important;font-size:14px!important;
+  margin:0 7px 4px 0!important;
+}
+.nexus-social .social-community-avatar.frame-violet,
+.nexus-social .social-message-avatar.frame-violet{
+  border:2px solid #b78aff!important;
+  box-shadow:0 0 0 2px #a879ff25,0 0 13px #a879ff80!important;
+}
+.nexus-social .social-community-avatar.frame-cyan,
+.nexus-social .social-message-avatar.frame-cyan{
+  border:2px solid #55e5f5!important;
+  box-shadow:0 0 0 2px #55e5f526,0 0 14px #35d9f58c!important;
+}
+.nexus-social .social-community-avatar.frame-gold,
+.nexus-social .social-message-avatar.frame-gold{
+  border:2px solid #f5cc75!important;
+  box-shadow:0 0 0 2px #f5cc7526,0 0 14px #eab85d88!important;
+}
+.nexus-social .social-community-avatar.frame-ruby,
+.nexus-social .social-message-avatar.frame-ruby{
+  border:2px solid #ff789e!important;
+  box-shadow:0 0 0 2px #ff789e26,0 0 14px #f04d7b88!important;
+}
+.nexus-social .social-community-avatar.frame-chrome,
+.nexus-social .social-message-avatar.frame-chrome{
+  border:2px solid transparent!important;
+  background:linear-gradient(145deg,#242c47,#171c36) padding-box,
+    linear-gradient(125deg,#fff,#8c9bbd 13%,#f7fbff 24%,#67748d 37%,#fff 49%,#8999b8 63%,#fff 76%,#59657f 90%,#f9fdff) border-box!important;
+  box-shadow:0 0 9px #d9e6ffb0,0 0 19px #b7caff75!important;
+}
+.nexus-social .social-community-avatar.frame-chromatic,
+.nexus-social .social-message-avatar.frame-chromatic{
+  border:2px solid transparent!important;
+  background:linear-gradient(145deg,#242c47,#171c36) padding-box,
+    linear-gradient(120deg,#ffe88a,#ff72cf,#8e6bff,#53eaff,#baff9a,#ffe88a) border-box!important;
+  box-shadow:0 0 9px #fff8,0 0 17px #d86bff99,0 0 22px #65eaff66!important;
+  animation:chromaticFrameGlow 3s linear infinite!important;
+}
+.nexus-social .social-community-avatar[class*="frame-"]:after,
+.nexus-social .social-message-avatar[class*="frame-"]:after{
+  content:"";position:absolute;z-index:4;top:-5px;left:50%;right:auto;bottom:auto;
+  width:9px;height:11px;transform:translateX(-50%);
+  clip-path:polygon(50% 0,100% 72%,50% 100%,0 72%);
+  border:0;border-radius:0;pointer-events:none;
+}
+.nexus-social .social-community-avatar.frame-violet:after,
+.nexus-social .social-message-avatar.frame-violet:after{
+  background:linear-gradient(145deg,#fff,#edcaff 20%,#b66cff 55%,#45206e);
+  box-shadow:0 0 7px #d3a0ff,0 0 12px #9e55ff;
+}
+.nexus-social .social-community-avatar.frame-cyan:after,
+.nexus-social .social-message-avatar.frame-cyan:after{
+  background:linear-gradient(145deg,#fff,#bafaff 22%,#27b7ed 58%,#124a9d);
+  box-shadow:0 0 7px #65efff,0 0 12px #25c9ff;
+}
+.nexus-social .social-community-avatar.frame-gold:after,
+.nexus-social .social-message-avatar.frame-gold:after{
+  background:linear-gradient(145deg,#fff,#fff4c5 20%,#ffd36b 55%,#70400a);
+  box-shadow:0 0 7px #ffe7a0,0 0 12px #e5a52b;
+}
+.nexus-social .social-community-avatar.frame-ruby:after,
+.nexus-social .social-message-avatar.frame-ruby:after{
+  background:linear-gradient(145deg,#fff,#ffd9e6 20%,#ff709a 55%,#650d31);
+  box-shadow:0 0 7px #ff9ab8,0 0 12px #f04479;
+}
+.nexus-social .social-community-avatar.frame-chrome:after,
+.nexus-social .social-message-avatar.frame-chrome:after{
+  background:linear-gradient(145deg,#fff,#f4f8ff 20%,#b9c9e5 55%,#34415f);
+  box-shadow:0 0 7px #e5efff,0 0 12px #a9c5ff;
+}
+.nexus-social .social-community-avatar.frame-chromatic:after,
+.nexus-social .social-message-avatar.frame-chromatic:after{
+  width:12px;height:11px;top:-6px;
+  background:linear-gradient(110deg,#50eaff,#d98cff 42%,#fff0a0 65%,#ff79cb 82%,#70f5e9);
+  box-shadow:0 0 8px #fff,0 0 14px #d86bff,0 0 18px #55eaff;
+}
+@media(max-width:640px){
+  .nexus-social .social-community-avatar[class*="frame-"]{width:40px;height:40px;flex-basis:40px}
+  .nexus-social .social-message-avatar[class*="frame-"]{width:26px;height:26px}
+}
