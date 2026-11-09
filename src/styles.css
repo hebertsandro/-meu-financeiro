@@ -2622,3 +2622,49 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
     margin:0!important;
   }
 }
+
+
+/* NEXUS SOCIAL — comunidade, chat, salas, clãs e desafios */
+.social-community{display:grid;gap:14px;min-width:0}
+.social-community-tabs{margin:0}
+.social-community-grid{display:grid;grid-template-columns:minmax(190px,.72fr) minmax(0,1.5fr);gap:12px;min-height:390px}
+.social-community-list{display:grid;align-content:start;gap:7px;max-height:520px;overflow:auto}
+.social-community-row{display:flex;align-items:center;gap:10px;width:100%;padding:10px;border:1px solid #293750;border-radius:12px;background:#0c1422;color:#eaf0fc;text-align:left;min-width:0}
+.social-community-row.selected{border-color:#8d72d5;background:#211d3b}
+.social-community-row>span:nth-child(2){display:grid;gap:3px;min-width:0;flex:1}
+.social-community-row b{font-size:12px}.social-community-row small{font-size:10px;color:#8f9db5;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.social-community-avatar{width:38px;height:38px;display:grid;place-items:center;border-radius:12px;background:#302753;font-size:19px;flex:0 0 auto}
+.social-community-chat{display:flex;flex-direction:column;min-height:390px;border:1px solid #293750;border-radius:14px;background:#0b1422;overflow:hidden}
+.social-chat-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap;padding:11px;border-bottom:1px solid #293750;background:#111d30}
+.social-chat-head b{font-size:12px}.social-chat-head small{color:#9d8bd2;font-size:10px;flex:1}
+.social-chat-head button{display:grid;place-items:center;width:31px;height:31px;border:1px solid #35435b;border-radius:9px;background:#1a2940;color:#cbd6e9}
+.social-chat-messages{display:flex;flex:1;flex-direction:column;gap:9px;min-height:210px;max-height:390px;overflow:auto;padding:13px}
+.social-chat-bubble{align-self:flex-start;max-width:82%;padding:10px 12px;border:1px solid #30415d;border-radius:13px 13px 13px 4px;background:#17263c;color:#e8effb;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.social-chat-bubble.mine{align-self:flex-end;border-color:#6752a2;border-radius:13px 13px 4px 13px;background:#30264e}
+.social-chat-bubble small{display:block;margin-top:5px;color:#91a0b8;font-size:9px}
+.social-chat-compose{display:flex;gap:8px;padding:10px;border-top:1px solid #293750}
+.social-chat-compose input{flex:1;min-width:0;padding:11px;border:1px solid #34435b;border-radius:10px;background:#111c2d;color:#f0f4fc;font-size:12px}
+.social-chat-compose button{width:40px;border:0;border-radius:10px;background:#7259b8;color:white;display:grid;place-items:center}
+.social-chat-compose button:disabled{opacity:.45}
+.social-community-empty{display:grid;place-content:center;justify-items:center;gap:9px;flex:1;padding:25px;text-align:center;color:#9c8bd2}
+.social-community-empty b{color:#eaf0fc;font-size:13px}.social-community-empty span,.social-muted{max-width:260px;color:#8797b1;font-size:11px;line-height:1.6;text-align:center}
+.social-community-cards{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin-top:14px}
+.social-community-card{display:grid;gap:8px;min-width:0;padding:14px;border:1px solid #2a3a55;border-radius:13px;background:#0c1626}
+.social-community-card>b{font-size:13px;color:#edf2fc}.social-community-card p{margin:0;color:#899ab4;font-size:11px;line-height:1.5;overflow-wrap:anywhere}
+.social-community-card small{color:#b6a1ff}.social-clan-emblem{font-size:24px}.social-challenge-type{font-size:9px;font-weight:800;letter-spacing:1px;color:#b7a3ff}
+.social-create-form{display:grid;gap:11px;max-width:520px;margin-top:14px}
+.social-create-form input,.social-create-form textarea,.social-create-form select{width:100%;padding:12px;border:1px solid #34435b;border-radius:10px;background:#0b1422;color:#edf2fc;font:12px 'DM Sans',sans-serif}
+.social-create-form textarea{min-height:90px;resize:vertical}
+.social-report-dialog{padding:20px;border:1px solid #3b4964;border-radius:17px;background:#111d30;box-shadow:0 20px 70px #0009}
+.social-report-dialog h3{margin:0;color:#f0f3fb}.social-report-dialog p{margin:0;color:#98a8c0;font-size:12px;line-height:1.5}
+.social-dialog-actions{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.social-room-chat{display:grid;gap:8px;margin-top:14px;padding:12px;border:1px solid #2a3a55;border-radius:13px;background:#0a1423}
+.social-room-chat h4{margin:0;color:#eee8ff}
+@media(max-width:640px){
+ .social-community-grid{grid-template-columns:1fr;min-height:0}
+ .social-community-list{max-height:220px}
+ .social-community-chat{min-height:350px}
+ .social-community-cards{grid-template-columns:1fr}
+ .social-community-tabs{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}
+ .social-community-tabs button{justify-content:center}
+}
