@@ -4,8 +4,8 @@ import {MessageCircle,Send,Shield,Flag,Users,Plus,RefreshCw,Swords,Handshake,Doo
 
 const errText=e=>e?.message||'Não foi possível concluir esta ação.';
 const duelQuestions=[{q:'Qual atitude ajuda a manter o orçamento saudável?',a:['Gastar todo o saldo','Registrar entradas e saídas','Ignorar pequenas compras'],correct:1},{q:'Você guardou R$ 80 por mês durante 5 meses. Quanto juntou?',a:['R$ 320','R$ 400','R$ 450'],correct:1},{q:'O que é mais importante antes de parcelar?',a:['Ver se a parcela cabe no orçamento','Olhar só o valor da primeira parcela','Ignorar juros'],correct:0},{q:'Uma compra custa R$ 150 e tem desconto de 20%. Qual o preço final?',a:['R$ 120','R$ 130','R$ 140'],correct:0},{q:'Qual é uma boa prática contra golpes?',a:['Compartilhar códigos','Clicar em qualquer link','Conferir o canal oficial'],correct:2}];
-export default function NexusCommunity({userId,playerProfile=null,friends=[],incoming=[],outgoing=[],onAnswerFriendRequest=()=>{},onToast=()=>{},onClanChange=()=>{}}){
- const [section,setSection]=useState('chat'),[busy,setBusy]=useState(false),[error,setError]=useState('');
+export default function NexusCommunity({mode='all',userId,playerProfile=null,friends=[],incoming=[],outgoing=[],onAnswerFriendRequest=()=>{},onToast=()=>{},onClanChange=()=>{}}){
+ const [section,setSection]=useState(mode==='clans'?'clans':'chat'),[busy,setBusy]=useState(false),[error,setError]=useState('');
  const [mobileChatOpen,setMobileChatOpen]=useState(false),[chatSearch,setChatSearch]=useState(''),[chatFilter,setChatFilter]=useState('all');
  const [chats,setChats]=useState([]),[activeChat,setActiveChat]=useState(null),[messages,setMessages]=useState([]),[draft,setDraft]=useState('');
  const [rooms,setRooms]=useState([]),[roomCode,setRoomCode]=useState(''),[activeRoom,setActiveRoom]=useState(null),[roomMessages,setRoomMessages]=useState([]),[roomDraft,setRoomDraft]=useState(''),[roomMembers,setRoomMembers]=useState([]),[roomInvites,setRoomInvites]=useState([]),[duels,setDuels]=useState([]),[duelAnswers,setDuelAnswers]=useState([]),[duelNow,setDuelNow]=useState(Date.now()),[inviteFriend,setInviteFriend]=useState('');
@@ -90,8 +90,8 @@ export default function NexusCommunity({userId,playerProfile=null,friends=[],inc
  async function createChallenge(e){e.preventDefault();await run(async()=>{const {error:e1}=await supabase.rpc('social_create_challenge',{challenge_title:form.title,challenge_description:form.description,kind:form.kind,target_goal:Number(form.goal)||1,finish_at:null});if(e1)throw e1;setShowCreate(false);setForm({...form,title:'',description:'',goal:'1'});await loadChallenges();onToast('Desafio publicado!');});}
  async function joinChallenge(item){await run(async()=>{const {error:e}=await supabase.from('social_challenge_members').insert({challenge_id:item.id,user_id:userId});if(e&&e.code!=='23505')throw e;await loadChallenges();onToast('Você entrou no desafio!');});}
  async function progressChallenge(item){await run(async()=>{const {data,error:e}=await supabase.rpc('social_increment_challenge_progress',{target_challenge:item.id,increment_by:1});if(e)throw e;await loadChallenges();onToast(data?.[0]?.challenge_status==='completed'?'Desafio concluído!':'Progresso registrado!');});}
- const tabs=[['chat','Conversas',MessageCircle],['clans','Clãs',Shield],['challenges','Missões de clã',Handshake]];
- return <section className={'social-community '+(mobileChatOpen?'mobile-chat-open':'mobile-inbox-open')}>
+ const allTabs=[['chat','Conversas',MessageCircle],['clans','Clãs',Shield],['challenges','Missões de clã',Handshake]];const tabs=mode==='chat'?allTabs.filter(x=>x[0]==='chat'):mode==='clans'?allTabs.filter(x=>x[0]!=='chat'):allTabs;
+ return <section className={'social-community '+(mode==='chat'?(mobileChatOpen?'mobile-chat-open':'mobile-inbox-open'):'social-community-clans')}>
   <div className="social-tabs social-community-tabs">{tabs.map(([id,label,Icon])=><button key={id} className={section===id?'active':''} onClick={()=>{setSection(id);setShowCreate(false);}}><Icon size={15}/>{label}</button>)}</div>
   {error&&<div className="social-error" role="alert">{error}</div>}
   <div className="social-panel">
