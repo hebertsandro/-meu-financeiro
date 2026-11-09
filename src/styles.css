@@ -2578,3 +2578,47 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
   .social-public-card .player-info{min-width:0!important}
 }
 
+
+
+/* Correção final: distância real entre avatar e identidade na Central do Jogador */
+.player-profile-page .game-world-hero .player-identity{
+  column-gap:22px!important;
+}
+.player-profile-page .game-world-hero .player-info{
+  min-width:0!important;
+}
+@media(max-width:640px){
+  .player-profile-page .game-world-hero .player-identity{
+    display:grid!important;
+    grid-template-columns:68px minmax(0,1fr) auto!important;
+    column-gap:18px!important;
+    row-gap:10px!important;
+  }
+  .player-profile-page .game-world-hero .player-avatar{
+    width:64px!important;
+    height:64px!important;
+    flex:0 0 64px!important;
+    margin-right:0!important;
+  }
+  .player-profile-page .game-world-hero .player-info{
+    min-width:0!important;
+    width:100%!important;
+  }
+}
+@media(max-width:380px){
+  .player-profile-page .game-world-hero .player-identity{
+    grid-template-columns:56px minmax(0,1fr)!important;
+    column-gap:15px!important;
+    row-gap:9px!important;
+  }
+  .player-profile-page .game-world-hero .player-avatar{
+    width:52px!important;
+    height:52px!important;
+    flex:0 0 52px!important;
+  }
+  .player-profile-page .game-world-hero .player-xp-total{
+    grid-column:2!important;
+    justify-self:start!important;
+    margin:0!important;
+  }
+}
