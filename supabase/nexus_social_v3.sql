@@ -126,7 +126,7 @@ begin
  if not found or auth.uid() not in (d.created_by,d.opponent_id) or d.status<>'live' or now()<d.starts_at then raise exception 'A partida ainda não começou ou não está disponível.'; end if;
  insert into public.social_room_duel_answers(duel_id,user_id,round_number,points)
  values($1,auth.uid(),$3,greatest(0,least($2,100)))
- on conflict(duel_id,user_id,round_number) do nothing;
+ on conflict on constraint social_room_duel_answers_pkey do nothing;
  update public.social_room_duels set
  challenger_score=(select coalesce(sum(points),0) from public.social_room_duel_answers where duel_id=target_duel and user_id=d.created_by),
  opponent_score=(select coalesce(sum(points),0) from public.social_room_duel_answers where duel_id=target_duel and user_id=d.opponent_id)
