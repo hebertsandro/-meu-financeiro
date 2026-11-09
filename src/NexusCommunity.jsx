@@ -45,12 +45,17 @@ export default function NexusCommunity({userId,friends=[],onToast=()=>{},onClanC
  },[activeChat?.id]);
  useEffect(()=>{
   if(!activeRoom)return;
-  const duelChannel=supabase.channel('social-room-duels-'+activeRoom.id).on('postgres_changes',{event:'*',schema:'public',table:'social_room_duels',filter:'room_id=eq.'+activeRoom.id},()=>loadRoomDetails(activeRoom)).subscribe();
+  const refreshDuel=()=>loadRoomDetails(activeRoom).catch(e=>setError(errText(e)));
+  const duelChannel=supabase.channel('social-room-duels-'+activeRoom.id).on('postgres_changes',{event:'*',schema:'public',table:'social_room_duels',filter:'room_id=eq.'+activeRoom.id},refreshDuel).subscribe();
+  const duelAnswersChannel=supabase.channel('social-room-duel-answers-'+activeRoom.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'social_room_duel_answers'},payload=>{
+   setDuelAnswers(prev=>prev.some(a=>a.duel_id===payload.new.duel_id&&a.user_id===payload.new.user_id&&a.round_number===payload.new.round_number)?prev:[...prev,payload.new]);
+   refreshDuel();
+  }).subscribe();
   let channel;
   const fetch=async()=>{const {data,error:e}=await supabase.from('social_room_messages').select('*').eq('room_id',activeRoom.id).order('created_at',{ascending:true}).limit(200);if(e)setError(errText(e));else setRoomMessages(data||[]);};
   fetch();
   channel=supabase.channel('social-room-'+activeRoom.id).on('postgres_changes',{event:'INSERT',schema:'public',table:'social_room_messages',filter:'room_id=eq.'+activeRoom.id},payload=>setRoomMessages(prev=>prev.some(m=>m.id===payload.new.id)?prev:[...prev,payload.new])).subscribe();
-  return()=>{if(channel)supabase.removeChannel(channel);if(duelChannel)supabase.removeChannel(duelChannel);};
+  return()=>{if(channel)supabase.removeChannel(channel);if(duelChannel)supabase.removeChannel(duelChannel);if(duelAnswersChannel)supabase.removeChannel(duelAnswersChannel);};
  },[activeRoom?.id]);
  async function run(action){setBusy(true);setError('');try{await action();}catch(e){setError(errText(e));}finally{setBusy(false);}}
  async function startChat(person){await run(async()=>{const {data,error:e}=await supabase.rpc('social_start_private_chat',{target_user:person.user_id});if(e)throw e;await loadChats();setActiveChat({id:data,person});setSection('chat');});}
