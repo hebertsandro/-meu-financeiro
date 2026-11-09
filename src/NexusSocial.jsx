@@ -22,7 +22,7 @@ function PublicPlayerProfile({person,onClose}){
   <div className={'social-public-card player-card-frame frame-'+(person.card_frame||'cyan')+(gems.length===4?' frame-chromatic':'')}>
    <div className={'frame-gem-ornament ornament-'+(person.card_frame||'cyan')}>{gems.map(id=><i key={id} className={'gemstone gem-'+id}/>)}</div>
    <div className="game-world-top"><span className="world-label"><span className="live-pulse"/> CENTRAL DO JOGADOR</span><span className="season-pill">JORNADA NEXUS</span></div>
-   <div className="player-identity"><div className={'player-avatar profile-big-avatar frame-'+(person.avatar_frame||'violet')+(gems.length===4?' frame-chromatic':'')}><span>{person.avatar||'👾'}</span><i><Zap size={12}/></i></div><div className="player-info"><span>{tier}</span><h2>{person.display_name||person.username}</h2><div className="player-social-identity"><b>@{person.username}</b></div>{person.bio&&<p className="player-social-bio">{person.bio}</p>}<div className="player-level-line"><b>NÍVEL {level}</b><span>{xp%500}/500 XP para o próximo nível</span></div><div className="player-xp-track"><i style={{width:(xp%500)/5+'%'}}/></div></div><div className="player-xp-total"><strong>{xp}</strong><small>XP TOTAL</small></div></div>
+   <div className="player-identity"><div className={'player-avatar profile-big-avatar frame-'+(person.avatar_frame||'violet')+(gems.length===4?' frame-chromatic':'')}><span>{person.avatar||'👾'}</span><i><Zap size={12}/></i></div><div className="player-info"><span>{tier}</span><h2>{person.display_name||person.username}</h2><div className="player-social-identity"><b>@{person.username}</b></div>{person.bio&&<p className="player-social-bio">{person.bio}</p>}{person.clan&&<div className="player-clan-badge">{person.clan.clan_emblem} {person.clan.clan_name} [{person.clan.clan_tag}] · {person.clan.clan_role==='leader'?'ADM':person.clan.clan_role==='officer'?'OFICIAL':'MEMBRO'}</div>}<div className="player-level-line"><b>NÍVEL {level}</b><span>{xp%500}/500 XP para o próximo nível</span></div><div className="player-xp-track"><i style={{width:(xp%500)/5+'%'}}/></div></div><div className="player-xp-total"><strong>{xp}</strong><small>XP TOTAL</small></div></div>
    <div className="world-stats"><div><Flame size={17}/><span><b>{correct}</b> desafios concluídos</span></div><div><Trophy size={17}/><span><b>{Math.floor(xp/500)}</b> níveis conquistados</span></div><div><Star size={17}/><span><b>{gems.length}/4</b> joias equipadas</span></div></div>
   </div>
   <div className="social-public-section"><div className="social-public-section-title"><div><span>PROGRESSO</span><h3>Conquistas</h3></div><Trophy size={20}/></div><div className="social-public-achievements">{medals.map(a=><article className={'social-public-achievement '+(a.unlocked?'unlocked':'locked')} key={a.name}><span>{a.icon}</span><div><b>{a.name}</b><small>{a.desc}</small></div><strong>{a.unlocked?'CONQUISTADA':'BLOQUEADA'}</strong></article>)}</div></div>
@@ -48,8 +48,8 @@ export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=
     supabase.from('social_friend_requests').select('id,sender_id,receiver_id,created_at').eq('sender_id',userId).eq('status','pending').order('created_at',{ascending:false})
    ]);
    for(const r of [p,f,inc,out])if(r.error)throw r.error;
-   const prof=p.data;setProfile(prof);setUsername(prof?.username||'');setBio(prof?.bio||'');
-   if(prof)onPlayerProfileChange(prev=>({...prev,username:prof.username||'',bio:prof.bio||''}));
+   const prof=p.data;const {data:ownClan}=await supabase.rpc('social_get_player_clan',{target_user:userId});const ownClanInfo=ownClan?.[0]||null;const profileWithClan=prof?{...prof,clan:ownClanInfo}:prof;setProfile(profileWithClan);setUsername(prof?.username||'');setBio(prof?.bio||'');
+    if(prof)onPlayerProfileChange(prev=>({...prev,username:prof.username||'',bio:prof.bio||'',clan:ownClanInfo}));
    const ids=[...new Set([...(f.data||[]).map(x=>x.user_a===userId?x.user_b:x.user_a),...(inc.data||[]).map(x=>x.sender_id),...(out.data||[]).map(x=>x.receiver_id)])];
    const people=ids.length?await supabase.from('social_profiles').select(PROFILE_FIELDS).in('user_id',ids):{data:[],error:null};
    if(people.error)throw people.error;
@@ -84,8 +84,8 @@ export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=
  }
  async function openPerson(person){
   if(!person?.user_id)return;
-  const {data,error:e1}=await supabase.from('social_profiles').select('*').eq('user_id',person.user_id).maybeSingle();
-  if(e1)setError(e1.message);else if(data&&!data.is_suspended)setViewPerson(data);
+  const [{data,error:e1},{data:clanData}]=await Promise.all([supabase.from('social_profiles').select('*').eq('user_id',person.user_id).maybeSingle(),supabase.rpc('social_get_player_clan',{target_user:person.user_id})]);
+  if(e1)setError(e1.message);else if(data&&!data.is_suspended)setViewPerson({...data,clan:clanData?.[0]||null});
  }
  async function requestFriend(id){
   setBusy(true);setError('');
