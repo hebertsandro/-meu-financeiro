@@ -60,7 +60,7 @@ export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=
   }catch(e){setError(e.message||'Não foi possível carregar o NEXUS Social.');}
   finally{setLoading(false);}
  },[userId,session,onPlayerProfileChange]);
- useEffect(()=>{load()},[load]);
+ useEffect(()=>{load()},[load]);\n  useEffect(()=>{if(!userId)return;const channel=supabase.channel('nexus-social-friends-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'social_friend_requests',filter:'receiver_id=eq.'+userId},()=>load()).on('postgres_changes',{event:'*',schema:'public',table:'social_friend_requests',filter:'sender_id=eq.'+userId},()=>load()).on('postgres_changes',{event:'*',schema:'public',table:'social_friendships'},()=>load()).subscribe();return()=>{supabase.removeChannel(channel);};},[userId,load]);
  async function saveProfile(e){
   e.preventDefault();if(!userId)return;
   const clean=username.toLowerCase().trim();
