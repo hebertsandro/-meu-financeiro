@@ -184,3 +184,70 @@
  .nexus-social .social-person-actions{width:100%;display:flex;justify-content:flex-end;gap:7px}
 }
 @media(prefers-reduced-motion:reduce){.nexus-social *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
+
+
+/* NEXUS Social 2.0 — inbox-first, mobile-native conversation experience */
+.nexus-social .social-community{--nxs-bg:#100d19;--nxs-surface:#191426;--nxs-line:rgba(197,169,244,.16);--nxs-violet:#9c78d5;min-width:0}
+.nexus-social .social-community .social-panel{overflow:hidden;padding:18px!important}
+.nexus-social .social-community .social-community-grid{display:grid!important;grid-template-columns:minmax(275px,.78fr) minmax(0,1.45fr)!important;align-items:stretch!important;min-height:610px!important;padding:10px!important;gap:12px!important}
+.nexus-social .social-community .social-community-list{display:flex!important;flex-direction:column!important;min-width:0;max-height:690px!important;overflow-y:auto!important;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(173,139,225,.3) transparent}
+.nexus-social .social-community .social-inbox-title{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:12px 10px 14px}
+.nexus-social .social-community .social-inbox-title h3{margin:4px 0 3px;color:#fbf7ff;font-size:21px;letter-spacing:-.7px}
+.nexus-social .social-community .social-inbox-title p{margin:0;color:#a99db8;font-size:11px}
+.nexus-social .social-community .social-inbox-live{display:inline-flex;align-items:center;gap:6px;padding:7px 9px;border:1px solid rgba(103,220,174,.18);border-radius:99px;background:rgba(63,166,128,.09);color:#91dfbd;font-size:8px;font-weight:850;letter-spacing:1px}
+.nexus-social .social-community .social-inbox-live i{width:6px;height:6px;border-radius:50%;background:#69d9a9;box-shadow:0 0 9px #69d9a9}
+.nexus-social .social-community .social-chat-search{display:flex;align-items:center;gap:9px;margin:0 5px 10px;padding:0 12px;min-height:45px;border:1px solid rgba(190,164,238,.17);border-radius:13px;background:rgba(10,8,17,.48);color:#a995ca}
+.nexus-social .social-community .social-chat-search input{width:100%;min-width:0;border:0!important;outline:0!important;background:transparent!important;color:#f6f0ff!important;font-size:11px!important;box-shadow:none!important}
+.nexus-social .social-community .social-chat-search input::placeholder{color:#857a96}
+.nexus-social .social-community .social-chat-search kbd{padding:3px 6px;border:1px solid rgba(190,164,238,.15);border-radius:6px;color:#8e80a4;font-size:10px}
+.nexus-social .social-community .social-chat-filters{display:flex;gap:6px;padding:0 5px 11px}
+.nexus-social .social-community .social-chat-filters button{padding:7px 12px;border:1px solid transparent;border-radius:99px;background:rgba(255,255,255,.035);color:#a99db8;font-size:10px;font-weight:750}
+.nexus-social .social-community .social-chat-filters button.active{border-color:rgba(189,158,244,.3);background:rgba(145,108,202,.19);color:#e7d8ff}
+.nexus-social .social-community .social-inbox-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;padding:0 5px 12px}
+.nexus-social .social-community .social-inbox-actions button{justify-content:center;min-width:0;padding:10px 7px!important;font-size:10px!important}
+.nexus-social .social-community .social-community-row{display:grid!important;grid-template-columns:44px minmax(0,1fr) auto;align-items:center;gap:11px!important;width:100%;text-align:left!important;min-height:72px!important;margin:3px 0!important;padding:10px!important;border:1px solid transparent!important;border-radius:14px!important;background:transparent!important}
+.nexus-social .social-community .social-community-row:hover{background:rgba(148,112,198,.09)!important;border-color:rgba(190,164,238,.12)!important}
+.nexus-social .social-community .social-community-row>span:nth-child(2){display:flex;flex-direction:column;gap:3px;min-width:0}
+.nexus-social .social-community .social-community-row>span:nth-child(2) b,.nexus-social .social-community .social-community-row>span:nth-child(2) small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nexus-social .social-community .social-community-row>span:nth-child(2) b{font-size:12px;color:#f6f0ff}
+.nexus-social .social-community .social-community-row>span:nth-child(2) small:last-child{color:#988ba8;font-size:10px}
+.nexus-social .social-community .social-community-avatar{width:43px!important;height:43px!important;display:grid;place-items:center;border-radius:14px!important;font-size:20px!important}
+.nexus-social .social-community .social-community-chat{display:flex!important;flex-direction:column!important;min-width:0;min-height:610px!important;overflow:hidden!important;border-radius:17px!important}
+.nexus-social .social-community .social-chat-head{display:flex!important;align-items:center!important;gap:10px!important;min-height:70px;padding:11px 15px!important}
+.nexus-social .social-community .social-chat-back{display:grid;place-items:center;flex:none;width:36px;height:36px;padding:0!important;border:1px solid rgba(190,164,238,.17)!important;border-radius:11px!important;background:rgba(255,255,255,.045)!important;color:#e6d9f8!important}
+.nexus-social .social-community .social-chat-head-avatar{display:grid;place-items:center;flex:none;width:42px;height:42px;border:1px solid rgba(204,178,255,.3);border-radius:14px;background:linear-gradient(145deg,#59447b,#2c2140);font-size:20px}
+.nexus-social .social-community .social-chat-head-copy{display:flex;flex:1;flex-direction:column;gap:4px;min-width:0}
+.nexus-social .social-community .social-chat-head-copy b{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font-size:12px!important}
+.nexus-social .social-community .social-chat-head-copy small{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#b8a6d2!important;font-size:10px}
+.nexus-social .social-community .social-chat-messages{display:flex!important;flex:1;flex-direction:column;min-height:0;overflow-y:auto!important;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:rgba(173,139,225,.25) transparent}
+.nexus-social .social-community .social-chat-bubble{position:relative;display:flex;flex-direction:column;gap:5px;width:fit-content;max-width:min(78%,520px);padding:11px 13px!important;font-size:12px!important;overflow-wrap:anywhere}
+.nexus-social .social-community .social-message-avatar{display:none!important}
+.nexus-social .social-community .social-chat-bubble .social-message-sender{font-size:9px;color:#d6baff}
+.nexus-social .social-community .social-chat-bubble small{align-self:flex-end;margin-top:2px;color:#aa9abf!important;font-size:8px!important}
+.nexus-social .social-community .social-chat-compose{display:flex!important;align-items:center!important;flex:none!important;gap:9px!important;padding:12px 14px calc(12px + env(safe-area-inset-bottom))!important}
+.nexus-social .social-community .social-chat-compose input{flex:1;min-width:0;padding:0 14px!important;border-radius:99px!important;font-size:12px!important}
+.nexus-social .social-community .social-chat-compose button{display:grid;place-items:center;flex:none;width:44px;height:44px;min-width:44px!important;border-radius:50%!important}
+.nexus-social .social-community .social-room-tools{display:flex;gap:8px;padding:9px 13px!important}
+.nexus-social .social-community .social-room-tools select{flex:1;min-width:0}
+.nexus-social .social-community .social-community-empty{display:flex;flex:1;flex-direction:column;align-items:center;justify-content:center;gap:12px;padding:28px;text-align:center;background:radial-gradient(ellipse at 50% 40%,rgba(139,102,197,.13),transparent 58%)}
+.nexus-social .social-community .social-community-empty svg{width:54px;height:54px;padding:15px;border:1px solid rgba(190,164,238,.2);border-radius:18px;background:rgba(137,99,193,.13);color:#c4a4f2}
+.nexus-social .social-community .social-community-empty b{color:#f5edff;font-size:16px}
+.nexus-social .social-community .social-community-empty span{max-width:270px;color:#a99db8;font-size:11px;line-height:1.7}
+@media(max-width:640px){
+ .nexus-social .social-community .social-panel{padding:10px!important;border-radius:17px!important}
+ .nexus-social .social-community .social-panel-heading{padding:5px 5px 12px!important}
+ .nexus-social .social-community .social-community-grid{display:grid!important;grid-template-columns:minmax(0,1fr)!important;min-height:0!important;padding:5px!important;gap:0!important}
+ .nexus-social .social-community .social-community-list{max-height:none!important;min-height:58dvh!important;overflow:visible!important}
+ .nexus-social .social-community.mobile-chat-open .social-community-list{display:none!important}
+ .nexus-social .social-community.mobile-inbox-open .social-community-chat{display:none!important}
+ .nexus-social .social-community.mobile-chat-open .social-community-chat{display:flex!important;grid-column:1/-1;min-height:calc(100dvh - 245px)!important;height:calc(100dvh - 245px)!important;max-height:760px!important;border-radius:15px!important}
+ .nexus-social .social-community.mobile-chat-open .social-panel-heading{display:none!important}
+ .nexus-social .social-community.mobile-chat-open .social-community-grid{padding:0!important}
+ .nexus-social .social-community.mobile-chat-open .social-chat-head{min-height:65px;padding:9px 10px!important}
+ .nexus-social .social-community.mobile-chat-open .social-chat-messages{padding:13px 10px!important}
+ .nexus-social .social-community.mobile-chat-open .social-chat-bubble{max-width:88%;font-size:12px!important}
+ .nexus-social .social-community.mobile-chat-open .social-chat-compose{padding:9px 10px calc(10px + env(safe-area-inset-bottom))!important}
+ .nexus-social .social-community .social-inbox-title h3{font-size:23px}
+ .nexus-social .social-community .social-inbox-actions{grid-template-columns:1fr 1fr}
+ .nexus-social .social-community .social-chat-filters button{min-height:34px}
+}
