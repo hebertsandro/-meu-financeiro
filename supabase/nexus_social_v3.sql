@@ -102,3 +102,39 @@ do $nexus$
 begin
  if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='social_clan_messages') then alter publication supabase_realtime add table public.social_clan_messages; end if;
 end; $nexus$;
+
+
+create table if not exists public.social_room_duel_answers(
+ duel_id uuid not null references public.social_room_duels(id) on delete cascade,
+ user_id uuid not null references auth.users(id) on delete cascade,
+ round_number integer not null check(round_number between 1 and 20),
+ points integer not null default 0 check(points between 0 and 100),
+ created_at timestamptz not null default now(),
+ primary key(duel_id,user_id,round_number)
+);
+alter table public.social_room_duel_answers enable row level security;
+drop policy if exists "Duel participants read answers" on public.social_room_duel_answers;
+create policy "Duel participants read answers" on public.social_room_duel_answers for select to authenticated using(exists(select 1 from public.social_room_duels d where d.id=duel_id and auth.uid() in (d.created_by,d.opponent_id)));
+grant select on public.social_room_duel_answers to authenticated;
+create or replace function public.social_submit_duel_score(target_duel uuid,score_delta integer,round_number integer)
+returns table(challenger integer,opponent integer)
+language plpgsql security definer set search_path=public as $nexus$
+declare d public.social_room_duels%rowtype;
+begin
+ select * into d from public.social_room_duels where id=target_duel for update;
+ if not found or auth.uid() not in (d.created_by,d.opponent_id) or d.status<>'live' or now()<d.starts_at then raise exception 'A partida ainda não começou ou não está disponível.'; end if;
+ insert into public.social_room_duel_answers(duel_id,user_id,round_number,points)
+ values(target_duel,auth.uid(),round_number,greatest(0,least(score_delta,100)))
+ on conflict(duel_id,user_id,round_number) do nothing;
+ update public.social_room_duels set
+ challenger_score=(select coalesce(sum(points),0) from public.social_room_duel_answers where duel_id=target_duel and user_id=d.created_by),
+ opponent_score=(select coalesce(sum(points),0) from public.social_room_duel_answers where duel_id=target_duel and user_id=d.opponent_id)
+ where id=target_duel;
+ return query select challenger_score,opponent_score from public.social_room_duels where id=target_duel;
+end; $nexus$;
+revoke all on function public.social_submit_duel_score(uuid,integer,integer) from public;
+grant execute on function public.social_submit_duel_score(uuid,integer,integer) to authenticated;
+do $nexus$
+begin
+ if not exists(select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='social_room_duel_answers') then alter publication supabase_realtime add table public.social_room_duel_answers; end if;
+end; $nexus$;
