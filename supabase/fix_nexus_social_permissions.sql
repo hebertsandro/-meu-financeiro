@@ -1,8 +1,21 @@
--- CORREÇÃO DE PERMISSÕES DO NEXUS SOCIAL
--- Execute no Supabase SQL Editor. Seguro para executar mais de uma vez.
--- Mantém RLS: cada usuário só cria/altera o próprio perfil.
+-- REPARO DO NEXUS SOCIAL — compatível com a tabela original e com a migração de perfil público.
+-- Execute este arquivo inteiro no SQL Editor do Supabase.
+-- Seguro para reexecutar: usa IF NOT EXISTS e recria as políticas.
 
 grant usage on schema public to authenticated;
+
+-- Garante as colunas adicionadas nas evoluções do NEXUS Social.
+alter table public.social_profiles
+  add column if not exists avatar_frame text not null default 'violet',
+  add column if not exists card_frame text not null default 'cyan',
+  add column if not exists equipped_gems text[] not null default '{}',
+  add column if not exists game_xp integer not null default 0,
+  add column if not exists game_correct integer not null default 0,
+  add column if not exists username_changed_at timestamptz not null default now(),
+  add column if not exists is_suspended boolean not null default false,
+  add column if not exists moderation_note text,
+  add column if not exists moderated_at timestamptz,
+  add column if not exists moderated_by uuid references auth.users(id) on delete set null;
 
 alter table public.social_profiles enable row level security;
 alter table public.social_friend_requests enable row level security;
@@ -45,7 +58,7 @@ create policy "Friends can read their friendship"
   on public.social_friendships for select to authenticated
   using (auth.uid() = user_a or auth.uid() = user_b);
 
--- Privilégios SQL da tabela (RLS continua filtrando as linhas).
+-- RLS limita as linhas; privilégios por coluna impedem editar campos de moderação.
 grant select on public.social_profiles to authenticated;
 revoke insert, update on public.social_profiles from authenticated;
 grant insert (user_id, username, display_name, bio, avatar, avatar_frame, card_frame, equipped_gems, game_xp, game_correct, updated_at)
