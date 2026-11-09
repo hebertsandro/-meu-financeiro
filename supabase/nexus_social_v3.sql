@@ -149,3 +149,18 @@ language sql stable security definer set search_path=public as $nexus$
 $nexus$;
 revoke all on function public.social_get_player_clan(uuid) from public;
 grant execute on function public.social_get_player_clan(uuid) to authenticated;
+
+
+create or replace function public.social_award_clan_xp()
+returns trigger language plpgsql security definer set search_path=public as $nexus$
+declare cid uuid; delta integer;
+begin
+ select clan_id into cid from public.social_challenges where id=new.challenge_id;
+ if cid is not null then
+  delta:=greatest(0,new.progress-coalesce(old.progress,0));
+  if delta>0 then update public.social_clans set clan_xp=clan_xp+delta,level=1+floor(sqrt((clan_xp+delta)::numeric/100))::integer where id=cid; end if;
+ end if;
+ return new;
+end; $nexus$;
+drop trigger if exists social_clan_xp_on_mission_progress on public.social_challenge_members;
+create trigger social_clan_xp_on_mission_progress after insert or update of progress on public.social_challenge_members for each row execute function public.social_award_clan_xp();
