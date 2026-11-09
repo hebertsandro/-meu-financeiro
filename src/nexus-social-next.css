@@ -251,3 +251,65 @@
  .nexus-social .social-community .social-inbox-actions{grid-template-columns:1fr 1fr}
  .nexus-social .social-community .social-chat-filters button{min-height:34px}
 }
+
+
+/* NEXUS FEED — premium editorial finish */
+.nexus-social .nexus-feed{position:relative;gap:15px!important;min-width:0}
+.nexus-social .nxf-heading{position:relative;align-items:center!important;min-height:112px;padding:17px 19px!important;overflow:hidden;border:1px solid rgba(196,169,255,.15)!important;border-radius:17px;background:radial-gradient(ellipse at 90% 12%,rgba(151,111,211,.18),transparent 42%),linear-gradient(115deg,#211a2c,#191722 70%,#211a2c)!important}
+.nexus-social .nxf-heading:after{content:"";position:absolute;right:72px;top:-68px;width:170px;height:170px;border:1px solid rgba(203,180,255,.1);border-radius:50%;box-shadow:0 0 0 22px rgba(203,180,255,.025),0 0 0 48px rgba(203,180,255,.018);pointer-events:none}
+.nexus-social .nxf-heading>div{position:relative;z-index:1}
+.nexus-social .nxf-heading h2{margin:6px 0!important;font-size:28px!important;letter-spacing:-1.2px!important}
+.nexus-social .nxf-heading p{max-width:360px;font-size:10px!important;line-height:1.6!important}
+.nexus-social .nxf-live{position:relative;z-index:1;box-shadow:inset 0 0 0 1px rgba(105,210,169,.06)}
+.nexus-social .nxf-composer{position:relative;overflow:hidden;padding:16px!important;border:1px solid rgba(196,169,255,.17)!important;border-radius:17px!important;background:linear-gradient(145deg,#211c2c,#191722 62%,#1d1928)!important;box-shadow:0 12px 30px rgba(0,0,0,.16)!important}
+.nexus-social .nxf-composer:before{content:"COMPARTILHE COM A COMUNIDADE";display:block;margin-bottom:12px;color:#bba4e9;font-size:8px;font-weight:850;letter-spacing:1.55px}
+.nexus-social .nxf-compose-top{align-items:flex-start!important;gap:12px!important}
+.nexus-social .nxf-compose-avatar{width:43px!important;height:43px!important;border-radius:14px!important;box-shadow:0 0 0 4px rgba(172,137,228,.08)!important}
+.nexus-social .nxf-compose-top textarea{min-height:66px!important;padding:8px 0!important;font-size:12px!important;line-height:1.7!important}
+.nexus-social .nxf-compose-bottom{margin-top:10px!important;padding-top:11px!important}
+.nexus-social .nxf-photo-pick{display:inline-flex;align-items:center;gap:7px;padding:9px 12px!important;border:1px solid rgba(192,164,239,.17)!important;border-radius:10px!important;background:rgba(150,112,202,.1)!important;color:#d0b9f2!important}
+.nexus-social .nxf-publish{min-height:37px;padding:9px 15px!important;border-radius:10px!important;background:linear-gradient(110deg,#8f6bc7,#a17bd9)!important;box-shadow:0 5px 14px rgba(113,79,164,.2)!important}
+.nexus-social .nxf-post-list{gap:13px!important}
+.nexus-social .nxf-post{position:relative;overflow:visible;padding:16px!important;border:1px solid rgba(196,169,255,.13)!important;border-radius:17px!important;background:linear-gradient(150deg,#1d1a27,#191722 65%,#1c1926)!important;box-shadow:0 8px 24px rgba(0,0,0,.12)!important;transition:border-color .2s,transform .2s,box-shadow .2s!important}
+.nexus-social .nxf-post:hover{transform:translateY(-1px)!important;border-color:rgba(196,169,255,.27)!important;box-shadow:0 13px 28px rgba(0,0,0,.18)!important}
+.nexus-social .nxf-post-head{gap:12px!important;padding-bottom:12px!important;border-bottom:1px solid rgba(196,169,255,.09)!important}
+.nexus-social .nxf-author{gap:11px!important;min-width:0}
+.nexus-social .nxf-avatar{width:42px!important;height:42px!important;border-radius:14px!important;box-shadow:0 0 0 3px rgba(176,143,230,.08)!important}
+.nexus-social .nxf-author-copy{gap:4px!important}
+.nexus-social .nxf-author-copy b{font-size:11px!important;font-weight:800!important;letter-spacing:.05px}
+.nexus-social .nxf-author-copy small{font-size:9px!important;color:#b39fcf!important}
+.nexus-social .nxf-post-meta{gap:7px!important;font-size:9px!important}
+.nexus-social .nxf-post-meta>button{width:32px;height:32px;border:1px solid transparent;border-radius:10px;color:#b5a8c7!important}
+.nexus-social .nxf-post-meta>button:hover{border-color:rgba(196,169,255,.15);background:rgba(153,117,203,.12)}
+.nexus-social .nxf-menu{border:1px solid rgba(196,169,255,.2)!important;border-radius:12px!important;background:#211c2c!important;box-shadow:0 16px 35px rgba(0,0,0,.4)!important}
+.nexus-social .nxf-post-body{margin:13px 2px!important;font-size:12px!important;line-height:1.8!important;color:#eee8f5!important}
+.nexus-social .nxf-post-image{max-height:520px!important;margin:13px 0 5px!important;border:1px solid rgba(196,169,255,.14)!important;border-radius:14px!important;background:#100e17!important;object-fit:cover!important}
+.nexus-social .nxf-actions{display:grid!important;grid-template-columns:1fr 1fr;gap:7px!important;margin-top:13px!important;padding-top:11px!important;border-top:1px solid rgba(196,169,255,.1)!important}
+.nexus-social .nxf-actions button{justify-content:center!important;min-height:39px!important;border:1px solid transparent!important;border-radius:10px!important;color:#b8aec6!important;font-size:10px!important;font-weight:700!important}
+.nexus-social .nxf-actions button:hover{border-color:rgba(196,169,255,.15)!important;background:rgba(153,117,203,.1)!important}
+.nexus-social .nxf-actions button.liked{border-color:rgba(255,133,173,.15)!important;background:rgba(255,105,153,.08)!important;color:#ff9abb!important}
+.nexus-social .nxf-actions button b{font-size:10px!important;color:inherit!important}
+.nexus-social .nxf-comments{margin-top:8px!important;padding-top:13px!important;border-top:1px solid rgba(196,169,255,.1)!important}
+.nexus-social .nxf-comment-content{padding:10px 12px!important;border:1px solid rgba(196,169,255,.1)!important;border-radius:0 12px 12px 12px!important;background:#211d2a!important}
+.nexus-social .nxf-comment-content p{font-size:10px!important;line-height:1.65!important}
+.nexus-social .nxf-comment-form{gap:8px!important}
+.nexus-social .nxf-comment-form input{min-height:42px!important;border:1px solid rgba(196,169,255,.17)!important;border-radius:11px!important;background:#121019!important}
+.nexus-social .nxf-comment-form button{width:42px!important;border-radius:11px!important;background:#9271cf!important}
+.nexus-social .nxf-empty,.nexus-social .nxf-loading{min-height:180px;align-content:center;border:1px dashed rgba(196,169,255,.2)!important;border-radius:17px!important;background:radial-gradient(ellipse at 50% 0%,rgba(151,111,211,.12),transparent 65%),#191722!important}
+.nexus-social .nxf-empty>span{display:grid;place-items:center;width:48px;height:48px;border:1px solid rgba(196,169,255,.18);border-radius:15px;background:rgba(151,111,211,.12);font-size:22px!important}
+.nexus-social .nxf-empty h3{font-size:14px!important;color:#f2eafa!important}
+.nexus-social .nxf-empty p{font-size:10px!important;line-height:1.7!important;color:#a99eb6!important}
+.nexus-social .nxf-footer{padding:7px 0 3px!important;color:#8f849e!important;font-size:9px!important;letter-spacing:.15px}
+@media(max-width:600px){
+ .nexus-social .nxf-heading{min-height:105px;padding:14px!important;border-radius:15px!important}
+ .nexus-social .nxf-heading h2{font-size:24px!important}
+ .nexus-social .nxf-heading p{max-width:245px;font-size:9px!important}
+ .nexus-social .nxf-heading:after{right:8px;top:-76px;width:140px;height:140px}
+ .nexus-social .nxf-composer{padding:13px!important;border-radius:15px!important}
+ .nexus-social .nxf-compose-avatar{width:39px!important;height:39px!important}
+ .nexus-social .nxf-post{padding:13px!important;border-radius:15px!important}
+ .nexus-social .nxf-post-head{padding-bottom:10px!important}
+ .nexus-social .nxf-post-body{font-size:11px!important;line-height:1.75!important}
+ .nexus-social .nxf-actions button{min-height:37px!important;padding:6px 4px!important;font-size:9px!important}
+ .nexus-social .nxf-actions button svg{width:16px;height:16px}
+}
