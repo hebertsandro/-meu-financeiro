@@ -65,3 +65,9 @@
 .nxf-spin{animation:nxf-spin 1s linear infinite}@keyframes nxf-spin{to{transform:rotate(360deg)}}
 .nxf-footer{text-align:center;color:#657792;font-size:9px;padding:3px 0 8px}
 @media(max-width:600px){.nexus-feed{gap:12px}.nxf-composer,.nxf-post{padding:12px;border-radius:14px}.nxf-heading{align-items:flex-start}.nxf-heading p{font-size:11px}.nxf-post-body{font-size:12px}.nxf-actions{gap:3px}.nxf-actions button{padding:8px 7px;font-size:10px}.nxf-comment.is-reply{margin-left:14px}.nxf-compose-bottom{gap:7px}.nxf-photo-pick{padding:8px;font-size:10px}.nxf-publish{padding:10px 11px}.nxf-preview{margin-left:0}}
+
+.nxf-avatar.frame-violet,.nxf-compose-avatar.frame-violet{border:2px solid #b78aff;box-shadow:0 0 0 3px #a879ff24,0 0 14px #a879ff66}
+.nxf-avatar.frame-cyan,.nxf-compose-avatar.frame-cyan{border:2px solid #55e5f5;box-shadow:0 0 0 3px #55e5f522,0 0 14px #55e5f566}
+.nxf-avatar.frame-gold,.nxf-compose-avatar.frame-gold{border:2px solid #f3ca70;box-shadow:0 0 0 3px #f3ca7022,0 0 14px #f3ca7066}
+.nxf-avatar.frame-legendary,.nxf-compose-avatar.frame-legendary{border:2px solid #e4a4ff;box-shadow:0 0 0 3px #bc7dff22,0 0 14px #bc7dff66}
+.nxf-avatar.frame-chromatic,.nxf-compose-avatar.frame-chromatic{border:2px solid transparent;background:linear-gradient(#24344e,#24344e) padding-box,linear-gradient(120deg,#ff5cda,#69e9ff,#b8ff8b,#ffe16a,#ff6ad5) border-box;box-shadow:0 0 16px #79eaff77}
