@@ -3752,3 +3752,21 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
   .profile-bio-footer { align-items: stretch; flex-direction: column; }
   .profile-bio-footer .primary { width: 100%; }
 }
+
+
+/* NEXUS SOCIAL — menu hierárquico da navegação principal */
+.nav-group-toggle{margin-top:7px!important}
+.nav-group-toggle .nav-group-chevron{margin-left:auto;color:#7f8ba4;transition:transform .2s ease}
+.nav-group-toggle .nav-group-chevron.expanded{transform:rotate(180deg)}
+.nav-submenu{display:grid;gap:4px;margin:0 0 7px 13px;padding:5px 0 5px 10px;border-left:1px solid rgba(165,139,224,.24)}
+.nav-sub-item{width:100%;display:flex;align-items:center;gap:11px;min-height:38px;padding:8px 12px;border:1px solid transparent;border-radius:9px;background:transparent;color:#9290a6;text-align:left;font-size:12px;font-weight:600;transition:background .18s,border-color .18s,color .18s}
+.nav-sub-item svg{color:#82749e}
+.nav-sub-item:hover{background:rgba(151,119,207,.09);color:#eee7ff}
+.nav-sub-item.active{background:linear-gradient(100deg,rgba(132,96,196,.2),rgba(132,96,196,.07));border-color:rgba(181,151,239,.18);color:#e5d8ff}
+.nav-sub-item.active svg{color:#c1a3ff}
+.nav-sub-item i{margin-left:auto;width:5px;height:5px;border-radius:50%;background:#c19cff;box-shadow:0 0 9px rgba(193,156,255,.65)}
+.social-community-clans .social-community-tabs{margin-bottom:14px}
+@media(max-width:900px){
+ .nav-submenu{margin-left:10px}
+ .nav-sub-item{min-height:42px}
+}
