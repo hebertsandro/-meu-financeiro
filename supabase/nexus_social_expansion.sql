@@ -104,13 +104,13 @@ create table if not exists public.social_challenge_members (
 );
 
 create or replace function public.social_is_conversation_member(target_conversation uuid, target_user uuid default auth.uid())
-returns boolean language sql stable security definer set search_path=public as $
+returns boolean language sql stable security definer set search_path=public as $nexus$
  select exists(select 1 from public.social_conversation_members where conversation_id=target_conversation and user_id=target_user);
-$;
+$nexus$;
 create or replace function public.social_is_room_member(target_room uuid, target_user uuid default auth.uid())
-returns boolean language sql stable security definer set search_path=public as $
+returns boolean language sql stable security definer set search_path=public as $nexus$
  select exists(select 1 from public.social_room_members where room_id=target_room and user_id=target_user);
-$;
+$nexus$;
 revoke all on function public.social_is_conversation_member(uuid,uuid) from public;
 revoke all on function public.social_is_room_member(uuid,uuid) from public;
 grant execute on function public.social_is_conversation_member(uuid,uuid) to authenticated;
