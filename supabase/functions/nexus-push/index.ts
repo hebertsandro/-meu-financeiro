@@ -8,8 +8,10 @@ Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response("ok", { headers: cors });
   if (req.method !== "POST") return json({ error: "Method not allowed" }, 405);
   const url = Deno.env.get("SUPABASE_URL")!;
-  const anon = Deno.env.get("SUPABASE_ANON_KEY")!;
-  const serviceKey = Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!;
+  const publishableKeys = JSON.parse(Deno.env.get("SUPABASE_PUBLISHABLE_KEYS") || "{}");
+  const secretKeys = JSON.parse(Deno.env.get("SUPABASE_SECRET_KEYS") || "{}");
+  const anon = publishableKeys.default || Deno.env.get("SUPABASE_ANON_KEY") || "";
+  const serviceKey = secretKeys.default || Deno.env.get("SUPABASE_SERVICE_ROLE_KEY") || "";
   const vapidPublic = Deno.env.get("VAPID_PUBLIC_KEY")!;
   const vapidPrivate = Deno.env.get("VAPID_PRIVATE_KEY")!;
   const vapidSubject = Deno.env.get("VAPID_SUBJECT") || "";
