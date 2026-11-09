@@ -71,3 +71,5 @@
 .nxf-avatar.frame-gold,.nxf-compose-avatar.frame-gold{border:2px solid #f3ca70;box-shadow:0 0 0 3px #f3ca7022,0 0 14px #f3ca7066}
 .nxf-avatar.frame-legendary,.nxf-compose-avatar.frame-legendary{border:2px solid #e4a4ff;box-shadow:0 0 0 3px #bc7dff22,0 0 14px #bc7dff66}
 .nxf-avatar.frame-chromatic,.nxf-compose-avatar.frame-chromatic{border:2px solid transparent;background:linear-gradient(#24344e,#24344e) padding-box,linear-gradient(120deg,#ff5cda,#69e9ff,#b8ff8b,#ffe16a,#ff6ad5) border-box;box-shadow:0 0 16px #79eaff77}
+
+.nxf-edit-comment{display:block;width:100%;min-height:70px;resize:vertical;padding:9px;border:1px solid #465779;border-radius:9px;background:#0d1726;color:#eef3ff;font:inherit;font-size:11px;outline:none}
