@@ -5,7 +5,7 @@ import {supabase} from './supabase';
 const decodeKey=value=>{const pad='='.repeat((4-value.length%4)%4);const raw=atob((value+pad).replace(/-/g,'+').replace(/_/g,'/'));return Uint8Array.from([...raw].map(c=>c.charCodeAt(0)));};
 export default function NexusPushSettings({userId}){
  const [supported,setSupported]=useState(false),[enabled,setEnabled]=useState(false),[busy,setBusy]=useState(false),[error,setError]=useState(''),[hint,setHint]=useState('');
- const publicKey=import.meta.env.VITE_VAPID_PUBLIC_KEY;
+ const publicKey=import.meta.env.VITE_VAPID_PUBLIC_KEY||'BCay49BvqxHdAPmTOEwxxyUhU7Brg0ElRvU9QdLMEwIorYHa7uOutg9DVZu9HiBGxftBr0VZwfKk9n12YdTD8Cs';
  const isIOS=/iphone|ipad|ipod/i.test(navigator.userAgent);
  const isStandalone=window.matchMedia?.('(display-mode: standalone)').matches||navigator.standalone===true;
  useEffect(()=>{let alive=true;const check=async()=>{const ok='serviceWorker'in navigator&&'PushManager'in window&&'Notification'in window; if(!alive)return;setSupported(ok);if(!ok)return;try{const reg=await navigator.serviceWorker.register('/sw.js');const sub=await reg.pushManager.getSubscription();if(alive)setEnabled(!!sub);}catch(e){if(alive)setError(e.message||'Não foi possível verificar as notificações.');}};check();return()=>{alive=false;};},[]);
