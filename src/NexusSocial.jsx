@@ -2,6 +2,7 @@ import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {Search,Users,UserPlus,Check,X,RefreshCw,ShieldCheck,UserRound,AtSign,Lock,Eye,CalendarClock,Trophy,Zap,Star,Flame,MessageCircle} from 'lucide-react';
 import {supabase} from './supabase';
 import NexusCommunity from './NexusCommunity';
+import NexusFeed from './NexusFeed';
 import NexusPushSettings from './NexusPushSettings';
 
 const PROFILE_FIELDS='user_id,username,display_name,bio,avatar,avatar_frame,card_frame,equipped_gems,game_xp,game_correct,username_changed_at,is_suspended';
@@ -35,7 +36,7 @@ export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=
  const userId=session?.user?.id;
  const [profile,setProfile]=useState(null),[username,setUsername]=useState(''),[bio,setBio]=useState('');
  const [query,setQuery]=useState(''),[results,setResults]=useState([]),[friends,setFriends]=useState([]),[incoming,setIncoming]=useState([]),[outgoing,setOutgoing]=useState([]);
- const [busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState(''),[tab,setTab]=useState('community'),[viewPerson,setViewPerson]=useState(null);
+ const [busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState(''),[tab,setTab]=useState('feed'),[viewPerson,setViewPerson]=useState(null);
  const daysLeft=daysUntilChange(profile?.username_changed_at);
  const usernameChanged=!!profile&&username.trim().toLowerCase()!==String(profile.username||'').toLowerCase();
  const load=useCallback(async()=>{
@@ -109,9 +110,10 @@ export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=
   {error&&<div className="social-error" role="alert">{error}</div>}
   <div className="social-layout">
    <div className="social-main">
-    <div className="social-tabs"><button className={tab==='community'?'active':''} onClick={()=>setTab('community')}><MessageCircle size={16}/> Conversas {incoming.length>0&&<b>{incoming.length}</b>}</button><button className={tab==='discover'?'active':''} onClick={()=>setTab('discover')}><UserPlus size={16}/> Adicionar amigos</button></div>
+    <div className="social-tabs"><button className={tab==='feed'?'active':''} onClick={()=>setTab('feed')}><MessageCircle size={16}/> Feed</button><button className={tab==='community'?'active':''} onClick={()=>setTab('community')}><Users size={16}/> Conversas {incoming.length>0&&<b>{incoming.length}</b>}</button><button className={tab==='discover'?'active':''} onClick={()=>setTab('discover')}><UserPlus size={16}/> Adicionar amigos</button></div>
     {loading?<div className="social-loading"><span className="spinner"/> Carregando comunidade...</div>:<>
      
+     {tab==='feed'&&<NexusFeed userId={userId} onToast={onToast} onOpenProfile={openPerson}/>}
      {tab==='discover'&&<div className="social-panel"><div className="social-panel-heading"><div><h3>Encontrar pessoas</h3><p>Busque pelo @usuário e abra a Central do Jogador.</p></div></div><form className="social-search" onSubmit={searchPeople}><AtSign size={17}/><input value={query} onChange={e=>setQuery(e.target.value)} placeholder="Digite um @usuário"/><button disabled={busy||query.trim().length<2}><Search size={16}/> Buscar</button></form><div className="social-people">{results.map(p=>personRow(p,<button className="social-add-button" disabled={busy} onClick={e=>{e.stopPropagation();requestFriend(p.user_id)}}><UserPlus size={15}/> Adicionar</button>))}</div>{!results.length&&<div className="social-empty-inline"><Search size={26}/><p>Pesquise um nome de usuário para encontrar pessoas.</p></div>}</div>}
      
     </>}
