@@ -48,9 +48,20 @@ alter table public.social_post_likes enable row level security;
 alter table public.social_post_comments enable row level security;
 alter table public.social_post_reports enable row level security;
 
+create or replace function public.social_feed_can_view_author(target_author uuid)
+returns boolean language sql stable security definer set search_path=public as $
+ select not exists(
+  select 1 from public.social_blocks b
+  where (b.blocker_id=auth.uid() and b.blocked_id=target_author)
+     or (b.blocker_id=target_author and b.blocked_id=auth.uid())
+ );
+$;
+revoke all on function public.social_feed_can_view_author(uuid) from public;
+grant execute on function public.social_feed_can_view_author(uuid) to authenticated;
+
 drop policy if exists "Feed members read posts" on public.social_posts;
 create policy "Feed members read posts" on public.social_posts for select to authenticated
- using (not exists(select 1 from public.social_blocks b where (b.blocker_id=auth.uid() and b.blocked_id=author_id) or (b.blocker_id=author_id and b.blocked_id=auth.uid())));
+ using (public.social_feed_can_view_author(author_id));
 drop policy if exists "Users create own posts" on public.social_posts;
 create policy "Users create own posts" on public.social_posts for insert to authenticated
  with check (author_id=auth.uid());
