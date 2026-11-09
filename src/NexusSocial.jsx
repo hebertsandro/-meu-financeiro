@@ -2,6 +2,7 @@ import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {Search,Users,UserPlus,Check,X,RefreshCw,ShieldCheck,UserRound,AtSign,Lock,Eye,CalendarClock,Trophy,Zap,Star,Flame,MessageCircle} from 'lucide-react';
 import {supabase} from './supabase';
 import NexusCommunity from './NexusCommunity';
+import NexusPushSettings from './NexusPushSettings';
 
 const PROFILE_FIELDS='user_id,username,display_name,bio,avatar,avatar_frame,card_frame,equipped_gems,game_xp,game_correct,username_changed_at,is_suspended';
 const initials=(name='')=>String(name).trim().split(/\\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'NX';
@@ -90,8 +91,8 @@ export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=
  }
  async function requestFriend(id){
   setBusy(true);setError('');
-  const {error:e1}=await supabase.from('social_friend_requests').insert({sender_id:userId,receiver_id:id});
-  if(e1)setError(e1.code==='23505'?'Já existe uma solicitação ou amizade.':e1.message);else{onToast('Solicitação enviada!');setResults(r=>r.filter(x=>x.user_id!==id));load();}
+  const {data:request,error:e1}=await supabase.from('social_friend_requests').insert({sender_id:userId,receiver_id:id}).select('id').single();
+  if(e1)setError(e1.code==='23505'?'Já existe uma solicitação ou amizade.':e1.message);else{await supabase.functions.invoke('nexus-push',{body:{type:'friend_request',record_id:request.id}}).catch(()=>{});onToast('Solicitação enviada!');setResults(r=>r.filter(x=>x.user_id!==id));load();}
   setBusy(false);
  }
  async function answerRequest(id,status){
@@ -104,6 +105,7 @@ export default function NexusSocial({session,playerProfile,gameXp=0,gameCorrect=
  if(!userId)return <section className="social-empty"><Lock/><h3>Entre na sua conta</h3><p>O NEXUS Social funciona com uma conta autenticada.</p></section>;
  return <section className="nexus-social">
   <div className="social-hero"><div><span>SEU UNIVERSO, SUA COMUNIDADE</span><h2>NEXUS <em>Social</em></h2><p>Conheça pessoas, visite suas centrais de jogador e construa amizades.</p></div><div className="social-hero-icon"><Users size={34}/></div></div>
+  <NexusPushSettings userId={userId}/>
   {error&&<div className="social-error" role="alert">{error}</div>}
   <div className="social-layout">
    <div className="social-main">
