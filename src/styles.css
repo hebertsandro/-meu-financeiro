@@ -3798,3 +3798,14 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
   object-fit:cover!important;border-radius:50%!important;
 }
 
+
+
+/* Central do jogador: elevar as joias para não sobrepor os indicadores de desafios */
+.player-profile-page .game-world-hero .frame-gem-ornament{
+  bottom:82px!important;
+}
+@media(max-width:640px){
+  .player-profile-page .game-world-hero .frame-gem-ornament{
+    bottom:86px!important;
+  }
+}
