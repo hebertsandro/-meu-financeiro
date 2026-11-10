@@ -118,3 +118,24 @@
  .content-social .nexus-social .nxf-story-composer>div:last-child small{margin-left:0}
  .content-social .nexus-social .nxf-feed-tabs button{padding:8px 10px}
 }
+
+
+/* Chat refinements: clear read states, typing, reactions and group member controls */
+.content-social .social-unread-count{display:grid;place-items:center;min-width:21px;height:21px;padding:0 6px;border-radius:20px;background:#a47ad1;color:#fff;font-size:10px;font-style:normal;font-weight:800}
+.content-social .social-typing-indicator{flex:0 0 auto;padding:5px 20px;background:#100f16;color:#c8a8eb;font-size:10px}
+.content-social .social-chat-bubble{position:relative}
+.content-social .social-chat-bubble.pinned{border-color:rgba(202,169,238,.55)!important}
+.content-social .social-message-tools{display:flex;align-items:center;gap:7px;flex-wrap:wrap;margin-top:8px}
+.content-social .social-message-tools button{display:inline-flex;align-items:center;gap:4px;padding:4px 7px;border:1px solid rgba(190,164,238,.15);border-radius:7px;background:rgba(9,8,14,.28);color:#b9a8cb;font-size:9px}
+.content-social .social-message-tools button:hover{color:#f2e8ff;border-color:#8867a8}
+.content-social .social-message-edit{display:block;width:100%;min-height:65px;padding:9px;border:1px solid #5d4772;border-radius:9px;background:#100f16;color:#f5eff9;font:inherit;resize:vertical}
+.content-social .social-deleted-message{color:#968a9f;font-size:11px}
+.content-social .social-message-reaction{display:inline-flex;margin:5px 5px 0 0;padding:4px 7px;border:1px solid #55416a;border-radius:20px;background:#2a2037;font-size:10px}
+.content-social .social-room-member-panel{display:grid;gap:8px;padding:13px 16px;border-bottom:1px solid #302a39;background:#17141f}
+.content-social .social-room-member-panel> b{font-size:11px;color:#eee5f5}
+.content-social .social-room-member-panel>div{display:flex;align-items:center;gap:9px;min-width:0}
+.content-social .social-room-member-panel>div>span:nth-child(2){display:grid;gap:3px;flex:1;min-width:0}
+.content-social .social-room-member-panel>div>span:nth-child(2) b{font-size:10px}
+.content-social .social-room-member-panel>div>span:nth-child(2) small{font-size:9px;color:#9b90a7}
+.content-social .social-room-member-panel button{padding:6px 8px;border:1px solid #514064;border-radius:8px;background:#2a2037;color:#e6d8f2;font-size:9px}
+.content-social .social-clan-members .social-community-row{min-height:62px}
