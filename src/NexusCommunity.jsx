@@ -1,6 +1,6 @@
 import React,{useCallback,useEffect,useState} from 'react';
 import {supabase} from './supabase';
-import {MessageCircle,Send,Shield,Flag,Users,Plus,RefreshCw,Swords,Handshake,DoorOpen,Lock,ChevronLeft,Pencil,Check,X,Zap,LogOut,Trash2,Search,MoreHorizontal,CornerUpLeft,Smile,Pin,Paperclip,FileText,Star,Archive,Bell,BellOff,Image as ImageIcon} from 'lucide-react';
+import {MessageCircle,Send,Shield,Flag,Users,Plus,RefreshCw,Swords,Handshake,DoorOpen,Lock,ChevronLeft,Pencil,Check,X,Zap,LogOut,Trash2,Search,MoreHorizontal,CornerUpLeft,Smile,Pin,Paperclip,FileText,Star,Archive,Bell,BellOff,Image as ImageIcon,Trophy} from 'lucide-react';
 import NexusVoiceRecorder,{NexusMessageAttachment} from './NexusVoiceRecorder';
 import NexusClanBoard from './NexusClanBoard';
 
