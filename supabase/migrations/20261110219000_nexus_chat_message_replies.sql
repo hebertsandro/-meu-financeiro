@@ -1,0 +1,3 @@
+alter table public.social_messages add column if not exists reply_to_id uuid references public.social_messages(id) on delete set null;
+alter table public.social_room_messages add column if not exists reply_to_id uuid references public.social_room_messages(id) on delete set null;
+alter table public.social_clan_messages add column if not exists reply_to_id uuid references public.social_clan_messages(id) on delete set null;
