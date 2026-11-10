@@ -645,3 +645,59 @@
 .social-quick-contact-list>p{padding:16px!important;color:#a99db5!important;font-size:12px!important;line-height:1.5!important}
 .social-quick-create-sheet .social-quick-action>svg:last-child{transform:rotate(180deg)!important}
 @media(max-width:760px){.social-quick-create-sheet{max-height:82dvh!important;overflow:auto!important}.social-quick-contact-list{max-height:55dvh!important}}
+
+
+/* Mobile private-chat header: stable back / identity / actions layout */
+@media(max-width:760px){
+  .nexus-social .social-community.mobile-chat-open .social-chat-head.social-chat-head-modern{
+    display:grid!important;
+    grid-template-columns:42px minmax(0,1fr) auto!important;
+    align-items:center!important;
+    gap:8px!important;
+    flex-wrap:nowrap!important;
+    width:100%!important;
+    min-height:76px!important;
+    padding:10px 12px!important;
+    box-sizing:border-box!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-back{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:40px!important;height:40px!important;min-width:40px!important;flex:0 0 40px!important;
+    border-radius:13px!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger{
+    display:flex!important;align-items:center!important;gap:10px!important;
+    width:100%!important;min-width:0!important;max-width:none!important;min-height:48px!important;
+    flex:1 1 auto!important;padding:0!important;border:0!important;background:transparent!important;
+    text-align:left!important;overflow:hidden!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger .social-chat-head-avatar{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:44px!important;height:44px!important;min-width:44px!important;flex:0 0 44px!important;
+    border-radius:14px!important;overflow:hidden!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger .social-chat-head-copy{
+    display:flex!important;flex:1 1 auto!important;flex-direction:column!important;
+    min-width:0!important;max-width:100%!important;gap:3px!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-copy b{font-size:13px!important;line-height:1.25!important}
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-copy small{font-size:10px!important;opacity:.72!important}
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-actions{
+    display:flex!important;align-items:center!important;justify-content:flex-end!important;
+    gap:6px!important;flex:0 0 auto!important;min-width:max-content!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-actions>button{
+    display:flex!important;align-items:center!important;justify-content:center!important;
+    width:38px!important;height:38px!important;min-width:38px!important;flex:0 0 38px!important;
+    border-radius:12px!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-message-search{display:none!important}
+}
+@media(max-width:380px){
+  .nexus-social .social-community.mobile-chat-open .social-chat-head.social-chat-head-modern{
+    grid-template-columns:36px minmax(0,1fr) auto!important;gap:5px!important;padding-left:8px!important;padding-right:8px!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-back{width:36px!important;height:36px!important;min-width:36px!important;flex-basis:36px!important}
+  .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger .social-chat-head-avatar{width:38px!important;height:38px!important;min-width:38px!important;flex-basis:38px!important}
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-actions>button{width:34px!important;height:34px!important;min-width:34px!important;flex-basis:34px!important}
+}
