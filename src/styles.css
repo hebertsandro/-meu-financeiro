@@ -3797,3 +3797,24 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
   display:block!important;width:100%!important;height:100%!important;
   object-fit:cover!important;border-radius:50%!important;
 }
+
+
+/* Navegação reorganizada: grupos claros e menos ruído visual */
+.sidebar{padding-top:23px}
+.sidebar .brand{padding-bottom:27px}
+.sidebar nav.sidebar-nav{display:flex;flex-direction:column;gap:15px;overflow-y:auto;min-height:0;padding:0 2px 12px;scrollbar-width:thin;scrollbar-color:#2b3a52 transparent}
+.nav-section{display:grid;gap:5px}
+.nav-section-toggle{display:flex;align-items:center;justify-content:space-between;width:100%;padding:7px 11px;border:0;border-radius:8px;background:transparent;color:#71829b;font-size:9px;font-weight:800;letter-spacing:1.5px;text-align:left}
+.nav-section-toggle svg{transition:transform .18s ease;color:#667993}
+.nav-section-toggle svg.expanded{transform:rotate(180deg)}
+.nav-section-toggle:hover,.nav-section-toggle.section-active{color:#a9c2ed;background:#111e30}
+.nav-section-items{display:grid;gap:3px}
+.sidebar-nav .nav-item{padding:10px 11px;gap:11px;font-size:12px;border-radius:10px}
+.sidebar-nav .nav-item svg{flex:none}
+.sidebar-nav .nav-group-toggle{margin-top:2px}
+.sidebar-nav .nav-submenu{margin:0 0 2px 20px;padding-left:9px;border-left:1px solid #293a53;display:grid;gap:2px}
+.sidebar-nav .nav-sub-item{padding:8px 10px;font-size:11px}
+.nav-section-label{padding:7px 11px;color:#71829b;font-size:9px;font-weight:800;letter-spacing:1.4px}
+.admin-nav-section{border-top:1px solid #202d41;padding-top:10px}
+.sidebar-bottom{padding-top:12px;border-top:1px solid #1d2a3d}
+@media(max-width:760px){.sidebar{padding:19px 15px 14px}.sidebar .brand{padding-bottom:22px}.sidebar nav.sidebar-nav{gap:12px}.sidebar-bottom{padding-top:10px}}
