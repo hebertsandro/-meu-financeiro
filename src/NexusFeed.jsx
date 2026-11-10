@@ -17,7 +17,8 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
  const [replyTo,setReplyTo]=useState(null),[menuPost,setMenuPost]=useState(null),[editingComment,setEditingComment]=useState(null),[editDraft,setEditDraft]=useState('');
  const [editingPost,setEditingPost]=useState(null),[postEditDraft,setPostEditDraft]=useState('');
  const [pollQuestion,setPollQuestion]=useState(''),[pollOptions,setPollOptions]=useState(['','']),[activeTag,setActiveTag]=useState('');
- const [feedMode,setFeedMode]=useState('for-you'),[savedIds,setSavedIds]=useState([]),[storyViewer,setStoryViewer]=useState(null),[showStoryComposer,setShowStoryComposer]=useState(false),[reactionPost,setReactionPost]=useState(null),[shareTarget,setShareTarget]=useState(null),[draftNotice,setDraftNotice]=useState(false);\n  const [viewedStoryIds,setViewedStoryIds]=useState(()=>{try{return new Set(JSON.parse(localStorage.getItem('nexus-viewed-stories-'+userId)||'[]'))}catch{return new Set()}});
+ const [feedMode,setFeedMode]=useState('for-you'),[savedIds,setSavedIds]=useState([]),[storyViewer,setStoryViewer]=useState(null),[showStoryComposer,setShowStoryComposer]=useState(false),[reactionPost,setReactionPost]=useState(null),[shareTarget,setShareTarget]=useState(null),[draftNotice,setDraftNotice]=useState(false);
+  const [viewedStoryIds,setViewedStoryIds]=useState(()=>{try{return new Set(JSON.parse(localStorage.getItem('nexus-viewed-stories-'+userId)||'[]'))}catch{return new Set()}});
  const friendIds=useMemo(()=>new Set(friends.map(x=>x.person?.user_id).filter(Boolean)),[friends]);
  const load=useCallback(async(silent=false)=>{
   if(!userId||!supabase)return;if(!silent)setLoading(true);setError('');
