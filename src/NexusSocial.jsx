@@ -18,7 +18,7 @@ const achievements=p=>[
  {name:'Mente afiada',desc:'Acertar 5 perguntas',icon:'⭐',unlocked:Number(p.game_correct||0)>=5},
  {name:'Explorador',desc:'Alcançar 1.000 XP',icon:'🔥',unlocked:Number(p.game_xp||0)>=1000}
 ];
-function PublicPlayerProfile({person,onClose}){
+function PublicPlayerProfile({person,onClose,onFollowToggle}){
  const xp=Number(person.game_xp||0),correct=Number(person.game_correct||0),level=Math.floor(xp/500)+1,gems=Array.isArray(person.equipped_gems)?person.equipped_gems:[];
  const tier=xp>=4500?'LENDÁRIO':xp>=2000?'ELITE':xp>=1000?'VETERANO':xp>=500?'EXPLORADOR':'JOGADOR';
  const medals=achievements(person);
@@ -28,11 +28,11 @@ function PublicPlayerProfile({person,onClose}){
    <div className={'frame-gem-ornament ornament-'+(person.card_frame||'cyan')}>{gems.map(id=><i key={id} className={'gemstone gem-'+id}/>)}</div>
    <div className="game-world-top"><span className="world-label"><span className="live-pulse"/> CENTRAL DO JOGADOR</span><span className="season-pill">JORNADA NEXUS</span></div>
    <div className="player-identity"><div className={'player-avatar profile-big-avatar frame-'+(person.avatar_frame||'violet')+(gems.length===4?' frame-chromatic':'')}><span>{person.avatar||'👾'}</span><i><Zap size={12}/></i></div><div className="player-info"><span>{tier}</span><h2>{person.display_name||person.username}</h2><div className="player-social-identity"><b>@{person.username}</b></div>{person.bio&&<p className="player-social-bio">{person.bio}</p>}{person.clan&&<div className="player-clan-badge">{person.clan.clan_emblem} {person.clan.clan_name} [{person.clan.clan_tag}] · {person.clan.clan_role==='leader'?'ADM':person.clan.clan_role==='officer'?'OFICIAL':'MEMBRO'}</div>}<div className="player-level-line"><b>NÍVEL {level}</b><span>{xp%500}/500 XP para o próximo nível</span></div><div className="player-xp-track"><i style={{width:(xp%500)/5+'%'}}/></div></div><div className="player-xp-total"><strong>{xp}</strong><small>XP TOTAL</small></div></div>
-   <div className="world-stats"><div><Flame size={17}/><span><b>{correct}</b> desafios concluídos</span></div><div><Trophy size={17}/><span><b>{Math.floor(xp/500)}</b> níveis conquistados</span></div><div><Star size={17}/><span><b>{gems.length}/4</b> joias equipadas</span></div></div>
+   <div className="world-stats"><div><Flame size={17}/><span><b>{correct}</b> desafios concluídos</span></div><div><Trophy size={17}/><span><b>{Math.floor(xp/500)}</b> níveis conquistados</span></div><div><Star size={17}/><span><b>{gems.length}/4</b> joias equipadas</span></div><div><Users size={17}/><span><b>{person.followersCount||0}</b> seguidores · <b>{person.followingCount||0}</b> seguindo</span></div></div>
   </div>
   <div className="social-public-section"><div className="social-public-section-title"><div><span>PROGRESSO</span><h3>Conquistas</h3></div><Trophy size={20}/></div><div className="social-public-achievements">{medals.map(a=><article className={'social-public-achievement '+(a.unlocked?'unlocked':'locked')} key={a.name}><span>{a.icon}</span><div><b>{a.name}</b><small>{a.desc}</small></div><strong>{a.unlocked?'CONQUISTADA':'BLOQUEADA'}</strong></article>)}</div></div>
   <div className="social-public-section"><div className="social-public-section-title"><div><span>PERSONALIZAÇÃO</span><h3>Itens equipados</h3></div></div><div className="social-equipped-items"><span className={'social-equipped-frame frame-'+(person.avatar_frame||'violet')}>Avatar · {person.avatar_frame||'violet'}</span><span className={'social-equipped-frame frame-'+(person.card_frame||'cyan')}>Central · {person.card_frame||'cyan'}</span>{gems.map(g=><span className="social-equipped-gem" key={g}>💎 {g}</span>)}</div></div>
-  <footer className="social-public-footer"><ShieldCheck size={16}/> Perfil público somente para visualização. Ninguém pode alterar os dados deste jogador por aqui.</footer>
+  <footer className="social-public-footer"><ShieldCheck size={16}/> Perfil público somente para visualização. Ninguém pode alterar os dados deste jogador por aqui.{person.user_id!==person.viewerId&&<button className={'social-follow-button '+(person.isFollowing?'following':'')} onClick={()=>onFollowToggle(person)}>{person.isFollowing?<><Check size={15}/> Seguindo</>:<><UserPlus size={15}/> Seguir jogador</>}</button>}</footer>
  </section></div>;
 }
 export default function NexusSocial({view='conversations',session,playerProfile,gameXp=0,gameCorrect=0,onPlayerProfileChange=()=>{},onToast=()=>{}}){
@@ -90,8 +90,19 @@ export default function NexusSocial({view='conversations',session,playerProfile,
  }
  async function openPerson(person){
   if(!person?.user_id)return;
-  const [{data,error:e1},{data:clanData}]=await Promise.all([supabase.from('social_profiles').select('*').eq('user_id',person.user_id).maybeSingle(),supabase.rpc('social_get_player_clan',{target_user:person.user_id})]);
-  if(e1)setError(e1.message);else if(data&&!data.is_suspended)setViewPerson({...data,clan:clanData?.[0]||null});
+  const [{data,error:e1},{data:clanData},{count:followersCount},{count:followingCount},{data:followRow}]=await Promise.all([
+   supabase.from('social_profiles').select('*').eq('user_id',person.user_id).maybeSingle(),
+   supabase.rpc('social_get_player_clan',{target_user:person.user_id}),
+   supabase.from('social_follows').select('follower_id',{count:'exact',head:true}).eq('following_id',person.user_id),
+   supabase.from('social_follows').select('following_id',{count:'exact',head:true}).eq('follower_id',person.user_id),
+   supabase.from('social_follows').select('follower_id').eq('follower_id',userId).eq('following_id',person.user_id).maybeSingle()
+  ]);
+  if(e1)setError(e1.message);else if(data&&!data.is_suspended)setViewPerson({...data,clan:clanData?.[0]||null,followersCount:followersCount||0,followingCount:followingCount||0,isFollowing:!!followRow,viewerId:userId});
+ }
+ async function toggleFollow(person){
+  if(!person?.user_id||person.user_id===userId)return;
+  const result=person.isFollowing?await supabase.from('social_follows').delete().eq('follower_id',userId).eq('following_id',person.user_id):await supabase.from('social_follows').insert({follower_id:userId,following_id:person.user_id});
+  if(result.error)setError(result.error.message);else{onToast(person.isFollowing?'Você deixou de seguir este jogador.':'Agora você está seguindo este jogador.');await openPerson(person);}
  }
  async function requestFriend(id){
   setBusy(true);setError('');
@@ -130,6 +141,6 @@ export default function NexusSocial({view='conversations',session,playerProfile,
    <div className="social-panel social-profile-editor"><div className="social-panel-heading"><div><span className="social-section-kicker">SUA IDENTIDADE</span><h3>Central do Jogador</h3><p>Seu perfil é compartilhado em todo o NEXUS Social.</p></div><UserRound size={21}/></div><div className="social-editor-identity"><div className={'social-editor-avatar frame-'+(playerProfile?.frame||'violet')}>{playerProfile?.avatar||'👾'}</div><div><b>{playerProfile?.name||'Seu jogador'}</b><span>@{profile?.username||playerProfile?.username||'seu_usuario'}</span><small>Nível {Math.floor(Number(gameXp||0)/500)+1} · {Number(gameXp||0)} XP</small></div></div>{profile&&<button type="button" className="social-view-button social-own-preview" onClick={()=>setViewPerson({...profile,display_name:playerProfile?.name||profile.display_name,avatar:playerProfile?.avatar||profile.avatar,avatar_frame:playerProfile?.frame||profile.avatar_frame,card_frame:playerProfile?.cardFrame||profile.card_frame,equipped_gems:playerProfile?.gems||profile.equipped_gems,game_xp:profile.game_xp,game_correct:profile.game_correct,bio:playerProfile?.bio||profile.bio})}><Eye size={15}/> Visualizar meu perfil público</button>}<div className="social-bio-readonly"><span>Identidade sincronizada</span><p>O @ pode ser alterado uma vez a cada 30 dias. A biografia pode ser editada na Central do Jogador.</p><small>Seu avatar, molduras e conquistas acompanham você nas interações.</small></div></div><div className="social-safety-note"><ShieldCheck size={18}/><div><b>Privacidade protegida</b><p>Seu perfil público não exibe informações financeiras, saldos ou movimentações.</p></div></div>
   </aside>
   </div>
-  {viewPerson&&<PublicPlayerProfile person={viewPerson} onClose={()=>setViewPerson(null)}/>}
+  {viewPerson&&<PublicPlayerProfile person={viewPerson} onClose={()=>setViewPerson(null)} onFollowToggle={toggleFollow}/>}
  </section>;
 }
