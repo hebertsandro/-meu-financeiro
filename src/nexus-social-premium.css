@@ -194,3 +194,5 @@
 .content-social .social-hero-profile-button{display:inline-flex;align-items:center;justify-content:center;gap:7px;flex:0 0 auto;margin-left:auto;margin-right:14px;padding:10px 13px;border:1px solid rgba(207,181,236,.3);border-radius:10px;background:rgba(10,8,15,.25);color:#e6d7f4;font-size:10px;font-weight:700}
 .content-social .social-hero-profile-button:hover{background:rgba(168,128,205,.18);border-color:#a985c5}
 @media(max-width:560px){.content-social .social-hero-profile-button{margin-right:0;padding:8px 9px;font-size:9px}.content-social .nexus-social>.social-hero{gap:9px}}
+
+.content-social .nxf-post-highlight{outline:2px solid #a77bd0;box-shadow:0 0 0 5px rgba(167,123,208,.12)}
