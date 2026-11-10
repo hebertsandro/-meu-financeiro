@@ -145,3 +145,14 @@
 .content-social .social-clan-member-actions{display:flex;gap:5px;flex-wrap:wrap}
 .content-social .social-clan-member-actions button{padding:6px 8px;border:1px solid #514064;border-radius:8px;background:#2a2037;color:#e6d8f2;font-size:9px}
 @media(max-width:600px){.content-social .social-clan-member-actions{width:100%;padding-left:39px}.content-social .social-clan-member-actions button{flex:1}}
+
+
+.content-social .social-clan-season{display:grid;gap:13px;margin:20px 0;padding:18px;border:1px solid rgba(190,164,238,.2);border-radius:15px;background:linear-gradient(135deg,#211a2b,#17141e)}
+.content-social .social-clan-season>div:first-child h4{margin:6px 0!important;border:0!important;padding:0!important;font-size:17px!important}
+.content-social .social-clan-season>div:first-child p{margin:5px 0 0;color:#a99cb4;font-size:11px;line-height:1.5}
+.content-social .social-clan-season-board{display:grid;gap:7px}
+.content-social .social-clan-season-board>div{display:flex;align-items:center;gap:10px;padding:9px 11px;border:1px solid #393044;border-radius:10px;background:#17131e}
+.content-social .social-clan-season-board>div>b{width:26px;color:#cba7f0;font-size:11px}
+.content-social .social-clan-season-board>div>span{font-size:19px}
+.content-social .social-clan-season-board>div>strong{flex:1;min-width:0;color:#eee6f4;font-size:11px}
+.content-social .social-clan-season-board>div>small{color:#d4b3f2;font-size:10px;font-weight:800}
