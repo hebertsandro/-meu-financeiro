@@ -25,3 +25,91 @@
 .player-central-posts .social-profile-posts-heading{margin-bottom:15px}
 .player-central-posts .social-profile-post-tile{aspect-ratio:1/1;border-radius:12px}
 @media(max-width:600px){.player-central-posts{padding:13px;border-radius:16px}.player-central-posts .social-profile-post-grid{gap:4px}.player-profile-edit-pencil{width:31px;height:31px;flex-basis:31px}}
+
+
+/* Central oficial: cabeçalho de perfil social */
+.player-profile-page .game-world-hero{
+ position:relative!important;isolation:isolate;overflow:hidden!important;
+ padding:24px 26px 18px!important;border-radius:26px!important;
+ background:radial-gradient(ellipse at 82% 0%,rgba(137,91,255,.28),transparent 38%),linear-gradient(135deg,#17152b 0%,#111522 54%,#101b29 100%)!important;
+ border:1px solid rgba(174,148,255,.24)!important;
+ box-shadow:0 20px 55px rgba(0,0,0,.28),inset 0 1px 0 rgba(255,255,255,.06)!important;
+}
+.player-profile-page .game-world-hero:before{
+ content:"";position:absolute;z-index:-1;inset:0 0 auto;height:5px;
+ background:linear-gradient(90deg,#8b5cf6,#22d3ee,#a78bfa);opacity:.9
+}
+.player-profile-page .player-profile-topline{
+ display:flex!important;align-items:center!important;justify-content:space-between!important;
+ gap:14px!important;margin-bottom:27px!important
+}
+.player-profile-page .player-profile-top-actions{display:flex;align-items:center;gap:10px}
+.player-profile-page .player-profile-topline .season-pill{font-size:9px;letter-spacing:.12em}
+.player-profile-page .player-profile-edit-pencil{
+ width:auto!important;min-width:112px!important;height:38px!important;padding:0 13px!important;
+ display:inline-flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;
+ border-radius:12px!important;background:rgba(139,92,246,.18)!important;
+ border:1px solid rgba(167,139,250,.38)!important;color:#e5dcff!important;
+ font-size:12px!important;font-weight:750!important;flex:0 0 auto!important
+}
+.player-profile-page .player-social-identity-layout{
+ display:grid!important;grid-template-columns:116px minmax(0,1fr) auto!important;
+ align-items:center!important;gap:22px!important;padding:0 5px 24px!important
+}
+.player-profile-page .profile-big-avatar{
+ width:112px!important;height:112px!important;min-width:112px!important;
+ border-radius:50%!important;display:grid!important;place-items:center!important;
+ box-shadow:0 0 0 7px rgba(255,255,255,.035),0 10px 30px rgba(0,0,0,.32)!important
+}
+.player-profile-page .profile-big-avatar>span{font-size:49px!important}
+.player-profile-page .player-info{min-width:0!important}
+.player-profile-page .player-profile-rank{
+ display:inline-flex!important;align-items:center!important;margin-bottom:6px!important;
+ padding:4px 8px!important;border-radius:6px!important;background:rgba(139,92,246,.16)!important;
+ color:#c7b7ff!important;font-size:9px!important;font-weight:850!important;letter-spacing:.14em!important
+}
+.player-profile-page .player-profile-name-row h2{
+ font-size:clamp(25px,3vw,34px)!important;line-height:1.12!important;
+ letter-spacing:-.035em!important;margin:0!important;color:#fff!important
+}
+.player-profile-page .player-social-identity{margin-top:5px!important;color:#a99bcf!important;font-size:13px!important}
+.player-profile-page .player-social-bio{max-width:620px!important;margin:11px 0 0!important;color:#d4d1e3!important;font-size:14px!important;line-height:1.55!important}
+.player-profile-page .player-level-line{margin-top:16px!important;font-size:11px!important}
+.player-profile-page .player-xp-total{
+ min-width:84px!important;padding:13px 15px!important;text-align:center!important;
+ border:1px solid rgba(167,139,250,.2)!important;border-radius:16px!important;
+ background:rgba(8,10,22,.36)!important
+}
+.player-profile-page .player-xp-total strong{font-size:25px!important;color:#e6dcff!important}
+.player-profile-page .player-xp-total small{font-size:9px!important;letter-spacing:.13em!important}
+.player-profile-page .player-profile-stats{
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:10px!important;
+ margin:0!important;padding-top:17px!important;border-top:1px solid rgba(255,255,255,.09)!important
+}
+.player-profile-page .player-profile-stats>div{
+ min-height:54px!important;display:flex!important;align-items:center!important;gap:10px!important;
+ padding:10px 13px!important;border:1px solid rgba(255,255,255,.07)!important;
+ border-radius:13px!important;background:rgba(255,255,255,.035)!important
+}
+.player-profile-page .player-profile-stats svg{color:#b7a0ff!important;flex:0 0 auto}
+.player-profile-page .player-profile-stats span{font-size:11px!important;color:#bcb8ce!important}
+.player-profile-page .player-profile-stats b{display:block!important;font-size:16px!important;color:#fff!important}
+.player-profile-page .player-central-posts{background:rgba(15,17,29,.72)!important;border:1px solid rgba(164,139,255,.17)!important}
+@media(max-width:640px){
+ .player-profile-page .game-world-hero{padding:17px 14px 14px!important;border-radius:20px!important}
+ .player-profile-page .player-profile-topline{margin-bottom:21px!important;align-items:flex-start!important}
+ .player-profile-page .player-profile-top-actions{gap:6px}
+ .player-profile-page .player-profile-topline .season-pill{display:none}
+ .player-profile-page .player-profile-edit-pencil{min-width:38px!important;width:38px!important;height:36px!important;padding:0!important}
+ .player-profile-page .player-profile-edit-pencil span{display:none}
+ .player-profile-page .player-social-identity-layout{grid-template-columns:76px minmax(0,1fr)!important;gap:13px!important;padding:0 0 18px!important}
+ .player-profile-page .profile-big-avatar{width:74px!important;height:74px!important;min-width:74px!important}
+ .player-profile-page .profile-big-avatar>span{font-size:34px!important}
+ .player-profile-page .player-profile-name-row h2{font-size:23px!important}
+ .player-profile-page .player-xp-total{grid-column:2;justify-self:start;display:flex!important;align-items:center!important;gap:8px!important;min-width:0!important;padding:7px 10px!important}
+ .player-profile-page .player-xp-total strong{font-size:16px!important}
+ .player-profile-page .player-profile-stats{gap:5px!important}
+ .player-profile-page .player-profile-stats>div{padding:8px 6px!important;gap:5px!important;justify-content:center!important;flex-wrap:wrap!important;text-align:center!important}
+ .player-profile-page .player-profile-stats span{font-size:9px!important}
+ .player-profile-page .player-profile-stats b{font-size:14px!important}
+}
