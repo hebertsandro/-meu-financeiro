@@ -255,3 +255,15 @@
 .nexus-feed .nxf-story-seen b{color:#a69eaf!important}
 .nexus-feed .nxf-story-unseen:focus-visible .nxf-story-ring,
 .nexus-feed .nxf-story-unseen:active .nxf-story-ring{filter:brightness(1.12)}
+
+
+/* Curtidas nos comentários */
+.nexus-feed .nxf-comment-tools button.nxf-comment-liked{
+ color:#ff82ad!important;
+ background:rgba(255,105,153,.10)!important;
+ border-color:rgba(255,130,173,.22)!important;
+}
+.nexus-feed .nxf-post-image,.nexus-feed .nxf-post-video{
+ cursor:pointer;
+ -webkit-tap-highlight-color:transparent;
+}
