@@ -1,6 +1,6 @@
 import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {supabase} from './supabase';
-import {Heart,MessageCircle,Send,ImagePlus,MoreHorizontal,Trash2,Flag,X,CornerUpLeft,LoaderCircle,Pencil,Check,Bookmark,Share2,Smile,Clock3,Users,Flame,Plus,ChevronLeft,Search} from 'lucide-react';
+import {Heart,MessageCircle,Send,ImagePlus,MoreHorizontal,Trash2,Flag,X,CornerUpLeft,LoaderCircle,Pencil,Check,Bookmark,Share2,Smile,Clock3,Users,Flame,Plus,ChevronLeft,Search,Video} from 'lucide-react';
 import './nexus-feed.css';
 
 const MAX_IMAGE=5*1024*1024,MAX_VIDEO=20*1024*1024;
