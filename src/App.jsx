@@ -703,6 +703,13 @@ function App(){
     results.forEach((r,i)=>{next[tables[i]]=r.data||[]});
     setData(next);
   }
+  useEffect(()=>{
+    if(!session?.user?.id)return;
+    const channel=supabase.channel('nexus-in-app-notifications-'+session.user.id)
+      .on('postgres_changes',{event:'INSERT',schema:'public',table:'notifications',filter:'user_id=eq.'+session.user.id},()=>loadData())
+      .subscribe();
+    return()=>{supabase.removeChannel(channel);};
+  },[session?.user?.id]);
   async function saveItem(table, values, item=null){
     setBusy(true);
     if(table==='goalMovement'){
