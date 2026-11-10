@@ -73,3 +73,37 @@
 .nxf-avatar.frame-chromatic,.nxf-compose-avatar.frame-chromatic{border:2px solid transparent;background:linear-gradient(#24344e,#24344e) padding-box,linear-gradient(120deg,#ff5cda,#69e9ff,#b8ff8b,#ffe16a,#ff6ad5) border-box;box-shadow:0 0 16px #79eaff77}
 
 .nxf-edit-comment{display:block;width:100%;min-height:70px;resize:vertical;padding:9px;border:1px solid #465779;border-radius:9px;background:#0d1726;color:#eef3ff;font:inherit;font-size:11px;outline:none}
+
+
+/* NEXUS FEED — acabamento 2.0 */
+.nexus-feed{gap:18px!important}
+.nxf-heading{align-items:flex-end!important}
+.nxf-heading h2{font-size:clamp(25px,3vw,34px)!important;letter-spacing:-1.4px!important}
+.nxf-stories,.nxf-composer,.nxf-post,.nxf-story-composer{backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px)}
+.nxf-stories{padding:16px!important;border:1px solid rgba(188,158,225,.13)!important;border-radius:18px!important;background:linear-gradient(140deg,rgba(39,32,52,.76),rgba(24,27,37,.92))!important}
+.nxf-story-rail{scrollbar-width:none!important}.nxf-story-rail::-webkit-scrollbar{display:none}
+.nxf-story-ring{box-shadow:0 0 0 3px #1c1a27,0 0 0 5px rgba(188,158,225,.55)!important}
+.nxf-composer{border-color:rgba(188,158,225,.18)!important;background:linear-gradient(145deg,#20212b,#191b24)!important;box-shadow:0 12px 30px rgba(0,0,0,.13)!important}
+.nxf-compose-top textarea{transition:border-color .18s,box-shadow .18s!important}
+.nxf-compose-top textarea:focus{border-color:#ad8bd5!important;box-shadow:0 0 0 3px #ad8bd522!important}
+.nxf-feed-tabs{display:flex!important;gap:6px!important;padding:5px!important;border:1px solid rgba(255,255,255,.07)!important;border-radius:13px!important;background:#141720!important;overflow-x:auto!important;scrollbar-width:none!important}
+.nxf-feed-tabs button{flex:0 0 auto!important;min-height:37px!important;padding:8px 12px!important;border-radius:9px!important;color:#a9a5b3!important;font-size:10px!important;white-space:nowrap!important}
+.nxf-feed-tabs button.active{background:linear-gradient(115deg,#70558e,#51456f)!important;color:#fff!important;box-shadow:0 4px 12px #0003!important}
+.nxf-trending{display:flex;align-items:center;gap:7px;flex-wrap:wrap;padding:2px 1px 4px}
+.nxf-trending>b{font-size:9px;color:#9b96a8;text-transform:uppercase;letter-spacing:.8px;margin-right:3px}
+.nxf-trending button{padding:6px 9px;border:1px solid rgba(190,160,226,.13);border-radius:20px;background:#a783d015;color:#cbb4e5;font-size:9px;font-weight:700}
+.nxf-trending button.active{background:#9b78c33a;border-color:#b895df;color:#fff}
+.nxf-trending .nxf-clear-tag{color:#aaa4b4;background:transparent}
+.nxf-poll-toggle{display:inline-flex;align-items:center;gap:6px;padding:8px 10px;border:1px solid rgba(188,158,225,.18);border-radius:9px;background:#9d7ac31b;color:#d7bdf2;font-size:10px;font-weight:700}
+.nxf-poll-editor{display:grid;gap:9px;margin-top:12px;padding:13px;border:1px solid rgba(188,158,225,.18);border-radius:13px;background:#11141d}
+.nxf-poll-editor>input,.nxf-poll-options input{width:100%;min-width:0;min-height:38px;padding:9px 11px;border:1px solid #ffffff17;border-radius:9px;background:#1b1e29;color:#f5f1fa;font-size:11px;outline:none}
+.nxf-poll-options{display:grid;gap:7px}.nxf-poll-options>div{display:flex;gap:6px;min-width:0}.nxf-poll-options>div>button{width:34px;flex:0 0 34px;border:1px solid #ffffff12;border-radius:8px;background:#ffffff08;color:#c7b4dd}
+.nxf-poll-editor-foot{display:flex;align-items:center;justify-content:space-between;gap:8px}.nxf-poll-editor-foot small{font-size:9px;color:#8f8c9b}.nxf-poll-editor-foot button{display:flex;align-items:center;gap:5px;border:0;background:transparent;color:#cdb3e9;font-size:9px;font-weight:700}
+.nxf-poll-card{display:grid;gap:9px;margin:13px 0;padding:14px;border:1px solid rgba(184,154,222,.2);border-radius:14px;background:linear-gradient(140deg,#242131,#191d29)}
+.nxf-poll-question{display:grid;gap:5px}.nxf-poll-question span{font-size:8px;letter-spacing:1.2px;color:#c3a3e6;font-weight:900}.nxf-poll-question b{font-size:13px;color:#f4eff9;line-height:1.45}
+.nxf-poll-option{position:relative;display:flex;align-items:center;justify-content:space-between;gap:8px;min-height:38px;padding:9px 10px;overflow:hidden;border:1px solid rgba(255,255,255,.09);border-radius:9px;background:#10141d;color:#e8e3ef;text-align:left;font-size:10px}
+.nxf-poll-option>i{position:absolute;left:0;top:0;bottom:0;z-index:0;display:block;background:linear-gradient(90deg,#9270b62e,#9270b60b);transition:width .3s}
+.nxf-poll-option>span,.nxf-poll-option>small{position:relative;z-index:1}.nxf-poll-option>small{color:#b7a6ca;font-size:9px;white-space:nowrap}.nxf-poll-option.voted{border-color:#b18bd8;background:#282239}.nxf-poll-foot{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap}.nxf-poll-foot small{font-size:9px;color:#9995a4}.nxf-poll-foot b{font-size:9px;color:#d6b9f0}
+.nxf-post{transition:transform .18s,border-color .18s,box-shadow .18s!important}.nxf-post:hover{border-color:rgba(190,160,226,.23)!important;box-shadow:0 14px 34px rgba(0,0,0,.16)!important}
+.nxf-post-body{overflow-wrap:anywhere}
+@media(max-width:600px){.nxf-stories{padding:12px!important}.nxf-poll-card{padding:11px}.nxf-feed-tabs button{padding:8px 10px!important}.nxf-poll-editor-foot{align-items:flex-start;flex-direction:column}}
