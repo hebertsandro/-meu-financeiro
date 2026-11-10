@@ -18,6 +18,7 @@ export default function NexusCommunity({mode='all',userId,playerProfile=null,fri
   const openPlayer=id=>{const person=profileFor(id);if(person?.user_id)onOpenProfile(person);};
  const profileFor=id=>id===userId?{display_name:'Você',username:'você',avatar:playerProfile?.avatar||'👾',avatar_frame:playerProfile?.frame||'violet'}:friendList.find(p=>p.user_id===id)||roomMembers.find(p=>p.user_id===id)||clanMembers.find(m=>m.user_id===id)?.profile||activeChat?.person;
 
+ useEffect(()=>{setReplyTarget(null);},[activeChat?.id,activeRoom?.id,selectedClan?.id]);
  const loadChats=useCallback(async()=>{
   const {data,error:e}=await supabase.from('social_conversation_members').select('conversation_id').eq('user_id',userId);
   if(e)throw e;
