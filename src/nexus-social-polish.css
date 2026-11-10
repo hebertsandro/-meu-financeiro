@@ -895,3 +895,37 @@
 /* O anel de story novo permanece destacado; após abrir, muda para cinza. */
 .nexus-feed .nxf-story-unseen .nxf-story-ring{border:2px solid transparent!important;background:linear-gradient(#191722,#191722) padding-box,linear-gradient(135deg,#ffca70,#ee67b9,#8c68ff) border-box!important;box-shadow:0 0 0 2px rgba(224,137,231,.13)!important}
 .nexus-feed .nxf-story-seen .nxf-story-ring{border:2px solid #77717f!important;background:#282431!important;box-shadow:none!important}
+
+
+/* FIX DIRETO — avatar no cabeçalho da conversa privada. */
+@media (max-width: 760px) {
+  .nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar,
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar {
+    box-sizing: border-box !important; position: relative !important;
+    display: grid !important; place-items: center !important;
+    flex: 0 0 42px !important; width: 42px !important; min-width: 42px !important; max-width: 42px !important;
+    height: 42px !important; min-height: 42px !important; max-height: 42px !important;
+    padding: 0 !important; border: 2px solid rgba(170,145,220,.9) !important;
+    border-radius: 12px !important; overflow: visible !important; clip-path: none !important;
+    background: linear-gradient(145deg,#29223b,#151b2b) !important;
+    line-height: 1 !important; isolation: isolate !important;
+  }
+  .nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar::before,
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar::before {
+    content: "" !important; position: absolute !important; inset: 4px !important;
+    display: block !important; border: 1px solid rgba(195,180,255,.95) !important;
+    border-radius: 50% !important;
+    background: radial-gradient(circle at 35% 25%,#53658c,#202b43 72%) !important;
+    box-shadow: 0 0 9px rgba(153,125,255,.3) !important;
+    z-index: -1 !important; pointer-events: none !important;
+  }
+  .nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar::after,
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar::after {
+    border-radius: 12px !important; clip-path: none !important;
+  }
+  .nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar img,
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar img {
+    position: relative !important; z-index: 1 !important; display: block !important;
+    width: 100% !important; height: 100% !important; object-fit: cover !important; border-radius: 50% !important;
+  }
+}
