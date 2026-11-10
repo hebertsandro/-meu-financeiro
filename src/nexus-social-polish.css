@@ -772,3 +772,70 @@
   .content-social .social-community.mobile-chat-open .social-chat-person-trigger>.social-chat-head-avatar{flex-basis:38px!important;width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important}
   .content-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-head-actions>button{flex-basis:33px!important;width:33px!important;min-width:33px!important}
 }
+
+
+/* Avatar circular definitivo no cabeçalho do chat mobile.
+   Neutraliza as molduras quadradas herdadas e mantém o conteúdo centralizado. */
+@media (max-width: 760px) {
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    position: relative !important;
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    aspect-ratio: 1 / 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    clip-path: circle(50% at 50% 50%) !important;
+    line-height: 1 !important;
+    transform: none !important;
+    background-position: center !important;
+    background-size: cover !important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar::before,
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar::after,
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar::before,
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar::after {
+    border-radius: 50% !important;
+    clip-path: circle(50% at 50% 50%) !important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar img,
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar picture,
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar video,
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar picture img {
+    display: block !important;
+    width: 100% !important;
+    height: 100% !important;
+    min-width: 100% !important;
+    min-height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: cover !important;
+    object-position: center !important;
+    border-radius: 50% !important;
+    clip-path: circle(50% at 50% 50%) !important;
+  }
+}
+@media (max-width: 380px) {
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
+  .nexus-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
+    flex-basis: 38px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+  }
+}
