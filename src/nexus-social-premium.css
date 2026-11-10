@@ -162,3 +162,9 @@
 .content-social .social-attach-button input{display:none}
 .content-social .social-chat-attachment{display:flex;align-items:center;gap:7px;width:max-content;max-width:100%;margin-top:8px;padding:8px 10px;border:1px solid rgba(190,164,238,.22);border-radius:9px;background:rgba(12,10,18,.42);color:#d5b8f2;font-size:10px;text-decoration:none;overflow-wrap:anywhere}
 .content-social .social-chat-attachment:hover{border-color:#9c78c1;color:#fff}
+
+
+.content-social .social-follow-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;margin-left:auto;padding:10px 15px;border:1px solid #8b6aa8;border-radius:10px;background:#3a2a4b;color:#f2e5ff;font-size:11px;font-weight:800}
+.content-social .social-follow-button.following{border-color:#3c6558;background:#1b322c;color:#a3e4c7}
+.content-social .social-public-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+@media(max-width:560px){.content-social .social-follow-button{width:100%;margin:8px 0 0}}
