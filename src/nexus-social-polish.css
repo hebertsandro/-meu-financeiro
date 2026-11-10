@@ -723,3 +723,52 @@
     border-radius:50%!important;
   }
 }
+
+
+/* Definitive mobile header fix: avatar belongs to the contact button, never a separate clipped flex item */
+@media(max-width:760px){
+  .content-social .social-community.mobile-chat-open .social-chat-head.social-chat-head-modern,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head.social-chat-head-modern{
+    display:flex!important;flex-flow:row nowrap!important;align-items:center!important;
+    justify-content:flex-start!important;gap:8px!important;width:100%!important;
+    min-width:0!important;min-height:72px!important;height:auto!important;
+    padding:10px 12px!important;box-sizing:border-box!important;overflow:visible!important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-back{
+    order:0!important;display:flex!important;flex:0 0 38px!important;
+    width:38px!important;min-width:38px!important;height:38px!important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-person-trigger{
+    order:1!important;display:flex!important;flex:1 1 0!important;
+    width:auto!important;min-width:0!important;max-width:none!important;
+    overflow:hidden!important;align-items:center!important;gap:9px!important;
+    padding:0!important;margin:0!important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-person-trigger>.social-chat-head-avatar{
+    display:grid!important;place-items:center!important;position:relative!important;
+    flex:0 0 42px!important;width:42px!important;min-width:42px!important;
+    height:42px!important;min-height:42px!important;max-width:42px!important;
+    aspect-ratio:1/1!important;border-radius:50%!important;overflow:hidden!important;
+    font-size:21px!important;line-height:1!important;transform:none!important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-person-trigger>.social-chat-head-copy{
+    display:flex!important;flex:1 1 auto!important;min-width:0!important;
+    max-width:none!important;overflow:hidden!important;flex-direction:column!important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-head-actions{
+    order:2!important;display:flex!important;flex:0 0 auto!important;
+    width:auto!important;min-width:max-content!important;gap:6px!important;
+    align-items:center!important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-head-actions>button{
+    flex:0 0 36px!important;width:36px!important;min-width:36px!important;
+    height:38px!important;padding:0!important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-message-search{display:none!important}
+}
+@media(max-width:380px){
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern{gap:6px!important;padding-left:8px!important;padding-right:8px!important}
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-back{flex-basis:34px!important;width:34px!important;min-width:34px!important}
+  .content-social .social-community.mobile-chat-open .social-chat-person-trigger>.social-chat-head-avatar{flex-basis:38px!important;width:38px!important;min-width:38px!important;height:38px!important;min-height:38px!important}
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern>.social-chat-head-actions>button{flex-basis:33px!important;width:33px!important;min-width:33px!important}
+}
