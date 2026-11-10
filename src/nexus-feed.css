@@ -107,3 +107,11 @@
 .nxf-post{transition:transform .18s,border-color .18s,box-shadow .18s!important}.nxf-post:hover{border-color:rgba(190,160,226,.23)!important;box-shadow:0 14px 34px rgba(0,0,0,.16)!important}
 .nxf-post-body{overflow-wrap:anywhere}
 @media(max-width:600px){.nxf-stories{padding:12px!important}.nxf-poll-card{padding:11px}.nxf-feed-tabs button{padding:8px 10px!important}.nxf-poll-editor-foot{align-items:flex-start;flex-direction:column}}
+
+.nexus-feed .nxf-share-backdrop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:18px;background:rgba(5,7,13,.76);backdrop-filter:blur(9px);-webkit-backdrop-filter:blur(9px)}
+.nexus-feed .nxf-share-dialog{width:min(430px,100%);max-height:min(78vh,620px);overflow:auto;padding:17px;border:1px solid rgba(190,160,226,.22);border-radius:18px;background:linear-gradient(145deg,#242331,#171b25);box-shadow:0 24px 70px #0008}
+.nexus-feed .nxf-share-dialog>header{display:flex;justify-content:space-between;align-items:center;gap:12px;margin-bottom:13px}
+.nexus-feed .nxf-share-dialog>header>div{display:grid;gap:4px}.nexus-feed .nxf-share-dialog>header b{font-size:14px;color:#f6f0fb}.nexus-feed .nxf-share-dialog>header small{font-size:10px;color:#aaa4b5}
+.nexus-feed .nxf-share-dialog>header button{width:32px;height:32px;display:grid;place-items:center;border:1px solid #ffffff18;border-radius:9px;background:#ffffff08;color:#ddd4e9}
+.nexus-feed .nxf-share-people{display:grid;gap:7px}.nexus-feed .nxf-share-people>button{display:flex;align-items:center;gap:10px;padding:9px;border:1px solid #ffffff10;border-radius:11px;background:#ffffff05;color:#cbb3e7;text-align:left}
+.nexus-feed .nxf-share-people>button>span:nth-child(2){display:grid;gap:3px;flex:1}.nexus-feed .nxf-share-people b{font-size:11px;color:#f2edf8}.nexus-feed .nxf-share-people small{font-size:9px;color:#9993a5}.nexus-feed .nxf-share-dialog>p{color:#a9a3b3;font-size:11px}
