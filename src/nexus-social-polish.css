@@ -1,0 +1,41 @@
+/* NEXUS SOCIAL · interface refinement 2.0 */
+.nexus-social{--nxs-border:rgba(190,164,224,.13);--nxs-muted:#a39eaf;isolation:isolate}
+.nexus-social .social-hero{position:relative;overflow:hidden;border:1px solid rgba(190,164,224,.2)!important;background:radial-gradient(ellipse at 85% 0%,rgba(154,119,190,.2),transparent 38%),linear-gradient(115deg,#282236,#1b202d 65%,#19212b)!important;box-shadow:0 16px 40px rgba(0,0,0,.16)!important}
+.nexus-social .social-hero:after{content:"";position:absolute;right:-60px;top:-100px;width:260px;height:260px;border:1px solid rgba(213,187,245,.08);border-radius:50%;box-shadow:0 0 0 28px rgba(213,187,245,.025),0 0 0 58px rgba(213,187,245,.018);pointer-events:none}
+.nexus-social .social-hero-icon{filter:drop-shadow(0 0 18px rgba(184,147,226,.28))!important}
+.nexus-social .social-layout{gap:18px!important;align-items:start!important}
+.nexus-social .social-main,.nexus-social .social-side{min-width:0}
+.nexus-social .social-panel{border:1px solid var(--nxs-border)!important;border-radius:17px!important;background:linear-gradient(145deg,#20232d,#191c25)!important;box-shadow:0 10px 28px rgba(0,0,0,.12)!important}
+.nexus-social .social-tabs{padding:5px!important;border:1px solid var(--nxs-border)!important;border-radius:13px!important;background:#141720!important}
+.nexus-social .social-tabs button{border-radius:9px!important;transition:background .18s,color .18s!important}
+.nexus-social .social-tabs button.active{background:linear-gradient(115deg,#74578f,#51456d)!important;box-shadow:0 4px 12px #0003!important}
+.nexus-social .social-community{border:1px solid var(--nxs-border)!important;border-radius:17px!important;background:#171a22!important;overflow:hidden!important;box-shadow:0 12px 32px rgba(0,0,0,.12)!important}
+.nexus-social .social-community-grid{gap:0!important}
+.nexus-social .social-community-list{background:#1b1e28!important;border-right:1px solid var(--nxs-border)!important}
+.nexus-social .social-community-row{transition:background .16s,border-color .16s!important}
+.nexus-social .social-chat-head{background:linear-gradient(100deg,#20232e,#1b1e28)!important}
+.nexus-social .social-chat-messages{scroll-behavior:smooth!important;overscroll-behavior:contain!important}
+.nexus-social .social-chat-bubble{box-shadow:0 4px 14px rgba(0,0,0,.08)!important;overflow-wrap:anywhere!important}
+.nexus-social .social-chat-bubble.mine{background:linear-gradient(135deg,#49395a,#39344e)!important}
+.nexus-social .social-chat-compose{align-items:center!important;gap:8px!important}
+.nexus-social .social-chat-compose input{transition:border-color .16s,box-shadow .16s!important}
+.nexus-social .social-chat-compose input:focus{border-color:#a98acb!important;box-shadow:0 0 0 3px #a98acb20!important;outline:0!important}
+.nexus-social .social-community-card{transition:transform .18s,border-color .18s,box-shadow .18s!important}
+.nexus-social .social-community-card:hover{box-shadow:0 12px 25px rgba(0,0,0,.16)!important}
+.nexus-social .social-clan-detail{background:linear-gradient(150deg,#1d2029,#171a22)!important}
+.nexus-social .social-clan-banner{position:relative;background-color:#2a2535!important}
+.nexus-social .social-clan-banner:after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,transparent,rgba(255,255,255,.035),transparent);pointer-events:none}
+.nexus-social .social-clan-season,.nexus-social .social-clan-rewards{min-width:0}
+.nexus-social .social-community-empty{min-height:300px!important}
+.nexus-social .social-error{border:1px solid rgba(239,123,145,.22)!important;border-radius:12px!important}
+@media(max-width:760px){
+ .nexus-social .social-layout{gap:12px!important}
+ .nexus-social .social-hero{box-shadow:0 8px 20px rgba(0,0,0,.13)!important}
+ .nexus-social .social-community{border-radius:13px!important}
+ .nexus-social .social-chat-head{position:sticky;top:0;z-index:3}
+ .nexus-social .social-chat-messages{overscroll-behavior-y:contain!important}
+ .nexus-social .social-chat-compose{padding:10px!important}
+ .nexus-social .social-chat-compose input{font-size:12px!important}
+ .nexus-social .social-chat-bubble{line-height:1.55!important}
+}
+@media(prefers-reduced-motion:reduce){.nexus-social *{scroll-behavior:auto!important;transition:none!important;animation:none!important}}
