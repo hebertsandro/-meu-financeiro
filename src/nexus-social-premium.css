@@ -184,3 +184,8 @@
 
 .content-social .social-public-profile .world-stats{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:620px){.content-social .social-public-profile .world-stats{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+
+.content-social .social-pinned-strip{display:flex;align-items:center;gap:9px;min-height:36px;padding:8px 16px;border-bottom:1px solid #40334e;background:#201a29;color:#cba9e8;font-size:10px}
+.content-social .social-pinned-strip>span{min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.content-social .social-pinned-strip b{color:#f0e4fa}
