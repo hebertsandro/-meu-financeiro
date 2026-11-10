@@ -839,3 +839,54 @@
     max-height: 38px !important;
   }
 }
+
+
+/* HOTFIX: avatar do contato no cabeçalho do chat — circular em qualquer wrapper/portal */
+@media (max-width: 760px) {
+  .social-community.mobile-chat-open .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar,
+  .nexus-social .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar,
+  .nexus-social-chat-portal .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar,
+  .nexus-social-chat-portal .nexus-social .social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar {
+    box-sizing: border-box !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    max-width: 42px !important;
+    height: 42px !important;
+    min-height: 42px !important;
+    max-height: 42px !important;
+    aspect-ratio: 1 / 1 !important;
+    padding: 0 !important;
+    margin: 0 !important;
+    border-radius: 50% !important;
+    overflow: hidden !important;
+    clip-path: circle(50%) !important;
+    -webkit-clip-path: circle(50%) !important;
+    line-height: 1 !important;
+    transform: none !important;
+    isolation: isolate !important;
+  }
+  .social-community.mobile-chat-open .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar::before,
+  .social-community.mobile-chat-open .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar::after,
+  .nexus-social-chat-portal .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar::before,
+  .nexus-social-chat-portal .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar::after {
+    border-radius: 50% !important;
+    clip-path: circle(50%) !important;
+    -webkit-clip-path: circle(50%) !important;
+  }
+}
+@media (max-width: 380px) {
+  .social-community.mobile-chat-open .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar,
+  .nexus-social-chat-portal .social-chat-head.social-chat-head-modern .social-chat-person-trigger > span.social-chat-head-avatar {
+    flex-basis: 38px !important;
+    width: 38px !important;
+    min-width: 38px !important;
+    max-width: 38px !important;
+    height: 38px !important;
+    min-height: 38px !important;
+    max-height: 38px !important;
+  }
+}
