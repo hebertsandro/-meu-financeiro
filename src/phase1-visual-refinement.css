@@ -1,0 +1,137 @@
+
+/* FASE 1 — refinamento visual global, sem alterar regras de negócio */
+:root{
+  --phase1-line:rgba(167,139,250,.17);
+  --phase1-panel:linear-gradient(145deg,rgba(20,24,40,.98),rgba(13,19,32,.98));
+  --phase1-purple:#b9a0ff;
+}
+.content{width:100%;min-width:0}
+.content-social{max-width:1540px;padding-left:clamp(14px,2.4vw,34px);padding-right:clamp(14px,2.4vw,34px)}
+.page-heading{min-width:0}
+.page-heading>div{min-width:0}
+.page-heading h1{overflow-wrap:anywhere}
+.panel{min-width:0;border-color:rgba(139,158,194,.17);box-shadow:0 10px 30px rgba(0,0,0,.12)}
+.panel-head{min-width:0}
+.panel-head>div{min-width:0}
+.panel-head h3{line-height:1.35}
+.item-grid{gap:16px}
+.finance-item{
+  position:relative;display:flex;flex-direction:column;gap:0;
+  padding:19px;border-radius:17px;
+  border-color:rgba(133,158,202,.18);
+  background:linear-gradient(145deg,#172238 0%,#121c2c 62%,#111a29 100%);
+  box-shadow:0 9px 24px rgba(0,0,0,.13),inset 0 1px rgba(255,255,255,.025);
+  transition:transform .18s ease,border-color .18s ease,box-shadow .18s ease;
+}
+.finance-item:hover{transform:translateY(-2px);border-color:rgba(145,169,218,.32);box-shadow:0 14px 30px rgba(0,0,0,.2)}
+.finance-item h3{margin:15px 0 9px;line-height:1.35;overflow-wrap:anywhere}
+.finance-item .item-number{font-size:clamp(20px,2vw,24px);font-variant-numeric:tabular-nums}
+.finance-item .item-meta{align-items:flex-start;line-height:1.45;flex-wrap:wrap}
+.finance-item .item-meta span,.finance-item .item-meta b{overflow-wrap:anywhere}
+.finance-item .goal-history{margin-top:auto}
+.finance-item>.delete-btn:last-child{align-self:flex-start;max-width:100%;margin-top:13px;white-space:normal;text-align:left;line-height:1.35}
+.finance-item .item-top{gap:10px;flex-wrap:wrap}
+.finance-item .item-actions{display:flex;justify-content:flex-end;gap:6px;flex-wrap:wrap}
+.finance-item .item-actions .delete-btn{min-height:34px;padding:7px 10px;border-radius:9px}
+.finance-item .progress{height:7px;border-radius:20px}
+.finance-item .progress i{border-radius:20px}
+.history-box{min-width:0;overflow:hidden;border-color:rgba(139,158,194,.16);border-radius:15px}
+.history-row{gap:10px;flex-wrap:wrap}
+.simple-row{min-width:0}
+.simple-row .row-main{min-width:0}
+.simple-row .row-main b,.simple-row .row-main span{overflow-wrap:anywhere}
+.player-profile-page{width:100%;min-width:0}
+.player-profile-page .game-world-hero{margin-bottom:20px}
+.player-profile-page .player-profile-topline{min-width:0}
+.player-profile-page .player-profile-stats>div{min-width:0}
+.player-profile-page .player-profile-stats span{min-width:0;line-height:1.35}
+.player-profile-page .player-profile-stats b{font-variant-numeric:tabular-nums}
+.player-profile-page .player-central-posts{margin-top:20px}
+.player-profile-page .profile-editor{width:100%;max-width:940px}
+.player-profile-page .profile-editor .profile-choice-group{min-width:0}
+.player-profile-page .profile-editor .profile-avatar-choices,
+.player-profile-page .profile-editor .profile-frame-choices{display:grid;grid-template-columns:repeat(auto-fit,minmax(105px,1fr));gap:10px}
+.player-profile-page .profile-editor input,
+.player-profile-page .profile-editor textarea{max-width:100%;min-width:0}
+.nexus-social{min-width:0}
+.nexus-social .social-layout{grid-template-columns:minmax(0,1.55fr) minmax(250px,.85fr);align-items:start}
+.nexus-social .social-main,.nexus-social .social-side{min-width:0}
+.nexus-social .social-panel{min-width:0;overflow-wrap:anywhere}
+.nexus-social .social-hero{min-width:0}
+.nexus-social .social-hero>div:first-child{min-width:0}
+.nexus-social .social-hero p{line-height:1.55;max-width:650px}
+.nexus-social .social-profile-editor .social-panel-heading{align-items:flex-start}
+.nexus-feed{min-width:0;width:100%;max-width:100%}
+.nexus-feed .nxf-post{min-width:0}
+.nexus-feed .nxf-post-image,.nexus-feed .nxf-post-video{max-width:100%}
+.nexus-feed .nxf-post-body{overflow-wrap:anywhere}
+.nexus-feed .nxf-compose-top textarea{width:100%;min-width:0}
+.nexus-feed .nxf-compose-bottom{min-width:0}
+.nexus-feed .nxf-post-head,.nexus-feed .nxf-post-details{min-width:0}
+.nexus-feed .nxf-post-head .nxf-author-copy{min-width:0}
+.nexus-feed .nxf-post-head .nxf-author-copy b{overflow-wrap:anywhere}
+.nexus-feed .nxf-story-rail{overscroll-behavior-x:contain;scrollbar-width:thin}
+@media(max-width:1050px){
+ .nexus-social .social-layout{grid-template-columns:minmax(0,1fr)}
+ .nexus-social .social-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
+ .nexus-social .social-side>.social-profile-editor,
+ .nexus-social .social-side>.social-safety-note{grid-column:1/-1}
+}
+@media(max-width:760px){
+ .content{padding:22px 16px 18px}
+ .content-social{padding:18px 12px}
+ .page-heading{align-items:flex-start;flex-direction:column;gap:12px;margin-bottom:18px}
+ .page-heading h1{font-size:25px}
+ .page-heading>.primary{align-self:stretch;justify-content:center}
+ .panel{padding:16px;border-radius:15px}
+ .item-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:11px}
+ .finance-item{padding:14px;border-radius:14px}
+ .finance-item .item-actions{width:100%;justify-content:flex-start}
+ .finance-item .item-actions .delete-btn{font-size:10px}
+ .nexus-social{gap:14px}
+ .nexus-social .social-layout{gap:13px}
+ .nexus-social .social-main,.nexus-social .social-side{gap:13px}
+ .nexus-social .social-side{grid-template-columns:minmax(0,1fr)}
+ .nexus-social .social-panel{padding:15px}
+ .nexus-social .social-hero{padding:20px;border-radius:18px}
+ .nexus-social .social-hero-icon{width:52px;height:52px;border-radius:16px}
+ .player-profile-page .game-world-hero{margin-bottom:15px}
+ .player-profile-page .player-profile-stats>div{overflow:hidden}
+}
+@media(max-width:560px){
+ .content{padding:17px 12px 14px}
+ .content-social{padding:14px 9px}
+ .panel{padding:13px}
+ .item-grid{grid-template-columns:minmax(0,1fr);gap:10px}
+ .finance-item{padding:15px}
+ .finance-item .item-top{align-items:flex-start}
+ .finance-item .item-actions{width:auto;max-width:100%}
+ .finance-item .item-number{font-size:22px}
+ .history-row{align-items:flex-start}
+ .nexus-social .social-hero{align-items:flex-start;padding:17px 15px;gap:12px}
+ .nexus-social .social-hero h2{font-size:26px}
+ .nexus-social .social-hero p{font-size:12px}
+ .nexus-social .social-hero-icon{width:44px;height:44px;flex:0 0 44px;border-radius:13px}
+ .nexus-social .social-hero-icon svg{width:23px;height:23px}
+ .player-profile-page .game-world-hero{padding:16px 12px 13px!important}
+ .player-profile-page .player-social-identity-layout{gap:11px!important}
+ .player-profile-page .player-profile-stats{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+ .player-profile-page .player-profile-stats>div{min-width:0!important;padding:7px 2px!important}
+ .player-profile-page .player-profile-stats span{font-size:8px!important;overflow-wrap:anywhere}
+ .player-profile-page .player-profile-stats b{font-size:14px!important}
+ .player-profile-page .player-central-posts{margin-top:14px;padding:12px!important}
+ .player-profile-page .profile-editor{padding:14px 12px!important}
+ .player-profile-page .profile-editor .profile-avatar-choices,
+ .player-profile-page .profile-editor .profile-frame-choices{grid-template-columns:repeat(3,minmax(0,1fr));gap:7px}
+ .nexus-feed .nxf-post{border-radius:13px!important}
+ .nexus-feed .nxf-post-head .nxf-author-copy b{max-width:100%;font-size:11px!important}
+ .nexus-feed .nxf-post-body{font-size:12px!important;line-height:1.55!important}
+ .nexus-feed .nxf-post-image{aspect-ratio:1/1!important}
+}
+@media(max-width:360px){
+ .content{padding-left:9px;padding-right:9px}
+ .player-profile-page .player-profile-name-row h2{font-size:20px!important}
+ .player-profile-page .player-profile-stats span{font-size:7.5px!important}
+ .player-profile-page .profile-editor .profile-avatar-choices,
+ .player-profile-page .profile-editor .profile-frame-choices{grid-template-columns:repeat(2,minmax(0,1fr))}
+}
