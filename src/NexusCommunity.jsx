@@ -1,4 +1,5 @@
 import React,{useCallback,useEffect,useState} from 'react';
+import {createPortal} from 'react-dom';
 import {supabase} from './supabase';
 import {MessageCircle,Send,Shield,Flag,Users,Plus,RefreshCw,Swords,Handshake,DoorOpen,Lock,ChevronLeft,Pencil,Check,X,Zap,LogOut,Trash2,Search,MoreHorizontal,CornerUpLeft,Smile,Pin,Paperclip,FileText,Star,Archive,Bell,BellOff,Image as ImageIcon,Trophy} from 'lucide-react';
 import NexusVoiceRecorder,{NexusMessageAttachment} from './NexusVoiceRecorder';
@@ -131,7 +132,7 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
  async function joinChallenge(item){await run(async()=>{const {error:e}=await supabase.from('social_challenge_members').insert({challenge_id:item.id,user_id:userId});if(e&&e.code!=='23505')throw e;await loadChallenges();onToast('Você entrou no desafio!');});}
  async function progressChallenge(item){await run(async()=>{const {data,error:e}=await supabase.rpc('social_increment_challenge_progress',{target_challenge:item.id,increment_by:1});if(e)throw e;await loadChallenges();onToast(data?.[0]?.challenge_status==='completed'?'Desafio concluído!':'Progresso registrado!');});}
  const allTabs=[['chat','Conversas',MessageCircle],['clans','Clãs',Shield],['challenges','Missões de clã',Handshake]];const tabs=mode==='chat'?allTabs.filter(x=>x[0]==='chat'):mode==='clans'?allTabs.filter(x=>x[0]!=='chat'):allTabs;
- return <section className={'social-community '+(mode==='chat'?(mobileChatOpen?'mobile-chat-open':'mobile-inbox-open'):'social-community-clans')}>
+ const communityView=(<section className={'social-community '+(mode==='chat'?(mobileChatOpen?'mobile-chat-open':'mobile-inbox-open'):'social-community-clans')}>
   <div className="social-tabs social-community-tabs">{tabs.map(([id,label,Icon])=><button key={id} className={section===id?'active':''} onClick={()=>{setSection(id);setShowCreate(false);}}><Icon size={15}/>{label}</button>)}</div>
   {error&&<div className="social-error" role="alert">{error}</div>}
   <div className="social-panel">
@@ -148,7 +149,8 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
   </div>
   {leaveChoice&&<div className="social-profile-modal-backdrop" role="dialog" aria-modal="true" aria-labelledby="social-leave-title"><div className="social-create-form social-report-dialog"><h3 id="social-leave-title">{leaveChoice.kind==='room'?'Sair do grupo':'Sair do clã'} · {leaveChoice.item.name}</h3><p>Você é o ADM. Escolha o que deseja fazer. Se desistir, nada será alterado.</p><div className="social-dialog-actions"><button type="button" className="social-view-button" onClick={()=>setLeaveChoice(null)} disabled={busy}>Desistir</button><button type="button" className="social-view-button" onClick={()=>resolveLeaveChoice('transfer')} disabled={busy}>Transferir ADM e sair</button><button type="button" className="social-primary" onClick={()=>resolveLeaveChoice('delete')} disabled={busy}>Excluir para todos</button></div></div></div>}
   {reportTarget&&<div className="social-profile-modal-backdrop"><form className="social-create-form social-report-dialog" onSubmit={submitReport}><h3>Denunciar @{reportTarget.username}</h3><p>Explique o que aconteceu. A denúncia será encaminhada para análise.</p><textarea required minLength={5} maxLength={1000} value={reportDetails} onChange={e=>setReportDetails(e.target.value)} placeholder="Descreva o motivo..."/><div className="social-dialog-actions"><button type="button" className="social-view-button" onClick={()=>setReportTarget(null)}>Cancelar</button><button className="social-primary" disabled={busy}>Enviar denúncia</button></div></form></div>}
- </section>;
+ </section>);
+  return mode==='chat'&&mobileChatOpen?createPortal(<div className="nexus-social nexus-social-chat-portal">{communityView}</div>,document.body):communityView;
 }
 
 export default function NexusCommunity(props){
