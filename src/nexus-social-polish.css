@@ -1001,12 +1001,12 @@
 @media (max-width: 760px) {
   .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
   .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
-    transform: translateX(3px) !important;
+    transform: translateX(5px) !important;
   }
 }
 @media (max-width: 380px) {
   .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
   .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
-    transform: translateX(2px) !important;
+    transform: translateX(4px) !important;
   }
 }
