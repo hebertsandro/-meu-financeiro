@@ -480,3 +480,241 @@
  .nexus-social .social-community .social-community-grid{grid-template-columns:minmax(0,1fr)!important;padding:5px!important}
  .nexus-social .social-community .social-community-list{max-height:190px!important;border-right:0!important;border-bottom:1px solid var(--nx-line)!important}
 }
+
+
+
+/* NEXUS SOCIAL — redesign completo: mensageria, feed editorial e squads */
+.nexus-social{
+  --nx-bg:#101116;--nx-panel:#191b22;--nx-panel-raised:#20232c;
+  --nx-panel-soft:#171920;--nx-stroke:rgba(235,235,245,.085);
+  --nx-stroke-hover:rgba(185,155,225,.28);--nx-violet:#a98bd0;
+  --nx-violet-soft:#cdb8ed;--nx-copy:#f2f1f6;--nx-sub:#a2a4b1;
+  width:100%;max-width:1500px;margin:0 auto;gap:18px!important;color:var(--nx-copy)!important;
+}
+.nexus-social>.social-hero{
+  min-height:104px!important;padding:20px 24px!important;border:1px solid var(--nx-stroke)!important;
+  border-radius:18px!important;background:linear-gradient(115deg,#1b1d25,#20202a 62%,#211c2b)!important;
+  box-shadow:0 10px 30px rgba(0,0,0,.13)!important;overflow:hidden;
+}
+.nexus-social>.social-hero h2{font-size:clamp(25px,3vw,32px)!important;letter-spacing:-1.1px!important}
+.nexus-social>.social-hero p{font-size:12px!important;color:var(--nx-sub)!important}
+.nexus-social>.social-hero .social-hero-icon{width:50px!important;height:50px!important;border-radius:15px!important;background:#30283a!important;color:#d2b9f0!important;border:1px solid rgba(191,163,225,.18)!important}
+.nexus-social .social-layout{display:block!important;width:100%}
+.nexus-social .social-main{width:100%;min-width:0}
+.nexus-social .social-side{display:none!important}
+.nexus-social .nexus-push-settings{border-radius:13px!important;background:#191b22!important;border:1px solid var(--nx-stroke)!important;box-shadow:none!important}
+.nexus-social .nexus-push-settings>button,.nexus-social .social-primary,.nexus-social .social-add-button,.nexus-social .nxf-publish{background:#8065a5!important;border:1px solid rgba(205,184,237,.12)!important;border-radius:10px!important;box-shadow:none!important}
+.nexus-social .social-panel{background:var(--nx-panel)!important;border:1px solid var(--nx-stroke)!important;border-radius:16px!important;box-shadow:0 8px 24px rgba(0,0,0,.1)!important}
+.nexus-social .social-tabs{width:100%;display:flex!important;gap:6px!important;padding:5px!important;border-radius:13px!important;background:#171920!important;border:1px solid var(--nx-stroke)!important}
+.nexus-social .social-tabs button{flex:1;justify-content:center!important;min-height:42px!important;border-radius:9px!important;font-size:11px!important}
+.nexus-social .social-tabs button.active{background:#30283a!important;border:1px solid rgba(190,160,226,.19)!important;box-shadow:inset 0 -2px #b99ad9!important;color:#fff!important}
+
+/* Conversas: estrutura de inbox e área de conversa */
+.nexus-social .social-community{gap:14px!important}
+.nexus-social .social-community>.social-tabs.social-community-tabs{display:flex!important;gap:7px!important;padding:0 0 3px!important;border:0!important;background:transparent!important}
+.nexus-social .social-community .social-community-tabs button{min-height:39px!important;padding:9px 14px!important;border:1px solid var(--nx-stroke)!important;border-radius:10px!important;background:#1a1c23!important;color:#aeb0bd!important;font-size:11px!important}
+.nexus-social .social-community .social-community-tabs button.active{background:#30283a!important;border-color:rgba(190,160,226,.25)!important;color:#f6efff!important;box-shadow:inset 0 -2px #b99ad9!important}
+.nexus-social .social-community .social-panel{padding:16px!important}
+.nexus-social .social-community .social-panel-heading{margin-bottom:13px!important;padding-bottom:13px!important;border-color:var(--nx-stroke)!important}
+.nexus-social .social-community .social-panel-heading h3{font-size:15px!important;letter-spacing:-.25px!important}
+.nexus-social .social-community .social-panel-heading p{font-size:11px!important;color:var(--nx-sub)!important}
+.nexus-social .social-community .social-community-grid{
+  display:grid!important;grid-template-columns:minmax(270px, .82fr) minmax(0,1.7fr)!important;
+  gap:0!important;padding:0!important;overflow:hidden!important;
+  border:1px solid var(--nx-stroke)!important;border-radius:17px!important;background:#15171d!important;
+  min-height:570px;
+}
+.nexus-social .social-community .social-community-list{
+  min-width:0;max-height:720px;overflow:auto;padding:16px!important;
+  border:0!important;border-right:1px solid var(--nx-stroke)!important;background:#1a1c23!important;
+}
+.nexus-social .social-community .social-inbox-title{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:15px!important}
+.nexus-social .social-community .social-inbox-title h3{margin:5px 0 2px!important;font-size:19px!important;letter-spacing:-.6px!important;color:#f4f1f8!important}
+.nexus-social .social-community .social-inbox-title p{font-size:10px!important;color:var(--nx-sub)!important}
+.nexus-social .social-community .social-inbox-live{padding:5px 8px!important;border:1px solid rgba(113,183,145,.16)!important;border-radius:20px!important;background:rgba(67,132,96,.1)!important;font-size:8px!important}
+.nexus-social .social-community .social-chat-search{min-height:41px!important;padding:0 11px!important;border:1px solid var(--nx-stroke)!important;border-radius:10px!important;background:#12141a!important}
+.nexus-social .social-community .social-chat-search input{border:0!important;background:transparent!important;box-shadow:none!important;font-size:11px!important}
+.nexus-social .social-community .social-chat-filters{display:flex;gap:5px!important;margin:11px 0!important}
+.nexus-social .social-community .social-chat-filters button{padding:6px 10px!important;border:1px solid transparent!important;border-radius:20px!important;background:transparent!important;color:#9da0ad!important;font-size:10px!important}
+.nexus-social .social-community .social-chat-filters button.active{background:#30283a!important;border-color:rgba(190,160,226,.16)!important;color:#e9ddf7!important}
+.nexus-social .social-community .social-inbox-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important;margin:10px 0 13px!important}
+.nexus-social .social-community .social-inbox-actions button{display:flex;align-items:center;justify-content:center;gap:6px;min-height:37px!important;padding:7px 8px!important;font-size:9px!important;white-space:normal!important}
+.nexus-social .social-community .social-community-row{
+  min-height:68px!important;gap:11px!important;padding:10px!important;margin:3px 0!important;
+  border:1px solid transparent!important;border-radius:12px!important;background:transparent!important;
+}
+.nexus-social .social-community .social-community-row:hover{background:#242630!important;border-color:var(--nx-stroke)!important}
+.nexus-social .social-community .social-community-row.selected{background:#2a2532!important;border-color:rgba(190,160,226,.2)!important;box-shadow:inset 3px 0 #b99ad9!important}
+.nexus-social .social-community .social-community-avatar{width:43px!important;height:43px!important;border-radius:14px!important;flex:0 0 43px}
+.nexus-social .social-community .social-community-row b{font-size:11px!important;color:#f1eef5!important}
+.nexus-social .social-community .social-community-row small{font-size:9px!important;color:#9fa2af!important}
+.nexus-social .social-community .social-community-chat{
+  min-width:0;min-height:570px!important;display:flex!important;flex-direction:column!important;
+  border:0!important;border-radius:0!important;background:#14161c!important;overflow:hidden!important;
+}
+.nexus-social .social-community .social-chat-head{
+  min-height:72px!important;padding:13px 18px!important;display:flex!important;align-items:center!important;gap:11px!important;
+  background:#1b1e26!important;border:0!important;border-bottom:1px solid var(--nx-stroke)!important;
+}
+.nexus-social .social-community .social-chat-head-copy{display:grid;gap:4px;min-width:0}
+.nexus-social .social-community .social-chat-head-copy b{font-size:12px!important;color:#f6f2fa!important}
+.nexus-social .social-community .social-chat-head-copy small{font-size:9px!important;color:#a4a5b1!important}
+.nexus-social .social-community .social-chat-head>button:not(.social-chat-back){width:34px;height:34px;display:grid;place-items:center;border:1px solid var(--nx-stroke)!important;border-radius:10px!important;background:#242630!important;color:#c4b0dd!important}
+.nexus-social .social-community .social-chat-messages{
+  flex:1!important;min-height:340px!important;max-height:620px!important;overflow:auto!important;
+  display:flex!important;flex-direction:column!important;align-items:stretch!important;gap:11px!important;
+  padding:22px!important;background:#14161c!important;
+}
+.nexus-social .social-community .social-chat-bubble{
+  position:relative;max-width:min(76%,520px)!important;width:fit-content!important;
+  padding:11px 13px!important;border:1px solid var(--nx-stroke)!important;
+  border-radius:15px 15px 15px 5px!important;background:#252832!important;
+  color:#eeedf3!important;font-size:11px!important;line-height:1.65!important;
+}
+.nexus-social .social-community .social-chat-bubble.mine{
+  align-self:flex-end!important;margin-left:auto!important;
+  border-color:rgba(190,160,226,.19)!important;border-radius:15px 15px 5px 15px!important;background:#40344d!important;
+}
+.nexus-social .social-community .social-message-sender{display:block!important;margin-bottom:4px!important;color:#d4b9f1!important;font-size:9px!important}
+.nexus-social .social-community .social-chat-bubble small{display:block!important;margin-top:6px!important;text-align:right!important;color:#aaa5b4!important;font-size:8px!important}
+.nexus-social .social-community .social-message-avatar{display:none!important}
+.nexus-social .social-community .social-chat-compose{
+  display:flex!important;gap:9px!important;padding:13px 15px!important;
+  background:#1b1e26!important;border:0!important;border-top:1px solid var(--nx-stroke)!important;border-radius:0!important;
+}
+.nexus-social .social-community .social-chat-compose input{flex:1;min-width:0;min-height:43px!important;padding:0 13px!important;border:1px solid var(--nx-stroke)!important;border-radius:22px!important;background:#11141a!important;font-size:11px!important}
+.nexus-social .social-community .social-chat-compose button{width:43px!important;height:43px!important;display:grid;place-items:center;border-radius:50%!important;background:#8065a5!important}
+.nexus-social .social-community .social-community-empty{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;padding:35px!important;background:transparent!important;color:#aaa4b4!important;text-align:center}
+.nexus-social .social-community .social-community-empty b{font-size:14px!important;color:#eeeaf4!important}
+.nexus-social .social-community .social-community-empty span{max-width:300px;font-size:10px!important;line-height:1.7!important}
+
+/* Feed: coluna editorial, cartões de publicação e ações em padrão social */
+.nexus-social .nexus-feed{width:100%;max-width:790px;margin:0 auto!important;gap:16px!important}
+.nexus-social .nxf-heading{display:flex!important;align-items:center!important;justify-content:space-between!important;padding:4px 2px 15px!important;border-bottom:1px solid var(--nx-stroke)!important}
+.nexus-social .nxf-heading h2{font-size:29px!important;letter-spacing:-1.2px!important}
+.nexus-social .nxf-heading p{font-size:11px!important;color:var(--nx-sub)!important}
+.nexus-social .nxf-live{font-size:8px!important;letter-spacing:.6px!important}
+.nexus-social .nxf-composer{
+  padding:16px!important;border:1px solid var(--nx-stroke)!important;border-radius:17px!important;
+  background:#1b1e25!important;box-shadow:0 7px 22px rgba(0,0,0,.1)!important;
+}
+.nexus-social .nxf-compose-top{display:flex!important;align-items:flex-start!important;gap:12px!important}
+.nexus-social .nxf-compose-avatar{width:43px!important;height:43px!important;flex:0 0 43px;border-radius:50%!important}
+.nexus-social .nxf-compose-top textarea{
+  min-height:64px!important;padding:12px 14px!important;border:1px solid var(--nx-stroke)!important;
+  border-radius:13px!important;background:#14171d!important;font-size:12px!important;line-height:1.55!important;
+}
+.nexus-social .nxf-compose-bottom{display:flex!important;align-items:center!important;gap:10px!important;margin-top:11px!important;padding-top:12px!important;border-top:1px solid var(--nx-stroke)!important}
+.nexus-social .nxf-compose-bottom>span{margin-left:auto!important;color:#858997!important;font-size:9px!important}
+.nexus-social .nxf-photo-pick{display:inline-flex!important;align-items:center!important;gap:7px!important;padding:8px 11px!important;border:1px solid var(--nx-stroke)!important;border-radius:9px!important;background:#252832!important;font-size:10px!important}
+.nexus-social .nxf-publish{display:inline-flex!important;align-items:center!important;gap:7px!important;padding:9px 14px!important;font-size:10px!important}
+.nexus-social .nxf-post-list{display:grid!important;gap:13px!important}
+.nexus-social .nxf-post{
+  padding:17px!important;border:1px solid var(--nx-stroke)!important;border-radius:17px!important;
+  background:#1b1e25!important;box-shadow:0 7px 22px rgba(0,0,0,.09)!important;
+}
+.nexus-social .nxf-post-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding-bottom:13px!important;border-bottom:1px solid var(--nx-stroke)!important}
+.nexus-social .nxf-author{display:inline-flex!important;align-items:center!important;gap:10px!important;min-width:0!important;text-align:left!important;background:transparent!important}
+.nexus-social .nxf-avatar{width:42px!important;height:42px!important;border-radius:50%!important}
+.nexus-social .nxf-author-copy{display:grid!important;gap:4px!important}
+.nexus-social .nxf-author-copy b{font-size:11px!important;color:#f4f0f7!important}
+.nexus-social .nxf-author-copy small{font-size:9px!important;color:#9fa1ae!important}
+.nexus-social .nxf-post-meta{display:flex!important;align-items:center!important;gap:9px!important;color:#9698a5!important;font-size:9px!important}
+.nexus-social .nxf-post-meta>button{width:32px!important;height:32px!important;display:grid!important;place-items:center!important;border:1px solid var(--nx-stroke)!important;border-radius:9px!important;background:#242730!important}
+.nexus-social .nxf-post-body{margin:14px 1px!important;font-size:13px!important;line-height:1.75!important;color:#e8e6ed!important;overflow-wrap:anywhere}
+.nexus-social .nxf-post-image{display:block!important;width:100%!important;max-height:560px!important;object-fit:cover!important;border-radius:13px!important}
+.nexus-social .nxf-actions{display:grid!important;grid-template-columns:1fr 1fr!important;gap:7px!important;margin-top:13px!important;padding-top:11px!important;border-top:1px solid var(--nx-stroke)!important}
+.nexus-social .nxf-actions button{display:flex!important;align-items:center!important;justify-content:center!important;gap:8px!important;min-height:41px!important;border:1px solid transparent!important;border-radius:10px!important;color:#b6b4c0!important;font-size:10px!important}
+.nexus-social .nxf-actions button:hover{background:#272a34!important;border-color:var(--nx-stroke)!important}
+.nexus-social .nxf-actions button.liked{color:#f18eae!important;background:rgba(241,142,174,.08)!important}
+.nexus-social .nxf-comments{margin-top:12px!important;padding-top:13px!important;border-top:1px solid var(--nx-stroke)!important}
+.nexus-social .nxf-comment-content{border:1px solid var(--nx-stroke)!important;border-radius:0 12px 12px 12px!important;background:#252832!important}
+.nexus-social .nxf-comment-form input{min-height:41px!important;border:1px solid var(--nx-stroke)!important;border-radius:20px!important;background:#14171d!important}
+.nexus-social .nxf-comment-form button{width:41px!important;height:41px!important;border-radius:50%!important;background:#8065a5!important}
+
+/* Clãs: descoberta em grade, identidade do time e progressão */
+.nexus-social .social-community .social-community-cards{
+  display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:14px!important;margin-top:14px!important;
+}
+.nexus-social .social-community .social-community-card{
+  position:relative;display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+  min-width:0;min-height:220px!important;padding:18px!important;gap:10px!important;
+  border:1px solid var(--nx-stroke)!important;border-radius:16px!important;
+  background:linear-gradient(155deg,#20232c,#191b22 78%)!important;
+  box-shadow:0 8px 22px rgba(0,0,0,.1)!important;transition:border-color .18s,transform .18s!important;
+}
+.nexus-social .social-community .social-community-card:hover{transform:translateY(-2px)!important;border-color:var(--nx-stroke-hover)!important}
+.nexus-social .social-community .social-clan-emblem{
+  width:52px!important;height:52px!important;display:grid!important;place-items:center!important;
+  border-radius:15px!important;background:#30283b!important;border:1px solid rgba(190,160,226,.2)!important;
+  font-size:25px!important;box-shadow:none!important;
+}
+.nexus-social .social-community .social-community-card>b{font-size:14px!important;line-height:1.35!important;color:#f3eff7!important}
+.nexus-social .social-community .social-community-card>b small{color:#c3a9df!important;font-size:10px!important}
+.nexus-social .social-community .social-community-card p{margin:0!important;color:#a7a7b3!important;font-size:10px!important;line-height:1.65!important}
+.nexus-social .social-community .social-community-card>small{margin-top:auto!important;color:#999ba8!important;font-size:9px!important}
+.nexus-social .social-community .social-community-card button{width:100%;margin-top:3px!important;min-height:38px!important}
+.nexus-social .social-community .social-clan-detail{
+  padding:20px!important;border:1px solid var(--nx-stroke)!important;border-radius:18px!important;background:#1a1c23!important;
+}
+.nexus-social .social-community .social-clan-detail-actions{display:flex!important;justify-content:space-between!important;gap:10px!important;margin-bottom:15px!important}
+.nexus-social .social-community .social-clan-banner{
+  min-height:190px!important;display:flex!important;align-items:center!important;gap:18px!important;
+  padding:24px!important;border:1px solid rgba(190,160,226,.2)!important;border-radius:16px!important;
+  background:radial-gradient(ellipse at 85% 10%,rgba(154,119,190,.2),transparent 40%),linear-gradient(120deg,#292333,#211f2c)!important;
+  box-shadow:none!important;overflow:hidden!important;
+}
+.nexus-social .social-community .social-clan-banner>span{
+  width:76px!important;height:76px!important;flex:0 0 76px;display:grid!important;place-items:center!important;
+  border:1px solid rgba(205,181,235,.22)!important;border-radius:22px!important;background:#3a3045!important;font-size:36px!important;
+}
+.nexus-social .social-community .social-clan-banner h4{margin:0 0 8px!important;font-size:23px!important;letter-spacing:-.6px!important;color:#fff!important}
+.nexus-social .social-community .social-clan-banner h4 small{font-size:11px!important;color:#d1b8ed!important}
+.nexus-social .social-community .social-clan-banner p{margin:0 0 9px!important;color:#c1bacb!important;font-size:11px!important}
+.nexus-social .social-community .social-clan-banner>div>small{font-size:9px!important;color:#cdb4e8!important;letter-spacing:.7px!important}
+.nexus-social .social-community .social-clan-detail>h4{margin:22px 0 12px!important;padding-bottom:10px!important;border-bottom:1px solid var(--nx-stroke)!important;font-size:13px!important;color:#f0edf5!important}
+.nexus-social .social-community .social-clan-members{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}
+.nexus-social .social-community .social-clan-members .social-community-row{margin:0!important;background:#22252e!important;border:1px solid var(--nx-stroke)!important}
+.nexus-social .social-community .social-clan-rewards{display:grid!important;grid-template-columns:repeat(4,minmax(0,1fr))!important;gap:9px!important}
+.nexus-social .social-community .social-clan-reward{min-height:110px!important;padding:13px!important;border:1px solid var(--nx-stroke)!important;border-radius:12px!important;background:#22252e!important}
+.nexus-social .social-community .social-clan-reward.unlocked{border-color:rgba(190,160,226,.3)!important;background:#30283a!important}
+.nexus-social .social-community .social-clan-chat{max-height:330px!important;min-height:180px!important;border-radius:12px!important}
+.nexus-social .social-community .social-create-form{display:grid!important;gap:11px!important;padding:17px!important;border:1px solid var(--nx-stroke)!important;border-radius:14px!important;background:#1c1f26!important}
+.nexus-social .social-community .social-create-form input,.nexus-social .social-community .social-create-form textarea,
+.nexus-social .social-community .social-room-tools select{min-height:43px!important;padding:10px 12px!important;border:1px solid var(--nx-stroke)!important;border-radius:10px!important;background:#13161c!important;color:#f3f0f7!important}
+.nexus-social .social-community .social-create-form textarea{min-height:100px!important}
+.nexus-social .social-community .social-room-tools{display:flex!important;gap:8px!important;padding:11px!important;background:#1c1f26!important;border:1px solid var(--nx-stroke)!important;border-radius:12px!important}
+.nexus-social .social-community .social-room-tools select{flex:1;min-width:0}
+
+/* Responsividade real: tablet e celular */
+@media(max-width:1050px){
+ .nexus-social .social-community .social-community-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .nexus-social .social-community .social-clan-rewards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:760px){
+ .nexus-social>.social-hero{padding:16px!important;min-height:92px!important;border-radius:14px!important}
+ .nexus-social>.social-hero h2{font-size:25px!important}
+ .nexus-social .social-community .social-community-grid{grid-template-columns:minmax(0,1fr)!important;min-height:0!important}
+ .nexus-social .social-community .social-community-list{max-height:none!important;padding:12px!important;border-right:0!important;border-bottom:1px solid var(--nx-stroke)!important}
+ .nexus-social .social-community .social-community-chat{min-height:500px!important}
+ .nexus-social .social-community .social-chat-messages{min-height:290px!important;padding:15px!important}
+ .nexus-social .social-community .social-chat-bubble{max-width:88%!important}
+ .nexus-social .social-community .social-community-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:9px!important}
+ .nexus-social .social-community .social-community-card{min-height:205px!important;padding:13px!important}
+ .nexus-social .social-community .social-clan-detail{padding:13px!important}
+ .nexus-social .social-community .social-clan-banner{min-height:150px!important;padding:15px!important;gap:12px!important}
+ .nexus-social .social-community .social-clan-banner>span{width:55px!important;height:55px!important;flex-basis:55px;font-size:27px!important;border-radius:15px!important}
+ .nexus-social .social-community .social-clan-banner h4{font-size:18px!important}
+ .nexus-social .social-community .social-clan-members{grid-template-columns:1fr!important}
+ .nexus-social .nexus-feed{max-width:100%!important}
+ .nexus-social .nxf-post{padding:13px!important}
+}
+@media(max-width:430px){
+ .nexus-social .social-community .social-community-cards{grid-template-columns:1fr!important}
+ .nexus-social .social-community .social-community-card{min-height:0!important}
+ .nexus-social .social-community .social-inbox-actions{grid-template-columns:1fr!important}
+ .nexus-social .social-community .social-clan-rewards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+ .nexus-social .social-community .social-clan-detail-actions{flex-wrap:wrap}
+ .nexus-social .nxf-actions button{gap:5px!important;font-size:9px!important}
+ .nexus-social .nxf-compose-bottom{flex-wrap:wrap}
+}
