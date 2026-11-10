@@ -30,6 +30,7 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
  const profileFor=id=>id===userId?{display_name:'Você',username:'você',avatar:playerProfile?.avatar||'👾',avatar_frame:playerProfile?.frame||'violet'}:friendList.find(p=>p.user_id===id)||roomMembers.find(p=>p.user_id===id)||clanMembers.find(m=>m.user_id===id)?.profile||activeChat?.person;
 
  useEffect(()=>{setReplyTarget(null);setShowMedia(false);},[activeChat?.id,activeRoom?.id,selectedClan?.id]);
+ useEffect(()=>{if(mode!=='chat'||!mobileChatOpen)return;const oldOverflow=document.body.style.overflow;const oldTouch=document.body.style.touchAction;document.body.style.overflow='hidden';document.body.style.touchAction='none';return()=>{document.body.style.overflow=oldOverflow;document.body.style.touchAction=oldTouch};},[mode,mobileChatOpen]);
  const loadChats=useCallback(async()=>{
   const {data,error:e}=await supabase.from('social_conversation_members').select('conversation_id').eq('user_id',userId);
   if(e)throw e;
