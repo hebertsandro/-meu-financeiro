@@ -926,14 +926,19 @@
 }
 
 
-/* Correção estrutural: moldura externa separada do círculo interno do avatar do contato. */
+/* FIX DE ESPECIFICIDADE: impede o botão retangular de recortar a moldura e o círculo interno. */
 @media (max-width: 760px) {
-  .nexus-social-chat-portal .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
-  .content-social .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger {
+    overflow: visible !important;
+    clip-path: none !important;
+  }
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
     box-sizing: border-box !important;
-    position: relative !important;
     display: grid !important;
     place-items: center !important;
+    position: relative !important;
     flex: 0 0 42px !important;
     width: 42px !important;
     min-width: 42px !important;
@@ -945,15 +950,16 @@
     border-radius: 12px !important;
     overflow: visible !important;
     clip-path: none !important;
-    line-height: 1 !important;
+    -webkit-clip-path: none !important;
   }
-  .nexus-social-chat-portal .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar > .social-chat-head-avatar-inner,
-  .content-social .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar > .social-chat-head-avatar-inner {
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar > .social-chat-head-avatar-inner,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar > .social-chat-head-avatar-inner {
     box-sizing: border-box !important;
     display: grid !important;
     place-items: center !important;
     position: relative !important;
-    z-index: 2 !important;
+    z-index: 5 !important;
+    flex: 0 0 32px !important;
     width: 32px !important;
     min-width: 32px !important;
     max-width: 32px !important;
@@ -963,14 +969,13 @@
     border-radius: 50% !important;
     overflow: hidden !important;
     clip-path: circle(50% at 50% 50%) !important;
-    background: radial-gradient(circle, #53658c 0 15px, #202b43 15.5px 16px) !important;
-    font-size: 20px !important;
+    -webkit-clip-path: circle(50% at 50% 50%) !important;
     line-height: 1 !important;
   }
 }
 @media (max-width: 380px) {
-  .nexus-social-chat-portal .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
-  .content-social .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
     flex-basis: 38px !important;
     width: 38px !important;
     min-width: 38px !important;
@@ -979,8 +984,9 @@
     min-height: 38px !important;
     max-height: 38px !important;
   }
-  .nexus-social-chat-portal .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar > .social-chat-head-avatar-inner,
-  .content-social .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar > .social-chat-head-avatar-inner {
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar > .social-chat-head-avatar-inner,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar > .social-chat-head-avatar-inner {
+    flex-basis: 28px !important;
     width: 28px !important;
     min-width: 28px !important;
     max-width: 28px !important;
