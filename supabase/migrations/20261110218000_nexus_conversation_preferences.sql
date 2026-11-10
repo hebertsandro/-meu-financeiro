@@ -15,3 +15,13 @@ with check(user_id=(select auth.uid()) and exists(select 1 from public.social_co
 drop policy if exists "Users update own conversation preferences" on public.social_conversation_preferences;
 create policy "Users update own conversation preferences" on public.social_conversation_preferences for update to authenticated
 using(user_id=(select auth.uid())) with check(user_id=(select auth.uid()));
+
+
+-- Qualify the outer row to keep preferences scoped to conversations the user belongs to.
+drop policy if exists "Users create own conversation preferences" on public.social_conversation_preferences;
+create policy "Users create own conversation preferences" on public.social_conversation_preferences for insert to authenticated
+with check(user_id=(select auth.uid()) and exists(select 1 from public.social_conversation_members m where m.conversation_id=social_conversation_preferences.conversation_id and m.user_id=(select auth.uid())));
+drop policy if exists "Users update own conversation preferences" on public.social_conversation_preferences;
+create policy "Users update own conversation preferences" on public.social_conversation_preferences for update to authenticated
+using(user_id=(select auth.uid()) and exists(select 1 from public.social_conversation_members m where m.conversation_id=social_conversation_preferences.conversation_id and m.user_id=(select auth.uid())))
+with check(user_id=(select auth.uid()) and exists(select 1 from public.social_conversation_members m where m.conversation_id=social_conversation_preferences.conversation_id and m.user_id=(select auth.uid())));
