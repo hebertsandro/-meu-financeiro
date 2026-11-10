@@ -175,3 +175,8 @@
 .content-social .social-chat-filters button.active{border-color:#8b6aa8;background:#332540;color:#f0e4fa}
 .content-social .social-chat-head>button{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border:1px solid #393044;border-radius:9px;background:#211b2b;color:#cbb5df}
 .content-social .social-chat-head>button:hover{border-color:#8869a5;color:#fff}
+
+
+.content-social .social-chat-message-search{flex:0 1 190px;min-width:95px;max-width:210px;height:34px;padding:7px 10px;border:1px solid #393044;border-radius:9px;background:#100f16;color:#eee5f5;font-size:10px;outline:none}
+.content-social .social-chat-message-search:focus{border-color:#9875b8}
+@media(max-width:760px){.content-social .social-chat-message-search{flex:1 1 100%;order:5;max-width:none;height:31px}.content-social .social-chat-head{flex-wrap:wrap}}
