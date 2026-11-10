@@ -16,3 +16,12 @@
 .social-public-card .player-social-bio{margin:7px 0 0!important;font-size:13px!important;line-height:1.5}
 .social-public-section{margin-top:22px}
 @media(max-width:600px){.social-public-card{padding:14px!important}.social-public-card .player-identity{gap:12px!important}.social-public-card .profile-big-avatar{flex:0 0 64px;width:64px;height:64px}.social-public-card .player-info h2{font-size:19px}}
+
+.player-profile-name-row{display:flex;align-items:center;gap:10px;min-width:0}
+.player-profile-name-row h2{margin:0;min-width:0}
+.player-profile-edit-pencil{width:34px;height:34px;flex:0 0 34px;display:grid;place-items:center;border:1px solid rgba(173,151,255,.3);border-radius:11px;background:rgba(143,112,255,.14);color:#d7caff;cursor:pointer;transition:background .18s,transform .18s}
+.player-profile-edit-pencil:hover{background:rgba(143,112,255,.28);transform:translateY(-1px)}
+.player-central-posts{margin:22px 0 28px;padding:20px;background:var(--panel-bg,rgba(18,19,31,.72));border:1px solid rgba(164,139,255,.16);border-radius:20px}
+.player-central-posts .social-profile-posts-heading{margin-bottom:15px}
+.player-central-posts .social-profile-post-tile{aspect-ratio:1/1;border-radius:12px}
+@media(max-width:600px){.player-central-posts{padding:13px;border-radius:16px}.player-central-posts .social-profile-post-grid{gap:4px}.player-profile-edit-pencil{width:31px;height:31px;flex-basis:31px}}
