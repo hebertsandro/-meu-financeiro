@@ -118,3 +118,67 @@
 .nexus-feed .nxf-video-preview{position:relative}.nexus-feed .nxf-video-preview video{display:block;width:100%;max-height:320px;border-radius:12px;background:#080a10}.nexus-feed .nxf-post-video{display:block;width:100%;max-height:560px;margin:10px 0;object-fit:contain;border:1px solid rgba(190,160,226,.13);border-radius:13px;background:#080a10}
 .nexus-feed .nxf-compose-bottom{flex-wrap:wrap}
 @media(max-width:560px){.nexus-feed .nxf-post-video{max-height:360px}.nexus-feed .nxf-video-preview video{max-height:230px}}
+
+
+/* NEXUS FEED 3.0 — Instagram-inspired, original violet identity */
+.nexus-feed{gap:15px!important}
+.nxf-heading{padding:4px 2px 2px!important}
+.nxf-heading h2 em{color:#c29af0!important}
+.nxf-stories{padding:13px 14px!important;border-radius:17px!important;background:linear-gradient(145deg,#211b2d,#171923)!important;border-color:#ffffff12!important}
+.nxf-stories-title{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nxf-story-rail{display:flex!important;gap:13px!important;overflow-x:auto!important;padding:12px 2px 3px!important;scroll-snap-type:x mandatory!important}
+.nxf-story{flex:0 0 66px!important;scroll-snap-align:start!important}
+.nxf-story-ring{width:57px!important;height:57px!important;border-radius:50%!important;padding:3px!important;background:linear-gradient(135deg,#f5c56b,#d66bdc,#8465ec)!important}
+.nxf-story-ring img{width:100%!important;height:100%!important;border-radius:50%!important;object-fit:cover!important;border:2px solid #191722!important}
+.nxf-story b{max-width:68px!important;font-size:9px!important}
+.nxf-composer{padding:13px!important;border-radius:16px!important;background:#191923!important;border:1px solid #ffffff12!important}
+.nxf-compose-top{align-items:center!important}
+.nxf-compose-top textarea{min-height:48px!important;max-height:140px!important;resize:vertical!important;font-size:14px!important}
+.nxf-compose-bottom{gap:7px!important;flex-wrap:wrap!important}
+.nxf-compose-bottom>span{font-variant-numeric:tabular-nums!important}
+.nxf-photo-pick,.nxf-poll-toggle{background:#252333!important;border:1px solid #ffffff0d!important;border-radius:20px!important;padding:8px 11px!important}
+.nxf-publish{border-radius:20px!important;background:linear-gradient(110deg,#8056b8,#a16bd0)!important;box-shadow:0 5px 15px #885bb533!important}
+.nxf-draft-notice{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:9px 0 0 49px;padding:7px 10px;border-radius:9px;background:#a783d311;color:#c8b4df;font-size:10px}
+.nxf-draft-notice button{border:0;background:transparent;color:#e0c5ff;font-size:10px;font-weight:800}
+.nxf-feed-tabs{position:sticky!important;top:0!important;z-index:8!important;backdrop-filter:blur(16px)!important;background:#14151deF!important}
+.nxf-post-list{gap:14px!important}
+.nxf-post{padding:0!important;overflow:hidden!important;border-radius:16px!important;background:#171821!important;border:1px solid #ffffff13!important;box-shadow:0 8px 24px #0003!important}
+.nxf-post-head{padding:13px 14px 10px!important}
+.nxf-post-head .nxf-avatar{width:41px!important;height:41px!important;border-radius:50%!important}
+.nxf-post-head .nxf-author-copy b{font-size:12px!important}
+.nxf-post-meta{gap:6px!important}
+.nxf-post-body{margin:0!important;padding:3px 14px 11px!important;color:#e9e4ef!important;font-size:13px!important;line-height:1.55!important}
+.nxf-inline-tag{display:inline!important;padding:0!important;border:0!important;background:transparent!important;color:#c69af2!important;font:inherit!important;font-weight:700!important;cursor:pointer!important}
+.nxf-post-image{width:100%!important;max-height:none!important;aspect-ratio:4/4.3!important;object-fit:cover!important;margin:0!important;border-radius:0!important;background:#0d0e14!important}
+.nxf-post-video{width:100%!important;max-height:70vh!important;aspect-ratio:9/16!important;object-fit:contain!important;margin:0!important;border:0!important;border-radius:0!important;background:#08090e!important}
+.nxf-reaction-summary{display:flex!important;justify-content:space-between!important;gap:10px!important;padding:10px 14px 0!important;color:#aaa4b4!important;font-size:10px!important}
+.nxf-actions{display:flex!important;align-items:center!important;gap:0!important;margin:5px 0 0!important;padding:5px 8px 9px!important;border-top:0!important;border-bottom:1px solid #ffffff10!important}
+.nxf-actions button{justify-content:center!important;gap:5px!important;min-width:0!important;min-height:38px!important;padding:7px 8px!important;border-radius:9px!important;color:#d0cbd8!important;font-size:10px!important}
+.nxf-actions button:nth-child(1){margin-right:auto!important}
+.nxf-actions button:nth-child(5){margin-left:auto!important}
+.nxf-actions button.liked{color:#ff6d9d!important}
+.nxf-actions button.saved{color:#c99cf1!important}
+.nxf-comments{margin:0 13px 13px!important;padding-top:11px!important;border-top:1px solid #ffffff10!important}
+.nxf-comment-form input{font-size:16px!important}
+.nxf-featured-label{font-size:8px!important;letter-spacing:.6px!important;color:#d7b4ff!important}
+.nxf-menu{backdrop-filter:blur(16px)!important}
+@media(max-width:600px){
+ .nexus-feed{gap:11px!important}
+ .nxf-heading{align-items:center!important}
+ .nxf-live{font-size:8px!important;padding:6px 8px!important}
+ .nxf-stories{padding:11px!important}
+ .nxf-composer{padding:11px!important}
+ .nxf-compose-avatar{width:36px!important;height:36px!important;border-radius:50%!important}
+ .nxf-compose-bottom{gap:5px!important}
+ .nxf-photo-pick,.nxf-poll-toggle{padding:8px 9px!important;font-size:10px!important}
+ .nxf-compose-bottom>span{font-size:9px!important}
+ .nxf-publish{padding:9px 12px!important}
+ .nxf-post-head{padding:11px 12px 8px!important}
+ .nxf-post-body{padding:3px 12px 10px!important;font-size:13px!important}
+ .nxf-post-image{aspect-ratio:1/1!important;object-fit:cover!important}
+ .nxf-actions{padding:4px 6px 7px!important}
+ .nxf-actions button{padding:7px 6px!important;font-size:9px!important}
+ .nxf-actions button:nth-child(4){display:none!important}
+ .nxf-reaction-summary{padding:9px 12px 0!important}
+ .nxf-draft-notice{margin-left:0}
+}
