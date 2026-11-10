@@ -168,3 +168,10 @@
 .content-social .social-follow-button.following{border-color:#3c6558;background:#1b322c;color:#a3e4c7}
 .content-social .social-public-footer{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 @media(max-width:560px){.content-social .social-follow-button{width:100%;margin:8px 0 0}}
+
+
+.content-social .social-chat-filters{display:flex;gap:6px;flex-wrap:wrap}
+.content-social .social-chat-filters button{display:inline-flex;align-items:center;gap:5px;padding:7px 10px;border:1px solid #393044;border-radius:9px;background:#1b1722;color:#a99eb4;font-size:9px}
+.content-social .social-chat-filters button.active{border-color:#8b6aa8;background:#332540;color:#f0e4fa}
+.content-social .social-chat-head>button{display:grid;place-items:center;flex:0 0 34px;width:34px;height:34px;border:1px solid #393044;border-radius:9px;background:#211b2b;color:#cbb5df}
+.content-social .social-chat-head>button:hover{border-color:#8869a5;color:#fff}
