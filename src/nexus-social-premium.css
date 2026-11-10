@@ -201,3 +201,10 @@
 .content-social .social-message-avatar{border:0;cursor:pointer;flex-shrink:0}
 .content-social .social-message-sender{display:block;width:max-content;max-width:100%;padding:0;border:0;background:transparent;color:#e8dff0;text-align:left;font-size:10px;font-weight:800;cursor:pointer}
 .content-social .social-message-sender:hover{color:#d1a8f4;text-decoration:underline}
+
+
+.content-social .social-reply-preview{margin:5px 0 8px;padding:7px 9px;border-left:2px solid #a47acb;border-radius:0 7px 7px 0;background:rgba(154,113,190,.1);color:#bca8cc;font-size:10px;line-height:1.5}
+.content-social .social-reply-preview b{color:#e0c9f4}
+.content-social .social-replying{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 14px;border-top:1px solid #393044;background:#201a29;color:#d2b6ec;font-size:10px}
+.content-social .social-replying span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.content-social .social-replying button{display:grid;place-items:center;width:25px;height:25px;border:1px solid #4a3b59;border-radius:7px;background:#2a2037;color:#e5d5f2}
