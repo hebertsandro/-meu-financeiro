@@ -3,6 +3,7 @@ import './nexus-social-refined.css';
 import './nexus-social-next.css';
 import './nexus-social-premium.css';
 import './nexus-social-polish.css';
+import './nexus-player-profile.css';
 import {Search,Users,UserPlus,Check,X,RefreshCw,ShieldCheck,UserRound,AtSign,Lock,Eye,CalendarClock,Trophy,Zap,Star,Flame,MessageCircle,Bell,CheckCheck,Pencil,Grid3X3,Heart,MessageCircleMore} from 'lucide-react';
 import {supabase} from './supabase';
 import NexusCommunity from './NexusCommunity';
