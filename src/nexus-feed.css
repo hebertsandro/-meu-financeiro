@@ -182,3 +182,46 @@
  .nxf-reaction-summary{padding:9px 12px 0!important}
  .nxf-draft-notice{margin-left:0}
 }
+
+
+/* NEXUS social-native post layout */
+.nxf-post-list{display:flex!important;flex-direction:column!important;gap:22px!important}
+.nexus-feed .nxf-post{display:flex!important;flex-direction:column!important;padding:0!important;overflow:hidden!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.12)!important;border-radius:0!important;background:transparent!important;box-shadow:none!important}
+.nexus-feed .nxf-post:hover{transform:none!important;border-color:rgba(255,255,255,.12)!important;box-shadow:none!important}
+.nexus-feed .nxf-post-head{display:flex!important;min-height:62px!important;align-items:center!important;justify-content:space-between!important;padding:9px 13px!important;gap:10px!important}
+.nexus-feed .nxf-post-head .nxf-avatar{width:39px!important;height:39px!important;border-radius:50%!important}
+.nexus-feed .nxf-author{gap:10px!important}
+.nexus-feed .nxf-author-copy{gap:2px!important}
+.nexus-feed .nxf-author-copy b{font-size:12px!important;font-weight:800!important;color:#f7f4fb!important}
+.nexus-feed .nxf-author-copy small{font-size:10px!important;color:#aaa4b5!important}
+.nexus-feed .nxf-post-meta time{font-size:10px!important}
+.nexus-feed .nxf-post-image{display:block!important;width:100%!important;max-height:640px!important;aspect-ratio:1/1!important;object-fit:cover!important;margin:0!important;border:0!important;border-radius:0!important;background:#0b0c12!important}
+.nexus-feed .nxf-post-video{display:block!important;width:100%!important;max-height:75vh!important;aspect-ratio:9/16!important;object-fit:contain!important;margin:0!important;border:0!important;border-radius:0!important;background:#05060a!important}
+.nexus-feed .nxf-post-details{display:grid!important;gap:6px!important;padding:7px 13px 13px!important}
+.nexus-feed .nxf-actions{display:flex!important;align-items:center!important;gap:17px!important;margin:0!important;padding:9px 13px 2px!important;border:0!important}
+.nexus-feed .nxf-actions button{display:grid!important;place-items:center!important;flex:0 0 auto!important;width:29px!important;height:34px!important;min-height:34px!important;padding:0!important;border:0!important;border-radius:7px!important;background:transparent!important;color:#eeeaf3!important}
+.nexus-feed .nxf-actions button:hover{background:rgba(255,255,255,.06)!important}
+.nexus-feed .nxf-actions button:first-child{margin:0!important}
+.nexus-feed .nxf-actions button:nth-child(5){margin-left:auto!important}
+.nexus-feed .nxf-actions button.liked{color:#ff6e9d!important}
+.nexus-feed .nxf-actions button.saved{color:#c99cf1!important}
+.nexus-feed .nxf-post-details>b{font-size:12px!important;color:#f5f0fa!important}
+.nexus-feed .nxf-post-details .nxf-post-body{margin:0!important;padding:0!important;color:#e8e3ed!important;font-size:12px!important;line-height:1.5!important}
+.nexus-feed .nxf-post-details .nxf-post-body strong{font-weight:800!important;color:#f7f3fb!important}
+.nexus-feed .nxf-comments-link{justify-self:start!important;padding:0!important;border:0!important;background:transparent!important;color:#96909f!important;font-size:11px!important}
+.nexus-feed .nxf-post-details>time{color:#777181!important;font-size:9px!important;text-transform:uppercase!important;letter-spacing:.35px!important}
+.nexus-feed .nxf-reaction-picker{padding:7px 13px!important}
+.nexus-feed .nxf-poll-card{margin:10px 13px!important}
+.nexus-feed .nxf-post-head .nxf-featured-label{margin-left:auto!important}
+.nexus-feed .nxf-comments{margin:0 13px 13px!important}
+.nexus-feed .nxf-edit-post{margin:10px 13px!important}
+@media(max-width:600px){
+ .nexus-feed .nxf-post-list{gap:17px!important}
+ .nexus-feed .nxf-post-head{min-height:57px!important;padding:8px 12px!important}
+ .nexus-feed .nxf-post-image{aspect-ratio:1/1!important;max-height:none!important}
+ .nexus-feed .nxf-actions{gap:16px!important;padding:8px 12px 1px!important}
+ .nexus-feed .nxf-actions button{width:27px!important;height:32px!important}
+ .nexus-feed .nxf-post-details{padding:7px 12px 12px!important}
+ .nexus-feed .nxf-post-details .nxf-post-body{font-size:12px!important}
+ .nexus-feed .nxf-poll-card{margin:9px 12px!important}
+}
