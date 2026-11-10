@@ -113,3 +113,52 @@
  .player-profile-page .player-profile-stats span{font-size:9px!important}
  .player-profile-page .player-profile-stats b{font-size:14px!important}
 }
+
+
+/* Indicadores fora do cartão principal: não podem cruzar as joias decorativas */
+.player-profile-page>.player-profile-stats{
+ position:relative!important;z-index:1!important;
+ display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;
+ gap:10px!important;margin:14px 0 22px!important;padding:0!important;
+ border:0!important;background:transparent!important
+}
+.player-profile-page>.player-profile-stats>div{
+ min-height:62px!important;display:flex!important;align-items:center!important;gap:11px!important;
+ padding:12px 15px!important;border:1px solid rgba(164,139,255,.16)!important;
+ border-radius:15px!important;background:linear-gradient(135deg,rgba(25,25,43,.96),rgba(14,22,34,.96))!important;
+ box-shadow:0 8px 22px rgba(0,0,0,.14)!important
+}
+.player-profile-page>.player-profile-stats svg{color:#b7a0ff!important;flex:0 0 auto}
+.player-profile-page>.player-profile-stats span{font-size:11px!important;color:#bcb8ce!important}
+.player-profile-page>.player-profile-stats b{display:block!important;font-size:17px!important;color:#fff!important}
+
+/* Edição da Central como tela própria, com rolagem independente e cabeçalho visível */
+.player-profile-page>.profile-editor[style*="display: block"]{
+ position:fixed!important;inset:0!important;z-index:10050!important;
+ width:100vw!important;height:100dvh!important;max-width:none!important;
+ margin:0!important;padding:24px max(18px,calc((100vw - 900px)/2)) 48px!important;
+ overflow-y:auto!important;overscroll-behavior:contain!important;
+ box-sizing:border-box!important;border:0!important;border-radius:0!important;
+ background:radial-gradient(ellipse at 85% 0%,rgba(119,83,220,.18),transparent 38%),#0d101a!important;
+}
+.player-profile-page>.profile-editor[style*="display: block"]>.panel-head:first-child{
+ position:sticky!important;top:-24px!important;z-index:2!important;
+ margin:0 -8px 20px!important;padding:18px 8px!important;
+ background:rgba(13,16,26,.94)!important;backdrop-filter:blur(16px)!important;
+ border-bottom:1px solid rgba(255,255,255,.09)!important
+}
+.player-profile-page>.profile-editor[style*="display: block"]>.panel-head:first-child h3{font-size:25px!important}
+.player-profile-page>.profile-editor[style*="display: block"]>.panel-head:first-child p{font-size:13px!important}
+.player-profile-page>.profile-editor[style*="display: block"]>.panel-head:first-child .text-button{
+ padding:10px 15px!important;border-radius:11px!important;background:rgba(139,92,246,.18)!important;
+ border:1px solid rgba(167,139,250,.32)!important;color:#e5dcff!important;font-weight:800!important
+}
+@media(max-width:640px){
+ .player-profile-page>.player-profile-stats{gap:6px!important;margin:10px 0 18px!important}
+ .player-profile-page>.player-profile-stats>div{min-height:70px!important;flex-direction:column!important;justify-content:center!important;gap:4px!important;padding:8px 4px!important;text-align:center!important}
+ .player-profile-page>.player-profile-stats span{font-size:9px!important}
+ .player-profile-page>.player-profile-stats b{font-size:15px!important}
+ .player-profile-page>.profile-editor[style*="display: block"]{padding:14px 13px 36px!important}
+ .player-profile-page>.profile-editor[style*="display: block"]>.panel-head:first-child{top:-14px!important;margin:0 -4px 16px!important;padding:13px 4px!important}
+ .player-profile-page>.profile-editor[style*="display: block"]>.panel-head:first-child h3{font-size:21px!important}
+}
