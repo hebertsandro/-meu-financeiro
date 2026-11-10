@@ -306,3 +306,9 @@
  .nexus-social .nxf-comment-tools{gap:5px}
  .nexus-social .nxf-comment-tools button{font-size:10px}
 }
+
+.nexus-social .social-reputation-stat{grid-column:1/-1!important;display:flex!important;align-items:center!important;gap:9px!important;padding:10px 12px!important;border:1px solid rgba(169,132,205,.18)!important;border-radius:11px!important;background:linear-gradient(110deg,rgba(127,91,157,.14),rgba(40,48,65,.24))!important}
+.nexus-social .social-reputation-stat>svg{flex:0 0 auto!important;color:#c5a1e8!important}
+.nexus-social .social-reputation-stat span{font-size:11px!important;line-height:1.45!important}
+.nexus-social .social-reputation-stat b{font-size:15px!important;color:#ead8ff!important}
+@media(max-width:760px){.nexus-social .social-reputation-stat{grid-column:1/-1!important;padding:9px!important}.nexus-social .social-reputation-stat span{font-size:10px!important}}
