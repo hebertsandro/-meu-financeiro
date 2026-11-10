@@ -995,3 +995,18 @@
     max-height: 28px !important;
   }
 }
+
+
+/* Alinhamento fino: avatar do contato no cabeçalho do chat privado */
+@media (max-width: 760px) {
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
+    transform: translateX(3px) !important;
+  }
+}
+@media (max-width: 380px) {
+  .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar,
+  .nexus-social-chat-portal .content-social .social-community.mobile-chat-open .social-chat-head-modern .social-chat-person-trigger > .social-chat-head-avatar {
+    transform: translateX(2px) !important;
+  }
+}
