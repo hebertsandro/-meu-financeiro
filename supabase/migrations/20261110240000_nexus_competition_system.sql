@@ -53,13 +53,18 @@ revoke all on function public.competition_create_friend_challenge(uuid,text,text
 grant execute on function public.competition_create_friend_challenge(uuid,text,text,integer,timestamptz) to authenticated;
 create or replace function public.competition_record_match(selected_game text,match_score integer,earned_xp integer,selected_mode text default 'normal',did_win boolean default false,match_duration integer default 0)
 returns uuid language plpgsql security definer set search_path='' as $$
-declare new_match uuid; season_start timestamptz; season_end timestamptz; tournament_start timestamptz; tournament_end timestamptz;
+declare new_match uuid; season_start timestamptz; season_end timestamptz; tournament_start timestamptz; tournament_end timestamptz; recent_count integer;
 begin
  if auth.uid() is null then raise exception 'Faça login para registrar a partida.'; end if;
  if selected_game not in ('space-nexus','piggy-run','quiz') then raise exception 'Jogo inválido.'; end if;
  if match_score is null or match_score<0 or match_score>1000000 then raise exception 'Pontuação inválida.'; end if;
  if earned_xp is null or earned_xp<0 or earned_xp>1000 then raise exception 'XP inválido.'; end if;
  if match_duration is null or match_duration<0 or match_duration>7200 then raise exception 'Duração inválida.'; end if;
+ if selected_game='quiz' and (match_score>5 or earned_xp>25 or (coalesce(did_win,false) and match_score<4)) then raise exception 'Resultado do quiz fora dos limites válidos.'; end if;
+ if selected_game='piggy-run' and (match_score>1000 or earned_xp>100 or (coalesce(did_win,false) and match_score<100)) then raise exception 'Resultado do Asas da Fortuna fora dos limites válidos.'; end if;
+ if selected_game='space-nexus' and coalesce(did_win,false) then raise exception 'Este jogo ainda não possui condição de vitória registrada.'; end if;
+ select count(*) into recent_count from public.competition_match_history h where h.user_id=auth.uid() and h.played_at>now()-interval '60 seconds';
+ if recent_count>=10 then raise exception 'Muitas partidas registradas em sequência. Aguarde um minuto.'; end if;
  insert into public.competition_match_history(user_id,game_key,score,xp_earned,mode,won,duration_seconds) values(auth.uid(),selected_game,match_score,earned_xp,left(coalesce(selected_mode,'normal'),24),coalesce(did_win,false),match_duration) returning id into new_match;
  season_start:=timestamptz '2026-01-01 00:00:00+00'+floor(extract(epoch from (now()-timestamptz '2026-01-01 00:00:00+00'))/2592000)*interval '30 days';season_end:=season_start+interval '30 days';
  insert into public.competition_seasons(name,starts_at,ends_at,status) values('Temporada NEXUS · '||to_char(season_start at time zone 'UTC','DD/MM/YYYY'),season_start,season_end,'active') on conflict(starts_at) do update set status='active';
@@ -69,7 +74,7 @@ begin
  insert into public.competition_weekly_tournaments(name,starts_at,ends_at,status) values('Torneio semanal · '||to_char(tournament_start,'DD/MM'),tournament_start,tournament_end,'active') on conflict(starts_at) do update set status='active';
  update public.competition_weekly_tournaments set status='completed' where ends_at<=now() and status='active';
  insert into public.competition_tournament_entries(tournament_id,user_id,points,matches_played,updated_at) select t.id,auth.uid(),earned_xp,1,now() from public.competition_weekly_tournaments t where t.starts_at=tournament_start on conflict(tournament_id,user_id) do update set points=public.competition_tournament_entries.points+excluded.points,matches_played=public.competition_tournament_entries.matches_played+1,updated_at=now();
- if did_win then insert into public.competition_game_medals(user_id,game_key,medals_count,updated_at) values(auth.uid(),selected_game,1,now()) on conflict(user_id,game_key) do update set medals_count=public.competition_game_medals.medals_count+1,updated_at=now(); end if;
+ if coalesce(did_win,false) then insert into public.competition_game_medals(user_id,game_key,medals_count,updated_at) values(auth.uid(),selected_game,1,now()) on conflict(user_id,game_key) do update set medals_count=public.competition_game_medals.medals_count+1,updated_at=now(); end if;
  update public.competition_challenge_members cm set best_score=greatest(cm.best_score,match_score),matches_played=cm.matches_played+1,updated_at=now() from public.competition_challenges c where cm.challenge_id=c.id and cm.user_id=auth.uid() and c.game_key=selected_game and c.status='active' and c.ends_at>now();
  update public.competition_challenges c set status='completed',winner_id=auth.uid() where c.status='active' and c.game_key=selected_game and c.ends_at>now() and c.winner_id is null and c.target_score<=match_score and exists(select 1 from public.competition_challenge_members cm where cm.challenge_id=c.id and cm.user_id=auth.uid());
  update public.competition_challenges set status='expired' where status='active' and ends_at<=now();
