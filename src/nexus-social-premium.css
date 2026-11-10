@@ -196,3 +196,8 @@
 @media(max-width:560px){.content-social .social-hero-profile-button{margin-right:0;padding:8px 9px;font-size:9px}.content-social .nexus-social>.social-hero{gap:9px}}
 
 .content-social .nxf-post-highlight{outline:2px solid #a77bd0;box-shadow:0 0 0 5px rgba(167,123,208,.12)}
+
+
+.content-social .social-message-avatar{border:0;cursor:pointer;flex-shrink:0}
+.content-social .social-message-sender{display:block;width:max-content;max-width:100%;padding:0;border:0;background:transparent;color:#e8dff0;text-align:left;font-size:10px;font-weight:800;cursor:pointer}
+.content-social .social-message-sender:hover{color:#d1a8f4;text-decoration:underline}
