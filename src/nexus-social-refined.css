@@ -329,3 +329,44 @@
  .nexus-social .social-community .social-clan-detail{padding:13px!important}
  .nexus-social .social-side{gap:12px}
 }
+
+
+/* NEXUS SOCIAL — contextual sidebars and full-page hierarchy */
+.nexus-social .social-layout{align-items:start!important}
+.nexus-social .social-side{display:flex!important;flex-direction:column!important;gap:14px!important;position:sticky;top:18px}
+.nexus-social .social-context-card{position:relative;overflow:hidden;padding:19px!important}
+.nexus-social .social-context-card:before{content:"";position:absolute;right:-42px;top:-52px;width:150px;height:150px;border:1px solid rgba(192,164,239,.12);border-radius:50%;box-shadow:0 0 0 18px rgba(192,164,239,.025),0 0 0 38px rgba(192,164,239,.018);pointer-events:none}
+.nexus-social .social-context-kicker{position:relative;z-index:1;color:#c4a6ef;font-size:8px;font-weight:900;letter-spacing:1.7px}
+.nexus-social .social-context-card h3{position:relative;z-index:1;margin:8px 0;color:#faf6ff;font-size:18px;line-height:1.25;letter-spacing:-.45px}
+.nexus-social .social-context-card>p{position:relative;z-index:1;margin:0;color:#b8adc8;font-size:11px;line-height:1.7}
+.nexus-social .social-context-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:7px;margin:17px 0 14px}
+.nexus-social .social-context-stats>div{display:flex;flex-direction:column;gap:4px;min-width:0;padding:11px 8px;border:1px solid rgba(190,164,238,.13);border-radius:12px;background:rgba(10,8,17,.35)}
+.nexus-social .social-context-stats b{overflow:hidden;color:#f1e8ff;font-size:17px;letter-spacing:-.5px;text-overflow:ellipsis}
+.nexus-social .social-context-stats span{color:#9589a6;font-size:8px;font-weight:750}
+.nexus-social .social-context-rule{display:flex;align-items:flex-start;gap:10px;margin-top:10px;padding:11px;border:1px solid rgba(190,164,238,.1);border-radius:12px;background:rgba(11,9,18,.28)}
+.nexus-social .social-context-rule>svg,.nexus-social .social-context-rule>span{display:grid;place-items:center;flex:none;width:28px;height:28px;padding:6px;border:1px solid rgba(192,164,239,.17);border-radius:9px;background:rgba(143,105,197,.13);color:#d2b8f6}
+.nexus-social .social-context-rule>div{display:flex;flex-direction:column;gap:4px;min-width:0}
+.nexus-social .social-context-rule b{color:#eee5f8;font-size:10px}
+.nexus-social .social-context-rule small{color:#a99db7;font-size:9px;line-height:1.55}
+.nexus-social .social-clan-context{text-align:center;background:radial-gradient(ellipse at 50% 0%,rgba(138,104,196,.2),transparent 62%),linear-gradient(150deg,#241c34,#171421 72%)!important}
+.nexus-social .social-clan-context .social-context-kicker{text-align:left;display:block}
+.nexus-social .social-clan-context h3{text-align:center}
+.nexus-social .social-clan-context-crest{display:grid;place-items:center;width:82px;height:82px;margin:17px auto 13px;border:1px solid rgba(208,180,255,.35);border-radius:24px;background:linear-gradient(145deg,rgba(154,119,211,.3),rgba(47,35,67,.7));box-shadow:0 10px 30px rgba(0,0,0,.2),inset 0 1px rgba(255,255,255,.1);font-size:39px}
+.nexus-social .social-clan-context .social-context-rule{text-align:left}
+.nexus-social .social-profile-editor{padding:17px!important}
+.nexus-social .social-profile-editor .social-editor-identity{gap:11px!important;padding:12px!important}
+.nexus-social .social-profile-editor .social-editor-identity small{display:block;margin-top:4px;color:#9f91b1;font-size:9px}
+.nexus-social .social-own-preview{width:100%;justify-content:center;margin-top:12px}
+@media(max-width:900px){
+ .nexus-social .social-layout{grid-template-columns:minmax(0,1fr)!important}
+ .nexus-social .social-side{position:static;display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;align-items:start}
+ .nexus-social .social-side>.social-safety-note{grid-column:1/-1}
+}
+@media(max-width:600px){
+ .nexus-social .social-side{display:flex!important;flex-direction:column!important;gap:11px!important}
+ .nexus-social .social-context-card{padding:15px!important}
+ .nexus-social .social-context-card h3{font-size:16px}
+ .nexus-social .social-context-stats{margin:13px 0 10px}
+ .nexus-social .social-context-stats>div{padding:9px 7px}
+ .nexus-social .social-context-stats b{font-size:15px}
+}
