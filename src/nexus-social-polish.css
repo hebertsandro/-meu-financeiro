@@ -701,3 +701,25 @@
   .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger .social-chat-head-avatar{width:38px!important;height:38px!important;min-width:38px!important;flex-basis:38px!important}
   .nexus-social .social-community.mobile-chat-open .social-chat-head-actions>button{width:34px!important;height:34px!important;min-width:34px!important;flex-basis:34px!important}
 }
+
+
+/* Preserve the complete contact photo in the mobile chat header */
+@media(max-width:760px){
+  .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger .social-chat-head-avatar{
+    border-radius:50%!important;
+    overflow:hidden!important;
+    background-position:center!important;
+    background-size:contain!important;
+    background-repeat:no-repeat!important;
+    padding:0!important;
+    box-sizing:border-box!important;
+  }
+  .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger .social-chat-head-avatar img,
+  .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger .social-chat-head-avatar picture,
+  .nexus-social .social-community.mobile-chat-open .social-chat-person-trigger .social-chat-head-avatar video{
+    display:block!important;width:100%!important;height:100%!important;
+    max-width:100%!important;max-height:100%!important;
+    object-fit:contain!important;object-position:center!important;
+    border-radius:50%!important;
+  }
+}
