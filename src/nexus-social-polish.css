@@ -890,3 +890,24 @@
     max-height: 38px !important;
   }
 }
+
+
+/* Correção definitiva: avatares de remetentes visíveis e realmente circulares nas mensagens. */
+.content-social .social-chat-bubble .social-message-avatar,
+.nexus-social .social-chat-bubble .social-message-avatar,
+.nexus-social-chat-portal .social-chat-bubble .social-message-avatar{
+  display:grid!important;place-items:center!important;flex:0 0 30px!important;
+  width:30px!important;min-width:30px!important;height:30px!important;min-height:30px!important;
+  padding:0!important;margin:0 0 5px!important;border-radius:50%!important;overflow:hidden!important;
+  aspect-ratio:1/1!important;line-height:1!important;object-fit:cover!important;
+}
+.content-social .social-chat-bubble .social-message-avatar img,
+.nexus-social .social-chat-bubble .social-message-avatar img,
+.nexus-social-chat-portal .social-chat-bubble .social-message-avatar img{
+  display:block!important;width:100%!important;height:100%!important;min-width:100%!important;
+  min-height:100%!important;max-width:none!important;max-height:none!important;
+  border-radius:50%!important;object-fit:cover!important;
+}
+/* O anel de story novo permanece destacado; após abrir, muda para cinza. */
+.nexus-feed .nxf-story-unseen .nxf-story-ring{border:2px solid transparent!important;background:linear-gradient(#191722,#191722) padding-box,linear-gradient(135deg,#ffca70,#ee67b9,#8c68ff) border-box!important;box-shadow:0 0 0 2px rgba(224,137,231,.13)!important}
+.nexus-feed .nxf-story-seen .nxf-story-ring{border:2px solid #77717f!important;background:#282431!important;box-shadow:none!important}
