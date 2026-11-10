@@ -3,6 +3,13 @@ import {supabase} from './supabase';
 import {MessageCircle,Send,Shield,Flag,Users,Plus,RefreshCw,Swords,Handshake,DoorOpen,Lock,ChevronLeft,Pencil,Check,X,Zap,LogOut,Trash2,Search,MoreHorizontal,CornerUpLeft,Smile,Pin,Paperclip,FileText,Star,Archive,Bell,BellOff} from 'lucide-react';
 
 const errText=e=>e?.message||'Não foi possível concluir esta ação.';
+class NexusCommunityBoundary extends React.Component{
+ constructor(props){super(props);this.state={failed:false};}
+ static getDerivedStateFromError(){return {failed:true};}
+ componentDidCatch(error){console.error('NEXUS Clãs render error:',error);}
+ render(){if(this.state.failed)return <section className="social-community social-community-clans"><div className="social-error" role="alert"><b>Não foi possível abrir os Clãs.</b><p>Ocorreu um erro ao carregar esta área. Atualize a página para tentar novamente.</p><button type="button" onClick={()=>this.setState({failed:false})}>Tentar novamente</button></div></section>;return this.props.children;}
+}
+
 const signedMessage=async message=>{if(!message?.attachment_path)return message;const {data}=await supabase.storage.from('nexus-posts').createSignedUrl(message.attachment_path,3600);return {...message,attachmentUrl:data?.signedUrl||''};};
 const duelQuestions=[{q:'Qual atitude ajuda a manter o orçamento saudável?',a:['Gastar todo o saldo','Registrar entradas e saídas','Ignorar pequenas compras'],correct:1},{q:'Você guardou R$ 80 por mês durante 5 meses. Quanto juntou?',a:['R$ 320','R$ 400','R$ 450'],correct:1},{q:'O que é mais importante antes de parcelar?',a:['Ver se a parcela cabe no orçamento','Olhar só o valor da primeira parcela','Ignorar juros'],correct:0},{q:'Uma compra custa R$ 150 e tem desconto de 20%. Qual o preço final?',a:['R$ 120','R$ 130','R$ 140'],correct:0},{q:'Qual é uma boa prática contra golpes?',a:['Compartilhar códigos','Clicar em qualquer link','Conferir o canal oficial'],correct:2}];
 export default function NexusCommunity({mode='all',userId,playerProfile=null,friends=[],incoming=[],outgoing=[],onAnswerFriendRequest=()=>{},onToast=()=>{},onClanChange=()=>{},onOpenProfile=()=>{}}){
