@@ -718,3 +718,70 @@
  .nexus-social .nxf-actions button{gap:5px!important;font-size:9px!important}
  .nexus-social .nxf-compose-bottom{flex-wrap:wrap}
 }
+
+
+
+/* NEXUS SOCIAL — ocupar toda a largura útil da página */
+.nexus-social{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+  margin:0!important;
+}
+.nexus-social .social-layout,
+.nexus-social .social-main,
+.nexus-social .social-community,
+.nexus-social .social-community>.social-panel,
+.nexus-social .social-community-grid,
+.nexus-social .nexus-feed{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+.nexus-social .nexus-feed{
+  margin:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.nexus-social .nxf-heading,
+.nexus-social .nxf-composer,
+.nexus-social .nxf-post-list,
+.nexus-social .nxf-post,
+.nexus-social .nxf-empty,
+.nexus-social .nxf-loading{
+  width:100%!important;
+  max-width:none!important;
+}
+.nexus-social .social-community-grid{
+  grid-template-columns:minmax(300px, minmax(300px, 30%)) minmax(0,1fr)!important;
+}
+.nexus-social .social-community-list,
+.nexus-social .social-community-chat{
+  width:100%!important;
+  max-width:none!important;
+  min-width:0!important;
+}
+.nexus-social .social-community-chat{
+  min-height:620px!important;
+}
+.nexus-social .social-chat-messages{
+  min-height:430px!important;
+}
+.nexus-social .social-community-cards{
+  width:100%!important;
+  max-width:none!important;
+  grid-template-columns:repeat(auto-fit,minmax(250px,1fr))!important;
+}
+.nexus-social .social-clan-detail{
+  width:100%!important;
+  max-width:none!important;
+}
+@media(max-width:760px){
+  .nexus-social .social-community-grid{grid-template-columns:minmax(0,1fr)!important}
+  .nexus-social .social-community-chat{min-height:520px!important}
+  .nexus-social .social-chat-messages{min-height:320px!important}
+  .nexus-social .social-community-cards{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+}
+@media(max-width:430px){
+  .nexus-social .social-community-cards{grid-template-columns:minmax(0,1fr)!important}
+}
