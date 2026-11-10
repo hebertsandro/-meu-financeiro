@@ -313,3 +313,170 @@
  .nexus-social .nxf-actions button{min-height:37px!important;padding:6px 4px!important;font-size:9px!important}
  .nexus-social .nxf-actions button svg{width:16px;height:16px}
 }
+
+
+/* NEXUS SOCIAL — redesign clean 2026. Menos camadas, mais conteúdo. */
+.nexus-social{
+ --nx-bg:#111318;--nx-surface:#191c23;--nx-surface-2:#20242d;
+ --nx-line:rgba(226,230,240,.09);--nx-line-strong:rgba(181,153,232,.28);
+ --nx-text:#f1f2f5;--nx-muted:#9da3b0;--nx-accent:#b69add;--nx-accent-2:#9274bd;
+ color:var(--nx-text)!important;gap:16px!important;
+}
+.nexus-social>.social-hero{
+ min-height:112px!important;padding:22px 24px!important;border:1px solid var(--nx-line)!important;
+ border-radius:16px!important;background:#191c23!important;box-shadow:none!important;
+}
+.nexus-social>.social-hero:before,.nexus-social>.social-hero:after{display:none!important}
+.nexus-social>.social-hero>div:first-child>span{font-size:9px!important;letter-spacing:1.35px!important;color:#b9a5d6!important}
+.nexus-social>.social-hero h2{margin:6px 0 4px!important;font-size:29px!important;letter-spacing:-1px!important}
+.nexus-social>.social-hero h2 em{color:#c3a9e2!important}
+.nexus-social>.social-hero p{max-width:560px;font-size:12px!important;line-height:1.55!important;color:#a8adba!important}
+.nexus-social>.social-hero .social-hero-icon{width:48px!important;height:48px!important;border:1px solid var(--nx-line)!important;border-radius:14px!important;background:#24212d!important;color:#c6b2e3!important;box-shadow:none!important}
+.nexus-social .nexus-push-settings{margin:0 0 2px!important;padding:11px 14px!important;border:1px solid var(--nx-line)!important;border-radius:12px!important;background:#191c23!important;box-shadow:none!important}
+.nexus-social .nexus-push-icon{width:34px!important;height:34px!important;border-radius:10px!important;background:#292431!important;color:#c7b3e4!important}
+.nexus-social .nexus-push-settings>button{border:0!important;border-radius:9px!important;background:#8065a6!important;box-shadow:none!important}
+.nexus-social .social-layout{grid-template-columns:minmax(0,1fr) 260px!important;gap:16px!important}
+.nexus-social .social-main,.nexus-social .social-side{min-width:0}
+.nexus-social .social-side{position:static!important;gap:12px!important}
+.nexus-social .social-context-card{display:none!important}
+.nexus-social .social-panel,.nexus-social .social-profile-editor,
+.nexus-social .social-community .social-panel,
+.nexus-social .social-community .social-community-grid,
+.nexus-social .social-community .social-community-list,
+.nexus-social .social-community .social-community-chat,
+.nexus-social .social-community .social-clan-detail{
+ background:#191c23!important;border:1px solid var(--nx-line)!important;
+ border-radius:14px!important;box-shadow:none!important;
+}
+.nexus-social .social-panel,.nexus-social .social-profile-editor{padding:16px!important}
+.nexus-social .social-panel-heading{padding-bottom:12px!important;border-bottom:1px solid var(--nx-line)!important}
+.nexus-social .social-panel-heading h3{font-size:15px!important;letter-spacing:-.2px!important}
+.nexus-social .social-panel-heading p{font-size:11px!important;color:#9da3b0!important}
+.nexus-social .social-section-kicker,.nexus-social .social-context-kicker{font-size:9px!important;letter-spacing:1.1px!important;color:#bca8d8!important}
+.nexus-social .social-tabs{
+ display:flex!important;gap:4px!important;padding:4px!important;margin:0 0 12px!important;
+ border:1px solid var(--nx-line)!important;border-radius:11px!important;background:#17191f!important;box-shadow:none!important;
+}
+.nexus-social .social-tabs button,.nexus-social .social-community .social-community-tabs button{
+ min-height:39px!important;padding:8px 13px!important;border:1px solid transparent!important;
+ border-radius:8px!important;background:transparent!important;color:#a9adba!important;
+ box-shadow:none!important;font-size:11px!important;font-weight:650!important;
+}
+.nexus-social .social-tabs button.active,.nexus-social .social-community .social-community-tabs button.active{
+ color:#f4effa!important;background:#30283b!important;border:1px solid rgba(186,158,220,.18)!important;
+ box-shadow:inset 0 -2px #b79ad9!important;
+}
+.nexus-social .social-tabs button b{background:#8065a6!important;box-shadow:none!important}
+.nexus-social .social-community .social-community-grid{overflow:hidden;border-radius:13px!important}
+.nexus-social .social-community .social-community-list{border-right:1px solid var(--nx-line)!important}
+.nexus-social .social-community .social-community-row,
+.nexus-social .social-community .social-community-card,
+.nexus-social .social-person{
+ background:#20232b!important;border:1px solid var(--nx-line)!important;
+ border-radius:11px!important;box-shadow:none!important;transform:none!important;
+}
+.nexus-social .social-community .social-community-row:hover,
+.nexus-social .social-person-clickable:hover{background:#252833!important;border-color:var(--nx-line-strong)!important;box-shadow:none!important;transform:none!important}
+.nexus-social .social-community .social-community-row.selected{background:#2a2533!important;border-color:rgba(185,157,220,.24)!important;box-shadow:inset 2px 0 #b79ad9!important}
+.nexus-social .social-community .social-chat-head{background:#1d2027!important;border-bottom:1px solid var(--nx-line)!important}
+.nexus-social .social-community .social-chat-messages{background:#171a20!important}
+.nexus-social .social-community .social-chat-bubble{background:#292d36!important;border:1px solid var(--nx-line)!important;border-radius:13px!important;box-shadow:none!important}
+.nexus-social .social-community .social-chat-bubble.mine{background:#423650!important;border-color:rgba(189,159,223,.17)!important}
+.nexus-social .social-community .social-chat-compose{background:#1c2027!important;border:1px solid var(--nx-line)!important;border-radius:11px!important;box-shadow:none!important}
+.nexus-social .social-community input,.nexus-social .social-community textarea,.nexus-social .social-community select,
+.nexus-social .social-search,.nexus-social .social-search input{
+ background:#14171d!important;border:1px solid var(--nx-line)!important;border-radius:9px!important;color:#f0eff4!important;box-shadow:none!important
+}
+.nexus-social .social-community input:focus,.nexus-social .social-community textarea:focus,.nexus-social .social-community select:focus,
+.nexus-social .social-search:focus-within{border-color:rgba(185,157,220,.55)!important;box-shadow:0 0 0 2px rgba(166,135,203,.1)!important;outline:0!important}
+.nexus-social .social-community .social-inbox-requests,
+.nexus-social .social-community .social-create-form,
+.nexus-social .social-community .social-room-tools{background:#1c2027!important;border:1px solid var(--nx-line)!important;border-radius:11px!important;box-shadow:none!important}
+.nexus-social .social-community .social-clan-banner{
+ border:1px solid rgba(185,157,220,.2)!important;border-radius:13px!important;
+ background:#292431!important;box-shadow:none!important;
+}
+.nexus-social .social-community .social-clan-banner:after,
+.nexus-social .social-community .social-clan-banner:before{display:none!important}
+.nexus-social .social-community .social-clan-emblem{background:#332b3d!important;border:1px solid var(--nx-line)!important;box-shadow:none!important}
+.nexus-social .social-community .social-clan-reward,
+.nexus-social .social-community .social-duel-card{background:#20232b!important;border:1px solid var(--nx-line)!important;box-shadow:none!important}
+.nexus-social .social-community .social-clan-reward.unlocked{background:#30283b!important;border-color:rgba(185,157,220,.28)!important}
+.nexus-social .social-profile-editor .social-editor-identity{padding:11px!important;border:1px solid var(--nx-line)!important;border-radius:11px!important;background:#20232b!important}
+.nexus-social .social-editor-identity b{font-size:12px!important}
+.nexus-social .social-editor-identity span{font-size:10px!important;color:#c2addf!important}
+.nexus-social .social-editor-identity small{font-size:10px!important;color:#969daa!important}
+.nexus-social .social-bio-readonly{padding:10px!important;background:#171a20!important;border:1px solid var(--nx-line)!important;border-radius:10px!important}
+.nexus-social .social-bio-readonly span{color:#c2addf!important}
+.nexus-social .social-bio-readonly p,.nexus-social .social-bio-readonly small{font-size:10px!important;color:#a3a8b3!important;line-height:1.55!important}
+.nexus-social .social-safety-note{border:1px solid rgba(115,169,143,.17)!important;border-radius:11px!important;background:#1b2421!important;box-shadow:none!important}
+.nexus-social .social-view-button{background:#282431!important;border:1px solid var(--nx-line)!important;border-radius:9px!important;box-shadow:none!important}
+.nexus-social .social-add-button,.nexus-social .social-primary,
+.nexus-social .social-community button.social-primary,.nexus-social .social-community button.social-add-button{
+ background:#8065a6!important;border:1px solid transparent!important;border-radius:9px!important;box-shadow:none!important
+}
+.nexus-social .social-community .social-inbox-actions button,
+.nexus-social .social-community .social-icon-button,
+.nexus-social .social-community .social-chat-head button{
+ background:#292631!important;border:1px solid var(--nx-line)!important;border-radius:9px!important;box-shadow:none!important
+}
+.nexus-social .social-person .social-avatar{box-shadow:none!important}
+.nexus-social .nexus-feed{gap:12px!important}
+.nexus-social .nxf-heading{
+ min-height:0!important;padding:3px 2px 12px!important;border:0!important;border-bottom:1px solid var(--nx-line)!important;
+ border-radius:0!important;background:transparent!important;box-shadow:none!important;
+}
+.nexus-social .nxf-heading:before,.nexus-social .nxf-heading:after{display:none!important}
+.nexus-social .nxf-heading .nxf-eyebrow{font-size:9px!important;letter-spacing:1.1px!important;color:#bba8d5!important}
+.nexus-social .nxf-heading h2{margin:5px 0!important;font-size:25px!important;letter-spacing:-.8px!important}
+.nexus-social .nxf-heading h2 em{color:#c0a7df!important}
+.nexus-social .nxf-heading p{font-size:11px!important;color:#a1a6b2!important}
+.nexus-social .nxf-live{padding:6px 9px!important;border:1px solid var(--nx-line)!important;border-radius:20px!important;background:#1c2421!important;color:#9bc8ad!important;box-shadow:none!important}
+.nexus-social .nxf-composer,.nexus-social .nxf-post{
+ padding:15px!important;border:1px solid var(--nx-line)!important;border-radius:13px!important;
+ background:#191c23!important;box-shadow:none!important;transform:none!important;
+}
+.nexus-social .nxf-composer:focus-within{border-color:rgba(185,157,220,.35)!important}
+.nexus-social .nxf-compose-top{gap:11px!important}
+.nexus-social .nxf-compose-avatar,.nexus-social .nxf-avatar{box-shadow:none!important}
+.nexus-social .nxf-compose-top textarea{
+ min-height:75px!important;padding:11px 12px!important;border:1px solid var(--nx-line)!important;
+ border-radius:10px!important;background:#14171d!important;color:#f1f0f5!important;font-size:12px!important;
+}
+.nexus-social .nxf-compose-bottom{padding-top:11px!important;border-top:1px solid var(--nx-line)!important}
+.nexus-social .nxf-photo-pick{color:#b9a5d5!important}
+.nexus-social .nxf-publish{background:#8065a6!important;border:0!important;border-radius:9px!important;box-shadow:none!important}
+.nexus-social .nxf-post{margin:0!important}
+.nexus-social .nxf-post:hover{transform:none!important;border-color:var(--nx-line-strong)!important;box-shadow:none!important}
+.nexus-social .nxf-post-head{border-color:var(--nx-line)!important}
+.nexus-social .nxf-post-body{font-size:13px!important;line-height:1.7!important;color:#e4e5eb!important}
+.nexus-social .nxf-post-image{border:0!important;border-radius:10px!important;box-shadow:none!important}
+.nexus-social .nxf-actions{border-color:var(--nx-line)!important}
+.nexus-social .nxf-actions button{border-radius:8px!important}
+.nexus-social .nxf-actions button:hover{background:#252832!important;border-color:var(--nx-line)!important}
+.nexus-social .nxf-comment-content{background:#20232b!important;border:1px solid var(--nx-line)!important;box-shadow:none!important}
+.nexus-social .nxf-comment-form input{background:#14171d!important;border:1px solid var(--nx-line)!important}
+.nexus-social .nxf-comment-form button{background:#8065a6!important;box-shadow:none!important}
+.nexus-social .nxf-empty,.nexus-social .nxf-loading{background:#191c23!important;border:1px dashed var(--nx-line)!important;box-shadow:none!important}
+.nexus-social button:not(:disabled):hover{filter:none!important}
+.nexus-social button:focus-visible,.nexus-social input:focus-visible,.nexus-social textarea:focus-visible{outline:2px solid rgba(185,157,220,.6)!important;outline-offset:2px!important}
+@media(max-width:900px){
+ .nexus-social .social-layout{grid-template-columns:minmax(0,1fr)!important}
+ .nexus-social .social-side{display:none!important}
+}
+@media(max-width:640px){
+ .nexus-social{gap:12px!important}
+ .nexus-social>.social-hero{min-height:94px!important;padding:16px!important;border-radius:13px!important}
+ .nexus-social>.social-hero h2{font-size:25px!important}
+ .nexus-social>.social-hero p{font-size:11px!important}
+ .nexus-social>.social-hero .social-hero-icon{width:40px!important;height:40px!important}
+ .nexus-social .social-tabs{gap:3px!important;padding:3px!important}
+ .nexus-social .social-tabs button{min-height:38px!important;padding:7px 8px!important;font-size:10px!important}
+ .nexus-social .social-panel,.nexus-social .social-profile-editor{padding:13px!important}
+ .nexus-social .nxf-heading{padding-bottom:10px!important}
+ .nexus-social .nxf-heading h2{font-size:23px!important}
+ .nexus-social .nxf-composer,.nexus-social .nxf-post{padding:12px!important;border-radius:11px!important}
+ .nexus-social .nxf-post-body{font-size:12px!important}
+ .nexus-social .social-community .social-community-grid{grid-template-columns:minmax(0,1fr)!important;padding:5px!important}
+ .nexus-social .social-community .social-community-list{max-height:190px!important;border-right:0!important;border-bottom:1px solid var(--nx-line)!important}
+}
