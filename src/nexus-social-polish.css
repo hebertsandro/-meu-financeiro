@@ -517,3 +517,23 @@
  }
  .nexus-social-chat-portal .nexus-social .social-chat-compose .nx-voice-error{bottom:calc(100% + 42px)!important;color:#ffc2c2!important}
 }
+
+
+/* Guard against a stale composer while the inbox/list is visible */
+@media(max-width:767px){
+ .nexus-social .social-community.mobile-inbox-open .social-chat-compose,
+ .nexus-social .social-community.mobile-inbox-open .social-chat-head,
+ .nexus-social .social-community.mobile-inbox-open .social-chat-messages,
+ .nexus-social .social-community.mobile-inbox-open .social-replying,
+ .nexus-social .social-community.mobile-inbox-open .social-typing-indicator{display:none!important}
+ .nexus-social-chat-portal,
+ .nexus-social-chat-portal>.content-social,
+ .nexus-social-chat-portal>.content-social>.nexus-social{
+   position:fixed!important;inset:0!important;width:100vw!important;height:100dvh!important;
+   max-width:none!important;max-height:none!important;margin:0!important;padding:0!important;
+   overflow:hidden!important;background:#0d0d1a!important;
+ }
+ .nexus-social-chat-portal>.content-social,
+ .nexus-social-chat-portal>.content-social>.nexus-social{display:flex!important;flex-direction:column!important}
+ .nexus-social-chat-portal .social-community.mobile-chat-open{position:relative!important;inset:auto!important;flex:1 1 auto!important}
+}
