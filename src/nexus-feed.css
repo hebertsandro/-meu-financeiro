@@ -239,3 +239,19 @@
 .nexus-feed .nxf-story-navigation{display:flex!important;justify-content:space-between!important;gap:12px!important;padding:12px!important}
 .nexus-feed .nxf-story-navigation button{padding:9px 15px!important;border-radius:20px!important}
 .nexus-feed .nxf-story-navigation button:disabled{opacity:.35!important}
+
+
+/* Stories: aro destacado para conteúdo novo e discreto após visualização */
+.nexus-feed .nxf-story-unseen .nxf-story-ring{
+  background:conic-gradient(from 20deg,#ffcf68 0deg,#f06acb 115deg,#8c62ff 235deg,#ffcf68 360deg)!important;
+  box-shadow:0 0 0 2px #171320,0 0 0 4px rgba(205,137,255,.95),0 0 16px rgba(171,105,255,.28)!important;
+}
+.nexus-feed .nxf-story-seen .nxf-story-ring{
+  background:linear-gradient(135deg,#777180,#494451)!important;
+  box-shadow:0 0 0 2px #171320,0 0 0 3px rgba(139,132,150,.55)!important;
+  filter:saturate(.72);
+}
+.nexus-feed .nxf-story-unseen b{color:#f4eaff!important}
+.nexus-feed .nxf-story-seen b{color:#a69eaf!important}
+.nexus-feed .nxf-story-unseen:focus-visible .nxf-story-ring,
+.nexus-feed .nxf-story-unseen:active .nxf-story-ring{filter:brightness(1.12)}
