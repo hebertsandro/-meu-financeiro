@@ -396,3 +396,84 @@
   .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head{gap:5px!important;padding-left:8px!important;padding-right:8px!important}
   .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head>button:not(.social-chat-back){flex-basis:30px!important;width:30px!important;min-width:30px!important;height:30px!important}
 }
+
+
+/* Final mobile fullscreen chat: opaque app layer, no page bleed-through */
+.nexus-social.nexus-social-chat-portal{
+  display:block!important;
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483647!important;
+  width:100vw!important;
+  height:100vh!important;
+  height:100dvh!important;
+  max-width:none!important;
+  max-height:none!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+  background:#0d0d1a!important;
+  isolation:isolate!important;
+}
+.nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open{
+  display:flex!important;
+  position:absolute!important;
+  inset:0!important;
+  flex-direction:column!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:0!important;
+  max-height:none!important;
+  overflow:hidden!important;
+  margin:0!important;
+  padding:0!important;
+  background:#0d0d1a!important;
+}
+@media(max-width:767px){
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open>.social-tabs,
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open>.social-error{display:none!important}
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open>.social-panel{
+    display:flex!important;
+    flex:1 1 auto!important;
+    flex-direction:column!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    max-height:none!important;
+    margin:0!important;
+    padding:0!important;
+    overflow:hidden!important;
+    border:0!important;
+    border-radius:0!important;
+    background:#0d0d1a!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-panel-heading{display:none!important}
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-community-grid{
+    display:flex!important;
+    flex:1 1 auto!important;
+    flex-direction:column!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    background:#0d0d1a!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-community-list{display:none!important}
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-community-chat{
+    display:flex!important;
+    flex:1 1 auto!important;
+    flex-direction:column!important;
+    width:100%!important;
+    height:100%!important;
+    min-height:0!important;
+    overflow:hidden!important;
+    background:#0d0d1a!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-messages{
+    flex:1 1 auto!important;
+    min-height:0!important;
+    overflow-y:auto!important;
+    -webkit-overflow-scrolling:touch!important;
+    overscroll-behavior:contain!important;
+  }
+}
