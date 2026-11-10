@@ -1,0 +1,8 @@
+drop policy if exists "Clan members read updates" on public.social_clan_updates;
+create policy "Clan members read updates" on public.social_clan_updates for select to authenticated using (exists (select 1 from public.social_clan_members m where m.clan_id = social_clan_updates.clan_id and m.user_id = (select auth.uid())));
+drop policy if exists "Clan officers create updates" on public.social_clan_updates;
+create policy "Clan officers create updates" on public.social_clan_updates for insert to authenticated with check (created_by = (select auth.uid()) and exists (select 1 from public.social_clan_members m where m.clan_id = social_clan_updates.clan_id and m.user_id = (select auth.uid()) and m.role in ('leader','officer')));
+drop policy if exists "Clan officers update updates" on public.social_clan_updates;
+create policy "Clan officers update updates" on public.social_clan_updates for update to authenticated using (exists (select 1 from public.social_clan_members m where m.clan_id = social_clan_updates.clan_id and m.user_id = (select auth.uid()) and m.role in ('leader','officer'))) with check (exists (select 1 from public.social_clan_members m where m.clan_id = social_clan_updates.clan_id and m.user_id = (select auth.uid()) and m.role in ('leader','officer')));
+drop policy if exists "Clan officers delete updates" on public.social_clan_updates;
+create policy "Clan officers delete updates" on public.social_clan_updates for delete to authenticated using (exists (select 1 from public.social_clan_members m where m.clan_id = social_clan_updates.clan_id and m.user_id = (select auth.uid()) and m.role in ('leader','officer')));
