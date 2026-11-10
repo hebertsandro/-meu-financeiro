@@ -312,3 +312,87 @@
 .nexus-social .social-reputation-stat span{font-size:11px!important;line-height:1.45!important}
 .nexus-social .social-reputation-stat b{font-size:15px!important;color:#ead8ff!important}
 @media(max-width:760px){.nexus-social .social-reputation-stat{grid-column:1/-1!important;padding:9px!important}.nexus-social .social-reputation-stat span{font-size:10px!important}}
+
+
+/* NEXUS mobile chat fix — detach fullscreen chat from page stacking contexts */
+.nexus-social.nexus-social-chat-portal{
+  position:fixed!important;
+  inset:0!important;
+  z-index:2147483000!important;
+  width:100vw!important;
+  height:100dvh!important;
+  margin:0!important;
+  padding:0!important;
+  isolation:isolate!important;
+  pointer-events:auto!important;
+}
+.nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open{
+  position:absolute!important;
+  inset:0!important;
+  z-index:1!important;
+  width:100%!important;
+  height:100%!important;
+  min-height:100%!important;
+  max-height:100%!important;
+}
+@media(max-width:767px){
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head{
+    display:flex!important;
+    flex-wrap:wrap!important;
+    align-content:flex-start!important;
+    align-items:center!important;
+    gap:6px!important;
+    min-height:0!important;
+    height:auto!important;
+    flex:0 0 auto!important;
+    padding:calc(8px + env(safe-area-inset-top,0px)) 10px 9px!important;
+    overflow:visible!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-back{
+    order:0!important;
+    flex:0 0 36px!important;
+    width:36px!important;
+    height:36px!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head-avatar{
+    order:1!important;
+    flex:0 0 38px!important;
+    width:38px!important;
+    height:38px!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head-copy{
+    order:2!important;
+    flex:1 1 140px!important;
+    min-width:0!important;
+    max-width:calc(100% - 90px)!important;
+    overflow:hidden!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head-copy b,
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head-copy small{
+    display:block!important;
+    overflow:hidden!important;
+    text-overflow:ellipsis!important;
+    white-space:nowrap!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-message-search{display:none!important}
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head>button:not(.social-chat-back){
+    order:3!important;
+    flex:0 0 32px!important;
+    width:32px!important;
+    min-width:32px!important;
+    height:32px!important;
+    margin:0!important;
+    padding:0!important;
+    display:inline-flex!important;
+    align-items:center!important;
+    justify-content:center!important;
+  }
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-compose{
+    flex:0 0 auto!important;
+    width:100%!important;
+  }
+}
+@media(max-width:380px){
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head{gap:5px!important;padding-left:8px!important;padding-right:8px!important}
+  .nexus-social.nexus-social-chat-portal .social-community.mobile-chat-open .social-chat-head>button:not(.social-chat-back){flex-basis:30px!important;width:30px!important;min-width:30px!important;height:30px!important}
+}
