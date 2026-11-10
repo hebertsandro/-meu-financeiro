@@ -1,0 +1,80 @@
+-- NEXUS COMPETITION SYSTEM
+create table if not exists public.competition_seasons(id uuid primary key default gen_random_uuid(),name text not null,starts_at timestamptz not null,ends_at timestamptz not null,status text not null default 'active' check(status in ('active','completed')),created_at timestamptz not null default now(),unique(starts_at),check(ends_at>starts_at));
+create table if not exists public.competition_season_scores(season_id uuid not null references public.competition_seasons(id) on delete cascade,user_id uuid not null references auth.users(id) on delete cascade,xp_points bigint not null default 0 check(xp_points>=0),total_score bigint not null default 0 check(total_score>=0),matches_played integer not null default 0 check(matches_played>=0),wins integer not null default 0 check(wins>=0),updated_at timestamptz not null default now(),primary key(season_id,user_id));
+create table if not exists public.competition_weekly_tournaments(id uuid primary key default gen_random_uuid(),name text not null,starts_at timestamptz not null,ends_at timestamptz not null,status text not null default 'active' check(status in ('active','completed')),created_at timestamptz not null default now(),unique(starts_at),check(ends_at>starts_at));
+create table if not exists public.competition_tournament_entries(tournament_id uuid not null references public.competition_weekly_tournaments(id) on delete cascade,user_id uuid not null references auth.users(id) on delete cascade,points bigint not null default 0 check(points>=0),matches_played integer not null default 0 check(matches_played>=0),updated_at timestamptz not null default now(),primary key(tournament_id,user_id));
+create table if not exists public.competition_match_history(id uuid primary key default gen_random_uuid(),user_id uuid not null references auth.users(id) on delete cascade,game_key text not null check(game_key in ('space-nexus','piggy-run','quiz')),score integer not null default 0 check(score between 0 and 1000000),xp_earned integer not null default 0 check(xp_earned between 0 and 1000),mode text not null default 'normal' check(char_length(mode)<=24),won boolean not null default false,duration_seconds integer not null default 0 check(duration_seconds between 0 and 7200),played_at timestamptz not null default now());
+create index if not exists competition_match_user_date_idx on public.competition_match_history(user_id,played_at desc);
+create index if not exists competition_match_game_date_idx on public.competition_match_history(game_key,played_at desc);
+create table if not exists public.competition_game_medals(user_id uuid not null references auth.users(id) on delete cascade,game_key text not null check(game_key in ('space-nexus','piggy-run','quiz')),medals_count integer not null default 0 check(medals_count>=0),updated_at timestamptz not null default now(),primary key(user_id,game_key));
+create table if not exists public.competition_challenges(id uuid primary key default gen_random_uuid(),creator_id uuid not null references auth.users(id) on delete cascade,opponent_id uuid not null references auth.users(id) on delete cascade,title text not null check(char_length(title) between 3 and 60),game_key text not null check(game_key in ('space-nexus','piggy-run','quiz')),target_score integer not null check(target_score between 1 and 1000000),starts_at timestamptz not null default now(),ends_at timestamptz not null,status text not null default 'active' check(status in ('active','completed','expired','cancelled')),winner_id uuid references auth.users(id) on delete set null,created_at timestamptz not null default now(),check(creator_id<>opponent_id),check(ends_at>starts_at));
+create table if not exists public.competition_challenge_members(challenge_id uuid not null references public.competition_challenges(id) on delete cascade,user_id uuid not null references auth.users(id) on delete cascade,best_score integer not null default 0 check(best_score>=0),matches_played integer not null default 0 check(matches_played>=0),updated_at timestamptz not null default now(),primary key(challenge_id,user_id));
+alter table public.competition_seasons enable row level security;
+alter table public.competition_season_scores enable row level security;
+alter table public.competition_weekly_tournaments enable row level security;
+alter table public.competition_tournament_entries enable row level security;
+alter table public.competition_match_history enable row level security;
+alter table public.competition_game_medals enable row level security;
+alter table public.competition_challenges enable row level security;
+alter table public.competition_challenge_members enable row level security;
+drop policy if exists "Authenticated read competition seasons" on public.competition_seasons;
+create policy "Authenticated read competition seasons" on public.competition_seasons for select to authenticated using(true);
+drop policy if exists "Authenticated read season scores" on public.competition_season_scores;
+create policy "Authenticated read season scores" on public.competition_season_scores for select to authenticated using(true);
+drop policy if exists "Authenticated read weekly tournaments" on public.competition_weekly_tournaments;
+create policy "Authenticated read weekly tournaments" on public.competition_weekly_tournaments for select to authenticated using(true);
+drop policy if exists "Authenticated read tournament entries" on public.competition_tournament_entries;
+create policy "Authenticated read tournament entries" on public.competition_tournament_entries for select to authenticated using(true);
+drop policy if exists "Users read own match history" on public.competition_match_history;
+create policy "Users read own match history" on public.competition_match_history for select to authenticated using(user_id=(select auth.uid()));
+drop policy if exists "Users read own game medals" on public.competition_game_medals;
+create policy "Users read own game medals" on public.competition_game_medals for select to authenticated using(user_id=(select auth.uid()));
+drop policy if exists "Challenge participants read challenges" on public.competition_challenges;
+create policy "Challenge participants read challenges" on public.competition_challenges for select to authenticated using(creator_id=(select auth.uid()) or opponent_id=(select auth.uid()));
+drop policy if exists "Challenge participants read scores" on public.competition_challenge_members;
+create policy "Challenge participants read scores" on public.competition_challenge_members for select to authenticated using(exists(select 1 from public.competition_challenges c where c.id=challenge_id and (c.creator_id=(select auth.uid()) or c.opponent_id=(select auth.uid()))));
+create or replace function public.competition_create_friend_challenge(target_friend uuid,challenge_title text,selected_game text,target_score integer,finish_at timestamptz)
+returns uuid language plpgsql security definer set search_path='' as $$
+declare new_id uuid; clean_title text;
+begin
+ if auth.uid() is null then raise exception 'Faça login para desafiar um amigo.'; end if;
+ if target_friend is null or target_friend=auth.uid() then raise exception 'Escolha um amigo válido.'; end if;
+ if selected_game not in ('space-nexus','piggy-run','quiz') then raise exception 'Jogo inválido.'; end if;
+ if target_score is null or target_score<1 or target_score>1000000 then raise exception 'Pontuação-alvo inválida.'; end if;
+ clean_title:=trim(challenge_title);
+ if char_length(clean_title)<3 or char_length(clean_title)>60 then raise exception 'O título deve ter de 3 a 60 caracteres.'; end if;
+ if not exists(select 1 from public.social_friendships f where f.user_a=least(auth.uid(),target_friend) and f.user_b=greatest(auth.uid(),target_friend)) then raise exception 'Só é possível desafiar alguém que já seja seu amigo.'; end if;
+ if finish_at is null or finish_at<=now() or finish_at>now()+interval '14 days' then raise exception 'O prazo deve estar entre agora e os próximos 14 dias.'; end if;
+ insert into public.competition_challenges(creator_id,opponent_id,title,game_key,target_score,ends_at) values(auth.uid(),target_friend,clean_title,selected_game,target_score,finish_at) returning id into new_id;
+ insert into public.competition_challenge_members(challenge_id,user_id) values(new_id,auth.uid()),(new_id,target_friend);
+ return new_id;
+end; $$;
+revoke all on function public.competition_create_friend_challenge(uuid,text,text,integer,timestamptz) from public,anon;
+grant execute on function public.competition_create_friend_challenge(uuid,text,text,integer,timestamptz) to authenticated;
+create or replace function public.competition_record_match(selected_game text,match_score integer,earned_xp integer,selected_mode text default 'normal',did_win boolean default false,match_duration integer default 0)
+returns uuid language plpgsql security definer set search_path='' as $$
+declare new_match uuid; season_start timestamptz; season_end timestamptz; tournament_start timestamptz; tournament_end timestamptz;
+begin
+ if auth.uid() is null then raise exception 'Faça login para registrar a partida.'; end if;
+ if selected_game not in ('space-nexus','piggy-run','quiz') then raise exception 'Jogo inválido.'; end if;
+ if match_score is null or match_score<0 or match_score>1000000 then raise exception 'Pontuação inválida.'; end if;
+ if earned_xp is null or earned_xp<0 or earned_xp>1000 then raise exception 'XP inválido.'; end if;
+ if match_duration is null or match_duration<0 or match_duration>7200 then raise exception 'Duração inválida.'; end if;
+ insert into public.competition_match_history(user_id,game_key,score,xp_earned,mode,won,duration_seconds) values(auth.uid(),selected_game,match_score,earned_xp,left(coalesce(selected_mode,'normal'),24),coalesce(did_win,false),match_duration) returning id into new_match;
+ season_start:=timestamptz '2026-01-01 00:00:00+00'+floor(extract(epoch from (now()-timestamptz '2026-01-01 00:00:00+00'))/2592000)*interval '30 days';season_end:=season_start+interval '30 days';
+ insert into public.competition_seasons(name,starts_at,ends_at,status) values('Temporada NEXUS · '||to_char(season_start at time zone 'UTC','DD/MM/YYYY'),season_start,season_end,'active') on conflict(starts_at) do update set status='active';
+ update public.competition_seasons set status='completed' where ends_at<=now() and status='active';
+ insert into public.competition_season_scores(season_id,user_id,xp_points,total_score,matches_played,wins,updated_at) select s.id,auth.uid(),earned_xp,match_score,1,case when did_win then 1 else 0 end,now() from public.competition_seasons s where s.starts_at=season_start on conflict(season_id,user_id) do update set xp_points=public.competition_season_scores.xp_points+excluded.xp_points,total_score=public.competition_season_scores.total_score+excluded.total_score,matches_played=public.competition_season_scores.matches_played+1,wins=public.competition_season_scores.wins+excluded.wins,updated_at=now();
+ tournament_start:=date_trunc('week',now());tournament_end:=tournament_start+interval '7 days';
+ insert into public.competition_weekly_tournaments(name,starts_at,ends_at,status) values('Torneio semanal · '||to_char(tournament_start,'DD/MM'),tournament_start,tournament_end,'active') on conflict(starts_at) do update set status='active';
+ update public.competition_weekly_tournaments set status='completed' where ends_at<=now() and status='active';
+ insert into public.competition_tournament_entries(tournament_id,user_id,points,matches_played,updated_at) select t.id,auth.uid(),earned_xp,1,now() from public.competition_weekly_tournaments t where t.starts_at=tournament_start on conflict(tournament_id,user_id) do update set points=public.competition_tournament_entries.points+excluded.points,matches_played=public.competition_tournament_entries.matches_played+1,updated_at=now();
+ if did_win then insert into public.competition_game_medals(user_id,game_key,medals_count,updated_at) values(auth.uid(),selected_game,1,now()) on conflict(user_id,game_key) do update set medals_count=public.competition_game_medals.medals_count+1,updated_at=now(); end if;
+ update public.competition_challenge_members cm set best_score=greatest(cm.best_score,match_score),matches_played=cm.matches_played+1,updated_at=now() from public.competition_challenges c where cm.challenge_id=c.id and cm.user_id=auth.uid() and c.game_key=selected_game and c.status='active' and c.ends_at>now();
+ update public.competition_challenges c set status='completed',winner_id=auth.uid() where c.status='active' and c.game_key=selected_game and c.ends_at>now() and c.winner_id is null and c.target_score<=match_score and exists(select 1 from public.competition_challenge_members cm where cm.challenge_id=c.id and cm.user_id=auth.uid());
+ update public.competition_challenges set status='expired' where status='active' and ends_at<=now();
+ return new_match;
+end; $$;
+revoke all on function public.competition_record_match(text,integer,integer,text,boolean,integer) from public,anon;
+grant execute on function public.competition_record_match(text,integer,integer,text,boolean,integer) to authenticated;
+grant select on public.competition_seasons,public.competition_season_scores,public.competition_weekly_tournaments,public.competition_tournament_entries,public.competition_match_history,public.competition_game_medals,public.competition_challenges,public.competition_challenge_members to authenticated;
