@@ -139,3 +139,9 @@
 .content-social .social-room-member-panel>div>span:nth-child(2) small{font-size:9px;color:#9b90a7}
 .content-social .social-room-member-panel button{padding:6px 8px;border:1px solid #514064;border-radius:8px;background:#2a2037;color:#e6d8f2;font-size:9px}
 .content-social .social-clan-members .social-community-row{min-height:62px}
+
+
+.content-social .social-clan-rank{display:grid;place-items:center;flex:0 0 30px;height:30px;border-radius:9px;background:#2b2137;color:#d7b7f5;font-size:11px}
+.content-social .social-clan-member-actions{display:flex;gap:5px;flex-wrap:wrap}
+.content-social .social-clan-member-actions button{padding:6px 8px;border:1px solid #514064;border-radius:8px;background:#2a2037;color:#e6d8f2;font-size:9px}
+@media(max-width:600px){.content-social .social-clan-member-actions{width:100%;padding-left:39px}.content-social .social-clan-member-actions button{flex:1}}
