@@ -3,7 +3,7 @@ import './nexus-social-refined.css';
 import './nexus-social-next.css';
 import './nexus-social-premium.css';
 import './nexus-social-polish.css';
-import {Search,Users,UserPlus,Check,X,RefreshCw,ShieldCheck,UserRound,AtSign,Lock,Eye,CalendarClock,Trophy,Zap,Star,Flame,MessageCircle} from 'lucide-react';
+import {Search,Users,UserPlus,Check,X,RefreshCw,ShieldCheck,UserRound,AtSign,Lock,Eye,CalendarClock,Trophy,Zap,Star,Flame,MessageCircle,Bell,CheckCheck} from 'lucide-react';
 import {supabase} from './supabase';
 import NexusCommunity from './NexusCommunity';
 import NexusFeed from './NexusFeed';
@@ -41,6 +41,7 @@ export default function NexusSocial({view='conversations',session,playerProfile,
  const [profile,setProfile]=useState(null),[username,setUsername]=useState(''),[bio,setBio]=useState('');
  const [query,setQuery]=useState(''),[results,setResults]=useState([]),[friends,setFriends]=useState([]),[incoming,setIncoming]=useState([]),[outgoing,setOutgoing]=useState([]);
  const [busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState(''),[tab,setTab]=useState('community'),[viewPerson,setViewPerson]=useState(null);
+ const [socialNotifications,setSocialNotifications]=useState([]),[showSocialNotifications,setShowSocialNotifications]=useState(false),[notificationsLoading,setNotificationsLoading]=useState(false);
  const daysLeft=daysUntilChange(profile?.username_changed_at);
  const usernameChanged=!!profile&&username.trim().toLowerCase()!==String(profile.username||'').toLowerCase();
  const load=useCallback(async()=>{
@@ -67,6 +68,15 @@ export default function NexusSocial({view='conversations',session,playerProfile,
   finally{setLoading(false);}
  },[userId,session,onPlayerProfileChange]);
  useEffect(()=>{load()},[load]);
+ const loadSocialNotifications=useCallback(async(silent=false)=>{
+  if(!userId||!supabase)return;if(!silent)setNotificationsLoading(true);
+  const {data,error:e}=await supabase.from('notifications').select('id,title,message,category,is_read,created_at').eq('user_id',userId).order('created_at',{ascending:false}).limit(40);
+  if(!e)setSocialNotifications(data||[]);else console.warn('NEXUS notifications:',e.message);
+  if(!silent)setNotificationsLoading(false);
+ },[userId]);
+ useEffect(()=>{loadSocialNotifications();if(!userId)return;const channel=supabase.channel('nexus-social-notifications-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'notifications',filter:'user_id=eq.'+userId},()=>loadSocialNotifications(true)).subscribe();return()=>{supabase.removeChannel(channel);};},[userId,loadSocialNotifications]);
+ async function markSocialNotificationRead(id){const {error:e}=await supabase.from('notifications').update({is_read:true}).eq('id',id).eq('user_id',userId);if(!e)setSocialNotifications(old=>old.map(n=>n.id===id?{...n,is_read:true}:n));}
+ async function markAllSocialNotificationsRead(){const ids=socialNotifications.filter(n=>!n.is_read).map(n=>n.id);if(!ids.length)return;const {error:e}=await supabase.from('notifications').update({is_read:true}).eq('user_id',userId).eq('is_read',false);if(e)setError(e.message);else setSocialNotifications(old=>old.map(n=>({...n,is_read:true})));}
   useEffect(()=>{if(!userId)return;const channel=supabase.channel('nexus-social-friends-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'social_friend_requests',filter:'receiver_id=eq.'+userId},()=>load()).on('postgres_changes',{event:'*',schema:'public',table:'social_friend_requests',filter:'sender_id=eq.'+userId},()=>load()).on('postgres_changes',{event:'*',schema:'public',table:'social_friendships'},()=>load()).subscribe();return()=>{supabase.removeChannel(channel);};},[userId,load]);
  async function saveProfile(e){
   e.preventDefault();if(!userId)return;
@@ -122,6 +132,10 @@ export default function NexusSocial({view='conversations',session,playerProfile,
  return <section className="nexus-social">
   <div className="social-hero"><div><span>{view==='feed'?'NEXUS COMMUNITY · PUBLICAÇÕES':view==='clans'?'NEXUS SQUADS · JOGO EM EQUIPE':'NEXUS MESSAGES · CONEXÕES'}</span><h2>NEXUS <em>{view==='feed'?'Feed':view==='clans'?'Clãs':'Conversas'}</em></h2><p>{view==='feed'?'Compartilhe momentos, ideias e conquistas com a comunidade.':view==='clans'?'Encontre sua equipe, evolua em conjunto e complete missões.':'Converse com amigos, organize grupos e gerencie solicitações.'}</p></div><button type="button" className="social-hero-profile-button" onClick={()=>profile&&openPerson({...profile,display_name:playerProfile?.name||profile.display_name,avatar:playerProfile?.avatar||profile.avatar,avatar_frame:playerProfile?.frame||profile.avatar_frame,card_frame:playerProfile?.cardFrame||profile.card_frame,equipped_gems:playerProfile?.gems||profile.equipped_gems,game_xp:profile.game_xp,game_correct:profile.game_correct,bio:playerProfile?.bio||profile.bio})}><Eye size={15}/> Meu perfil</button><div className="social-hero-icon">{view==='feed'?<MessageCircle size={34}/>:view==='clans'?<ShieldCheck size={34}/>:<Users size={34}/>}</div></div>
   <NexusPushSettings userId={userId}/>
+  <div className="nxs-notification-wrap">
+   <button type="button" className="nxs-notification-trigger" aria-expanded={showSocialNotifications} onClick={()=>{setShowSocialNotifications(v=>!v);if(!showSocialNotifications)loadSocialNotifications();}}><Bell size={17}/><span>Notificações</span>{socialNotifications.some(n=>!n.is_read)&&<i>{socialNotifications.filter(n=>!n.is_read).length>99?'99+':socialNotifications.filter(n=>!n.is_read).length}</i>}</button>
+   {showSocialNotifications&&<section className="nxs-notification-panel" aria-label="Central de notificações"><header><div><b>Central de notificações</b><small>Mensagens, interações e novidades do NEXUS</small></div><button type="button" onClick={()=>setShowSocialNotifications(false)} aria-label="Fechar notificações"><X size={17}/></button></header><div className="nxs-notification-actions"><span>{socialNotifications.filter(n=>!n.is_read).length} não lidas</span><button type="button" onClick={markAllSocialNotificationsRead} disabled={!socialNotifications.some(n=>!n.is_read)}><CheckCheck size={14}/> Marcar todas como lidas</button></div><div className="nxs-notification-list">{notificationsLoading?<div className="nxs-notification-empty">Carregando notificações…</div>:socialNotifications.length?socialNotifications.map(n=><button type="button" key={n.id} className={'nxs-notification-item '+(!n.is_read?'unread':'')} onClick={()=>markSocialNotificationRead(n.id)}><span className="nxs-notification-dot"/><span><b>{n.title||'Atualização do NEXUS'}</b><small>{n.message||'Você tem uma nova atualização.'}</small><time>{new Date(n.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time></span></button>):<div className="nxs-notification-empty"><Bell size={24}/><b>Tudo em dia!</b><span>Suas notificações aparecerão aqui.</span></div>}</div></section>}
+  </div>
   {error&&<div className="social-error" role="alert">{error}</div>}
   <div className="social-layout">
    <div className="social-main">
