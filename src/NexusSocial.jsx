@@ -42,6 +42,18 @@ function PublicPlayerProfile({person,onClose,onFollowToggle,onEdit}){
   <footer className="social-public-footer"><ShieldCheck size={16}/> Perfil público somente para visualização. Ninguém pode alterar os dados deste jogador por aqui.{person.user_id!==person.viewerId&&<button className={'social-follow-button '+(person.isFollowing?'following':'')} onClick={()=>onFollowToggle(person)}>{person.isFollowing?<><Check size={15}/> Seguindo</>:<><UserPlus size={15}/> Seguir jogador</>}</button>}</footer>
  </section></div>;
 }
+
+export function PlayerPostGrid({userId,displayName='jogador'}){
+ const [posts,setPosts]=useState([]),[loadingPosts,setLoadingPosts]=useState(true),[selected,setSelected]=useState(null);
+ useEffect(()=>{let active=true;(async()=>{try{
+  const {data,error}=await supabase.from('social_posts').select('id,body,image_path,video_path,created_at').eq('author_id',userId).order('created_at',{ascending:false}).limit(60);
+  if(error)throw error;
+  const rows=await Promise.all((data||[]).filter(p=>p.image_path||p.video_path).map(async p=>{const path=p.image_path||p.video_path;const {data:media}=await supabase.storage.from('nexus-posts').createSignedUrl(path,3600);return {...p,mediaUrl:media?.signedUrl||''};}));
+  if(active)setPosts(rows.filter(p=>p.mediaUrl));
+ }catch(e){console.warn('Publicações do jogador:',e.message);if(active)setPosts([]);}finally{if(active)setLoadingPosts(false);}})();return()=>{active=false;};},[userId]);
+ return <section className="social-profile-posts player-central-posts"><div className="social-profile-posts-heading"><div><span>SEU ESPAÇO SOCIAL</span><h3>Publicações</h3></div><Grid3X3 size={19}/></div>{loadingPosts?<div className="social-profile-posts-empty">Carregando publicações…</div>:posts.length?<div className="social-profile-post-grid">{posts.map(post=><button type="button" className="social-profile-post-tile" key={post.id} onClick={()=>setSelected(post)}>{post.video_path?<video src={post.mediaUrl} muted playsInline/>:<img src={post.mediaUrl} alt={'Publicação de '+displayName}/>}<i><Heart size={14}/><MessageCircleMore size={14}/></i></button>)}</div>:<div className="social-profile-posts-empty"><Grid3X3 size={25}/><b>Suas publicações aparecerão aqui</b><span>Publique uma foto ou vídeo no Feed para montar seu perfil.</span></div>}{selected&&<div className="social-profile-post-viewer" onMouseDown={e=>{if(e.target===e.currentTarget)setSelected(null)}}><article><button className="social-profile-post-close" onClick={()=>setSelected(null)} aria-label="Fechar"><X size={19}/></button>{selected.video_path?<video src={selected.mediaUrl} controls playsInline/>:<img src={selected.mediaUrl} alt="Publicação"/>}<div className="social-profile-post-caption"><b>{displayName}</b><p>{selected.body}</p><time>{new Date(selected.created_at).toLocaleString('pt-BR',{dateStyle:'medium',timeStyle:'short'})}</time></div></article></div>}</section>;
+}
+
 export default function NexusSocial({view='conversations',session,playerProfile,gameXp=0,gameCorrect=0,onPlayerProfileChange=()=>{},onToast=()=>{}}){
  const userId=session?.user?.id;
  const [profile,setProfile]=useState(null),[username,setUsername]=useState(''),[bio,setBio]=useState('');
