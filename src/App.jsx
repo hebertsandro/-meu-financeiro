@@ -551,7 +551,7 @@ function generateNexusReply(question, finance={}, history=[]) {
 }
 function App(){
   const [session,setSession]=useState(null), [loading,setLoading]=useState(true);
-  const [page,setPage]=useState('overview'), [mobileMenu,setMobileMenu]=useState(false), [socialExpanded,setSocialExpanded]=useState(true);
+  const [page,setPage]=useState(()=>window.location.hash.startsWith('#post-')?'social-feed':'overview'), [mobileMenu,setMobileMenu]=useState(false), [socialExpanded,setSocialExpanded]=useState(true);
   const [data,setData]=useState({transactions:[],cards:[],debts:[],goals:[],installments:[],subscriptions:[],card_limit_history:[],goal_movements:[],notifications:[]});
   const [modal,setModal]=useState(null), [toast,setToast]=useState('');
   const [payModal,setPayModal]=useState(false),[payBusy,setPayBusy]=useState(false);
