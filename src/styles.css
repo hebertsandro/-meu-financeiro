@@ -3770,3 +3770,21 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
  .nav-submenu{margin-left:10px}
  .nav-sub-item{min-height:42px}
 }
+
+
+/* Ajuste final do avatar no topo: círculo real e conteúdo centralizado sem corte */
+.topbar .profile-avatar-button{
+  width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;
+  flex:0 0 34px!important;aspect-ratio:1/1!important;border-radius:50%!important;
+  padding:0!important;display:grid!important;place-items:center!important;overflow:visible!important;
+  line-height:1!important;
+}
+.topbar .profile-avatar-button>span{
+  width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  display:grid!important;place-items:center!important;border-radius:50%!important;
+  line-height:1!important;font-size:19px!important;transform:none!important;
+}
+.topbar .profile-avatar-button>span img{
+  display:block!important;width:100%!important;height:100%!important;
+  object-fit:cover!important;border-radius:50%!important;
+}
