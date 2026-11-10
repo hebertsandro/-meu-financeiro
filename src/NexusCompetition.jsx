@@ -33,7 +33,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
    ]);
    const profileRows=profilesRes.data||[];
    setGlobalRows(profileRows);
-   const friendIds=[...new Set((friendshipsRes.data||[]).map(f=>f.user_a===userId?f.user_b:f.user_a))];
+   const friendIds=[...new Set([userId,...(friendshipsRes.data||[]).map(f=>f.user_a===userId?f.user_b:f.user_a)])];
    const friendProfiles=friendIds.length?await supabase.from('social_profiles').select('user_id,username,display_name,avatar,game_xp,game_correct').in('user_id',friendIds):{data:[]};
    setFriends(friendProfiles.data||[]);
    setFriendRows(friendProfiles.data||[]);
