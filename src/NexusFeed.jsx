@@ -1,176 +1,99 @@
-import React,{useCallback,useEffect,useState} from 'react';
+import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {supabase} from './supabase';
-import {Heart,MessageCircle,Send,ImagePlus,MoreHorizontal,Trash2,Flag,X,CornerUpLeft,LoaderCircle,Pencil,Check} from 'lucide-react';
+import {Heart,MessageCircle,Send,ImagePlus,MoreHorizontal,Trash2,Flag,X,CornerUpLeft,LoaderCircle,Pencil,Check,Bookmark,Share2,Smile,Clock3,Users,Flame,Plus,ChevronLeft} from 'lucide-react';
 import './nexus-feed.css';
 
 const MAX_IMAGE=5*1024*1024;
-const timeAgo=value=>{
- const diff=Math.max(0,Date.now()-new Date(value).getTime());
- const mins=Math.floor(diff/60000);
- if(mins<1)return 'agora';
- if(mins<60)return mins+' min';
- const hours=Math.floor(mins/60);
- if(hours<24)return hours+' h';
- const days=Math.floor(hours/24);
- return days<7?days+' d':new Date(value).toLocaleDateString('pt-BR');
-};
+const REACTIONS=['❤️','🔥','👏','💡','😂'];
+const timeAgo=value=>{const diff=Math.max(0,Date.now()-new Date(value).getTime()),mins=Math.floor(diff/60000);if(mins<1)return 'agora';if(mins<60)return mins+' min';const hours=Math.floor(mins/60);if(hours<24)return hours+' h';const days=Math.floor(hours/24);return days<7?days+' d':new Date(value).toLocaleDateString('pt-BR');};
 const initials=name=>String(name||'NX').trim().split(/\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase();
 const profileName=p=>p?.display_name||p?.username||'Jogador';
 
 export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=()=>{},onOpenProfile=()=>{}}){
- const [posts,setPosts]=useState([]),[draft,setDraft]=useState(''),[photo,setPhoto]=useState(null),[photoPreview,setPhotoPreview]=useState('');
+ const [posts,setPosts]=useState([]),[stories,setStories]=useState([]),[draft,setDraft]=useState(''),[photo,setPhoto]=useState(null),[photoPreview,setPhotoPreview]=useState('');
+ const [storyDraft,setStoryDraft]=useState(''),[storyPhoto,setStoryPhoto]=useState(null),[storyPreview,setStoryPreview]=useState('');
  const [busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState('');
  const [expanded,setExpanded]=useState({}),[comments,setComments]=useState({}),[commentDraft,setCommentDraft]=useState('');
  const [replyTo,setReplyTo]=useState(null),[menuPost,setMenuPost]=useState(null),[editingComment,setEditingComment]=useState(null),[editDraft,setEditDraft]=useState('');
+ const [editingPost,setEditingPost]=useState(null),[postEditDraft,setPostEditDraft]=useState('');
+ const [feedMode,setFeedMode]=useState('for-you'),[savedIds,setSavedIds]=useState([]),[storyViewer,setStoryViewer]=useState(null),[showStoryComposer,setShowStoryComposer]=useState(false),[reactionPost,setReactionPost]=useState(null);
+ const friendIds=useMemo(()=>new Set(friends.map(x=>x.person?.user_id).filter(Boolean)),[friends]);
  const load=useCallback(async()=>{
-  if(!userId||!supabase)return;
-  setLoading(true);setError('');
+  if(!userId||!supabase)return;setLoading(true);setError('');
   try{
-   // O feed é comunitário: carrega publicações de todos os perfis ativos do NEXUS Social.
-   // A política RLS do banco continua respeitando bloqueios e suspensões.
-   const {data:rows,error:e}=await supabase.from('social_posts').select('id,author_id,body,image_path,created_at,updated_at').order('created_at',{ascending:false}).limit(40);
-   if(e)throw e;
-   const ids=[...new Set((rows||[]).map(p=>p.author_id))];
+   const [postRes,storyRes,bookmarkRes]=await Promise.all([
+    supabase.from('social_posts').select('id,author_id,body,image_path,created_at,updated_at').order('created_at',{ascending:false}).limit(60),
+    supabase.from('social_stories').select('id,author_id,body,image_path,created_at,expires_at').gt('expires_at',new Date().toISOString()).order('created_at',{ascending:false}).limit(60),
+    supabase.from('social_post_bookmarks').select('post_id').eq('user_id',userId)
+   ]);
+   for(const r of [postRes,storyRes,bookmarkRes])if(r.error)throw r.error;
+   const rows=postRes.data||[],storyRows=storyRes.data||[],ids=[...new Set([...rows.map(p=>p.author_id),...storyRows.map(p=>p.author_id)])];
    const prof=ids.length?await supabase.from('social_profiles').select('user_id,username,display_name,avatar,avatar_frame,card_frame,equipped_gems,is_suspended').in('user_id',ids):{data:[],error:null};
    if(prof.error)throw prof.error;
    const profileMap=Object.fromEntries((prof.data||[]).map(p=>[p.user_id,p]));
-   const visible=(rows||[]).filter(p=>profileMap[p.author_id]&&!profileMap[p.author_id].is_suspended);
+   const visible=rows.filter(p=>profileMap[p.author_id]&&!profileMap[p.author_id].is_suspended);
+   const visibleStories=storyRows.filter(p=>profileMap[p.author_id]&&!profileMap[p.author_id].is_suspended);
    const postIds=visible.map(p=>p.id);
-   const [likes,commentRows,mine]=postIds.length?await Promise.all([
+   const [likes,commentRows,mine,reactionRows]=postIds.length?await Promise.all([
     supabase.from('social_post_likes').select('post_id,user_id').in('post_id',postIds),
     supabase.from('social_post_comments').select('post_id').in('post_id',postIds).is('deleted_at',null),
-    supabase.from('social_post_likes').select('post_id').in('post_id',postIds).eq('user_id',userId)
-   ]):[{data:[],error:null},{data:[],error:null},{data:[],error:null}];
-   for(const r of [likes,commentRows,mine])if(r.error)throw r.error;
-   const likeCounts={},commentCounts={},liked=new Set((mine.data||[]).map(x=>x.post_id));
+    supabase.from('social_post_likes').select('post_id').in('post_id',postIds).eq('user_id',userId),
+    supabase.from('social_post_reactions').select('post_id,user_id,reaction').in('post_id',postIds)
+   ]):[{data:[],error:null},{data:[],error:null},{data:[],error:null},{data:[],error:null}];
+   for(const r of [likes,commentRows,mine,reactionRows])if(r.error)throw r.error;
+   const likeCounts={},commentCounts={},liked=new Set((mine.data||[]).map(x=>x.post_id)),reactions={};
    (likes.data||[]).forEach(x=>likeCounts[x.post_id]=(likeCounts[x.post_id]||0)+1);
    (commentRows.data||[]).forEach(x=>commentCounts[x.post_id]=(commentCounts[x.post_id]||0)+1);
-   const withImages=await Promise.all(visible.map(async p=>{
-    let imageUrl='';
-    if(p.image_path){const {data}=await supabase.storage.from('nexus-posts').createSignedUrl(p.image_path,3600);imageUrl=data?.signedUrl||'';}
-    return {...p,author:profileMap[p.author_id],imageUrl,likeCount:likeCounts[p.id]||0,commentCount:commentCounts[p.id]||0,liked:liked.has(p.id)};
-   }));
-   setPosts(withImages);
+   (reactionRows.data||[]).forEach(x=>{reactions[x.post_id] ||= {};reactions[x.post_id][x.reaction]=(reactions[x.post_id][x.reaction]||0)+1;if(x.user_id===userId)reactions[x.post_id].mine=x.reaction;});
+   const sign=async path=>{if(!path)return '';const {data}=await supabase.storage.from('nexus-posts').createSignedUrl(path,3600);return data?.signedUrl||'';};
+   const [withImages,withStories]=await Promise.all([
+    Promise.all(visible.map(async p=>({...p,author:profileMap[p.author_id],imageUrl:await sign(p.image_path),likeCount:likeCounts[p.id]||0,commentCount:commentCounts[p.id]||0,liked:liked.has(p.id),reactions:reactions[p.id]||{}}))),
+    Promise.all(visibleStories.map(async p=>({...p,author:profileMap[p.author_id],imageUrl:await sign(p.image_path)})))
+   ]);
+   setPosts(withImages);setStories(withStories);setSavedIds((bookmarkRes.data||[]).map(x=>x.post_id));
   }catch(e){setError(e.message||'Não foi possível carregar o feed.');}
   finally{setLoading(false);}
- },[userId,friends]);
+ },[userId]);
  useEffect(()=>{load();},[load]);
- useEffect(()=>{
-  if(!userId)return;
-  const channel=supabase.channel('nexus-feed-'+userId)
-   .on('postgres_changes',{event:'*',schema:'public',table:'social_posts'},load)
-   .on('postgres_changes',{event:'*',schema:'public',table:'social_post_likes'},load)
-   .on('postgres_changes',{event:'*',schema:'public',table:'social_post_comments'},()=>{load();Object.keys(expanded).filter(id=>expanded[id]).forEach(id=>loadComments(id));})
-   .subscribe();
-  return()=>{supabase.removeChannel(channel);};
- },[userId,load,expanded]);
- useEffect(()=>()=>{if(photoPreview)URL.revokeObjectURL(photoPreview);},[photoPreview]);
- function choosePhoto(file){
-  if(!file)return;
-  if(!['image/jpeg','image/png','image/webp'].includes(file.type)){setError('Use uma imagem JPG, PNG ou WEBP.');return;}
-  if(file.size>MAX_IMAGE){setError('A imagem deve ter no máximo 5 MB.');return;}
-  if(photoPreview)URL.revokeObjectURL(photoPreview);
-  setPhoto(file);setPhotoPreview(URL.createObjectURL(file));setError('');
- }
- async function publish(e){
-  e.preventDefault();
-  const body=draft.trim();
-  if(!body&&!photo){setError('Escreva algo ou escolha uma foto para publicar.');return;}
-  if(body.length>2000){setError('A publicação pode ter até 2.000 caracteres.');return;}
-  setBusy(true);setError('');
-  try{
-   let imagePath=null;
-   if(photo){
-    const ext=photo.type==='image/png'?'png':photo.type==='image/webp'?'webp':'jpg';
-    imagePath=userId+'/'+crypto.randomUUID()+'.'+ext;
-    const {error:uploadError}=await supabase.storage.from('nexus-posts').upload(imagePath,photo,{contentType:photo.type,upsert:false});
-    if(uploadError)throw uploadError;
-   }
-   const {error:e}=await supabase.from('social_posts').insert({author_id:userId,body,image_path:imagePath});
-   if(e){if(imagePath)await supabase.storage.from('nexus-posts').remove([imagePath]);throw e;}
-   setDraft('');setPhoto(null);if(photoPreview)URL.revokeObjectURL(photoPreview);setPhotoPreview('');
-   onToast('Publicação compartilhada!');await load();
-  }catch(e){setError(e.message||'Não foi possível publicar.');}
-  finally{setBusy(false);}
- }
- async function toggleLike(post){
-  setPosts(old=>old.map(p=>p.id===post.id?{...p,liked:!p.liked,likeCount:Math.max(0,p.likeCount+(p.liked?-1:1))}:p));
-  const result=post.liked
-   ?await supabase.from('social_post_likes').delete().eq('post_id',post.id).eq('user_id',userId)
-   :await supabase.from('social_post_likes').insert({post_id:post.id,user_id:userId});
-  if(result.error){setError(result.error.message);load();}
- }
- async function loadComments(postId){
-  const {data,error:e}=await supabase.from('social_post_comments').select('id,post_id,author_id,parent_comment_id,body,created_at,deleted_at').eq('post_id',postId).is('deleted_at',null).order('created_at',{ascending:true}).limit(100);
-  if(e){setError(e.message);return;}
-  const ids=[...new Set((data||[]).map(c=>c.author_id))];
-  const profiles=ids.length?await supabase.from('social_profiles').select('user_id,username,display_name,avatar,avatar_frame').in('user_id',ids):{data:[],error:null};
-  if(profiles.error){setError(profiles.error.message);return;}
-  const map=Object.fromEntries((profiles.data||[]).map(p=>[p.user_id,p]));
-  setComments(old=>({...old,[postId]:(data||[]).map(c=>({...c,author:map[c.author_id]}))}));
- }
- async function toggleComments(postId){
-  const next=!expanded[postId];setExpanded(old=>({...old,[postId]:next}));
-  if(next&&!comments[postId])await loadComments(postId);
- }
- async function sendComment(postId,e){
-  e.preventDefault();const body=commentDraft.trim();if(!body)return;
-  setBusy(true);
-  const {error:e1}=await supabase.from('social_post_comments').insert({post_id:postId,author_id:userId,body,parent_comment_id:replyTo?.postId===postId?replyTo.id:null});
-  if(e1)setError(e1.message);else{setCommentDraft('');setReplyTo(null);await loadComments(postId);await load();}
-  setBusy(false);
- }
- async function saveCommentEdit(comment){
-  const body=editDraft.trim();
-  if(!body){setError('O comentário não pode ficar vazio.');return;}
-  const {error:e}=await supabase.from('social_post_comments').update({body}).eq('id',comment.id).eq('author_id',userId);
-  if(e)setError(e.message);else{setEditingComment(null);setEditDraft('');await loadComments(comment.post_id);onToast('Comentário atualizado.');}
- }
- async function deleteComment(comment){
-  const {error:e}=await supabase.from('social_post_comments').update({deleted_at:new Date().toISOString()}).eq('id',comment.id).eq('author_id',userId);
-  if(e)setError(e.message);else{await loadComments(comment.post_id);await load();}
- }
- async function deletePost(post){
-  if(!window.confirm('Excluir esta publicação?'))return;
-  const {error:e}=await supabase.from('social_posts').delete().eq('id',post.id).eq('author_id',userId);
-  if(e)setError(e.message);else{if(post.image_path)await supabase.storage.from('nexus-posts').remove([post.image_path]);onToast('Publicação excluída.');load();}
-  setMenuPost(null);
- }
- async function reportPost(post){
-  const reason=window.prompt('Conte brevemente por que deseja denunciar esta publicação:');
-  if(reason===null)return;
-  const {error:e}=await supabase.from('social_post_reports').insert({reporter_id:userId,post_id:post.id,details:reason.trim().slice(0,1000)});
-  if(e)setError(e.message);else onToast('Denúncia enviada para análise.');
-  setMenuPost(null);
- }
- async function reportComment(comment){
-  const reason=window.prompt('Conte brevemente por que deseja denunciar este comentário:');
-  if(reason===null)return;
-  const {error:e}=await supabase.from('social_post_reports').insert({reporter_id:userId,comment_id:comment.id,details:reason.trim().slice(0,1000)});
-  if(e)setError(e.message);else onToast('Denúncia enviada para análise.');
- }
- const authorButton=(person)=> <button className="nxf-author" onClick={()=>onOpenProfile(person)}><span className={'nxf-avatar frame-'+(person?.avatar_frame||'violet')+((person?.equipped_gems||[]).length===4?' frame-chromatic':'')}>{person?.avatar||initials(profileName(person))}</span><span className="nxf-author-copy"><b>{profileName(person)}</b><small>@{person?.username||'jogador'}</small></span></button>;
+ useEffect(()=>{if(!userId)return;const channel=supabase.channel('nexus-feed-live-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'social_posts'},load).on('postgres_changes',{event:'*',schema:'public',table:'social_post_likes'},load).on('postgres_changes',{event:'*',schema:'public',table:'social_post_comments'},load).on('postgres_changes',{event:'*',schema:'public',table:'social_stories'},load).on('postgres_changes',{event:'*',schema:'public',table:'social_post_reactions'},load).subscribe();return()=>{supabase.removeChannel(channel);};},[userId,load]);
+ useEffect(()=>()=>{if(photoPreview)URL.revokeObjectURL(photoPreview);if(storyPreview)URL.revokeObjectURL(storyPreview);},[photoPreview,storyPreview]);
+ const visiblePosts=useMemo(()=>{let list=posts.filter(p=>feedMode==='saved'?savedIds.includes(p.id):feedMode==='friends'?friendIds.has(p.author_id)||p.author_id===userId:true);if(feedMode==='for-you')list=[...list].sort((a,b)=>(b.likeCount+b.commentCount*2)-(a.likeCount+a.commentCount*2)||new Date(b.created_at)-new Date(a.created_at));return list;},[posts,feedMode,savedIds,friendIds,userId]);
+ function choosePhoto(file,kind='post'){if(!file)return;if(!['image/jpeg','image/png','image/webp'].includes(file.type)){setError('Use uma imagem JPG, PNG ou WEBP.');return;}if(file.size>MAX_IMAGE){setError('A imagem deve ter no máximo 5 MB.');return;}const old=kind==='story'?storyPreview:photoPreview;if(old)URL.revokeObjectURL(old);const preview=URL.createObjectURL(file);if(kind==='story'){setStoryPhoto(file);setStoryPreview(preview);}else{setPhoto(file);setPhotoPreview(preview);}setError('');}
+ async function uploadImage(file,folder){if(!file)return null;const ext=file.type==='image/png'?'png':file.type==='image/webp'?'webp':'jpg',path=userId+'/'+folder+'/'+crypto.randomUUID()+'.'+ext;const {error:e}=await supabase.storage.from('nexus-posts').upload(path,file,{contentType:file.type,upsert:false});if(e)throw e;return path;}
+ async function publish(e){e.preventDefault();const body=draft.trim();if(!body&&!photo){setError('Escreva algo ou escolha uma foto para publicar.');return;}if(body.length>2000)return setError('A publicação pode ter até 2.000 caracteres.');setBusy(true);setError('');try{const image_path=await uploadImage(photo,'posts');const {error:e1}=await supabase.from('social_posts').insert({author_id:userId,body,image_path});if(e1){if(image_path)await supabase.storage.from('nexus-posts').remove([image_path]);throw e1;}setDraft('');setPhoto(null);if(photoPreview)URL.revokeObjectURL(photoPreview);setPhotoPreview('');onToast('Publicação compartilhada!');await load();}catch(e){setError(e.message||'Não foi possível publicar.');}finally{setBusy(false);}}
+ async function publishStory(e){e.preventDefault();const body=storyDraft.trim();if(!body&&!storyPhoto)return;setBusy(true);setError('');try{const image_path=await uploadImage(storyPhoto,'stories');const {error:e}=await supabase.from('social_stories').insert({author_id:userId,body,image_path,expires_at:new Date(Date.now()+24*60*60*1000).toISOString()});if(e){if(image_path)await supabase.storage.from('nexus-posts').remove([image_path]);throw e;}setStoryDraft('');setStoryPhoto(null);if(storyPreview)URL.revokeObjectURL(storyPreview);setStoryPreview('');setShowStoryComposer(false);onToast('Story publicado por 24 horas!');await load();}catch(e){setError(e.message||'Não foi possível publicar o story.');}finally{setBusy(false);}}
+ async function toggleLike(post){setPosts(old=>old.map(p=>p.id===post.id?{...p,liked:!p.liked,likeCount:Math.max(0,p.likeCount+(p.liked?-1:1))}:p));const result=post.liked?await supabase.from('social_post_likes').delete().eq('post_id',post.id).eq('user_id',userId):await supabase.from('social_post_likes').insert({post_id:post.id,user_id:userId});if(result.error){setError(result.error.message);load();}}
+ async function toggleBookmark(post){const saved=savedIds.includes(post.id);setSavedIds(old=>saved?old.filter(x=>x!==post.id):[...old,post.id]);const result=saved?await supabase.from('social_post_bookmarks').delete().eq('post_id',post.id).eq('user_id',userId):await supabase.from('social_post_bookmarks').insert({post_id:post.id,user_id:userId});if(result.error){setError(result.error.message);load();}else onToast(saved?'Publicação removida dos salvos.':'Publicação salva.');}
+ async function setReaction(post,reaction){const mine=post.reactions?.mine;const result=mine===reaction?await supabase.from('social_post_reactions').delete().eq('post_id',post.id).eq('user_id',userId):await supabase.from('social_post_reactions').upsert({post_id:post.id,user_id:userId,reaction},{onConflict:'post_id,user_id'});setReactionPost(null);if(result.error)setError(result.error.message);else load();}
+ async function sharePost(post){const url=window.location.origin+window.location.pathname+'#post-'+post.id;try{if(navigator.share)await navigator.share({title:'NEXUS Social',text:post.body||'Confira esta publicação no NEXUS Social',url});else{await navigator.clipboard.writeText(url);onToast('Link da publicação copiado!');}}catch(e){if(e?.name!=='AbortError')setError('Não foi possível compartilhar esta publicação.');}}
+ async function savePostEdit(post){const body=postEditDraft.trim();if(!body&&!post.image_path)return setError('A publicação precisa ter texto ou imagem.');setBusy(true);const {error:e}=await supabase.from('social_posts').update({body,updated_at:new Date().toISOString()}).eq('id',post.id).eq('author_id',userId);if(e)setError(e.message);else{setEditingPost(null);setPostEditDraft('');onToast('Publicação atualizada.');await load();}setBusy(false);}
+ async function deletePost(post){if(!window.confirm('Excluir esta publicação?'))return;const {error:e}=await supabase.from('social_posts').delete().eq('id',post.id).eq('author_id',userId);if(e)setError(e.message);else{if(post.image_path)await supabase.storage.from('nexus-posts').remove([post.image_path]);onToast('Publicação excluída.');load();}setMenuPost(null);}
+ async function reportPost(post){const reason=window.prompt('Conte brevemente por que deseja denunciar esta publicação:');if(reason===null)return;const {error:e}=await supabase.from('social_post_reports').insert({reporter_id:userId,post_id:post.id,details:reason.trim().slice(0,1000)});if(e)setError(e.message);else onToast('Denúncia enviada para análise.');setMenuPost(null);}
+ async function loadComments(postId){const {data,error:e}=await supabase.from('social_post_comments').select('id,post_id,author_id,parent_comment_id,body,created_at,deleted_at').eq('post_id',postId).is('deleted_at',null).order('created_at',{ascending:true}).limit(100);if(e){setError(e.message);return;}const ids=[...new Set((data||[]).map(c=>c.author_id))],profiles=ids.length?await supabase.from('social_profiles').select('user_id,username,display_name,avatar,avatar_frame').in('user_id',ids):{data:[],error:null};if(profiles.error){setError(profiles.error.message);return;}const map=Object.fromEntries((profiles.data||[]).map(p=>[p.user_id,p]));setComments(old=>({...old,[postId]:(data||[]).map(c=>({...c,author:map[c.author_id]}))}));}
+ async function toggleComments(postId){const next=!expanded[postId];setExpanded(old=>({...old,[postId]:next}));if(next&&!comments[postId])await loadComments(postId);}
+ async function sendComment(postId,e){e.preventDefault();const body=commentDraft.trim();if(!body)return;setBusy(true);const {error:e1}=await supabase.from('social_post_comments').insert({post_id:postId,author_id:userId,body,parent_comment_id:replyTo?.postId===postId?replyTo.id:null});if(e1)setError(e1.message);else{setCommentDraft('');setReplyTo(null);await loadComments(postId);await load();}setBusy(false);}
+ async function saveCommentEdit(comment){const body=editDraft.trim();if(!body)return setError('O comentário não pode ficar vazio.');const {error:e}=await supabase.from('social_post_comments').update({body}).eq('id',comment.id).eq('author_id',userId);if(e)setError(e.message);else{setEditingComment(null);setEditDraft('');await loadComments(comment.post_id);onToast('Comentário atualizado.');}}
+ async function deleteComment(comment){const {error:e}=await supabase.from('social_post_comments').update({deleted_at:new Date().toISOString()}).eq('id',comment.id).eq('author_id',userId);if(e)setError(e.message);else{await loadComments(comment.post_id);await load();}}
+ async function reportComment(comment){const reason=window.prompt('Conte brevemente por que deseja denunciar este comentário:');if(reason===null)return;const {error:e}=await supabase.from('social_post_reports').insert({reporter_id:userId,comment_id:comment.id,details:reason.trim().slice(0,1000)});if(e)setError(e.message);else onToast('Denúncia enviada para análise.');}
+ const authorButton=person=><button className="nxf-author" onClick={()=>onOpenProfile(person)}><span className={'nxf-avatar frame-'+(person?.avatar_frame||'violet')+((person?.equipped_gems||[]).length===4?' frame-chromatic':'')}>{person?.avatar||initials(profileName(person))}</span><span className="nxf-author-copy"><b>{profileName(person)}</b><small>@{person?.username||'jogador'}</small></span></button>;
  return <section className="nexus-feed">
-  <header className="nxf-heading"><div><span className="nxf-eyebrow">NEXUS SOCIAL · COMUNIDADE</span><h2>Feed <em>da galera</em></h2><p>Veja o que toda a comunidade está compartilhando e mostre sua jornada.</p></div><span className="nxf-live"><i/> AO VIVO</span></header>
-  <form className="nxf-composer" onSubmit={publish}>
-   <div className="nxf-compose-top"><span className={'nxf-compose-avatar frame-'+(playerProfile?.frame||'violet')+((playerProfile?.gems||[]).length===4?' frame-chromatic':'')}>{playerProfile?.avatar||'👾'}</span><textarea value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} rows={3} placeholder="O que está acontecendo na sua jornada?"/></div>
-   {photoPreview&&<div className="nxf-preview"><img src={photoPreview} alt="Prévia da publicação"/><button type="button" onClick={()=>{setPhoto(null);URL.revokeObjectURL(photoPreview);setPhotoPreview('')}} aria-label="Remover foto"><X size={17}/></button></div>}
-   <div className="nxf-compose-bottom"><label className="nxf-photo-pick"><ImagePlus size={17}/> Foto <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>choosePhoto(e.target.files?.[0])}/></label><span>{draft.length}/2000</span><button className="nxf-publish" disabled={busy||(!draft.trim()&&!photo)}>{busy?<LoaderCircle size={16} className="nxf-spin"/>:<Send size={16}/>} Publicar</button></div>
-  </form>
+  <header className="nxf-heading"><div><span className="nxf-eyebrow">NEXUS SOCIAL · COMUNIDADE</span><h2>Feed <em>da galera</em></h2><p>Compartilhe sua evolução, encontre ideias e acompanhe a comunidade.</p></div><span className="nxf-live"><i/> COMUNIDADE ATIVA</span></header>
+  <section className="nxf-stories"><div className="nxf-stories-title"><div><b>Stories</b><small>Momentos que desaparecem em 24 horas</small></div><button onClick={()=>setShowStoryComposer(v=>!v)}><Plus size={16}/> Criar story</button></div><div className="nxf-story-rail"><button className="nxf-story own" onClick={()=>setShowStoryComposer(true)}><span className={'nxf-story-ring frame-'+(playerProfile?.frame||'violet')}>{playerProfile?.avatar||'👾'}</span><b>Seu story</b><small>Adicionar</small></button>{stories.filter(s=>s.author_id!==userId).map((s,i)=><button className="nxf-story" key={s.id} onClick={()=>setStoryViewer(i)}><span className={'nxf-story-ring frame-'+(s.author?.avatar_frame||'violet')}>{s.imageUrl?<img src={s.imageUrl} alt="Story"/>:s.author?.avatar||'👾'}</span><b>{profileName(s.author)}</b><small>{timeAgo(s.created_at)}</small></button>)}</div></section>
+  {showStoryComposer&&<form className="nxf-story-composer" onSubmit={publishStory}><div><b>Novo story</b><button type="button" onClick={()=>setShowStoryComposer(false)} aria-label="Fechar"><X size={17}/></button></div><textarea value={storyDraft} onChange={e=>setStoryDraft(e.target.value)} maxLength={240} rows={2} placeholder="Compartilhe um momento rápido..."/>{storyPreview&&<img src={storyPreview} alt="Prévia do story"/>}<div><label className="nxf-photo-pick"><ImagePlus size={16}/> Foto <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>choosePhoto(e.target.files?.[0],'story')}/></label><small>{storyDraft.length}/240 · expira em 24h</small><button className="nxf-publish" disabled={busy||(!storyDraft.trim()&&!storyPhoto)}>Publicar story</button></div></form>}
+  <form className="nxf-composer" onSubmit={publish}><div className="nxf-compose-top"><span className={'nxf-compose-avatar frame-'+(playerProfile?.frame||'violet')+((playerProfile?.gems||[]).length===4?' frame-chromatic':'')}>{playerProfile?.avatar||'👾'}</span><textarea value={draft} onChange={e=>setDraft(e.target.value)} maxLength={2000} rows={3} placeholder="O que está acontecendo na sua jornada?"/></div>{photoPreview&&<div className="nxf-preview"><img src={photoPreview} alt="Prévia da publicação"/><button type="button" onClick={()=>{setPhoto(null);URL.revokeObjectURL(photoPreview);setPhotoPreview('')}} aria-label="Remover foto"><X size={17}/></button></div>}<div className="nxf-compose-bottom"><label className="nxf-photo-pick"><ImagePlus size={17}/> Foto <input type="file" accept="image/jpeg,image/png,image/webp" onChange={e=>choosePhoto(e.target.files?.[0])}/></label><span>{draft.length}/2000</span><button className="nxf-publish" disabled={busy||(!draft.trim()&&!photo)}>{busy?<LoaderCircle size={16} className="nxf-spin"/>:<Send size={16}/>} Publicar</button></div></form>
+  <nav className="nxf-feed-tabs"><button className={feedMode==='for-you'?'active':''} onClick={()=>setFeedMode('for-you')}><Flame size={15}/> Para você</button><button className={feedMode==='recent'?'active':''} onClick={()=>setFeedMode('recent')}><Clock3 size={15}/> Recentes</button><button className={feedMode==='friends'?'active':''} onClick={()=>setFeedMode('friends')}><Users size={15}/> Amigos</button><button className={feedMode==='saved'?'active':''} onClick={()=>setFeedMode('saved')}><Bookmark size={15}/> Salvos</button></nav>
   {error&&<div className="nxf-error" role="alert">{error}<button onClick={()=>setError('')} aria-label="Fechar"><X size={14}/></button></div>}
-  {loading?<div className="nxf-loading"><LoaderCircle className="nxf-spin"/> Carregando publicações...</div>:posts.length===0?<div className="nxf-empty"><span>✦</span><h3>A comunidade está começando</h3><p>Seja o primeiro a publicar e acompanhe as novidades de todos os jogadores do NEXUS Social.</p></div>:
-   <div className="nxf-post-list">{posts.map(post=><article className="nxf-post" key={post.id}>
-    <div className="nxf-post-head">{authorButton(post.author)}<div className="nxf-post-meta"><time>{timeAgo(post.created_at)}</time><button aria-label="Mais opções" onClick={()=>setMenuPost(menuPost===post.id?null:post.id)}><MoreHorizontal size={20}/></button>{menuPost===post.id&&<div className="nxf-menu">{post.author_id===userId?<button onClick={()=>deletePost(post)}><Trash2 size={14}/> Excluir publicação</button>:<button onClick={()=>reportPost(post)}><Flag size={14}/> Denunciar</button>}</div>}</div></div>
-    {post.body&&<p className="nxf-post-body">{post.body}</p>}
-    {post.imageUrl&&<img className="nxf-post-image" src={post.imageUrl} alt="Imagem da publicação" loading="lazy"/>}
-    <div className="nxf-actions"><button className={post.liked?'liked':''} onClick={()=>toggleLike(post)}><Heart size={19} fill={post.liked?'currentColor':'none'}/><b>{post.likeCount}</b> Curtir</button><button onClick={()=>toggleComments(post.id)}><MessageCircle size={19}/><b>{post.commentCount}</b> Comentários</button></div>
-    {expanded[post.id]&&<div className="nxf-comments">
-     <div className="nxf-comment-list">{(comments[post.id]||[]).map(c=><div className={'nxf-comment '+(c.parent_comment_id?'is-reply':'')} key={c.id}>{authorButton(c.author)}<div className="nxf-comment-content">{editingComment===c.id?<><textarea className="nxf-edit-comment" value={editDraft} maxLength={1000} onChange={e=>setEditDraft(e.target.value)}/><div className="nxf-comment-tools"><button onClick={()=>saveCommentEdit(c)}><Check size={13}/> Salvar</button><button onClick={()=>setEditingComment(null)}><X size={13}/> Cancelar</button></div></>:<><p>{c.body}</p><div className="nxf-comment-tools"><time>{timeAgo(c.created_at)}</time><button onClick={()=>setReplyTo({id:c.id,postId:post.id,name:profileName(c.author)})}><CornerUpLeft size={13}/> Responder</button>{c.author_id===userId&&<><button onClick={()=>{setEditingComment(c.id);setEditDraft(c.body)}}><Pencil size={13}/> Editar</button><button onClick={()=>deleteComment(c)}><Trash2 size={13}/></button></>}{c.author_id!==userId&&<button onClick={()=>reportComment(c)}><Flag size={13}/></button>}</div></>}</div></div>)}</div>
-     {replyTo?.postId===post.id&&<div className="nxf-replying">Respondendo a {replyTo.name}<button onClick={()=>setReplyTo(null)}><X size={13}/></button></div>}
-     <form className="nxf-comment-form" onSubmit={e=>sendComment(post.id,e)}><input value={commentDraft} onChange={e=>setCommentDraft(e.target.value)} maxLength={1000} placeholder="Escreva um comentário..."/><button disabled={busy||!commentDraft.trim()}><Send size={16}/></button></form>
-    </div>}
-   </article>)}</div>
-  }
-  <footer className="nxf-footer">Publicações de toda a comunidade · 40 mais recentes</footer>
+  {loading?<div className="nxf-loading"><LoaderCircle className="nxf-spin"/> Carregando publicações...</div>:visiblePosts.length===0?<div className="nxf-empty"><span>✦</span><h3>{feedMode==='saved'?'Suas publicações salvas aparecerão aqui':feedMode==='friends'?'Seus amigos ainda não publicaram':'A comunidade está começando'}</h3><p>{feedMode==='saved'?'Salve publicações interessantes para encontrá-las rapidamente.':'Seja o primeiro a compartilhar uma ideia ou conquista no NEXUS Social.'}</p></div>:<div className="nxf-post-list">{visiblePosts.map(post=><article className="nxf-post" id={'post-'+post.id} key={post.id}>
+   <div className="nxf-post-head">{authorButton(post.author)}<div className="nxf-post-meta"><time>{timeAgo(post.created_at)}{post.updated_at&&new Date(post.updated_at)-new Date(post.created_at)>5000?' · editado':''}</time><button aria-label="Mais opções" onClick={()=>setMenuPost(menuPost===post.id?null:post.id)}><MoreHorizontal size={20}/></button>{menuPost===post.id&&<div className="nxf-menu">{post.author_id===userId?<><button onClick={()=>{setEditingPost(post.id);setPostEditDraft(post.body||'');setMenuPost(null)}}><Pencil size={14}/> Editar publicação</button><button onClick={()=>deletePost(post)}><Trash2 size={14}/> Excluir publicação</button></>:<button onClick={()=>reportPost(post)}><Flag size={14}/> Denunciar</button>}</div>}</div></div>
+   {editingPost===post.id?<div className="nxf-edit-post"><textarea value={postEditDraft} maxLength={2000} onChange={e=>setPostEditDraft(e.target.value)}/><div><button onClick={()=>savePostEdit(post)} disabled={busy}><Check size={14}/> Salvar</button><button onClick={()=>setEditingPost(null)}><X size={14}/> Cancelar</button></div></div>:post.body&&<p className="nxf-post-body">{post.body}</p>}
+   {post.imageUrl&&<img className="nxf-post-image" src={post.imageUrl} alt="Imagem da publicação" loading="lazy"/>}
+   <div className="nxf-reaction-summary">{post.likeCount>0&&<span>❤️ {post.likeCount} curtidas</span>}<span>{post.commentCount} comentários</span></div>
+   <div className="nxf-actions"><button className={post.liked?'liked':''} onClick={()=>toggleLike(post)}><Heart size={18} fill={post.liked?'currentColor':'none'}/> Curtir</button><button onClick={()=>toggleComments(post.id)}><MessageCircle size={18}/> Comentar</button><button onClick={()=>sharePost(post)}><Share2 size={18}/> Compartilhar</button><button className={savedIds.includes(post.id)?'saved':''} onClick={()=>toggleBookmark(post)}><Bookmark size={18} fill={savedIds.includes(post.id)?'currentColor':'none'}/></button><button onClick={()=>setReactionPost(reactionPost===post.id?null:post.id)} aria-label="Mais reações"><Smile size={18}/></button></div>
+   {reactionPost===post.id&&<div className="nxf-reaction-picker">{REACTIONS.map(r=><button key={r} className={post.reactions?.mine===r?'active':''} onClick={()=>setReaction(post,r)}>{r}</button>)}</div>}
+   {Object.entries(post.reactions||{}).filter(([k])=>k!=='mine').length>0&&<div className="nxf-reaction-counts">{Object.entries(post.reactions||{}).filter(([k])=>k!=='mine').map(([r,n])=><span key={r}>{r} {n}</span>)}</div>}
+   {expanded[post.id]&&<div className="nxf-comments"><div className="nxf-comment-list">{(comments[post.id]||[]).map(c=><div className={'nxf-comment '+(c.parent_comment_id?'is-reply':'')} key={c.id}>{authorButton(c.author)}<div className="nxf-comment-content">{editingComment===c.id?<><textarea className="nxf-edit-comment" value={editDraft} maxLength={1000} onChange={e=>setEditDraft(e.target.value)}/><div className="nxf-comment-tools"><button onClick={()=>saveCommentEdit(c)}><Check size={13}/> Salvar</button><button onClick={()=>setEditingComment(null)}><X size={13}/> Cancelar</button></div></>:<><p>{c.body}</p><div className="nxf-comment-tools"><time>{timeAgo(c.created_at)}</time><button onClick={()=>setReplyTo({id:c.id,postId:post.id,name:profileName(c.author)})}><CornerUpLeft size={13}/> Responder</button>{c.author_id===userId&&<><button onClick={()=>{setEditingComment(c.id);setEditDraft(c.body)}}><Pencil size={13}/> Editar</button><button onClick={()=>deleteComment(c)}><Trash2 size={13}/></button></>}{c.author_id!==userId&&<button onClick={()=>reportComment(c)}><Flag size={13}/></button>}</div></>}</div></div>)}</div>{replyTo?.postId===post.id&&<div className="nxf-replying">Respondendo a {replyTo.name}<button onClick={()=>setReplyTo(null)}><X size={13}/></button></div>}<form className="nxf-comment-form" onSubmit={e=>sendComment(post.id,e)}><input value={commentDraft} onChange={e=>setCommentDraft(e.target.value)} maxLength={1000} placeholder="Escreva um comentário..."/><button disabled={busy||!commentDraft.trim()}><Send size={16}/></button></form></div>}
+  </article>)}</div>}
+  <footer className="nxf-footer">Conteúdo da comunidade · stories expiram em 24 horas</footer>
+  {storyViewer!==null&&stories.filter(s=>s.author_id!==userId)[storyViewer]&&(()=>{const story=stories.filter(s=>s.author_id!==userId)[storyViewer];return <div className="nxf-story-viewer" onClick={()=>setStoryViewer(null)}><button aria-label="Fechar story"><X size={20}/></button><article onClick={e=>e.stopPropagation()}>{story.imageUrl&&<img src={story.imageUrl} alt="Story"/>}<div><b>{profileName(story.author)}</b><small>@{story.author?.username} · {timeAgo(story.created_at)}</small>{story.body&&<p>{story.body}</p>}</div><button onClick={()=>setStoryViewer(null)}><ChevronLeft size={18}/> Fechar</button></article></div>})()}
  </section>;
 }
