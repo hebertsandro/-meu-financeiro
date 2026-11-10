@@ -537,3 +537,26 @@
  .nexus-social-chat-portal>.content-social>.nexus-social{display:flex!important;flex-direction:column!important}
  .nexus-social-chat-portal .social-community.mobile-chat-open{position:relative!important;inset:auto!important;flex:1 1 auto!important}
 }
+
+
+/* NEXUS quick-create menu inspired by familiar messaging apps */
+.nexus-social .social-inbox-title{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:14px!important}
+.nexus-social .social-inbox-title-actions{display:flex!important;align-items:center!important;gap:12px!important}
+.nexus-social .social-new-chat-button{display:grid!important;place-items:center!important;flex:0 0 44px!important;width:44px!important;height:44px!important;border:1px solid rgba(190,151,255,.45)!important;border-radius:50%!important;background:linear-gradient(145deg,#8c5bfa,#4a9dff)!important;color:white!important;box-shadow:0 5px 22px rgba(120,83,245,.3)!important}
+.nexus-social .social-new-chat-button:active{transform:scale(.95)!important}
+.social-quick-create-backdrop{position:fixed!important;inset:0!important;z-index:2147483000!important;display:flex!important;align-items:flex-end!important;justify-content:center!important;padding:16px!important;background:rgba(3,4,12,.68)!important;backdrop-filter:blur(9px)!important;-webkit-backdrop-filter:blur(9px)!important}
+.social-quick-create-sheet{width:min(100%,520px)!important;padding:18px!important;border:1px solid rgba(185,151,239,.24)!important;border-radius:25px!important;background:#171522!important;box-shadow:0 24px 80px rgba(0,0,0,.55)!important;color:#f8f4ff!important;animation:nexusQuickSheetIn .2s ease-out!important}
+.social-quick-create-sheet>header{display:flex!important;align-items:center!important;justify-content:space-between!important;margin-bottom:12px!important}
+.social-quick-create-sheet>header small{font-size:9px!important;letter-spacing:1.6px!important;color:#ad8be8!important;font-weight:800!important}
+.social-quick-create-sheet>header h3{margin:4px 0 0!important;font-size:19px!important}
+.social-quick-create-sheet>header>button{display:grid!important;place-items:center!important;width:36px!important;height:36px!important;border:1px solid rgba(255,255,255,.12)!important;border-radius:50%!important;background:#292536!important;color:#fff!important}
+.social-quick-action{display:flex!important;align-items:center!important;gap:13px!important;width:100%!important;min-height:68px!important;padding:10px 4px!important;border:0!important;border-bottom:1px solid rgba(255,255,255,.09)!important;background:transparent!important;color:#f7f2ff!important;text-align:left!important}
+.social-quick-action>span{display:grid!important;place-items:center!important;flex:0 0 43px!important;width:43px!important;height:43px!important;border-radius:15px!important;background:rgba(145,102,230,.16)!important;color:#c6a5ff!important}
+.social-quick-action>div{display:flex!important;flex:1!important;flex-direction:column!important;gap:4px!important;min-width:0!important}
+.social-quick-action b{font-size:14px!important}
+.social-quick-action small{font-size:11px!important;color:#a9a2b5!important}
+.social-quick-action>svg:last-child{transform:rotate(180deg)!important;color:#8f879e!important}
+.social-quick-create-sheet>p{margin:13px 2px 2px!important;color:#898294!important;font-size:10px!important;line-height:1.5!important}
+@keyframes nexusQuickSheetIn{from{opacity:0;transform:translateY(16px)}to{opacity:1;transform:translateY(0)}}
+@media(min-width:768px){.social-quick-create-backdrop{align-items:center!important}.social-quick-create-sheet{border-radius:24px!important}}
+@media(max-width:767px){.nexus-social .social-new-chat-button{width:42px!important;height:42px!important;flex-basis:42px!important}.nexus-social .social-inbox-title-actions{gap:9px!important}}
