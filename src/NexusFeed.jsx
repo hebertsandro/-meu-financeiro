@@ -55,6 +55,7 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
   finally{setLoading(false);}
  },[userId]);
  useEffect(()=>{load();},[load]);
+ useEffect(()=>{if(loading||!window.location.hash.startsWith('#post-'))return;const target=document.getElementById(window.location.hash.slice(1));if(target){target.scrollIntoView({behavior:'smooth',block:'center'});target.classList.add('nxf-post-highlight');}},[loading,posts]);
  useEffect(()=>{if(!userId)return;const channel=supabase.channel('nexus-feed-live-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'social_posts'},load).on('postgres_changes',{event:'*',schema:'public',table:'social_post_likes'},load).on('postgres_changes',{event:'*',schema:'public',table:'social_post_comments'},load).on('postgres_changes',{event:'*',schema:'public',table:'social_stories'},load).on('postgres_changes',{event:'*',schema:'public',table:'social_post_reactions'},load).subscribe();return()=>{supabase.removeChannel(channel);};},[userId,load]);
  useEffect(()=>()=>{if(photoPreview)URL.revokeObjectURL(photoPreview);if(storyPreview)URL.revokeObjectURL(storyPreview);},[photoPreview,storyPreview]);
  const visiblePosts=useMemo(()=>{let list=posts.filter(p=>feedMode==='saved'?savedIds.includes(p.id):feedMode==='friends'?friendIds.has(p.author_id)||p.author_id===userId:true);if(feedMode==='for-you')list=[...list].sort((a,b)=>(b.likeCount+b.commentCount*2)-(a.likeCount+a.commentCount*2)||new Date(b.created_at)-new Date(a.created_at));return list;},[posts,feedMode,savedIds,friendIds,userId]);
