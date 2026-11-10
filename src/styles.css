@@ -3788,3 +3788,22 @@ input:focus,select:focus,textarea:focus{box-shadow:0 0 0 4px rgba(111,159,255,.1
   display:block!important;width:100%!important;height:100%!important;
   object-fit:cover!important;border-radius:50%!important;
 }
+
+
+/* Correção definitiva do formato do avatar no cabeçalho, independentemente da moldura equipada. */
+header.topbar button.avatar.profile-avatar-button[class*="frame-"]{
+  width:34px!important;height:34px!important;min-width:34px!important;min-height:34px!important;
+  flex:0 0 34px!important;aspect-ratio:1/1!important;
+  border-radius:50%!important;clip-path:circle(50% at 50% 50%)!important;
+  padding:0!important;display:grid!important;place-items:center!important;
+}
+header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span{
+  width:100%!important;height:100%!important;min-width:0!important;min-height:0!important;
+  border-radius:50%!important;clip-path:circle(50% at 50% 50%)!important;
+  display:grid!important;place-items:center!important;overflow:hidden!important;
+  line-height:1!important;transform:none!important;
+}
+header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
+  width:100%!important;height:100%!important;display:block!important;
+  object-fit:cover!important;border-radius:50%!important;
+}
