@@ -3912,3 +3912,48 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 .admin-security-info b{color:#d9eaff;font-size:12px}.admin-security-info p{margin:6px 0;color:#9aacc4;font-size:11px;line-height:1.6}.admin-security-info small{color:#7e9ab9;font-size:10px;line-height:1.5}
 @media(max-width:850px){.admin-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.admin-section-grid{grid-template-columns:1fr}.admin-action-tile{min-height:145px}}
 @media(max-width:620px){.admin-hero{padding:19px;border-radius:17px}.admin-hero-emblem{width:62px;height:62px;flex-basis:62px;border-radius:18px}.admin-hero-emblem svg{width:31px}.admin-hero-meta{display:grid;gap:7px}.admin-stat{padding:12px}.admin-stat>b{font-size:20px}.admin-section{padding:13px}.admin-section-heading{align-items:flex-start;flex-direction:column}.admin-section-heading>.primary{width:100%;justify-content:center}.admin-record{align-items:flex-start;flex-wrap:wrap}.admin-record-main{flex-basis:calc(100% - 55px)}.admin-record-actions{width:100%;justify-content:stretch}.admin-record-actions .delete-btn{flex:1 1 auto;justify-content:center}.admin-operation-head{flex-wrap:wrap}.admin-operation-head .admin-state-pill{margin-left:49px}.admin-operation-foot{align-items:stretch;flex-direction:column}.admin-operation-foot .primary{width:100%;justify-content:center}.admin-tabs button{padding:0 12px;font-size:10px}}
+
+
+/* ADMIN — central de comunicados */
+.admin-announcement-preview{display:grid;gap:9px;padding:17px;border:1px solid rgba(151,126,232,.24);border-radius:15px;background:radial-gradient(circle at 100% 0%,rgba(139,92,246,.16),transparent 42%),linear-gradient(140deg,rgba(28,34,61,.92),rgba(13,21,36,.96))}
+.admin-announcement-preview>span{display:flex;align-items:center;gap:7px;color:#b9a5ff;font-size:9px;font-weight:900;letter-spacing:1.2px}
+.admin-announcement-preview>b{color:#f4f2ff;font-size:16px;overflow-wrap:anywhere}
+.admin-announcement-preview>p{margin:0;color:#b9c2d7;font-size:12px;line-height:1.6;white-space:pre-wrap;overflow-wrap:anywhere}
+.admin-announcement-preview>small{color:#8392ad;font-size:9px;font-weight:800;letter-spacing:1px}
+.admin-announcement-form{display:grid;gap:9px;padding:16px;border:1px solid rgba(128,151,190,.15);border-radius:15px;background:rgba(8,16,29,.48)}
+.admin-announcement-form input,.admin-announcement-form textarea{width:100%;box-sizing:border-box;padding:12px 13px;border:1px solid rgba(139,159,197,.2);border-radius:11px;background:rgba(6,13,24,.65);color:#edf2ff;font:inherit;font-size:12px;outline:none}
+.admin-announcement-form textarea{min-height:116px;resize:vertical;line-height:1.55}
+.admin-announcement-form input:focus,.admin-announcement-form textarea:focus{border-color:rgba(145,165,255,.6);box-shadow:0 0 0 3px rgba(108,130,255,.1)}
+.admin-announcement-counter{margin-top:-6px;text-align:right;color:#7f8fa8;font-size:10px}
+@media(max-width:620px){.admin-announcement-form{padding:12px}.admin-announcement-form .admin-operation-foot{gap:10px}.admin-announcement-form .admin-operation-foot .primary{width:100%;justify-content:center}}
+
+
+/* ADMIN — moderação de denúncias */
+.admin-report-toolbar{display:grid;gap:11px;margin:12px 0 16px}
+.admin-report-filters{display:flex;gap:7px;overflow-x:auto;padding:2px 0 5px}
+.admin-report-filters button{flex:0 0 auto;padding:8px 11px;border:1px solid rgba(139,159,197,.18);border-radius:10px;background:rgba(8,16,29,.55);color:#aab6cb;font-size:11px;font-weight:750}
+.admin-report-filters button.active{border-color:rgba(151,126,232,.55);background:rgba(126,91,214,.17);color:#e3d9ff}
+.admin-report-list{display:grid;gap:12px}
+.admin-report-card{display:grid;gap:12px;padding:14px;border:1px solid rgba(128,151,190,.17);border-radius:15px;background:linear-gradient(145deg,rgba(20,29,48,.8),rgba(9,17,30,.82));min-width:0}
+.admin-report-top,.admin-report-reason,.admin-report-parties,.admin-report-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;min-width:0}
+.admin-report-kind,.admin-report-status{display:inline-flex;align-items:center;padding:5px 8px;border-radius:7px;font-size:9px;font-weight:900;letter-spacing:.55px}
+.admin-report-kind{background:rgba(110,130,175,.13);color:#bac8e1}
+.admin-report-kind.profile{background:rgba(139,92,246,.14);color:#d0b9ff}
+.admin-report-status{background:rgba(230,160,70,.12);color:#f4c57f}
+.admin-report-status.reviewing{background:rgba(73,151,226,.14);color:#9bcfff}
+.admin-report-status.resolved{background:rgba(54,176,125,.13);color:#8be0b7}
+.admin-report-status.dismissed{background:rgba(130,143,163,.14);color:#b6c0d1}
+.admin-report-reason b{color:#f1f4ff;font-size:13px}
+.admin-report-reason time{color:#8392a9;font-size:10px;text-align:right}
+.admin-report-details{margin:0;color:#c2cbe0;font-size:12px;line-height:1.5;overflow-wrap:anywhere}
+.admin-report-parties{align-items:stretch}
+.admin-report-parties>div{display:grid;gap:4px;flex:1;min-width:0;padding:10px;border:1px solid rgba(128,151,190,.12);border-radius:10px;background:rgba(6,13,24,.35)}
+.admin-report-parties small,.admin-report-content small{color:#7f91ae;font-size:9px;font-weight:900;letter-spacing:.8px}
+.admin-report-parties b{color:#e8edfa;font-size:11px;overflow-wrap:anywhere}
+.admin-report-parties span{color:#91a0b8;font-size:10px;overflow-wrap:anywhere}
+.admin-report-content{padding:10px;border-left:2px solid rgba(151,126,232,.6);background:rgba(116,88,190,.07);border-radius:0 9px 9px 0}
+.admin-report-content p{margin:6px 0 0;color:#c4cbe0;font-size:11px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere}
+.admin-report-actions{justify-content:flex-end}
+.admin-report-actions label{display:flex;align-items:center;gap:9px;color:#95a4bd;font-size:10px}
+.admin-report-actions select{max-width:150px;padding:8px 10px;border:1px solid rgba(139,159,197,.22);border-radius:9px;background:#111d31;color:#eaf0ff;font-size:11px}
+@media(max-width:520px){.admin-report-parties{flex-direction:column}.admin-report-reason{align-items:flex-start;flex-direction:column}.admin-report-reason time{text-align:left}.admin-report-actions{justify-content:stretch}.admin-report-actions label{width:100%;justify-content:space-between}.admin-report-actions select{max-width:58%}}
