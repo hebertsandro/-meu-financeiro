@@ -4191,3 +4191,8 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 .nexus-reward-empty{margin:18px 0;padding:13px;border:1px solid rgba(153,126,235,.2);border-radius:13px;color:#aaaec4;font-size:12px;line-height:1.5}
 .nexus-reward-modal>.primary{width:100%;margin-top:8px}
 @media(max-width:480px){.nexus-reward-modal{padding:22px 17px;border-radius:21px}.nexus-reward-modal h2{font-size:22px}}
+
+/* Space Nexus: four modes without an orphaned card on narrow screens */
+.space-mode-picker>div{grid-template-columns:repeat(4,minmax(0,1fr))}
+@media(max-width:760px){.space-mode-picker>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:380px){.space-mode-picker button{padding:10px 6px}.space-mode-picker button strong{font-size:.76rem}.space-mode-picker button small{font-size:.55rem}}
