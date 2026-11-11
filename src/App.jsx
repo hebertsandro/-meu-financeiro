@@ -5,7 +5,7 @@ import NexusSocial, { PlayerPostGrid } from './NexusSocial';
 import NexusCompetition from './NexusCompetition';
 import PushNotifications from './PushNotifications';
 import {
-  Activity, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined, Search, SlidersHorizontal, Power,
+  Activity, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined, Search, SlidersHorizontal, Power, Flag,
   Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock, Bot, Sparkles, Send,
   Gamepad2, Trophy, Coins, Brain, Gift, ClipboardList, Star, Zap, Flame, MessageCircle, Newspaper, Shield, ChevronDown,
   LogOut, Menu, Plus, ReceiptText, ShieldCheck, Target, TrendingUp, Wallet, X, Users, Ban, UserCheck, KeyRound, RefreshCw
@@ -567,6 +567,9 @@ function App(){
   const [adminTab,setAdminTab]=useState('overview');
   const [adminUserSearch,setAdminUserSearch]=useState('');
   const [adminSocialSearch,setAdminSocialSearch]=useState('');
+  const [adminReports,setAdminReports]=useState([]);
+  const [adminReportFilter,setAdminReportFilter]=useState('open');
+  const [adminReportSearch,setAdminReportSearch]=useState('');
   const [adminAnnouncementTitle,setAdminAnnouncementTitle]=useState('');
   const [adminAnnouncementBody,setAdminAnnouncementBody]=useState('');
   const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);
@@ -815,12 +818,15 @@ function App(){
   async function adminAction(action,userId,extra={}){
     if(action==='delete_user'&&!window.confirm('ATENÇÃO: excluir esta conta é definitivo. Os dados vinculados também poderão ser removidos. Deseja continuar?'))return;
     if(action==='broadcast_announcement'&&!window.confirm('Enviar este comunicado para todos os usuários ativos? Essa ação não pode ser desfeita.'))return;
+    if(action==='update_report_status'&&!window.confirm('Confirmar a atualização do status desta denúncia?'))return;
     setAdminBusy(true);setAdminError('');setAdminMessage('');
     const {data:result,error}=await supabase.functions.invoke('admin-panel',{body:{action,user_id:userId,...extra}});
     setAdminBusy(false);
     if(error||result?.error){let detail=result?.error||error?.message||'Falha sem detalhes retornados.';try{const ctx=error?.context;if(ctx&&typeof ctx.clone==='function'){const payload=await ctx.clone().json();detail=payload?.error||payload?.message||detail}}catch{}setAdminError(detail);return}
     if(action==='list_users'){setAdminUsers(result.users||[]);setAdminMessage('Lista de contas atualizada.');return}
      if(action==='list_social_profiles'){setAdminSocialProfiles(result.profiles||[]);setAdminMessage('Perfis sociais atualizados.');return}
+     if(action==='list_reports'){setAdminReports(result.reports||[]);setAdminMessage('Denúncias atualizadas.');return}
+     if(action==='update_report_status'){setAdminMessage('Status da denúncia atualizado.');await adminAction('list_reports');return}
      if(action==='moderate_social_profile'||action==='delete_social_profile'){setAdminMessage(action==='delete_social_profile'?'Perfil social removido.':extra.suspended?'Perfil social suspenso.':'Perfil social reativado.');await adminAction('list_social_profiles');return}
     if(action==='get_maintenance'){setMaintenance(!!result.settings?.maintenance_mode);setMaintenanceMessage(result.settings?.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.');return}
     if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
@@ -970,11 +976,12 @@ function App(){
           <div className="admin-stat"><span><Gamepad2 size={17}/> MODO DE TESTE</span><b>{adminTestMode?'Ativado':'Desativado'}</b><small>Somente neste navegador</small></div>
         </div>
         <nav className="admin-tabs" aria-label="Seções administrativas">
-          {[['overview','Visão geral',LayoutDashboard],['users','Usuários',Users],['social','NEXUS Social',MessageCircle],['announcements','Comunicados',Newspaper],['operations','Operações e segurança',ShieldCheck]].map(([key,label,Icon])=><button type="button" key={key} className={adminTab===key?'active':''} onClick={()=>setAdminTab(key)}><Icon size={16}/>{label}</button>)}
+          {[['overview','Visão geral',LayoutDashboard],['users','Usuários',Users],['social','NEXUS Social',MessageCircle],['reports','Denúncias',Flag],['announcements','Comunicados',Newspaper],['operations','Operações e segurança',ShieldCheck]].map(([key,label,Icon])=><button type="button" key={key} className={adminTab===key?'active':''} onClick={()=>setAdminTab(key)}><Icon size={16}/>{label}</button>)}
         </nav>
         {adminTab==='overview'&&<div className="admin-section-grid">
           <button className="admin-action-tile" onClick={()=>setAdminTab('users')}><span className="admin-tile-icon"><Users size={20}/></span><b>Gerenciar usuários</b><small>Bloqueio, recuperação de acesso e exclusão com confirmação.</small><em>Abrir gerenciamento <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>{setAdminTab('social');if(!adminSocialProfiles.length)adminAction('list_social_profiles')}}><span className="admin-tile-icon purple"><MessageCircle size={20}/></span><b>Moderação social</b><small>Revise perfis públicos e suspenda contas que violem as regras.</small><em>Moderar comunidade <ChevronRight size={15}/></em></button>
+          <button className="admin-action-tile" onClick={()=>{setAdminTab('reports');if(!adminReports.length)adminAction('list_reports')}}><span className="admin-tile-icon purple"><Flag size={20}/></span><b>Central de denúncias</b><small>Analise denúncias de perfis, publicações e comentários do NEXUS Social.</small><em>Revisar denúncias <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>setAdminTab('announcements')}><span className="admin-tile-icon purple"><Newspaper size={20}/></span><b>Central de comunicados</b><small>Envie avisos importantes para todos os usuários ativos.</small><em>Criar comunicado <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>setAdminTab('operations')}><span className="admin-tile-icon green"><SlidersHorizontal size={20}/></span><b>Operações do site</b><small>Manutenção, aviso aos usuários e ferramentas de teste.</small><em>Configurar operações <ChevronRight size={15}/></em></button>
         </div>}
@@ -989,6 +996,23 @@ function App(){
           <label className="admin-search"><Search size={17}/><input value={adminSocialSearch} onChange={e=>setAdminSocialSearch(e.target.value)} placeholder="Buscar por nome, @ ou e-mail"/></label>
           {!adminSocialProfiles.length?<Empty icon={Users} title="Perfis ainda não carregados" text="Atualize para consultar os perfis da comunidade."/>:<div className="admin-record-list">{adminSocialProfiles.filter(p=>[p.display_name,p.username,p.email].some(v=>String(v||'').toLowerCase().includes(adminSocialSearch.toLowerCase()))).map(p=><div className="admin-record" key={p.user_id}><div className="admin-record-avatar social">{p.avatar||'👾'}</div><div className="admin-record-main"><b>{p.display_name} · @{p.username}</b><span>{p.email||p.user_id}</span>{p.bio&&<small>{p.bio}</small>}<small className={p.is_suspended?'admin-danger-text':'admin-good-text'}>{p.is_suspended?'Perfil suspenso':'Perfil visível na comunidade'}</small></div><div className="admin-record-actions"><button className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('moderate_social_profile',p.user_id,{suspended:!p.is_suspended})}>{p.is_suspended?<><UserCheck size={15}/> Reativar</>:<><Ban size={15}/> Suspender</>}</button><button className="delete-btn danger" disabled={adminBusy} onClick={()=>{if(window.confirm('Remover somente o perfil social de @'+p.username+'? A conta e os dados financeiros serão mantidos.'))adminAction('delete_social_profile',p.user_id)}}><X size={15}/> Remover perfil</button></div></div>)}</div>}
           <p className="admin-note"><ShieldCheck size={15}/> Suspender oculta o perfil público. Remover perfil social não apaga a conta nem os dados financeiros.</p>
+        </div>}
+        {adminTab==='reports'&&<div className="admin-section">
+          <div className="admin-section-heading"><div><h3>Central de denúncias</h3><p>Revise denúncias de perfis, publicações e comentários. Os dados financeiros dos usuários não são exibidos.</p></div><button className="primary" disabled={adminBusy} onClick={()=>adminAction('list_reports')}><RefreshCw size={16}/> Atualizar denúncias</button></div>
+          <div className="admin-report-toolbar">
+            <label className="admin-search"><Search size={17}/><input value={adminReportSearch} onChange={e=>setAdminReportSearch(e.target.value)} placeholder="Buscar motivo, usuário ou conteúdo"/></label>
+            <div className="admin-report-filters">{[['open','Abertas'],['reviewing','Em análise'],['resolved','Resolvidas'],['dismissed','Arquivadas'],['all','Todas']].map(([key,label])=><button type="button" key={key} className={adminReportFilter===key?'active':''} onClick={()=>setAdminReportFilter(key)}>{label}</button>)}</div>
+          </div>
+          {!adminReports.length?<Empty icon={Flag} title="Denúncias ainda não carregadas" text="Toque em Atualizar denúncias para consultar os relatos enviados pela comunidade."/>:
+          <div className="admin-report-list">{adminReports.filter(r=>(adminReportFilter==='all'||r.status===adminReportFilter)&&[r.category,r.details,r.reporter_name,r.reporter_email,r.reported_name,r.reported_username,r.content_preview].some(v=>String(v||'').toLowerCase().includes(adminReportSearch.toLowerCase()))).map(r=><article className="admin-report-card" key={r.report_type+':'+r.id}>
+            <div className="admin-report-top"><span className={'admin-report-kind '+(r.report_type==='profile'?'profile':'content')}>{r.report_type==='profile'?'PERFIL':'PUBLICAÇÃO / COMENTÁRIO'}</span><span className={'admin-report-status '+r.status}>{({open:'Aberta',reviewing:'Em análise',resolved:'Resolvida',dismissed:'Arquivada'})[r.status]||r.status}</span></div>
+            <div className="admin-report-reason"><b>{({harassment:'Assédio',spam:'Spam',inappropriate:'Conteúdo impróprio',impersonation:'Falsidade ideológica',other:'Outro'})[r.category]||r.category||'Denúncia de conteúdo'}</b><time>{r.created_at?new Date(r.created_at).toLocaleString('pt-BR'):''}</time></div>
+            <p className="admin-report-details">{r.details||'Nenhum detalhe adicional informado.'}</p>
+            <div className="admin-report-parties"><div><small>DENUNCIANTE</small><b>{r.reporter_name||'Usuário'}</b><span>{r.reporter_email||r.reporter_id}</span></div><div><small>ALVO DA DENÚNCIA</small><b>{r.reported_name||'Conteúdo removido ou indisponível'}</b><span>{r.reported_username?'@'+r.reported_username:r.reported_email||r.reported_id||'—'}</span></div></div>
+            {r.content_preview&&<div className="admin-report-content"><small>CONTEÚDO DENUNCIADO</small><p>{r.content_preview}</p></div>}
+            <div className="admin-report-actions"><label><span>Status</span><select value={r.status} disabled={adminBusy} onChange={e=>adminAction('update_report_status',null,{report_type:r.report_type,report_id:r.id,status:e.target.value})}><option value="open">Aberta</option><option value="reviewing">Em análise</option><option value="resolved">Resolvida</option><option value="dismissed">Arquivada</option></select></label></div>
+          </article>)}</div>}
+          <p className="admin-note"><ShieldCheck size={15}/> Alterar o status não bloqueia nem exclui automaticamente ninguém. Ações disciplinares continuam separadas e exigem análise.</p>
         </div>}
         {adminTab==='announcements'&&<div className="admin-section">
           <div className="admin-section-heading"><div><h3>Central de comunicados</h3><p>Publique avisos importantes diretamente na área de notificações dos usuários ativos.</p></div><span className="admin-secure-pill"><ShieldCheck size={14}/> Envio administrativo</span></div>
