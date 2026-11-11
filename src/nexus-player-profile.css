@@ -1000,3 +1000,29 @@
     transform:translateY(8px)!important;
   }
 }
+
+
+/* NEXUS career stats — separate from the player card and placed below publications */
+.profile-career-stats{
+  width:min(100%,980px);margin:22px auto 34px;padding:20px;
+  border:1px solid rgba(133,112,214,.24);border-radius:22px;
+  background:linear-gradient(145deg,rgba(23,25,51,.94),rgba(10,18,34,.96));
+  box-shadow:0 14px 38px rgba(0,0,0,.18),inset 0 1px 0 rgba(255,255,255,.035);
+}
+.profile-career-heading{display:flex;align-items:flex-end;justify-content:space-between;gap:12px;margin-bottom:16px}
+.profile-career-heading>div>span{font-size:10px;letter-spacing:.2em;font-weight:800;color:#b6a0ff}
+.profile-career-heading h3{margin:5px 0 0;font-size:20px;color:#f3f2ff}
+.profile-career-heading>small{font-size:11px;color:#9da6c0;text-align:right}
+.profile-career-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px}
+.profile-career-grid>div{min-width:0;min-height:106px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:5px;text-align:center;border:1px solid rgba(153,132,225,.2);border-radius:16px;background:linear-gradient(155deg,rgba(103,81,163,.16),rgba(20,29,50,.5))}
+.profile-career-grid>div>span{font-size:20px;line-height:1.2}
+.profile-career-grid>div>b{font-size:23px;line-height:1.2;color:#fff;font-weight:850;font-variant-numeric:tabular-nums}
+.profile-career-grid>div>small{font-size:11px;line-height:1.35;color:#aeb4ca}
+.profile-career-stats>p{margin:13px 2px 0;color:#858fa9;font-size:11px;line-height:1.5}
+@media(max-width:560px){
+ .profile-career-stats{width:100%;margin:16px 0 28px;padding:15px;border-radius:18px}
+ .profile-career-heading h3{font-size:18px}
+ .profile-career-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .profile-career-grid>div{min-height:94px;padding:12px 8px}
+ .profile-career-grid>div>b{font-size:21px}
+}
