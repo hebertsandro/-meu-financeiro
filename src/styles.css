@@ -4056,3 +4056,118 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 }
 
 .profile-honors-inline{display:flex;flex-wrap:wrap;gap:6px;margin-top:9px;max-width:100%}.profile-honor-chip{display:inline-flex;align-items:center;gap:4px;padding:5px 8px;border:1px solid #465078;border-radius:999px;background:#202541;color:#e0d8ff;font-size:9px;font-weight:700;line-height:1.2}.profile-honor-chip.founder{border-color:#947443;background:linear-gradient(100deg,#473820,#2b2638);color:#f6d68e}.profile-honor-empty-inline{font-size:9px;color:#929db6;padding:4px 0}@media(max-width:600px){.profile-honors-inline{gap:5px}.profile-honor-chip{font-size:8px;padding:5px 7px}}
+
+
+/* FIX DEFINITIVO — cartão do jogador compacto e sem espaços vazios */
+.player-profile-page .game-world-hero{
+  height:auto!important;
+  min-height:0!important;
+  display:flex!important;
+  flex-direction:column!important;
+  justify-content:flex-start!important;
+  align-items:stretch!important;
+  gap:14px!important;
+  padding:22px 24px!important;
+}
+.player-profile-page .game-world-hero .player-identity{
+  display:grid!important;
+  grid-template-columns:76px minmax(0,1fr)!important;
+  align-items:center!important;
+  gap:16px!important;
+  margin:10px 0 0!important;
+  min-height:0!important;
+}
+.player-profile-page .game-world-hero .player-info{
+  width:100%!important;
+  min-width:0!important;
+  overflow:visible!important;
+}
+.player-profile-page .profile-honors-inline{
+  display:flex!important;
+  flex-wrap:wrap!important;
+  align-items:center!important;
+  gap:7px!important;
+  width:100%!important;
+  margin:0!important;
+  min-height:0!important;
+}
+.player-profile-page .player-profile-summary-row{
+  display:flex!important;
+  align-items:center!important;
+  justify-content:space-between!important;
+  flex-wrap:wrap!important;
+  gap:12px!important;
+  width:100%!important;
+  margin:0!important;
+}
+.player-profile-page .player-profile-stats{
+  display:flex!important;
+  flex:1 1 300px!important;
+  align-items:stretch!important;
+  gap:9px!important;
+  min-width:0!important;
+}
+.player-profile-page .player-profile-stats>div{
+  flex:1 1 0!important;
+  min-width:0!important;
+  justify-content:center!important;
+}
+.player-profile-page .player-xp-total{
+  flex:0 0 auto!important;
+  min-width:88px!important;
+  margin:0!important;
+}
+@media(max-width:640px){
+  .player-profile-page .game-world-hero{
+    padding:18px 15px!important;
+    gap:13px!important;
+    border-radius:19px!important;
+  }
+  .player-profile-page .game-world-hero .player-identity{
+    grid-template-columns:64px minmax(0,1fr)!important;
+    gap:12px!important;
+    margin:8px 0 0!important;
+  }
+  .player-profile-page .game-world-hero .player-avatar{
+    width:60px!important;
+    height:60px!important;
+    flex:0 0 60px!important;
+  }
+  .player-profile-page .player-profile-summary-row{
+    align-items:stretch!important;
+    gap:10px!important;
+  }
+  .player-profile-page .player-xp-total{
+    min-width:72px!important;
+    padding:8px 10px!important;
+    align-self:center!important;
+  }
+  .player-profile-page .player-xp-total strong{font-size:20px!important}
+  .player-profile-page .player-profile-stats{
+    flex:1 1 100%!important;
+    display:grid!important;
+    grid-template-columns:repeat(3,minmax(0,1fr))!important;
+    gap:7px!important;
+  }
+  .player-profile-page .player-profile-stats>div{
+    display:flex!important;
+    flex-direction:column!important;
+    align-items:center!important;
+    text-align:center!important;
+    gap:5px!important;
+    padding:10px 5px!important;
+  }
+  .player-profile-page .player-profile-stats span{
+    font-size:8px!important;
+    line-height:1.35!important;
+  }
+}
+@media(max-width:380px){
+  .player-profile-page .game-world-hero .player-identity{
+    grid-template-columns:52px minmax(0,1fr)!important;
+    gap:10px!important;
+  }
+  .player-profile-page .game-world-hero .player-avatar{
+    width:50px!important;height:50px!important;flex-basis:50px!important;
+  }
+}
