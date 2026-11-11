@@ -4040,3 +4040,17 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 @media (hover: none) {
   .easy-start-grid > button:hover { transform: none; }
 }
+
+
+/* FIX MOBILE — mantém a NEXUS AI acima da navegação inferior */
+@media (max-width: 760px) {
+  .assistant-fab {
+    right: 16px !important;
+    bottom: calc(88px + env(safe-area-inset-bottom)) !important;
+  }
+  .assistant-popover {
+    right: 12px !important;
+    bottom: calc(158px + env(safe-area-inset-bottom)) !important;
+    max-height: calc(100dvh - 180px - env(safe-area-inset-bottom)) !important;
+  }
+}
