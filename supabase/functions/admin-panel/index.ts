@@ -130,6 +130,16 @@ Deno.serve(async (req) => {
     return respond({ reports });
   }
 
+  if (body.action === "delete_report") {
+    if (!body.report_id) return respond({ error: "Informe a denúncia que deseja apagar." }, 400);
+    const table = body.report_type === "profile" ? "social_reports" : body.report_type === "content" ? "social_post_reports" : null;
+    if (!table) return respond({ error: "Tipo de denúncia inválido." }, 400);
+    const { data, error } = await admin.from(table).delete().eq("id", body.report_id).select("id").maybeSingle();
+    if (error) return respond({ error: "Não foi possível apagar a denúncia." }, 500);
+    if (!data) return respond({ error: "Denúncia não encontrada." }, 404);
+    return respond({ success: true, deleted: true });
+  }
+
   if (body.action === "update_report_status") {
     const allowedStatuses = ["open", "reviewing", "resolved", "dismissed"];
     if (!body.report_id || !allowedStatuses.includes(body.status ?? "")) return respond({ error: "Informe uma denúncia e um status válidos." }, 400);
