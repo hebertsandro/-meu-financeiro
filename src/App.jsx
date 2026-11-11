@@ -834,7 +834,7 @@ function App(){
   function startQuiz(){if(!quizAvailable)return;const selected=[...gameQuestions].sort(()=>Math.random()-.5).slice(0,5);const now=Date.now();setRoundQuestions(selected);setGameQuestionIndex(0);setGameAnswer(null);setGameFeedback('');setRoundCorrect(0);setQuizLastPlayed(now);window.localStorage.setItem('mf_quiz_last',String(now));setQuizActive(true)}
   function answerGame(index){if(gameAnswer!==null||!quizActive)return;setGameAnswer(index);const q=roundQuestions[gameQuestionIndex];if(index===q.correct){setGameXp(v=>v+5);setGameCorrect(v=>v+1);setRoundCorrect(v=>v+1);if(session?.user?.id&&supabase)void supabase.rpc('social_record_clan_game_xp',{target_game:'quiz',xp_delta:5});setGameFeedback('Resposta certa! +5 XP. '+q.explanation)}else{setGameFeedback('Quase! '+q.explanation)}}
   function nextGameQuestion(){if(gameQuestionIndex>=roundQuestions.length-1){setQuizActive(false);setGameFeedback('');void recordCompetitionMatch({gameKey:'quiz',score:roundCorrect,xpEarned:roundCorrect*5,mode:'5-perguntas',won:roundCorrect>=4});return}setGameQuestionIndex(v=>v+1);setGameAnswer(null);setGameFeedback('')}
-  async function awardLootDrop(gameKey,sourceKey){if(!session?.user?.id||!supabase)return null;const {data,error}=await supabase.rpc('nexus_award_loot_drop',{selected_game:gameKey,source_key:sourceKey});if(error){console.warn('Loot drop:',error.message);return null}if(data?.item_name)notify('DROP RARO! '+(data.icon||'🎁')+' '+data.item_name+' · +'+Number(data.score_value||0).toLocaleString('pt-BR')+' pontos na coleção');return data||null}
+  async function awardLootDrop(gameKey,sourceKey){if(!session?.user?.id||!supabase)return null;const {data,error}=sourceKey==='coin_pickup'?await supabase.rpc('nexus_award_coin_drop',{selected_game:gameKey}):await supabase.rpc('nexus_award_loot_drop',{selected_game:gameKey,source_key:sourceKey});if(error){console.warn('Loot drop:',error.message);return null}if(data?.coins)notify('MOEDAS NEXUS! +'+data.coins+' moedas');else if(data?.item_name)notify('DROP RARO! '+(data.icon||'🎁')+' '+data.item_name+' · +'+Number(data.score_value||0).toLocaleString('pt-BR')+' pontos na coleção');return data||null}
   async function recordCompetitionMatch({gameKey,score,xpEarned=0,mode='normal',won=false,durationSeconds=0}){if(!session?.user?.id||!supabase)return;const {data:matchId,error}=await supabase.rpc('competition_record_match',{selected_game:gameKey,match_score:Math.max(0,Math.floor(Number(score)||0)),earned_xp:Math.max(0,Math.min(1000,Math.floor(Number(xpEarned)||0))),selected_mode:String(mode||'normal'),did_win:!!won,match_duration:Math.max(0,Math.min(7200,Math.floor(Number(durationSeconds)||0)))});if(error){notify('Partida não registrada na competição: '+error.message);return}const {data:drops}=await supabase.from('nexus_loot_drops').select('item_name,score_value,icon,quantity').eq('match_id',matchId).order('score_value',{ascending:false});if(drops?.length){const lootText=drops.map(d=>(d.icon||'🎁')+' '+d.item_name+' +'+Number(d.score_value||0).toLocaleString('pt-BR')+' pts').join(' · ');notify('Drop da partida: '+lootText)}else notify('Partida registrada! + moedas NEXUS.')}
   function awardFlapXp(score,gameKey='piggy-run'){const day=new Date().toLocaleDateString('en-CA');const saved=JSON.parse(window.localStorage.getItem('mf_flap_daily')||'{}');const used=saved.day===day?Number(saved.xp||0):0;const points=Math.max(0,Math.floor(Number(score)||0));const requested=points*2;const reward=Math.min(requested,Math.max(0,100-used));if(reward>0){const total=used+reward;window.localStorage.setItem('mf_flap_daily',JSON.stringify({day,xp:total}));setDailyGameXp(total);setGameXp(v=>v+reward);if(session?.user?.id&&supabase)void supabase.rpc('social_record_clan_game_xp',{target_game:gameKey,xp_delta:reward});notify('Mandou bem! +'+reward+' XP no jogo.');return reward}else{notify('Limite diário de 100 XP do Flappy atingido. Volte amanhã!');return 0}}
 
@@ -1141,14 +1141,14 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
  };
  useEffect(()=>{
   if(!running)return;
-  const id=setInterval(()=>{
+  let raf=0,last=0,accumulator=0;const frame=(timestamp)=>{raf=requestAnimationFrame(frame);if(!last)last=timestamp;accumulator+=Math.min(100,timestamp-last);last=timestamp;let steps=0;while(accumulator>=1000/120&&steps<8){accumulator-=1000/120;steps++;
    const g=game.current;if(!g||g.phase==='finished')return;
    g.tick++;const n=g.tick,cfg=modes[g.mode],w=g.wave;
    const fireRate=Math.max(7,Math.round(17*cfg.fire)-Math.floor(w/5));
    if(n%fireRate===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
    const bossWave=w%5===0;
    const waveTarget=5+w*2;
-   const spawnEvery=Math.max(24,Math.round((cfg.spawn-w*1.7)));
+   const spawnEvery=Math.max(16,Math.round((cfg.spawn-w*2.8)));
    if(!bossWave&&g.spawned<waveTarget&&n%spawnEvery===0&&g.foes.length<Math.min(7,3+Math.ceil(w/3))){
     const roll=Math.random();let type='drone',hp=1;
     if(w>=2&&roll>.73){type='scout';hp=1}
@@ -1160,7 +1160,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
    }
    g.foes.forEach(f=>{
     const base=f.type==='scout'?.34:f.type==='brute'?.19:f.type==='tank'?.15:f.type==='phantom'?.27:.23;
-    f.y+=base*cfg.speed*(1+w*.055);
+    f.y+=base*cfg.speed*Math.min(2.4,1+Math.max(0,w-1)*.10);
     if(f.type==='scout'||f.type==='phantom')f.x+=Math.sin(n*.045+f.phase)*(f.type==='phantom'?.28:.16);
    });
    g.shots.forEach(b=>{b.y-=1.18});
@@ -1194,13 +1194,13 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
      const radius=foe.type==='tank'?7:foe.type==='brute'?6.5:5;
      if(Math.abs(shot.x-foe.x)<radius&&shot.y>=foe.y-4&&shot.y<=foe.y+5){
       foe.hp--;hit=true;
-      if(foe.hp<=0){void Promise.resolve(onLoot?.('space-nexus','enemy_kill')).then(item=>{if(item){g.drops.push({id:'loot-'+n+'-'+foe.id,type:'loot',icon:item.icon||'💎',x:foe.x,y:foe.y});setDrops([...g.drops]);setMessage('DROP! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}}).catch(()=>{});g.score+=foe.type==='tank'?55:foe.type==='brute'?35:foe.type==='phantom'?40:foe.type==='scout'?20:10;g.killed++;if(Math.random()<.2){const types=['shield','rapid','double','repair'];const type=types[Math.floor(Math.random()*types.length)];g.drops.push({id:'drop-'+n+'-'+foe.id,type,x:foe.x,y:foe.y})}}
+      if(foe.hp<=0){void Promise.resolve(onLoot?.('space-nexus','enemy_kill')).then(item=>{if(item){g.drops.push({id:'loot-'+n+'-'+foe.id,type:'loot',icon:item.icon||'💎',x:foe.x,y:foe.y});setDrops([...g.drops]);setMessage('DROP! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}}).catch(()=>{});g.score+=foe.type==='tank'?55:foe.type==='brute'?35:foe.type==='phantom'?40:foe.type==='scout'?20:10;g.killed++;if(Math.random()<.07){const roll=Math.random();const type=roll<.38?'shield':roll<.70?'rapid':roll<.91?'double':'repair';g.drops.push({id:'drop-'+n+'-'+foe.id,type,x:foe.x,y:foe.y})}if(g.killed%4===0&&Math.random()<.72)g.drops.push({id:'coin-'+n+'-'+foe.id,type:'coin',x:foe.x,y:foe.y})}
       break;
      }
     }
     if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){
      g.boss.hp--;hit=true;
-     if(g.boss.hp<=0){void Promise.resolve(onLoot?.('space-nexus','boss_kill')).then(item=>{if(item){g.drops.push({id:'loot-boss-'+n,type:'loot',icon:item.icon||'💎',x:g.boss?.x||50,y:g.boss?.y||15});setDrops([...g.drops]);setMessage('DROP DE CHEFÃO! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}}).catch(()=>{});g.score+=300+g.wave*20;g.bossesDefeated++;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');g.phase='boss-cleared';setMessage('CHEFÃO DERROTADO! Recompensa liberada!')}
+     if(g.boss.hp<=0){void Promise.resolve(onLoot?.('space-nexus','boss_kill')).then(item=>{if(item){g.drops.push({id:'loot-boss-'+n,type:'loot',icon:item.icon||'💎',x:g.boss?.x||50,y:g.boss?.y||15});setDrops([...g.drops]);setMessage('DROP DE CHEFÃO! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}}).catch(()=>{});g.score+=300+g.wave*20;g.bossesDefeated++;if(Math.random()<.18){const roll=Math.random();const type=roll<.35?'shield':roll<.68?'rapid':roll<.90?'double':'repair';g.drops.push({id:'boss-drop-'+n,type,x:g.boss.x,y:g.boss.y})}if(Math.random()<.85)g.drops.push({id:'boss-coin-'+n,type:'coin',x:g.boss.x+5,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');g.phase='boss-cleared';setMessage('CHEFÃO DERROTADO! Recompensa liberada!')}
      else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão mudou seu padrão de ataque!');
     }
     if(!hit&&shot.y>0)remainingShots.push(shot);
@@ -1216,7 +1216,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
    const remainingDrops=[];
    for(const d of g.drops){
     if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){
-     if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}
+     if(d.type==='coin'){void Promise.resolve(onLoot?.('space-nexus','coin_pickup')).then(result=>{if(result?.coins)setMessage('+'+result.coins+' MOEDAS NEXUS!')}).catch(()=>{});setMessage('MOEDA NEXUS COLETADA!')}else if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}
      else if(d.type==='rapid'){g.rapidUntil=n+375;setMessage('DISPARO RÁPIDO!')}
      else if(d.type==='double'){g.doubleUntil=n+375;setMessage('TIRO DUPLO!')}
      else if(d.type==='repair'){g.lives=Math.min(cfg.lives,g.lives+1);setMessage('REPARO COLETADO! +1 vida.')}
@@ -1240,8 +1240,10 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
     setWave(g.wave);setMessage('ONDA '+g.wave+' — a ameaça está evoluindo!');
    }
    if(n%2===0){setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
-  },16);
-  return()=>clearInterval(id);
+  }
+  };
+  raf=requestAnimationFrame(frame);
+  return()=>cancelAnimationFrame(raf);
  },[running,mode,onReward,onMatch]);
  return <section className="space-nexus-card">
   {!running&&<div className="space-mode-picker"><b>ESCOLHA A DIFICULDADE</b><div>{Object.entries(modes).map(([id,m])=><button key={id} type="button" className={mode===id?'active':''} onClick={()=>setMode(id)}><strong>{m.label}</strong><small>{m.waves} ondas · {m.lives} vidas</small></button>)}</div></div>}
@@ -1250,7 +1252,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
    <div className="space-stars"/><div className="space-nebula"/>
    {foes.map(f=><div key={f.id} className={'space-enemy '+f.type} style={{left:f.x+'%',top:f.y+'%'}}><EnemyArtwork type={f.type}/><i className="space-enemy-hp" style={{width:(f.hp/f.maxHp*100)+'%'}}/></div>)}
    {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}
-   {drops.map(d=><div key={d.id} className={'space-drop space-drop-'+d.type} style={{left:d.x+'%',top:d.y+'%'}}><span>{d.type==='loot'?(d.icon||'💎'):d.type==='shield'?'S':d.type==='rapid'?'R':d.type==='double'?'×2':'+'}</span></div>)}
+   {drops.map(d=><div key={d.id} className={'space-drop space-drop-'+d.type} style={{left:d.x+'%',top:d.y+'%'}}><span>{d.type==='loot'?(d.icon||'💎'):d.type==='coin'?'🪙':d.type==='shield'?'S':d.type==='rapid'?'R':d.type==='double'?'×2':'+'}</span></div>)}
    {shots.map(b=><i key={b.id} className="space-player-shot" style={{left:b.x+'%',top:b.y+'%'}}/>)}
    {boss&&<div className={'space-boss boss-'+boss.id+' '+(boss.hp<=boss.max*.5?'phase-two':'')} style={{left:boss.x+'%',top:boss.y+'%'}}><BossArtwork/><b>{boss.name}</b><small>{boss.hp<=boss.max*.5?'FASE 2 · FÚRIA MÁXIMA':boss.description}</small><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
    <div className={'space-player-ship '+(shieldActive?'shielded':'')} style={{left:ship.x+'%',top:ship.y+'%'}}><ShipArtwork/></div>
