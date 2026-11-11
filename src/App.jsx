@@ -1194,13 +1194,13 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
      const radius=foe.type==='tank'?7:foe.type==='brute'?6.5:5;
      if(Math.abs(shot.x-foe.x)<radius&&shot.y>=foe.y-4&&shot.y<=foe.y+5){
       foe.hp--;hit=true;
-      if(foe.hp<=0){void Promise.resolve(onLoot?.('space-nexus','enemy_kill')).then(item=>{if(item)setMessage('DROP! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}).catch(()=>{});g.score+=foe.type==='tank'?55:foe.type==='brute'?35:foe.type==='phantom'?40:foe.type==='scout'?20:10;g.killed++;if(Math.random()<.2){const types=['shield','rapid','double','repair'];const type=types[Math.floor(Math.random()*types.length)];g.drops.push({id:'drop-'+n+'-'+foe.id,type,x:foe.x,y:foe.y})}}
+      if(foe.hp<=0){void Promise.resolve(onLoot?.('space-nexus','enemy_kill')).then(item=>{if(item){g.drops.push({id:'loot-'+n+'-'+foe.id,type:'loot',icon:item.icon||'💎',x:foe.x,y:foe.y});setDrops([...g.drops]);setMessage('DROP! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}}).catch(()=>{});g.score+=foe.type==='tank'?55:foe.type==='brute'?35:foe.type==='phantom'?40:foe.type==='scout'?20:10;g.killed++;if(Math.random()<.2){const types=['shield','rapid','double','repair'];const type=types[Math.floor(Math.random()*types.length)];g.drops.push({id:'drop-'+n+'-'+foe.id,type,x:foe.x,y:foe.y})}}
       break;
      }
     }
     if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){
      g.boss.hp--;hit=true;
-     if(g.boss.hp<=0){void Promise.resolve(onLoot?.('space-nexus','boss_kill')).then(item=>{if(item)setMessage('DROP DE CHEFÃO! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}).catch(()=>{});g.score+=300+g.wave*20;g.bossesDefeated++;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');g.phase='boss-cleared';setMessage('CHEFÃO DERROTADO! Recompensa liberada!')}
+     if(g.boss.hp<=0){void Promise.resolve(onLoot?.('space-nexus','boss_kill')).then(item=>{if(item){g.drops.push({id:'loot-boss-'+n,type:'loot',icon:item.icon||'💎',x:g.boss?.x||50,y:g.boss?.y||15});setDrops([...g.drops]);setMessage('DROP DE CHEFÃO! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}}).catch(()=>{});g.score+=300+g.wave*20;g.bossesDefeated++;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');g.phase='boss-cleared';setMessage('CHEFÃO DERROTADO! Recompensa liberada!')}
      else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão mudou seu padrão de ataque!');
     }
     if(!hit&&shot.y>0)remainingShots.push(shot);
@@ -1250,7 +1250,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
    <div className="space-stars"/><div className="space-nebula"/>
    {foes.map(f=><div key={f.id} className={'space-enemy '+f.type} style={{left:f.x+'%',top:f.y+'%'}}><EnemyArtwork type={f.type}/><i className="space-enemy-hp" style={{width:(f.hp/f.maxHp*100)+'%'}}/></div>)}
    {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}
-   {drops.map(d=><div key={d.id} className={'space-drop space-drop-'+d.type} style={{left:d.x+'%',top:d.y+'%'}}><span>{d.type==='shield'?'S':d.type==='rapid'?'R':d.type==='double'?'×2':'+'}</span></div>)}
+   {drops.map(d=><div key={d.id} className={'space-drop space-drop-'+d.type} style={{left:d.x+'%',top:d.y+'%'}}><span>{d.type==='loot'?(d.icon||'💎'):d.type==='shield'?'S':d.type==='rapid'?'R':d.type==='double'?'×2':'+'}</span></div>)}
    {shots.map(b=><i key={b.id} className="space-player-shot" style={{left:b.x+'%',top:b.y+'%'}}/>)}
    {boss&&<div className={'space-boss boss-'+boss.id+' '+(boss.hp<=boss.max*.5?'phase-two':'')} style={{left:boss.x+'%',top:boss.y+'%'}}><BossArtwork/><b>{boss.name}</b><small>{boss.hp<=boss.max*.5?'FASE 2 · FÚRIA MÁXIMA':boss.description}</small><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
    <div className={'space-player-ship '+(shieldActive?'shielded':'')} style={{left:ship.x+'%',top:ship.y+'%'}}><ShipArtwork/></div>
