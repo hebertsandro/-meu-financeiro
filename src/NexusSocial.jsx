@@ -10,7 +10,7 @@ import NexusCommunity from './NexusCommunity';
 import NexusFeed from './NexusFeed';
 import NexusPushSettings from './NexusPushSettings';
 
-const PROFILE_FIELDS='user_id,username,display_name,bio,avatar,avatar_frame,card_frame,equipped_gems,game_xp,game_correct,username_changed_at,is_suspended';
+const PROFILE_FIELDS='user_id,username,display_name,bio,avatar,avatar_frame,card_frame,equipped_gems,equipped_medals,game_xp,game_correct,username_changed_at,is_suspended';
 const initials=(name='')=>String(name).trim().split(/\\s+/).slice(0,2).map(x=>x[0]||'').join('').toUpperCase()||'NX';
 const dateText=value=>value?new Date(value).toLocaleDateString('pt-BR'):'';
 const daysUntilChange=value=>{if(!value)return 0;const elapsed=Date.now()-new Date(value).getTime();return Math.max(0,30-Math.floor(elapsed/86400000));};
@@ -40,8 +40,8 @@ function PublicPlayerProfile({person,onClose,onFollowToggle,onEdit}){
 
   <section className="social-public-honors"><div className="social-public-honors-title"><div><span>CONQUISTAS</span><b>Medalhas e honrarias</b></div><Trophy size={19}/></div><div className="social-public-honors-grid">
    {own&&person.viewerEmail?.toLowerCase()==="hebertsandro877@gmail.com"&&<><article className="social-public-honor founder"><span>👑</span><div><b>Fundador</b><small>Criador do Meu Financeiro</small></div><em>OFICIAL</em></article><article className="social-public-honor founder"><span>⚡</span><div><b>Fundador NEXUS</b><small>Idealizador da comunidade</small></div></article><article className="social-public-honor founder"><span>🛡️</span><div><b>Administrador oficial</b><small>Responsável pelo projeto</small></div></article></>}
-   {earnedGameMedals.map(m=><article className="social-public-honor" key={"g-"+m.game_key}><span>🏅</span><div><b>{{"space-nexus":"Space Nexus","piggy-run":"Asas da Fortuna",quiz:"Quiz Financeiro"}[m.game_key]||m.game_key}</b><small>Medalhas de competição</small></div><strong>×{Number(m.medals_count||0)}</strong></article>)}
-   {earnedRankMedals.map(m=><article className="social-public-honor" key={"r-"+m.medal_key}><span>{m.medal_key==="global-season"?"🌍":m.medal_key==="weekly-tournament"?"🏆":"👥"}</span><div><b>{{"global-season":"Campeão global","weekly-tournament":"Campeão semanal","friends-weekly":"Campeão dos amigos"}[m.medal_key]||"Medalha de competição"}</b><small>Vitórias em rankings e torneios</small></div><strong>×{Number(m.medals_count||0)}</strong></article>)}
+   {earnedGameMedals.filter(m=>(Array.isArray(person.equipped_medals)?person.equipped_medals:[]).includes('game:'+m.game_key)).map(m=><article className="social-public-honor" key={"g-"+m.game_key}><span>🏅</span><div><b>{{"space-nexus":"Space Nexus","piggy-run":"Asas da Fortuna",quiz:"Quiz Financeiro"}[m.game_key]||m.game_key}</b><small>Medalhas de competição</small></div><strong>×{Number(m.medals_count||0)}</strong></article>)}
+   {earnedRankMedals.filter(m=>(Array.isArray(person.equipped_medals)?person.equipped_medals:[]).includes('rank:'+m.medal_key)).map(m=><article className="social-public-honor" key={"r-"+m.medal_key}><span>{m.medal_key==="global-season"?"🌍":m.medal_key==="weekly-tournament"?"🏆":"👥"}</span><div><b>{{"global-season":"Campeão global","weekly-tournament":"Campeão semanal","friends-weekly":"Campeão dos amigos"}[m.medal_key]||"Medalha de competição"}</b><small>Vitórias em rankings e torneios</small></div><strong>×{Number(m.medals_count||0)}</strong></article>)}
    {!earnedMedalsLoading&&!earnedGameMedals.length&&!earnedRankMedals.length&&!(own&&person.viewerEmail?.toLowerCase()==="hebertsandro877@gmail.com")&&<p className="social-public-honors-empty">🏆 As medalhas conquistadas em competições aparecerão aqui.</p>}
    {earnedMedalsLoading&&<p className="social-public-honors-empty">Carregando conquistas…</p>}
   </div></section>
