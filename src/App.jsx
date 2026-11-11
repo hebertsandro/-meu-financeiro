@@ -1112,70 +1112,151 @@ function EnemyArtwork({type}){if(type==='scout')return <svg className="space-art
 function BossArtwork(){return <svg className="space-art-boss" viewBox="0 0 260 150" role="img" aria-label="Chefão Titã Nebular"><defs><linearGradient id="bossArmor" x2="1" y2="1"><stop stopColor="#fff1d8"/><stop offset=".2" stopColor="#ff9eb6"/><stop offset=".55" stopColor="#d22e70"/><stop offset="1" stopColor="#381044"/></linearGradient><linearGradient id="bossWing" x2="1" y2="1"><stop stopColor="#ffe1e8"/><stop offset=".4" stopColor="#e64d87"/><stop offset="1" stopColor="#4a124f"/></linearGradient></defs><path d="M97 44 L12 8 L28 70 L4 116 L91 99 L112 73Z M163 44 L248 8 L232 70 L256 116 L169 99 L148 73Z" fill="url(#bossWing)" stroke="#ffd2df" strokeWidth="3"/><path d="M91 41 L48 27 L68 53 L34 78 L91 82 M169 41 L212 27 L192 53 L226 78 L169 82" fill="none" stroke="#fff0f5" strokeWidth="3" opacity=".7"/><path d="M130 6 L176 28 L205 67 L190 116 L130 143 L70 116 L55 67 L84 28Z" fill="url(#bossArmor)" stroke="#ffe5ed" strokeWidth="3"/><path d="M130 9 L130 132 M79 42 L104 65 L92 104 M181 42 L156 65 L168 104" stroke="#fff0f4" strokeWidth="2" opacity=".7"/><path d="M94 37 L120 24 L126 58 L105 71Z M166 37 L140 24 L134 58 L155 71Z" fill="#67194e" stroke="#ffc1d3" strokeWidth="2"/><path d="M91 77 L169 77 L180 104 L130 128 L80 104Z" fill="#541348" stroke="#ffbdd1" strokeWidth="3"/><path d="M110 48 L150 48 L160 72 L130 91 L100 72Z" fill="#260d3d" stroke="#ffd9e7" strokeWidth="3"/><circle cx="130" cy="69" r="17" fill="#fff1f5" stroke="#ff9fbe" strokeWidth="6"/><circle cx="130" cy="69" r="29" fill="#ff367d" opacity=".2"/><path d="M30 82 L8 91 L18 111 L48 103 M230 82 L252 91 L242 111 L212 103" fill="#681847" stroke="#ffbad0" strokeWidth="3"/><path d="M54 124 L40 145 M206 124 L220 145" stroke="#ff759f" strokeWidth="6" strokeLinecap="round"/><path d="M102 114 L90 145 L119 130 M158 114 L170 145 L141 130" fill="#ff759f" opacity=".8"/></svg>}
 
 function SpaceNexusGame({onReward,onMatch}){
- const [running,setRunning]=useState(false),[ended,setEnded]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState({x:50,y:84}),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[drops,setDrops]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('A galáxia precisa de você!'),[shieldActive,setShieldActive]=useState(false);
- const game=React.useRef({tick:0,ship:{x:50,y:84},score:0,lives:3,wave:1,shots:[],foes:[],enemyShots:[],drops:[],boss:null,shield:false,rapidUntil:0,doubleUntil:0});
+ const modes={
+  easy:{label:'Fácil',waves:10,lives:4,spawn:86,speed:.72,bossHp:1,fire:1.25},
+  medium:{label:'Médio',waves:15,lives:3,spawn:72,speed:1,bossHp:1.35,fire:1},
+  hard:{label:'Difícil',waves:20,lives:2,spawn:60,speed:1.3,bossHp:1.8,fire:.78}
+ };
+ const bossRoster=[
+  {name:'DEVORADOR ESTELAR',id:'devourer',style:'spread',hp:18,attackEvery:78,description:'Rajada tripla em leque'},
+  {name:'GENERAL VORTEX',id:'vortex',style:'cross',hp:22,attackEvery:68,description:'Disparos cruzados e rápidos'},
+  {name:'TITÃ NEBULAR',id:'titan',style:'slam',hp:28,attackEvery:92,description:'Onda de energia em área'},
+  {name:'RAINHA SINGULAR',id:'queen',style:'aimed',hp:25,attackEvery:58,description:'Mira diretamente na nave'},
+  {name:'COLOSSO ÔMEGA',id:'omega',style:'spiral',hp:34,attackEvery:52,description:'Espiral de projéteis'}
+ ];
+ const [mode,setMode]=useState('medium'),[running,setRunning]=useState(false),[ended,setEnded]=useState(false),[victory,setVictory]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState({x:50,y:84}),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[drops,setDrops]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('Escolha a dificuldade e prepare sua nave!'),[shieldActive,setShieldActive]=useState(false),[bossesDefeated,setBossesDefeated]=useState(0);
+ const game=React.useRef({});
  const moveTo=(clientX,clientY,arena)=>{const r=arena.getBoundingClientRect();const x=Math.max(5,Math.min(95,(clientX-r.left)/r.width*100));const y=Math.max(9,Math.min(91,(clientY-r.top)/r.height*100));game.current.ship={x,y};setShip({x,y})};
- const start=()=>{game.current={tick:0,ship:{x:50,y:84},score:0,lives:3,wave:1,shots:[],foes:[],enemyShots:[],drops:[],boss:null,shield:false,rapidUntil:0,doubleUntil:0};setScore(0);setLives(3);setShip({x:50,y:84});setShots([]);setFoes([]);setEnemyShots([]);setDrops([]);setBoss(null);setWave(1);setShieldActive(false);setEnded(false);setMessage('O esquadrão alienígena está chegando!');setRunning(true)};
+ const finish=(won,g)=>{
+  setRunning(false);setEnded(true);setVictory(won);setMessage(won?'GALÁXIA SALVA! CAMPANHA CONCLUÍDA!':'Sua nave foi destruída. A galáxia ainda precisa de você!');
+  setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});
+  const earned=onReward(Math.floor(g.score/25),'space-nexus');
+  void onMatch?.({gameKey:'space-nexus',score:g.score,xpEarned:Number(earned)||0,mode:mode,won,durationSeconds:Math.floor(g.tick/60)});
+ };
+ const start=()=>{
+  const cfg=modes[mode];
+  game.current={tick:0,ship:{x:50,y:84},score:0,lives:cfg.lives,wave:1,shots:[],foes:[],enemyShots:[],drops:[],boss:null,shield:false,rapidUntil:0,doubleUntil:0,spawned:0,killed:0,bossesDefeated:0,phase:'wave',bossAttack:0,mode};
+  setScore(0);setLives(cfg.lives);setShip({x:50,y:84});setShots([]);setFoes([]);setEnemyShots([]);setDrops([]);setBoss(null);setWave(1);setShieldActive(false);setBossesDefeated(0);setVictory(false);setEnded(false);setMessage('O esquadrão alienígena está chegando!');setRunning(true);
+ };
  useEffect(()=>{
   if(!running)return;
   const id=setInterval(()=>{
-   const g=game.current;g.tick++;
-   const n=g.tick;
-   if(n%(n<g.rapidUntil?9:19)===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
-   // Limita inimigos simultâneos para reduzir carga de colisão e renderização.
-   if(!g.boss&&n%68===0&&g.foes.length<5)g.foes.push({id:n+'e',x:12+Math.random()*76,y:4,hp:n%195===0?3:1,type:n%156===0?'brute':n%146===0?'scout':'drone',fire:n%65===0||Math.random()>.48});
-   if(n%675===0){g.wave++;setWave(g.wave);setMessage('ONDA '+g.wave+' — novos invasores detectados!')}
-   g.foes.forEach(f=>{f.y+=((f.type==='scout'?.35:.2167)+(g.wave*.0267))*.8});
-   g.shots.forEach(b=>{b.y-=1.0664});
-   g.enemyShots.forEach(b=>{b.y+=.58664});g.drops.forEach(d=>{d.y+=.176});
-   // Sem disparos de inimigos comuns durante a batalha de chefão.
-   if(!g.boss&&n%98===0){g.foes.filter(f=>f.fire).slice(-1).forEach(f=>g.enemyShots.push({id:'m'+n+f.id,x:f.x,y:f.y+3,kind:'minion'}))}
-   if(g.boss&&n%82===0){const spread=g.boss.style==='spread'?[0,-12,12]:g.boss.style==='cross'?[0,-15,15]:[0,-9,9];spread.forEach((dx,i)=>g.enemyShots.push({id:'b'+n+i,x:Math.max(3,Math.min(97,g.boss.x+dx)),y:g.boss.y+8,kind:'boss'}));if(g.enemyShots.length>18)g.enemyShots=g.enemyShots.slice(-18)}
-   if(n%1350===0&&!g.boss){const bosses=[{name:'DEVORADOR ESTELAR',style:'spread'},{name:'GENERAL VORTEX',style:'cross'},{name:'TITÃ NEBULAR',style:'spread'}];const chosen=bosses[(Math.floor(n/360)-1)%bosses.length];g.foes=[];g.enemyShots=[];g.boss={hp:12+g.wave*3,max:12+g.wave*3,x:50,y:9,direction:1,...chosen};setMessage('CHEFÃO DETECTADO! Arena de chefão iniciada!')}
-   if(g.boss){g.boss.x+=g.boss.direction*.34;if(g.boss.x>=77){g.boss.x=77;g.boss.direction=-1}else if(g.boss.x<=23){g.boss.x=23;g.boss.direction=1}}
-   // Colisão tiro da nave x inimigo: só remove o projétil quando realmente acerta.
+   const g=game.current;if(!g||g.phase==='finished')return;
+   g.tick++;const n=g.tick,cfg=modes[g.mode],w=g.wave;
+   const fireRate=Math.max(7,Math.round(17*cfg.fire)-Math.floor(w/5));
+   if(n%fireRate===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
+   const bossWave=w%5===0;
+   const waveTarget=5+w*2;
+   const spawnEvery=Math.max(24,Math.round((cfg.spawn-w*1.7)));
+   if(!bossWave&&g.spawned<waveTarget&&n%spawnEvery===0&&g.foes.length<Math.min(7,3+Math.ceil(w/3))){
+    const roll=Math.random();let type='drone',hp=1;
+    if(w>=2&&roll>.73){type='scout';hp=1}
+    if(w>=3&&roll>.86){type='brute';hp=2}
+    if(w>=6&&roll>.94){type='tank';hp=3}
+    if(w>=9&&roll>.975){type='phantom';hp=2}
+    g.foes.push({id:n+'e',x:9+Math.random()*82,y:3,hp,maxHp:hp,type,fire:Math.random()>(.72-(w*.012)),phase:Math.random()*Math.PI*2});
+    g.spawned++;
+   }
+   g.foes.forEach(f=>{
+    const base=f.type==='scout'?.34:f.type==='brute'?.19:f.type==='tank'?.15:f.type==='phantom'?.27:.23;
+    f.y+=base*cfg.speed*(1+w*.055);
+    if(f.type==='scout'||f.type==='phantom')f.x+=Math.sin(n*.045+f.phase)*(f.type==='phantom'?.28:.16);
+   });
+   g.shots.forEach(b=>{b.y-=1.18});
+   g.enemyShots.forEach(b=>{b.x+=b.vx||0;b.y+=b.vy||.58});
+   g.drops.forEach(d=>{d.y+=.18});
+   if(!bossWave&&n%Math.max(35,105-Math.floor(w*2))===0){g.foes.filter(f=>f.fire).slice(-2).forEach((f,i)=>g.enemyShots.push({id:'m'+n+f.id+i,x:f.x,y:f.y+3,kind:'minion',vy:.48*cfg.speed}))}
+   if(bossWave&&!g.boss&&g.spawned>=0&&g.foes.length===0&&g.phase!=='boss-cleared'){
+    const b=bossRoster[(Math.floor((w-1)/5))%bossRoster.length],hp=Math.round((b.hp+w*2)*cfg.bossHp);
+    g.boss={...b,hp,max:hp,x:50,y:10,direction:1,attackCount:0};g.phase='boss';g.enemyShots=[];setMessage('CHEFÃO: '+b.name+' — '+b.description+'!');
+   }
+   if(g.boss){
+    const b=g.boss;b.attackCount++;
+    const move=b.id==='titan'?.19:b.id==='queen'?.42:.3;
+    b.x+=b.direction*move*cfg.speed;
+    if(b.x>=79){b.x=79;b.direction=-1}else if(b.x<=21){b.x=21;b.direction=1}
+    if(b.id==='queen')b.y=10+Math.sin(n*.035)*3;
+    if(b.attackCount%b.attackEvery===0){
+     const push=(x,vx,vy=.62)=>g.enemyShots.push({id:'b'+n+g.enemyShots.length+Math.random(),x:Math.max(2,Math.min(98,x)),y:b.y+9,vx,vy:vy*cfg.speed,kind:'boss'});
+     if(b.style==='spread'){[-13,0,13].forEach(dx=>push(b.x+dx,dx*.009,.58))}
+     else if(b.style==='cross'){[-.28,0,.28].forEach(vx=>push(b.x,vx,.78));[-.18,.18].forEach(vx=>push(b.x,vx,.55))}
+     else if(b.style==='slam'){for(let x=8;x<=92;x+=14)push(x,(x-b.x)*.002,.72)}
+     else if(b.style==='aimed'){const dx=(g.ship.x-b.x)*.008;push(b.x,dx,.82);push(b.x-7,dx-.07,.65);push(b.x+7,dx+.07,.65)}
+     else {for(let i=0;i<5;i++){const angle=(b.attackCount*.12)+(i*Math.PI*2/5);push(b.x,Math.cos(angle)*.24,.58+Math.sin(angle)*.12)}}
+     if(g.enemyShots.length>28)g.enemyShots=g.enemyShots.slice(-28);
+    }
+   }
    const remainingShots=[];
    for(const shot of g.shots){
     let hit=false;
     for(const foe of g.foes){
-     const hitX=Math.abs(shot.x-foe.x)<(foe.type==='brute'?7:5.5);
-     const hitY=shot.y>=foe.y-4&&shot.y<=foe.y+5;
-     if(hitX&&hitY){foe.hp-=1;hit=true;if(foe.hp<=0){g.score+=foe.type==='brute'?35:foe.type==='scout'?20:10;if(Math.random()<.24){const types=['shield','rapid','double','repair'];const type=types[Math.floor(Math.random()*types.length)];g.drops.push({id:'drop-'+n+'-'+foe.id,type,x:foe.x,y:foe.y})}}break;}
+     const radius=foe.type==='tank'?7:foe.type==='brute'?6.5:5;
+     if(Math.abs(shot.x-foe.x)<radius&&shot.y>=foe.y-4&&shot.y<=foe.y+5){
+      foe.hp--;hit=true;
+      if(foe.hp<=0){g.score+=foe.type==='tank'?55:foe.type==='brute'?35:foe.type==='phantom'?40:foe.type==='scout'?20:10;g.killed++;if(Math.random()<.2){const types=['shield','rapid','double','repair'];const type=types[Math.floor(Math.random()*types.length)];g.drops.push({id:'drop-'+n+'-'+foe.id,type,x:foe.x,y:foe.y})}}
+      break;
+     }
     }
-    if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){g.boss.hp--;hit=true;if(g.boss.hp<=0){g.score+=250;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');setMessage('CHEFÃO DERROTADO! +250 pontos — recompensa liberada!')}else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão ficou mais agressivo!')}
+    if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){
+     g.boss.hp--;hit=true;
+     if(g.boss.hp<=0){g.score+=300+g.wave*20;g.bossesDefeated++;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');g.phase='boss-cleared';setMessage('CHEFÃO DERROTADO! Recompensa liberada!')}
+     else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão mudou seu padrão de ataque!');
+    }
     if(!hit&&shot.y>0)remainingShots.push(shot);
    }
-   g.shots=remainingShots;g.foes=g.foes.filter(f=>f.hp>0&&f.y<96);
-   const remainingDrops=[];for(const d of g.drops){if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}else if(d.type==='rapid'){g.rapidUntil=n+375;setMessage('DISPARO RÁPIDO! Poder ativo por 6 segundos.')}else if(d.type==='double'){g.doubleUntil=n+375;setMessage('TIRO DUPLO! Poder ativo por 6 segundos.')}else if(d.type==='repair'){g.lives=Math.min(3,g.lives+1);setLives(g.lives);setMessage('REPARO COLETADO! +1 vida.')}}else if(d.y<100)remainingDrops.push(d)}g.drops=remainingDrops;
+   g.shots=remainingShots;
+   const survivors=[];
+   for(const foe of g.foes){
+    if(foe.hp<=0)continue;
+    if(foe.y>=88){g.lives=Math.max(0,g.lives-1);setMessage('Invasor atravessou a defesa! -1 vida.')}
+    else survivors.push(foe);
+   }
+   g.foes=survivors;
+   const remainingDrops=[];
+   for(const d of g.drops){
+    if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){
+     if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}
+     else if(d.type==='rapid'){g.rapidUntil=n+375;setMessage('DISPARO RÁPIDO!')}
+     else if(d.type==='double'){g.doubleUntil=n+375;setMessage('TIRO DUPLO!')}
+     else if(d.type==='repair'){g.lives=Math.min(cfg.lives,g.lives+1);setMessage('REPARO COLETADO! +1 vida.')}
+    }else if(d.y<100)remainingDrops.push(d);
+   }
+   g.drops=remainingDrops;
    let tookHit=false;
    const enemyRemaining=[];
-   for(const shot of g.enemyShots){if(Math.abs(shot.x-g.ship.x)<6&&Math.abs(shot.y-g.ship.y)<7){tookHit=true}else if(shot.y<100)enemyRemaining.push(shot)}
+   for(const shot of g.enemyShots){if(Math.abs(shot.x-g.ship.x)<6&&Math.abs(shot.y-g.ship.y)<7)tookHit=true;else if(shot.y<100)enemyRemaining.push(shot)}
    g.enemyShots=enemyRemaining;
    const foeRemaining=[];
-   for(const foe of g.foes){if(Math.abs(foe.x-g.ship.x)<7&&Math.abs(foe.y-g.ship.y)<6){tookHit=true}else foeRemaining.push(foe)}
+   for(const foe of g.foes){if(Math.abs(foe.x-g.ship.x)<7&&Math.abs(foe.y-g.ship.y)<6)tookHit=true;else foeRemaining.push(foe)}
    g.foes=foeRemaining;
-   if(tookHit){if(g.shield){g.shield=false;setShieldActive(false);setMessage('Escudo absorveu o impacto!')}else{g.lives=Math.max(0,g.lives-1);setMessage('A nave foi atingida! Desvie dos disparos!')}}
-   // Mantém a simulação e colisões em 60 FPS, mas atualiza o React a cada 2 ciclos.
-   // Isso reduz pela metade as reconciliações do DOM sem alterar a velocidade da partida.
-   if(n%2===0||g.lives<=0){setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);}
-   if(g.lives<=0){setRunning(false);setEnded(true);setMessage('Sua nave foi destruída. A galáxia ainda precisa de você!');setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});const earned=onReward(Math.floor(g.score/25));void onMatch?.({gameKey:'space-nexus',score:g.score,xpEarned:Number(earned)||0,mode:'standard',won:false})}
+   if(tookHit){if(g.shield){g.shield=false;setShieldActive(false);setMessage('Escudo absorveu o impacto!')}else{g.lives=Math.max(0,g.lives-1);setMessage('A nave foi atingida! -1 vida. Desvie!')}}
+   if(g.lives<=0){g.phase='finished';setScore(g.score);setLives(0);setShots([]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(null);finish(false,g);return}
+   if(g.phase==='boss-cleared'){
+    g.phase='wave';g.wave++;g.spawned=0;g.killed=0;setWave(g.wave);setMessage('ONDA '+g.wave+' — inimigos mais velozes e resistentes!');
+   }else if(!bossWave&&g.spawned>=waveTarget&&g.foes.length===0){
+    g.wave++;g.spawned=0;g.killed=0;
+    if(g.wave>cfg.waves){g.phase='finished';finish(true,g);return}
+    setWave(g.wave);setMessage('ONDA '+g.wave+' — a ameaça está evoluindo!');
+   }
+   if(n%2===0){setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
   },16);
   return()=>clearInterval(id);
- },[running,onReward]);
+ },[running,mode,onReward,onMatch]);
  return <section className="space-nexus-card">
-  <div className="space-nexus-hud"><div className="space-hud-block"><small>SETOR ATUAL</small><span className="space-wave-pill"><i/> ONDA {wave}</span></div><div className="space-score-block"><small>PONTUAÇÃO</small><b>{score.toLocaleString('pt-BR')}</b></div><div className="space-lives-block"><small>INTEGRIDADE</small><span>{'❤️'.repeat(lives)}{'🖤'.repeat(3-lives)}</span></div></div>
+  {!running&&!ended&&<div className="space-mode-picker"><b>ESCOLHA A DIFICULDADE</b><div>{Object.entries(modes).map(([id,m])=><button key={id} type="button" className={mode===id?'active':''} onClick={()=>setMode(id)}><strong>{m.label}</strong><small>{m.waves} ondas · {m.lives} vidas</small></button>)}</div></div>}
+  <div className="space-nexus-hud"><div className="space-hud-block"><small>SETOR ATUAL</small><span className="space-wave-pill"><i/> ONDA {wave}/{modes[mode].waves}</span></div><div className="space-score-block"><small>PONTUAÇÃO</small><b>{score.toLocaleString('pt-BR')}</b></div><div className="space-lives-block"><small>INTEGRIDADE</small><span>{'❤️'.repeat(lives)}{'🖤'.repeat(Math.max(0,modes[mode].lives-lives))}</span></div></div>
   <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.clientY,e.currentTarget)}} onPointerMove={e=>{if(!running)return;if(e.pointerType==='touch'||(e.buttons&1))moveTo(e.clientX,e.clientY,e.currentTarget)}}>
    <div className="space-stars"/><div className="space-nebula"/>
-   {foes.map(f=><div key={f.id} className={'space-enemy '+f.type} style={{left:f.x+'%',top:f.y+'%'}}><EnemyArtwork type={f.type}/></div>)}
+   {foes.map(f=><div key={f.id} className={'space-enemy '+f.type} style={{left:f.x+'%',top:f.y+'%'}}><EnemyArtwork type={f.type}/><i className="space-enemy-hp" style={{width:(f.hp/f.maxHp*100)+'%'}}/></div>)}
    {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}
    {drops.map(d=><div key={d.id} className={'space-drop space-drop-'+d.type} style={{left:d.x+'%',top:d.y+'%'}}><span>{d.type==='shield'?'S':d.type==='rapid'?'R':d.type==='double'?'×2':'+'}</span></div>)}
    {shots.map(b=><i key={b.id} className="space-player-shot" style={{left:b.x+'%',top:b.y+'%'}}/>)}
-   {boss&&<div className={'space-boss '+(boss.hp<=boss.max*.5?'phase-two':'')} style={{left:boss.x+'%',top:boss.y+'%'}}><BossArtwork/><b>{boss.name}</b><small>{boss.hp<=boss.max*.5?'FASE 2 · FÚRIA MÁXIMA':'FASE 1'}</small><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
+   {boss&&<div className={'space-boss boss-'+boss.id+' '+(boss.hp<=boss.max*.5?'phase-two':'')} style={{left:boss.x+'%',top:boss.y+'%'}}><BossArtwork/><b>{boss.name}</b><small>{boss.hp<=boss.max*.5?'FASE 2 · FÚRIA MÁXIMA':boss.description}</small><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
    <div className={'space-player-ship '+(shieldActive?'shielded':'')} style={{left:ship.x+'%',top:ship.y+'%'}}><ShipArtwork/></div>
-   {!running&&<div className="space-overlay"><div className="space-overlay-icon"><span className="space-overlay-orbit"/></div><h3>{ended?'MISSÃO ENCERRADA':'SPACE NEXUS'}</h3><p>{ended?'Pontuação: '+score+' · Recorde: '+best:message}</p><button className="primary" onClick={start}>{ended?'Jogar novamente':'Iniciar missão'} <ChevronRight size={17}/></button></div>}
+   {!running&&<div className="space-overlay"><div className="space-overlay-icon"><span className="space-overlay-orbit"/></div><h3>{ended?(victory?'CAMPANHA CONCLUÍDA':'MISSÃO ENCERRADA'):'SPACE NEXUS'}</h3><p>{ended?'Pontuação: '+score+' · Chefões derrotados: '+bossesDefeated+' · Recorde: '+best:message}</p>{ended&&<small className="space-result-medal">{victory?'🏅 Medalha de campeão conquistada!':'Continue treinando para conquistar a medalha.'}</small>}<button className="primary" onClick={start}>{ended?'Jogar novamente':'Iniciar missão'} <ChevronRight size={17}/></button></div>}
   </div>
   <div className="space-nexus-controls"><span>ARRASTE A NAVE E COLETE AS RECOMPENSAS</span></div>
-  <div className="space-nexus-footer"><span>Recorde: {best}</span><span>Disparo automático</span><span>Escudo: {shieldActive?'ativo':'aguardando coleta'}</span><span>Chefões com evolução de combate</span></div>
+  <div className="space-nexus-footer"><span>Recorde: {best}</span><span>Disparo automático</span><span>Escudo: {shieldActive?'ativo':'aguardando coleta'}</span><span>Chefões derrotados: {bossesDefeated}</span></div>
  </section>
 }
 function FinanceFlapGame({onReward,onMatch}){
