@@ -846,6 +846,7 @@ function App(){
     if(action==='delete_user'&&!window.confirm('ATENÇÃO: excluir esta conta é definitivo. Os dados vinculados também poderão ser removidos. Deseja continuar?'))return;
     if(action==='broadcast_announcement'&&!window.confirm('Enviar este comunicado para todos os usuários ativos? Essa ação não pode ser desfeita.'))return;
     if(action==='update_report_status'&&!window.confirm('Confirmar a atualização do status desta denúncia?'))return;
+    if(action==='delete_report'&&!window.confirm('Apagar esta denúncia permanentemente? Esta ação não pode ser desfeita.'))return;
     setAdminBusy(true);setAdminError('');setAdminMessage('');
     const {data:result,error}=await supabase.functions.invoke('admin-panel',{body:{action,user_id:userId,...extra}});
     setAdminBusy(false);
@@ -854,6 +855,7 @@ function App(){
      if(action==='list_social_profiles'){setAdminSocialProfiles(result.profiles||[]);setAdminMessage('Perfis sociais atualizados.');return}
      if(action==='list_reports'){setAdminReports(result.reports||[]);setAdminMessage('Denúncias atualizadas.');return}
      if(action==='update_report_status'){setAdminMessage('Status da denúncia atualizado.');await adminAction('list_reports');return}
+     if(action==='delete_report'){setAdminMessage('Denúncia apagada.');await adminAction('list_reports');return}
      if(action==='moderate_social_profile'||action==='delete_social_profile'){setAdminMessage(action==='delete_social_profile'?'Perfil social removido.':extra.suspended?'Perfil social suspenso.':'Perfil social reativado.');await adminAction('list_social_profiles');return}
     if(action==='get_maintenance'){setMaintenance(!!result.settings?.maintenance_mode);setMaintenanceMessage(result.settings?.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.');return}
     if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
@@ -1066,7 +1068,7 @@ function App(){
             <p className="admin-report-details">{r.details||'Nenhum detalhe adicional informado.'}</p>
             <div className="admin-report-parties"><div><small>DENUNCIANTE</small><b>{r.reporter_name||'Usuário'}</b><span>{r.reporter_email||r.reporter_id}</span></div><div><small>ALVO DA DENÚNCIA</small><b>{r.reported_name||'Conteúdo removido ou indisponível'}</b><span>{r.reported_username?'@'+r.reported_username:r.reported_email||r.reported_id||'—'}</span></div></div>
             {r.content_preview&&<div className="admin-report-content"><small>CONTEÚDO DENUNCIADO</small><p>{r.content_preview}</p></div>}
-            <div className="admin-report-actions"><label><span>Status</span><select value={r.status} disabled={adminBusy} onChange={e=>adminAction('update_report_status',null,{report_type:r.report_type,report_id:r.id,status:e.target.value})}><option value="open">Aberta</option><option value="reviewing">Em análise</option><option value="resolved">Resolvida</option><option value="dismissed">Arquivada</option></select></label></div>
+            <div className="admin-report-actions"><label><span>Status</span><select value={r.status} disabled={adminBusy} onChange={e=>adminAction('update_report_status',null,{report_type:r.report_type,report_id:r.id,status:e.target.value})}><option value="open">Aberta</option><option value="reviewing">Em análise</option><option value="resolved">Resolvida</option><option value="dismissed">Arquivada</option></select></label><button type="button" className="delete-btn danger" disabled={adminBusy} onClick={()=>adminAction('delete_report',null,{report_type:r.report_type,report_id:r.id})}><Trash2 size={14}/> Apagar denúncia</button></div>
           </article>)}</div>}
           <p className="admin-note"><ShieldCheck size={15}/> Alterar o status não bloqueia nem exclui automaticamente ninguém. Ações disciplinares continuam separadas e exigem análise.</p>
         </div>}
