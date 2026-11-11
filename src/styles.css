@@ -3957,3 +3957,35 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 .admin-report-actions label{display:flex;align-items:center;gap:9px;color:#95a4bd;font-size:10px}
 .admin-report-actions select{max-width:150px;padding:8px 10px;border:1px solid rgba(139,159,197,.22);border-radius:9px;background:#111d31;color:#eaf0ff;font-size:11px}
 @media(max-width:520px){.admin-report-parties{flex-direction:column}.admin-report-reason{align-items:flex-start;flex-direction:column}.admin-report-reason time{text-align:left}.admin-report-actions{justify-content:stretch}.admin-report-actions label{width:100%;justify-content:space-between}.admin-report-actions select{max-width:58%}}
+
+/* REDESIGN DE USABILIDADE — atalhos, navegação mobile e tutorial inicial */
+.easy-start-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:11px;margin:16px 0 24px}
+.easy-start-grid>button{display:flex;align-items:center;gap:12px;min-width:0;padding:15px;border:1px solid rgba(130,157,204,.18);border-radius:16px;background:linear-gradient(145deg,rgba(22,36,59,.94),rgba(13,23,40,.96));color:#eaf1ff;text-align:left;transition:transform .18s,border-color .18s,background .18s}
+.easy-start-grid>button:hover{transform:translateY(-2px);border-color:rgba(115,190,255,.45);background:linear-gradient(145deg,#1a3150,#111e35)}
+.easy-start-grid>button>span:nth-child(2){display:grid;gap:4px;flex:1;min-width:0}
+.easy-start-grid b{font-size:12px}.easy-start-grid small{color:#91a3bf;font-size:10px;line-height:1.4}
+.easy-start-grid>button>svg:last-child{color:#8298bb;flex:0 0 auto}
+.easy-start-icon{display:grid;place-items:center;width:39px;height:39px;flex:0 0 39px;border:1px solid #72b5ff35;border-radius:12px;background:#4c8bd51b;color:#8fc8ff}
+.easy-start-icon.income{color:#69e0b1;border-color:#35d39a40;background:#35d39a16}.easy-start-icon.card{color:#9abaff;border-color:#729cff40;background:#729cff16}.easy-start-icon.goal{color:#c2a6ff;border-color:#a98bff40;background:#a98bff16}.easy-start-icon.social{color:#ffb4dc;border-color:#ef8dc440;background:#ef8dc416}
+.mobile-bottom-nav{display:none}
+.onboarding-backdrop{position:fixed;inset:0;z-index:1000;display:grid;place-items:center;padding:20px;background:rgba(3,8,19,.78);backdrop-filter:blur(12px)}
+.onboarding-card{position:relative;width:min(100%,470px);padding:30px;border:1px solid rgba(124,167,255,.3);border-radius:24px;background:radial-gradient(circle at 90% 0%,rgba(94,116,230,.2),transparent 38%),linear-gradient(145deg,#15243b,#0c1525);box-shadow:0 28px 90px rgba(0,0,0,.5);color:#eff5ff;animation:onboardingIn .24s ease-out both}
+@keyframes onboardingIn{from{opacity:0;transform:translateY(12px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+.onboarding-close{position:absolute;top:15px;right:15px;display:grid;place-items:center;width:34px;height:34px;border:1px solid #91a9ce30;border-radius:10px;background:#ffffff08;color:#b7c6df}
+.onboarding-progress{display:flex;gap:6px;padding-right:43px;margin-bottom:24px}.onboarding-progress i{height:4px;flex:1;border-radius:9px;background:#64748b55}.onboarding-progress i.done{background:linear-gradient(90deg,#65d7ff,#a78bfa);box-shadow:0 0 10px #71caff55}
+.onboarding-icon{display:grid;place-items:center;width:58px;height:58px;margin-bottom:17px;border:1px solid #80baff45;border-radius:18px;background:linear-gradient(145deg,#3675b83a,#9270d83a);color:#a9d6ff;box-shadow:0 0 30px #5ca9ff18}
+.onboarding-eyebrow{color:#91baff;font-size:9px;font-weight:900;letter-spacing:1.5px}.onboarding-card h2{margin:9px 0 10px;color:#f4f7ff;font:800 clamp(22px,4vw,28px)/1.15 Manrope,sans-serif;letter-spacing:-.6px}.onboarding-card>p{margin:0;color:#b2bfd4;font-size:13px;line-height:1.7}
+.onboarding-tip{display:flex;align-items:flex-start;gap:9px;margin-top:20px;padding:13px;border:1px solid #8aaeff25;border-radius:13px;background:#7399e911;color:#b9cbed;font-size:11px;line-height:1.55}.onboarding-tip svg{flex:0 0 auto;color:#9dbbff}
+.onboarding-actions{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:25px}.onboarding-actions>div{display:flex;align-items:center;gap:8px}
+.onboarding-skip,.onboarding-back{min-height:42px;padding:0 12px;border:1px solid #9ab2d52b;border-radius:11px;background:#ffffff08;color:#aebed5;font-size:11px;font-weight:750}
+.onboarding-actions .primary{display:flex;align-items:center;gap:7px;min-height:43px;padding:0 16px;border:0;border-radius:11px;background:linear-gradient(120deg,#397ed2,#7659c9);color:#fff;font-weight:800}
+@media(max-width:760px){
+ .content{padding-bottom:calc(94px + env(safe-area-inset-bottom))!important}
+ .mobile-bottom-nav{position:fixed;z-index:24;left:10px;right:10px;bottom:calc(9px + env(safe-area-inset-bottom));display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:3px;padding:7px;border:1px solid rgba(133,164,211,.23);border-radius:18px;background:rgba(10,18,32,.94);box-shadow:0 12px 36px rgba(0,0,0,.38);backdrop-filter:blur(18px)}
+ .mobile-bottom-nav button{display:grid;justify-items:center;align-content:center;gap:4px;min-width:0;min-height:49px;border:1px solid transparent;border-radius:12px;background:transparent;color:#8fa2c1}
+ .mobile-bottom-nav button span{font-size:9px;font-weight:800;white-space:nowrap}.mobile-bottom-nav button.active{border-color:#779fff35;background:linear-gradient(145deg,#517fd32b,#8866d52b);color:#e3edff}.mobile-bottom-nav button.active svg{color:#8fd7ff;filter:drop-shadow(0 0 7px #66baff66)}
+ .easy-start-grid{grid-template-columns:1fr;gap:8px;margin:13px 0 18px}.easy-start-grid>button{padding:12px;border-radius:14px}
+ .onboarding-backdrop{align-items:end;padding:12px}.onboarding-card{width:100%;padding:23px 19px calc(20px + env(safe-area-inset-bottom));border-radius:22px 22px 17px 17px;max-height:90dvh;overflow:auto}.onboarding-progress{margin-bottom:19px}.onboarding-card h2{font-size:23px}.onboarding-card>p{font-size:12px}
+}
+@media(max-width:390px){.mobile-bottom-nav{left:6px;right:6px;gap:1px;padding:5px}.mobile-bottom-nav button span{font-size:8px}.easy-start-grid b{font-size:11px}}
+@media(prefers-reduced-motion:reduce){.onboarding-card{animation:none!important}.easy-start-grid>button{transition:none!important}}
