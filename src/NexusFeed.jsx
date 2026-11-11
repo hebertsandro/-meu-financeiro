@@ -79,10 +79,26 @@ export default function NexusFeed({userId,playerProfile=null,friends=[],onToast=
    (likes.data||[]).forEach(x=>likeCounts[x.post_id]=(likeCounts[x.post_id]||0)+1);
    (commentRows.data||[]).forEach(x=>commentCounts[x.post_id]=(commentCounts[x.post_id]||0)+1);
    (reactionRows.data||[]).forEach(x=>{reactions[x.post_id] ||= {};reactions[x.post_id][x.reaction]=(reactions[x.post_id][x.reaction]||0)+1;if(x.user_id===userId)reactions[x.post_id].mine=x.reaction;});
-   const sign=async path=>{if(!path)return '';const {data}=await supabase.storage.from('nexus-posts').createSignedUrl(path,3600);return data?.signedUrl||'';};
+   // Gere URLs assinadas em lote para evitar dezenas de requisições concorrentes
+   // ao Storage (o que podia deixar fotos secundárias sem URL no iPhone).
+   const pathsForPost=p=>(Array.isArray(p.image_paths)&&p.image_paths.length?p.image_paths:(p.image_path?[p.image_path]:[])).filter(Boolean);
+   const allMediaPaths=[...new Set([...visible.flatMap(p=>[...pathsForPost(p),p.video_path].filter(Boolean)),...visibleStories.map(p=>p.image_path).filter(Boolean)])];
+   const signedByPath=new Map();
+   if(allMediaPaths.length){
+    const {data:batchData,error:batchError}=await supabase.storage.from('nexus-posts').createSignedUrls(allMediaPaths,3600);
+    if(batchData)batchData.forEach((item,index)=>{const path=item.path||allMediaPaths[index];if(item.signedUrl)signedByPath.set(path,item.signedUrl);});
+    // Fallback individual apenas para caminhos que falharam no lote.
+    const missing=allMediaPaths.filter(path=>!signedByPath.has(path));
+    if(missing.length){
+     const fallback=await Promise.all(missing.map(async path=>{const {data,error}=await supabase.storage.from('nexus-posts').createSignedUrl(path,3600);if(error){console.warn('Falha ao gerar URL da mídia do feed:',path,error.message);return [path,''];}return [path,data?.signedUrl||''];}));
+     fallback.forEach(([path,url])=>{if(url)signedByPath.set(path,url);});
+     if(batchError)console.warn('Algumas URLs do feed precisaram de nova tentativa:',batchError.message);
+    }
+   }
+   const sign=path=>path?signedByPath.get(path)||'':'';
    const [withImages,withStories]=await Promise.all([
-    Promise.all(visible.map(async p=>{const imagePaths=(p.image_paths||[]).length?p.image_paths:(p.image_path?[p.image_path]:[]);const imageUrls=await Promise.all(imagePaths.map(sign));return {...p,author:profileMap[p.author_id],imagePaths,imageUrls,imageUrl:imageUrls[0]||'',videoUrl:await sign(p.video_path),likeCount:likeCounts[p.id]||0,commentCount:commentCounts[p.id]||0,liked:liked.has(p.id),reactions:reactions[p.id]||{},poll:pollMap[p.id]||null};})),
-    Promise.all(visibleStories.map(async p=>({...p,author:profileMap[p.author_id],imageUrl:await sign(p.image_path)})))
+    Promise.resolve(visible.map(p=>{const imagePaths=pathsForPost(p);const imageUrls=imagePaths.map(sign);return {...p,author:profileMap[p.author_id],imagePaths,imageUrls,imageUrl:imageUrls[0]||'',videoUrl:sign(p.video_path),likeCount:likeCounts[p.id]||0,commentCount:commentCounts[p.id]||0,liked:liked.has(p.id),reactions:reactions[p.id]||{},poll:pollMap[p.id]||null};})),
+    Promise.resolve(visibleStories.map(p=>({...p,author:profileMap[p.author_id],imageUrl:sign(p.image_path)})))
    ]);
    setPosts(withImages);setStories(withStories);setSavedIds((bookmarkRes.data||[]).map(x=>x.post_id));
   }catch(e){setError(e.message||'Não foi possível carregar o feed.');}
