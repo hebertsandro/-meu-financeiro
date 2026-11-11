@@ -835,7 +835,7 @@ function App(){
   function answerGame(index){if(gameAnswer!==null||!quizActive)return;setGameAnswer(index);const q=roundQuestions[gameQuestionIndex];if(index===q.correct){setGameXp(v=>v+5);setGameCorrect(v=>v+1);setRoundCorrect(v=>v+1);if(session?.user?.id&&supabase)void supabase.rpc('social_record_clan_game_xp',{target_game:'quiz',xp_delta:5});setGameFeedback('Resposta certa! +5 XP. '+q.explanation)}else{setGameFeedback('Quase! '+q.explanation)}}
   function nextGameQuestion(){if(gameQuestionIndex>=roundQuestions.length-1){setQuizActive(false);setGameFeedback('');void recordCompetitionMatch({gameKey:'quiz',score:roundCorrect,xpEarned:roundCorrect*5,mode:'5-perguntas',won:roundCorrect>=4});return}setGameQuestionIndex(v=>v+1);setGameAnswer(null);setGameFeedback('')}
   async function awardLootDrop(gameKey,sourceKey){if(!session?.user?.id||!supabase)return null;const {data,error}=sourceKey==='coin_pickup'?await supabase.rpc('nexus_award_coin_drop',{selected_game:gameKey}):await supabase.rpc('nexus_award_loot_drop',{selected_game:gameKey,source_key:sourceKey});if(error){console.warn('Loot drop:',error.message);return null}if(data?.coins)notify('MOEDAS NEXUS! +'+data.coins+' moedas');else if(data?.item_name)notify('DROP RARO! '+(data.icon||'🎁')+' '+data.item_name+' · +'+Number(data.score_value||0).toLocaleString('pt-BR')+' pontos na coleção');return data||null}
-  async function recordCompetitionMatch({gameKey,score,xpEarned=0,mode='normal',won=false,durationSeconds=0}){if(!session?.user?.id||!supabase)return;const {data:matchId,error}=await supabase.rpc('competition_record_match',{selected_game:gameKey,match_score:Math.max(0,Math.floor(Number(score)||0)),earned_xp:Math.max(0,Math.min(1000,Math.floor(Number(xpEarned)||0))),selected_mode:String(mode||'normal'),did_win:!!won,match_duration:Math.max(0,Math.min(7200,Math.floor(Number(durationSeconds)||0)))});if(error){notify('Partida não registrada na competição: '+error.message);return}const {data:drops}=await supabase.from('nexus_loot_drops').select('item_name,score_value,icon,quantity').eq('match_id',matchId).order('score_value',{ascending:false});if(drops?.length){const lootText=drops.map(d=>(d.icon||'🎁')+' '+d.item_name+' +'+Number(d.score_value||0).toLocaleString('pt-BR')+' pts').join(' · ');notify('Drop da partida: '+lootText)}else notify('Partida registrada! + moedas NEXUS.')}
+  async function recordCompetitionMatch({gameKey,score,xpEarned=0,mode='normal',won=false,durationSeconds=0}){if(!session?.user?.id||!supabase)return;const {data:matchId,error}=await supabase.rpc('competition_record_match',{selected_game:gameKey,match_score:Math.max(0,Math.floor(Number(score)||0)),earned_xp:Math.max(0,Math.min(1000,Math.floor(Number(xpEarned)||0))),selected_mode:String(mode||'normal'),did_win:!!won,match_duration:Math.max(0,Math.min(7200,Math.floor(Number(durationSeconds)||0)))});if(error){notify('Partida não registrada na competição: '+error.message);return}const {data:drops}=await supabase.from('nexus_loot_drops').select('item_name,score_value,icon,quantity').eq('match_id',matchId).order('score_value',{ascending:false});if(drops?.length){const lootText=drops.map(d=>(d.icon||'🎁')+' '+d.item_name+' +'+Number(d.score_value||0).toLocaleString('pt-BR')+' pts').join(' · ');notify('Drop da partida: '+lootText)}else notify('Partida registrada! As moedas agora são coletadas durante a missão.')}
   function awardFlapXp(score,gameKey='piggy-run'){const day=new Date().toLocaleDateString('en-CA');const saved=JSON.parse(window.localStorage.getItem('mf_flap_daily')||'{}');const used=saved.day===day?Number(saved.xp||0):0;const points=Math.max(0,Math.floor(Number(score)||0));const requested=points*2;const reward=Math.min(requested,Math.max(0,100-used));if(reward>0){const total=used+reward;window.localStorage.setItem('mf_flap_daily',JSON.stringify({day,xp:total}));setDailyGameXp(total);setGameXp(v=>v+reward);if(session?.user?.id&&supabase)void supabase.rpc('social_record_clan_game_xp',{target_game:gameKey,xp_delta:reward});notify('Mandou bem! +'+reward+' XP no jogo.');return reward}else{notify('Limite diário de 100 XP do Flappy atingido. Volte amanhã!');return 0}}
 
   async function sendAssistantMessage(value=assistantInput){
@@ -1132,7 +1132,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
   setRunning(false);setEnded(true);setVictory(won);setMessage(won?'GALÁXIA SALVA! CAMPANHA CONCLUÍDA!':'Sua nave foi destruída. A galáxia ainda precisa de você!');
   setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});
   const earned=onReward(Math.floor(g.score/25),'space-nexus');
-  void onMatch?.({gameKey:'space-nexus',score:g.score,xpEarned:Number(earned)||0,mode:mode,won,durationSeconds:Math.floor(g.tick/60)});
+  void onMatch?.({gameKey:'space-nexus',score:g.score,xpEarned:Number(earned)||0,mode:mode,won,durationSeconds:Math.floor(g.tick/120)});
  };
  const start=()=>{
   const cfg=modes[mode];
@@ -1144,11 +1144,11 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
   let raf=0,last=0,accumulator=0;const frame=(timestamp)=>{raf=requestAnimationFrame(frame);if(!last)last=timestamp;accumulator+=Math.min(100,timestamp-last);last=timestamp;let steps=0;while(accumulator>=1000/120&&steps<8){accumulator-=1000/120;steps++;
    const g=game.current;if(!g||g.phase==='finished')return;
    g.tick++;const n=g.tick,cfg=modes[g.mode],w=g.wave;
-   const fireRate=Math.max(7,Math.round(17*cfg.fire)-Math.floor(w/5));
+   const fireRate=Math.max(14,Math.round((17*cfg.fire-Math.floor(w/5))*2));
    if(n%fireRate===0){g.shots.push({id:n+'p',x:g.ship.x,y:g.ship.y-7});if(n<g.doubleUntil){g.shots.push({id:n+'pl',x:g.ship.x-2.5,y:g.ship.y-7},{id:n+'pr',x:g.ship.x+2.5,y:g.ship.y-7})}}
    const bossWave=w%5===0;
    const waveTarget=5+w*2;
-   const spawnEvery=Math.max(16,Math.round((cfg.spawn-w*2.8)));
+   const spawnEvery=Math.max(32,Math.round((cfg.spawn-w*2.8)*2));
    if(!bossWave&&g.spawned<waveTarget&&n%spawnEvery===0&&g.foes.length<Math.min(7,3+Math.ceil(w/3))){
     const roll=Math.random();let type='drone',hp=1;
     if(w>=2&&roll>.73){type='scout';hp=1}
@@ -1160,13 +1160,13 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
    }
    g.foes.forEach(f=>{
     const base=f.type==='scout'?.34:f.type==='brute'?.19:f.type==='tank'?.15:f.type==='phantom'?.27:.23;
-    f.y+=base*cfg.speed*Math.min(2.4,1+Math.max(0,w-1)*.10);
+    f.y+=base*cfg.speed*Math.min(2.4,1+Math.max(0,w-1)*.10)*.5;
     if(f.type==='scout'||f.type==='phantom')f.x+=Math.sin(n*.045+f.phase)*(f.type==='phantom'?.28:.16);
    });
-   g.shots.forEach(b=>{b.y-=1.18});
-   g.enemyShots.forEach(b=>{b.x+=b.vx||0;b.y+=b.vy||.58});
-   g.drops.forEach(d=>{d.y+=.18});
-   if(!bossWave&&n%Math.max(35,105-Math.floor(w*2))===0){g.foes.filter(f=>f.fire).slice(-2).forEach((f,i)=>g.enemyShots.push({id:'m'+n+f.id+i,x:f.x,y:f.y+3,kind:'minion',vy:.48*cfg.speed}))}
+   g.shots.forEach(b=>{b.y-=.59});
+   g.enemyShots.forEach(b=>{b.x+=(b.vx||0)*.5;b.y+=(b.vy||.58)*.5});
+   g.drops.forEach(d=>{d.y+=.09});
+   if(!bossWave&&n%Math.max(70,(105-Math.floor(w*2))*2)===0){g.foes.filter(f=>f.fire).slice(-2).forEach((f,i)=>g.enemyShots.push({id:'m'+n+f.id+i,x:f.x,y:f.y+3,kind:'minion',vy:.24*cfg.speed}))}
    if(bossWave&&!g.boss&&g.spawned>=0&&g.foes.length===0&&g.phase!=='boss-cleared'){
     const b=bossRoster[(Math.floor((w-1)/5))%bossRoster.length],hp=Math.round((b.hp+w*2)*cfg.bossHp);
     g.boss={...b,hp,max:hp,x:50,y:10,direction:1,attackCount:0};g.phase='boss';g.enemyShots=[];setMessage('CHEFÃO: '+b.name+' — '+b.description+'!');
@@ -1174,11 +1174,11 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
    if(g.boss){
     const b=g.boss;b.attackCount++;
     const move=b.id==='titan'?.19:b.id==='queen'?.42:.3;
-    b.x+=b.direction*move*cfg.speed;
+    b.x+=b.direction*move*cfg.speed*.5;
     if(b.x>=79){b.x=79;b.direction=-1}else if(b.x<=21){b.x=21;b.direction=1}
     if(b.id==='queen')b.y=10+Math.sin(n*.035)*3;
-    if(b.attackCount%b.attackEvery===0){
-     const push=(x,vx,vy=.62)=>g.enemyShots.push({id:'b'+n+g.enemyShots.length+Math.random(),x:Math.max(2,Math.min(98,x)),y:b.y+9,vx,vy:vy*cfg.speed,kind:'boss'});
+    if(b.attackCount%(b.attackEvery*2)===0){
+     const push=(x,vx,vy=.62)=>g.enemyShots.push({id:'b'+n+g.enemyShots.length+Math.random(),x:Math.max(2,Math.min(98,x)),y:b.y+9,vx:vx*.5,vy:vy*cfg.speed*.5,kind:'boss'});
      if(b.style==='spread'){[-13,0,13].forEach(dx=>push(b.x+dx,dx*.009,.58))}
      else if(b.style==='cross'){[-.28,0,.28].forEach(vx=>push(b.x,vx,.78));[-.18,.18].forEach(vx=>push(b.x,vx,.55))}
      else if(b.style==='slam'){for(let x=8;x<=92;x+=14)push(x,(x-b.x)*.002,.72)}
@@ -1217,8 +1217,8 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
    for(const d of g.drops){
     if(Math.abs(d.x-g.ship.x)<7&&Math.abs(d.y-g.ship.y)<8){
      if(d.type==='coin'){void Promise.resolve(onLoot?.('space-nexus','coin_pickup')).then(result=>{if(result?.coins)setMessage('+'+result.coins+' MOEDAS NEXUS!')}).catch(()=>{});setMessage('MOEDA NEXUS COLETADA!')}else if(d.type==='shield'){g.shield=true;setShieldActive(true);setMessage('ESCUDO COLETADO! O próximo impacto será bloqueado.')}
-     else if(d.type==='rapid'){g.rapidUntil=n+375;setMessage('DISPARO RÁPIDO!')}
-     else if(d.type==='double'){g.doubleUntil=n+375;setMessage('TIRO DUPLO!')}
+     else if(d.type==='rapid'){g.rapidUntil=n+750;setMessage('DISPARO RÁPIDO!')}
+     else if(d.type==='double'){g.doubleUntil=n+750;setMessage('TIRO DUPLO!')}
      else if(d.type==='repair'){g.lives=Math.min(cfg.lives,g.lives+1);setMessage('REPARO COLETADO! +1 vida.')}
     }else if(d.y<100)remainingDrops.push(d);
    }
