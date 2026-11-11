@@ -895,3 +895,6 @@
 .player-profile-page .profile-xp-gems .gemstone{position:static!important;inset:auto!important;display:block!important;flex:none!important;width:13px!important;height:17px!important;margin:0!important;transform:none!important}
 }
 @media(max-width:390px){.player-profile-page .game-world-hero{padding:14px 11px 13px!important}.player-profile-page .game-world-hero .player-social-identity-layout{grid-template-columns:58px minmax(0,1fr)!important;min-height:116px!important;grid-template-rows:minmax(116px,auto)!important;column-gap:10px!important}.player-profile-page .game-world-hero .profile-big-avatar{width:54px!important;height:54px!important;min-width:54px!important;max-width:54px!important;min-height:54px!important}.player-profile-page .game-world-hero .player-info{min-height:116px!important}.player-profile-page .profile-social-stats{gap:5px!important}.player-profile-page .profile-social-stats>div{min-height:72px!important;padding:8px 3px!important}.player-profile-page .profile-social-stats span{font-size:8px!important}.player-profile-page .profile-honor-chip{font-size:8px!important;padding:6px 7px!important}}
+
+/* Keep the profile heading below the fixed mobile app bar */
+@media(max-width:760px){.player-profile-page{padding-top:70px!important}}
