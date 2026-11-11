@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
   if (authData.user.email?.toLowerCase() !== adminEmail) return respond({ error: "Acesso restrito ao administrador autorizado." }, 403);
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  let body: { action?: string; user_id?: string; enabled?: boolean; message?: string; suspended?: boolean; title?: string };
+  let body: { action?: string; user_id?: string; enabled?: boolean; message?: string; suspended?: boolean; title?: string; report_type?: string; report_id?: string; status?: string };
   try { body = await req.json(); } catch { return respond({ error: "Corpo da solicitação inválido." }, 400); }
 
   if (body.action === "get_maintenance") {
@@ -77,6 +77,68 @@ Deno.serve(async (req) => {
       sent += rows.length;
     }
     return respond({ success: true, sent });
+  }
+
+  if (body.action === "list_reports") {
+    const [{ data: profileReports, error: profileError }, { data: postReports, error: postError }] = await Promise.all([
+      admin.from("social_reports").select("id,reporter_id,reported_id,category,details,status,created_at").order("created_at", { ascending: false }).limit(500),
+      admin.from("social_post_reports").select("id,reporter_id,post_id,comment_id,details,status,created_at").order("created_at", { ascending: false }).limit(500),
+    ]);
+    if (profileError || postError) return respond({ error: "Não foi possível carregar todas as denúncias." }, 500);
+
+    const postIds = [...new Set((postReports ?? []).map((r) => r.post_id).filter(Boolean))];
+    const commentIds = [...new Set((postReports ?? []).map((r) => r.comment_id).filter(Boolean))];
+    const [{ data: posts }, { data: comments }] = await Promise.all([
+      postIds.length ? admin.from("social_posts").select("id,author_id,body").in("id", postIds) : Promise.resolve({ data: [] }),
+      commentIds.length ? admin.from("social_post_comments").select("id,author_id,body,post_id").in("id", commentIds) : Promise.resolve({ data: [] }),
+    ]);
+    const postMap = new Map((posts ?? []).map((p) => [p.id, p]));
+    const commentMap = new Map((comments ?? []).map((c) => [c.id, c]));
+    const ids = new Set<string>();
+    for (const r of profileReports ?? []) { ids.add(r.reporter_id); ids.add(r.reported_id); }
+    for (const r of postReports ?? []) {
+      ids.add(r.reporter_id);
+      const targetId = r.comment_id ? commentMap.get(r.comment_id)?.author_id : postMap.get(r.post_id)?.author_id;
+      if (targetId) ids.add(targetId);
+    }
+    const [{ data: authUsers }, { data: profiles }] = await Promise.all([
+      admin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
+      ids.size ? admin.from("social_profiles").select("user_id,username,display_name").in("user_id", [...ids]) : Promise.resolve({ data: [] }),
+    ]);
+    const emailMap = new Map((authUsers?.users ?? []).map((u) => [u.id, u.email ?? ""]));
+    const profileMap = new Map((profiles ?? []).map((p) => [p.user_id, p]));
+    const person = (id?: string) => {
+      const p = id ? profileMap.get(id) : null;
+      return { name: p?.display_name || "Usuário", username: p?.username || "", email: id ? emailMap.get(id) ?? "" : "" };
+    };
+    const profilesOut = (profileReports ?? []).map((r) => ({
+      ...r, report_type: "profile", reporter_name: person(r.reporter_id).name, reporter_email: person(r.reporter_id).email,
+      reported_name: person(r.reported_id).name, reported_username: person(r.reported_id).username, reported_email: person(r.reported_id).email,
+    }));
+    const postsOut = (postReports ?? []).map((r) => {
+      const content = r.comment_id ? commentMap.get(r.comment_id) : postMap.get(r.post_id);
+      const targetId = content?.author_id;
+      const target = person(targetId);
+      return {
+        ...r, report_type: "content", category: r.comment_id ? "Comentário denunciado" : "Publicação denunciada",
+        reporter_name: person(r.reporter_id).name, reporter_email: person(r.reporter_id).email,
+        reported_id: targetId ?? "", reported_name: target.name, reported_username: target.username, reported_email: target.email,
+        content_preview: content?.body ?? "[Conteúdo não disponível]",
+      };
+    });
+    const reports = [...profilesOut, ...postsOut].sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime()).slice(0, 1000);
+    return respond({ reports });
+  }
+
+  if (body.action === "update_report_status") {
+    const allowedStatuses = ["open", "reviewing", "resolved", "dismissed"];
+    if (!body.report_id || !allowedStatuses.includes(body.status ?? "")) return respond({ error: "Informe uma denúncia e um status válidos." }, 400);
+    const table = body.report_type === "profile" ? "social_reports" : body.report_type === "content" ? "social_post_reports" : null;
+    if (!table) return respond({ error: "Tipo de denúncia inválido." }, 400);
+    const { data, error } = await admin.from(table).update({ status: body.status }).eq("id", body.report_id).select("id").maybeSingle();
+    if (error) return respond({ error: "Não foi possível atualizar o status da denúncia." }, 500);
+    if (!data) return respond({ error: "Denúncia não encontrada." }, 404);
+    return respond({ success: true, status: body.status });
   }
 
   if (body.action === "list_social_profiles") {
