@@ -1161,12 +1161,12 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
    g.foes.forEach(f=>{
     const base=f.type==='scout'?.34:f.type==='brute'?.19:f.type==='tank'?.15:f.type==='phantom'?.27:.23;
     f.y+=base*cfg.speed*Math.min(2.4,1+Math.max(0,w-1)*.10)*.5;
-    if(f.type==='scout'||f.type==='phantom')f.x+=Math.sin(n*.045+f.phase)*(f.type==='phantom'?.28:.16);
+    if(f.type==='scout'||f.type==='phantom')f.x+=Math.sin(n*.0225+f.phase)*(f.type==='phantom'?.14:.08);
    });
    g.shots.forEach(b=>{b.y-=.59});
    g.enemyShots.forEach(b=>{b.x+=(b.vx||0)*.5;b.y+=(b.vy||.58)*.5});
    g.drops.forEach(d=>{d.y+=.09});
-   if(!bossWave&&n%Math.max(70,(105-Math.floor(w*2))*2)===0){g.foes.filter(f=>f.fire).slice(-2).forEach((f,i)=>g.enemyShots.push({id:'m'+n+f.id+i,x:f.x,y:f.y+3,kind:'minion',vy:.24*cfg.speed}))}
+   if(!bossWave&&n%Math.max(70,(105-Math.floor(w*2))*2)===0){g.foes.filter(f=>f.fire).slice(-2).forEach((f,i)=>g.enemyShots.push({id:'m'+n+f.id+i,x:f.x,y:f.y+3,kind:'minion',vy:.48*cfg.speed}))}
    if(bossWave&&!g.boss&&g.spawned>=0&&g.foes.length===0&&g.phase!=='boss-cleared'){
     const b=bossRoster[(Math.floor((w-1)/5))%bossRoster.length],hp=Math.round((b.hp+w*2)*cfg.bossHp);
     g.boss={...b,hp,max:hp,x:50,y:10,direction:1,attackCount:0};g.phase='boss';g.enemyShots=[];setMessage('CHEFÃO: '+b.name+' — '+b.description+'!');
