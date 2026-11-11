@@ -4179,6 +4179,10 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 .nexus-reward-kicker{font-size:11px;letter-spacing:.24em;font-weight:900;color:#a9a0ff}
 .nexus-reward-modal h2{margin:8px 0 5px;font-size:25px;letter-spacing:.02em}
 .nexus-reward-modal>p{margin:0 0 18px;color:#aeb7ce;font-size:13px}
+.nexus-reward-score{display:grid;grid-template-columns:1fr auto;align-items:center;gap:4px 12px;margin:0 0 12px;padding:13px 15px;border:1px solid rgba(105,220,255,.24);border-radius:15px;background:rgba(12,25,48,.7)}
+.nexus-reward-score span{font-size:10px;letter-spacing:.16em;color:#9ba9ca;font-weight:800}
+.nexus-reward-score b{grid-column:2;grid-row:1 / span 2;font-size:25px;color:#eaf8ff;font-variant-numeric:tabular-nums}
+.nexus-reward-score small{font-size:10px;color:#9ba9ca;letter-spacing:.08em}
 .nexus-reward-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .nexus-reward-stats>div{display:flex;flex-direction:column;gap:5px;padding:16px 12px;border:1px solid rgba(153,126,235,.28);border-radius:16px;background:rgba(115,85,190,.13)}
 .nexus-reward-stats b{font-size:21px;color:#fff}
