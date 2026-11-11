@@ -5,7 +5,7 @@ import './nexus-competition.css';
 
 const games=[{id:'space-nexus',name:'Space Nexus',icon:'🚀'},{id:'piggy-run',name:'Asas da Fortuna',icon:'🐷'},{id:'quiz',name:'Quiz Financeiro',icon:'🧠'}];
 const gameName=id=>games.find(g=>g.id===id)?.name||id;
-const fmtDate=value=>value?new Date(value).toLocaleDateString('pt-BR',{day:'2-digit',month:'short'}):'—';
+const fmtDate=value=>value?new Date(value).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'}):'—';
 const fmtDateTime=value=>value?new Date(value).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'—';
 const initials=name=>String(name||'Jogador').trim().slice(0,1).toUpperCase();
 
