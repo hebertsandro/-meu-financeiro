@@ -1,7 +1,8 @@
 import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {supabase} from './supabase';
-import {Trophy,Users,Globe,CalendarDays,Swords,Medal,History,LoaderCircle,RefreshCw,Target,Zap,Clock3,Plus,ChevronRight,Gamepad2,ShieldCheck} from 'lucide-react';
+import {Trophy,Users,Globe,CalendarDays,Swords,Medal,History,LoaderCircle,RefreshCw,Target,Zap,Clock3,Plus,ChevronRight,Gamepad2,ShieldCheck,Package} from 'lucide-react';
 import './nexus-competition.css';
+import NexusLoot from './NexusLoot';
 
 const games=[{id:'space-nexus',name:'Space Nexus',icon:'🚀'},{id:'piggy-run',name:'Asas da Fortuna',icon:'🐷'},{id:'quiz',name:'Quiz Financeiro',icon:'🧠'}];
 const gameName=id=>games.find(g=>g.id===id)?.name||id;
@@ -90,7 +91,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
   if(e2){onToast(e2.message||'Não foi possível criar o desafio.');return}
   onToast('Desafio enviado! ⚔️');setTab('challenges');await load(true);
  }
- const tabs=[['global','Global',Globe],['friends','Amigos',Users],['season','Temporada',CalendarDays],['tournament','Torneios',Trophy],['challenges','Desafios',Swords],['medals','Medalhas',Medal],['history','Partidas',History]];
+ const tabs=[['global','Global',Globe],['friends','Amigos',Users],['collection','Coleção',Package],['season','Temporada',CalendarDays],['tournament','Torneios',Trophy],['challenges','Desafios',Swords],['medals','Medalhas',Medal],['history','Partidas',History]];
  if(!userId)return <section className="nc-panel"><p>Entre na sua conta para participar das competições NEXUS.</p></section>;
  return <section className="nexus-competition">
   <div className="nc-hero"><div><span className="nc-eyebrow">NEXUS · ARENA COMPETITIVA</span><h2>Competição</h2><p>Suba no ranking, dispute torneios e conquiste medalhas jogando.</p></div><div className="nc-hero-xp"><Trophy size={21}/><b>{Number(gameXp).toLocaleString('pt-BR')} XP</b><small>{myMedals} medalhas colecionadas</small></div></div>
@@ -99,7 +100,8 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
   <div className="nc-content-head"><div><span>PLACAR NEXUS</span><h3>{tabs.find(t=>t[0]===tab)?.[1]}</h3></div><button onClick={()=>load(true)} disabled={refreshing}><RefreshCw size={15} className={refreshing?'nc-spin':''}/> Atualizar</button></div>
   {(loading||refreshing)&&<div className="nc-loading"><LoaderCircle className="nc-spin"/> Carregando competição…</div>}
   {error&&<div className="nc-error">{error}</div>}
-  {!loading&&tab==='global'&&<div className="nc-board"><div className="nc-board-caption">OS JOGADORES COM MAIS XP NO MEU FINANCEIRO</div>{sortedGlobal.length?sortedGlobal.map((p,i)=>rankRow(p,i,p.game_xp,'XP')):<p className="nc-empty">Ainda não há jogadores no ranking.</p>}</div>}
+  {!loading&&tab==='global'&&<NexusLoot userId={userId} view="ranking"/>}
+  {!loading&&tab==='collection'&&<NexusLoot userId={userId} view="collection"/>}
   {!loading&&tab==='friends'&&<div className="nc-board"><div className="nc-board-caption">SEUS AMIGOS ORDENADOS POR XP</div>{sortedFriends.length?sortedFriends.map((p,i)=>rankRow(p,i,p.game_xp,'XP')):<p className="nc-empty">Adicione amigos no NEXUS Social para montar seu ranking.</p>}</div>}
   {!loading&&tab==='season'&&<div className="nc-panel"><div className="nc-season-banner"><CalendarDays/><div><b>{season?.name||'Temporada NEXUS'}</b><small>{season?fmtDate(season.starts_at)+' — '+fmtDate(season.ends_at):'A temporada começa após sua primeira partida registrada.'}</small></div><span>30 DIAS</span></div>{seasonRows.length?seasonRows.map((x,i)=>rankRow(x.profile||{user_id:x.user_id},i,x.xp_points,'XP da temporada')):<p className="nc-empty">Jogue um dos jogos compatíveis para entrar no ranking desta temporada.</p>}</div>}
   {!loading&&tab==='tournament'&&<div className="nc-panel"><div className="nc-season-banner"><Trophy/><div><b>{tournament?.name||'Torneio semanal NEXUS'}</b><small>{tournament?fmtDate(tournament.starts_at)+' — '+fmtDate(tournament.ends_at):'O torneio semanal abre automaticamente com a primeira partida registrada.'}</small></div><span>SEMANAL</span></div>{tournamentRows.length?tournamentRows.map((x,i)=>rankRow(x.profile||{user_id:x.user_id},i,x.points,'pontos')):<p className="nc-empty">Nenhuma pontuação neste torneio ainda. Jogue para aparecer no placar!</p>}</div>}
