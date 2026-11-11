@@ -267,3 +267,14 @@
  cursor:pointer;
  -webkit-tap-highlight-color:transparent;
 }
+
+
+/* Story privacy and viewer list */
+.nxf-story-viewers-trigger{display:inline-flex;align-items:center;gap:7px;margin-top:12px;padding:9px 12px;border:1px solid rgba(130,150,190,.28);border-radius:12px;background:rgba(20,26,45,.72);color:inherit;font:inherit;font-size:12px;font-weight:700;cursor:pointer}
+.nxf-story-viewers{display:grid;gap:9px;margin-top:10px;padding:12px;border:1px solid rgba(130,150,190,.2);border-radius:14px;background:rgba(12,17,31,.88)}
+.nxf-story-viewers>div{display:flex;align-items:center;gap:9px;min-width:0}
+.nxf-story-viewers>div>span:first-child{display:grid;place-items:center;width:34px;height:34px;flex:0 0 34px;border-radius:50%;background:rgba(120,130,180,.18)}
+.nxf-story-viewers>div>span:nth-child(2){display:grid;min-width:0;flex:1}
+.nxf-story-viewers>div>span:nth-child(2) b{font-size:12px}
+.nxf-story-viewers>div>span:nth-child(2) small,.nxf-story-viewers>small{font-size:11px;opacity:.7}
+.nxf-story-viewers time{font-size:10px;opacity:.65;white-space:nowrap}
