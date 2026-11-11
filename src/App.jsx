@@ -1126,13 +1126,13 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
   {name:'COLOSSO ÔMEGA',id:'omega',style:'spiral',hp:34,attackEvery:52,description:'Espiral de projéteis'}
  ];
  const [mode,setMode]=useState('medium'),[running,setRunning]=useState(false),[ended,setEnded]=useState(false),[victory,setVictory]=useState(false),[score,setScore]=useState(0),[lives,setLives]=useState(3),[ship,setShip]=useState({x:50,y:84}),[shots,setShots]=useState([]),[foes,setFoes]=useState([]),[enemyShots,setEnemyShots]=useState([]),[drops,setDrops]=useState([]),[boss,setBoss]=useState(null),[wave,setWave]=useState(1),[best,setBest]=useState(()=>Number(localStorage.getItem('mf_space_best')||0)),[message,setMessage]=useState('Escolha a dificuldade e prepare sua nave!'),[shieldActive,setShieldActive]=useState(false),[bossesDefeated,setBossesDefeated]=useState(0);
- const game=React.useRef({});
+ const game=React.useRef({});const callbacksRef=React.useRef({onReward,onMatch,onLoot});callbacksRef.current={onReward,onMatch,onLoot};
  const moveTo=(clientX,clientY,arena)=>{const r=arena.getBoundingClientRect();const x=Math.max(5,Math.min(95,(clientX-r.left)/r.width*100));const y=Math.max(9,Math.min(91,(clientY-r.top)/r.height*100));game.current.ship={x,y};setShip({x,y})};
  const finish=(won,g)=>{
   setRunning(false);setEnded(true);setVictory(won);setMessage(won?'GALÁXIA SALVA! CAMPANHA CONCLUÍDA!':'Sua nave foi destruída. A galáxia ainda precisa de você!');
   setBest(old=>{const value=Math.max(old,g.score);localStorage.setItem('mf_space_best',String(value));return value});
-  const earned=onReward(Math.floor(g.score/25),'space-nexus');
-  void onMatch?.({gameKey:'space-nexus',score:g.score,xpEarned:Number(earned)||0,mode:mode,won,durationSeconds:Math.floor(g.tick/120)});
+  const earned=callbacksRef.current.onReward?.(Math.floor(g.score/25),'space-nexus');
+  void callbacksRef.current.onMatch?.({gameKey:'space-nexus',score:g.score,xpEarned:Number(earned)||0,mode:mode,won,durationSeconds:Math.floor(g.tick/120)});
  };
  const start=()=>{
   const cfg=modes[mode];
@@ -1244,7 +1244,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
   };
   raf=requestAnimationFrame(frame);
   return()=>cancelAnimationFrame(raf);
- },[running,mode,onReward,onMatch]);
+ },[running,mode]);
  return <section className="space-nexus-card">
   {!running&&<div className="space-mode-picker"><b>ESCOLHA A DIFICULDADE</b><div>{Object.entries(modes).map(([id,m])=><button key={id} type="button" className={mode===id?'active':''} onClick={()=>setMode(id)}><strong>{m.label}</strong><small>{m.waves} ondas · {m.lives} vidas</small></button>)}</div></div>}
   <div className="space-nexus-hud"><div className="space-hud-block"><small>SETOR ATUAL</small><span className="space-wave-pill"><i/> ONDA {wave}/{modes[mode].waves}</span></div><div className="space-score-block"><small>PONTUAÇÃO</small><b>{score.toLocaleString('pt-BR')}</b></div><div className="space-lives-block"><small>INTEGRIDADE</small><span>{'❤️'.repeat(lives)}{'🖤'.repeat(Math.max(0,modes[mode].lives-lives))}</span></div></div>
