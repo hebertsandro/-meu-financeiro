@@ -938,3 +938,44 @@
     margin-bottom:12px!important;
   }
 }
+
+
+/* Compact mobile stack: intrinsic rows eliminate the oversized blank gap */
+@media(max-width:760px){
+  .player-profile-page .game-world-hero{
+    display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+    grid-auto-flow:row!important;grid-auto-rows:max-content!important;
+    align-content:start!important;justify-content:start!important;
+    justify-items:stretch!important;row-gap:0!important;
+    height:auto!important;min-height:0!important;max-height:none!important;
+    padding-bottom:14px!important;
+  }
+  .player-profile-page .game-world-hero>*{
+    align-self:start!important;min-height:0!important;margin-top:0!important;
+  }
+  .player-profile-page .game-world-hero>.player-profile-topline{margin-bottom:14px!important}
+  .player-profile-page .game-world-hero>.player-social-identity-layout{
+    min-height:0!important;height:auto!important;margin-bottom:12px!important;
+    grid-template-rows:auto!important;
+  }
+  .player-profile-page .game-world-hero .player-info{min-height:0!important;height:auto!important}
+  .player-profile-page .game-world-hero>.profile-social-stats{
+    min-height:0!important;height:auto!important;margin:0 0 12px!important;
+    grid-auto-rows:minmax(72px,auto)!important;
+  }
+  .player-profile-page .game-world-hero>.profile-social-bio{
+    min-height:0!important;height:auto!important;margin:0 0 12px!important;
+  }
+  .player-profile-page .game-world-hero>.player-clan-badge{
+    min-height:0!important;height:auto!important;margin:0 0 12px!important;
+  }
+  .player-profile-page .game-world-hero>.profile-honors-inline{
+    min-height:0!important;height:auto!important;margin:0 0 22px!important;
+    padding:0 0 2px!important;position:relative!important;z-index:1!important;
+  }
+  .player-profile-page .game-world-hero>.profile-xp-progress{
+    min-height:0!important;height:auto!important;margin:0!important;
+    position:relative!important;clear:both!important;z-index:0!important;
+  }
+  .player-profile-page .profile-honor-chip{position:static!important;transform:none!important}
+}
