@@ -9,6 +9,71 @@
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
     <meta name="description" content="Seu controle financeiro pessoal e privado." />
     <title>Meu Financeiro</title>
+    <style>
+      /* SPACE NEXUS — moeda de drop centralizada e legível */
+      .space-nexus-arena .space-drop.space-drop-coin {
+        position: absolute;
+        display: grid;
+        place-items: center;
+        box-sizing: border-box;
+        width: 34px;
+        height: 34px;
+        padding: 0;
+        border: 2px solid #fff0a6;
+        border-radius: 50%;
+        background:
+          radial-gradient(circle at 31% 23%, #fffbe0 0 7%, transparent 26%),
+          radial-gradient(circle at 36% 30%, #ffe98b 0, #f8c84b 43%, #d99220 72%, #8e500c 100%);
+        box-shadow:
+          inset 0 0 0 2px rgba(255, 247, 190, .55),
+          inset 0 -3px 5px rgba(105, 57, 5, .42),
+          0 0 9px rgba(255, 215, 80, .9),
+          0 0 21px rgba(255, 174, 38, .55);
+        transform: translate(-50%, -50%);
+        animation: dropFloat .55s ease-in-out infinite alternate, nexusCoinShine 1.8s ease-in-out infinite;
+        z-index: 2;
+      }
+      .space-nexus-arena .space-drop.space-drop-coin > span {
+        position: relative;
+        display: grid;
+        place-items: center;
+        width: 100%;
+        height: 100%;
+        color: #70420a;
+        font-family: Arial, sans-serif;
+        font-size: 0;
+        font-weight: 900;
+        line-height: 1;
+        text-shadow: 0 1px rgba(255,255,255,.55);
+      }
+      .space-nexus-arena .space-drop.space-drop-coin > span::before {
+        content: "";
+        position: absolute;
+        inset: 4px;
+        border: 1px solid rgba(128, 76, 13, .62);
+        border-radius: 50%;
+        box-shadow: inset 0 0 0 1px rgba(255, 248, 194, .5);
+      }
+      .space-nexus-arena .space-drop.space-drop-coin > span::after {
+        content: "$";
+        position: relative;
+        z-index: 1;
+        font-size: 15px;
+        font-weight: 900;
+        letter-spacing: -1px;
+        transform: translateY(-.5px);
+      }
+      @keyframes nexusCoinShine {
+        0%, 100% { filter: brightness(1); }
+        50% { filter: brightness(1.16); }
+      }
+      @media (max-width: 480px) {
+        .space-nexus-arena .space-drop.space-drop-coin {
+          width: 32px;
+          height: 32px;
+        }
+      }
+    </style>
   </head>
   <body><div id="root"></div><script type="module" src="/src/main.jsx"></script></body>
 </html>
