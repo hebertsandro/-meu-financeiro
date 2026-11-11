@@ -3834,3 +3834,10 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 @keyframes spaceEnemyHover{from{transform:translateY(-2px) rotate(-4deg)}to{transform:translateY(2px) rotate(4deg)}}
 
 .space-drop-loot{width:31px;height:31px;border-radius:50%;border:1px solid #fff;background:radial-gradient(circle at 30% 25%,#fff8c9,#f9d34d 42%,#a66b16);box-shadow:0 0 14px #ffe56b,0 0 30px #ffc83d99;animation:dropFloat .45s ease-in-out infinite alternate,lootPulse 1s ease-in-out infinite alternate}.space-drop-loot span{font-size:17px;color:#51320b;text-shadow:0 1px #fff9}@keyframes lootPulse{from{filter:brightness(1)}to{filter:brightness(1.35)}}
+
+/* SPACE NEXUS — performance e drops de moedas */
+.space-enemy,.space-player-ship,.space-drop,.space-player-shot,.space-enemy-shot{will-change:transform,left,top;backface-visibility:hidden}
+.space-art-enemy.tank-art{filter:drop-shadow(0 0 10px #ffc15b) drop-shadow(0 0 18px #e28c35)}
+.space-art-enemy.phantom-art{filter:drop-shadow(0 0 10px #b69cff) drop-shadow(0 0 20px #7556ff)}
+.space-drop-coin{width:27px;height:27px;border-radius:50%;border:2px solid #fff0a5;background:radial-gradient(circle at 32% 25%,#fff9cf,#ffcf42 45%,#a96a10 100%);box-shadow:0 0 10px #ffd95b,0 0 22px #ffb52e99;animation:dropFloat .55s ease-in-out infinite alternate}
+.space-drop-coin span{font-size:16px;color:#68400a;text-shadow:0 1px #fff8}
