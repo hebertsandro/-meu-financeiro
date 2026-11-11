@@ -38,8 +38,10 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
    setGlobalRows(profileRows);
    const friendIds=[...new Set([userId,...(friendshipsRes.data||[]).map(f=>f.user_a===userId?f.user_b:f.user_a)])];
    const friendProfiles=friendIds.length?await supabase.from('social_profiles').select('user_id,username,display_name,avatar,game_xp,game_correct').in('user_id',friendIds):{data:[]};
+   const friendWallets=friendIds.length?await supabase.from('nexus_loot_wallets').select('user_id,coins,collection_score').in('user_id',friendIds):{data:[]};
+   const lootByUser=new Map((friendWallets.data||[]).map(x=>[x.user_id,x]));
    setFriends(friendProfiles.data||[]);
-   setFriendRows(friendProfiles.data||[]);
+   setFriendRows((friendProfiles.data||[]).map(p=>({...p,...(lootByUser.get(p.user_id)||{coins:0,collection_score:0})})));
    const activeSeason=seasonRes.data||null;setSeason(activeSeason);
    if(activeSeason){
     const scores=await supabase.from('competition_season_scores').select('*').eq('season_id',activeSeason.id).order('xp_points',{ascending:false}).limit(50);
@@ -68,7 +70,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
 
  useEffect(()=>{load()},[load]);
  const sortedGlobal=useMemo(()=>globalRows.slice().sort((a,b)=>Number(b.game_xp||0)-Number(a.game_xp||0)),[globalRows]);
- const sortedFriends=useMemo(()=>friendRows.slice().sort((a,b)=>Number(b.game_xp||0)-Number(a.game_xp||0)),[friendRows]);
+ const sortedFriends=useMemo(()=>friendRows.slice().sort((a,b)=>Number(b.collection_score||0)-Number(a.collection_score||0)),[friendRows]);
  const myGlobalRank=sortedGlobal.findIndex(x=>x.user_id===userId)+1;
  const myFriendRank=sortedFriends.findIndex(x=>x.user_id===userId)+1;
  const mySeasonRank=seasonRows.findIndex(x=>x.user_id===userId)+1;
@@ -102,7 +104,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
   {error&&<div className="nc-error">{error}</div>}
   {!loading&&tab==='global'&&<NexusLoot userId={userId} view="ranking"/>}
   {!loading&&tab==='collection'&&<NexusLoot userId={userId} view="collection"/>}
-  {!loading&&tab==='friends'&&<div className="nc-board"><div className="nc-board-caption">SEUS AMIGOS ORDENADOS POR XP</div>{sortedFriends.length?sortedFriends.map((p,i)=>rankRow(p,i,p.game_xp,'XP')):<p className="nc-empty">Adicione amigos no NEXUS Social para montar seu ranking.</p>}</div>}
+  {!loading&&tab==='friends'&&<div className="nc-board"><div className="nc-board-caption">SEUS AMIGOS · VALOR TOTAL DA COLEÇÃO</div>{sortedFriends.length?sortedFriends.map((p,i)=>rankRow(p,i,p.collection_score,'pontos de coleção')):<p className="nc-empty">Adicione amigos no NEXUS Social para montar seu ranking.</p>}</div>}
   {!loading&&tab==='season'&&<div className="nc-panel"><div className="nc-season-banner"><CalendarDays/><div><b>{season?.name||'Temporada NEXUS'}</b><small>{season?fmtDate(season.starts_at)+' — '+fmtDate(season.ends_at):'A temporada começa após sua primeira partida registrada.'}</small></div><span>30 DIAS</span></div>{seasonRows.length?seasonRows.map((x,i)=>rankRow(x.profile||{user_id:x.user_id},i,x.xp_points,'XP da temporada')):<p className="nc-empty">Jogue um dos jogos compatíveis para entrar no ranking desta temporada.</p>}</div>}
   {!loading&&tab==='tournament'&&<div className="nc-panel"><div className="nc-season-banner"><Trophy/><div><b>{tournament?.name||'Torneio semanal NEXUS'}</b><small>{tournament?fmtDate(tournament.starts_at)+' — '+fmtDate(tournament.ends_at):'O torneio semanal abre automaticamente com a primeira partida registrada.'}</small></div><span>SEMANAL</span></div>{tournamentRows.length?tournamentRows.map((x,i)=>rankRow(x.profile||{user_id:x.user_id},i,x.points,'pontos')):<p className="nc-empty">Nenhuma pontuação neste torneio ainda. Jogue para aparecer no placar!</p>}</div>}
   {!loading&&tab==='challenges'&&<div className="nc-challenges-layout"><form className="nc-panel nc-challenge-form" onSubmit={createChallenge}><div className="nc-form-title"><Swords/><div><b>Desafiar um amigo</b><small>Quem alcançar a meta primeiro vence.</small></div></div><label>Amigo<select value={challengeFriend} onChange={e=>setChallengeFriend(e.target.value)} required><option value="">Selecione um amigo</option>{friends.map(f=><option key={f.user_id} value={f.user_id}>{display(f)}</option>)}</select></label><label>Nome do desafio<input value={challengeTitle} onChange={e=>setChallengeTitle(e.target.value)} minLength={3} maxLength={60} required/></label><div className="nc-form-two"><label>Jogo<select value={challengeGame} onChange={e=>setChallengeGame(e.target.value)}>{games.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label><label>Pontuação-alvo<input type="number" min="1" max="1000000" value={challengeTarget} onChange={e=>setChallengeTarget(e.target.value)} required/></label></div><label>Prazo<input type="datetime-local" value={challengeEnd} onChange={e=>setChallengeEnd(e.target.value)} required/></label><button className="nc-primary" disabled={creating||!friends.length}><Plus size={16}/>{creating?'Enviando…':'Enviar desafio'}</button>{!friends.length&&<small className="nc-muted">Você precisa ter amigos adicionados para criar um duelo.</small>}</form>
