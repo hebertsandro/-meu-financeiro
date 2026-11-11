@@ -843,6 +843,18 @@ function App(){
   }
 
   async function adminAction(action,userId,extra={}){
+    if(action==='update_report_status'){
+      const existing=adminReports.find(report=>
+        report.report_type===extra.report_type&&String(report.id)===String(extra.report_id)
+      );
+      // A denúncia pode já estar resolvida (ex.: após atualizar a página).
+      // Não envia uma segunda atualização nem deixa a interface entrar em estado de erro.
+      if(existing&&existing.status===extra.status){
+        setAdminError('');
+        setAdminMessage(extra.status==='resolved'?'Esta denúncia já está marcada como resolvida.':'Esta denúncia já está com esse status.');
+        return;
+      }
+    }
     if(action==='delete_user'&&!window.confirm('ATENÇÃO: excluir esta conta é definitivo. Os dados vinculados também poderão ser removidos. Deseja continuar?'))return;
     if(action==='broadcast_announcement'&&!window.confirm('Enviar este comunicado para todos os usuários ativos? Essa ação não pode ser desfeita.'))return;
     if(action==='update_report_status'&&!window.confirm('Confirmar a atualização do status desta denúncia?'))return;
