@@ -234,3 +234,5 @@
 .profile-medal-count b{font-size:13px;color:#f0eaff}
 .profile-honor-chip.equipped-honor{border-color:rgba(91,220,218,.42);box-shadow:0 0 12px rgba(91,220,218,.08)}
 @media(max-width:560px){.profile-medal-loadout{grid-template-columns:1fr}.profile-medal-option{padding:10px}}
+
+.profile-medal-option.locked{filter:saturate(.45);background:rgba(12,17,30,.55);border-style:dashed}.profile-medal-option.locked>span:first-child{background:rgba(120,130,150,.1);font-size:17px}.profile-medal-option.locked strong{color:#8d96aa}
