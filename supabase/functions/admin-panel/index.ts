@@ -32,7 +32,7 @@ Deno.serve(async (req) => {
   if (authData.user.email?.toLowerCase() !== adminEmail) return respond({ error: "Acesso restrito ao administrador autorizado." }, 403);
 
   const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
-  let body: { action?: string; user_id?: string; enabled?: boolean; message?: string; suspended?: boolean };
+  let body: { action?: string; user_id?: string; enabled?: boolean; message?: string; suspended?: boolean; title?: string };
   try { body = await req.json(); } catch { return respond({ error: "Corpo da solicitação inválido." }, 400); }
 
   if (body.action === "get_maintenance") {
@@ -47,6 +47,36 @@ Deno.serve(async (req) => {
     const { error } = await admin.from("app_settings").upsert({ id: true, maintenance_mode: enabled, maintenance_message: message, updated_at: new Date().toISOString() });
     if (error) return respond({ error: "Falha ao salvar manutenção: " + error.message }, 500);
     return respond({ success: true, maintenance_mode: enabled });
+  }
+
+  if (body.action === "broadcast_announcement") {
+    const title = typeof body.title === "string" ? body.title.trim().slice(0, 80) : "";
+    const message = typeof body.message === "string" ? body.message.trim().slice(0, 500) : "";
+    if (title.length < 3 || message.length < 5) return respond({ error: "Informe um título e uma mensagem válidos." }, 400);
+
+    const recipients: string[] = [];
+    for (let page = 1; page <= 20; page++) {
+      const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+      if (error) return respond({ error: "Não foi possível consultar os destinatários." }, 500);
+      const users = data.users ?? [];
+      for (const user of users) {
+        const isBanned = !!user.banned_until && new Date(user.banned_until).getTime() > Date.now();
+        if (user.id !== authData.user.id && !isBanned) recipients.push(user.id);
+      }
+      if (users.length < 1000) break;
+      if (page === 20) return respond({ error: "A base ultrapassou o limite de segurança de 20 mil contas. Nenhum comunicado foi enviado." }, 413);
+    }
+
+    let sent = 0;
+    for (let offset = 0; offset < recipients.length; offset += 250) {
+      const rows = recipients.slice(offset, offset + 250).map((user_id) => ({
+        user_id, title, message, category: "anuncios",
+      }));
+      const { error } = await admin.from("notifications").insert(rows);
+      if (error) return respond({ error: "Falha após enviar para " + sent + " contas. Verifique antes de tentar novamente.", sent_partial: sent }, 500);
+      sent += rows.length;
+    }
+    return respond({ success: true, sent });
   }
 
   if (body.action === "list_social_profiles") {
