@@ -858,11 +858,30 @@ function App(){
       if(action==='list_users'){setAdminUsers(result.users||[]);setAdminMessage('Lista de contas atualizada.');return}
       if(action==='list_social_profiles'){setAdminSocialProfiles(result.profiles||[]);setAdminMessage('Perfis sociais atualizados.');return}
       if(action==='list_reports'){setAdminReports(result.reports||[]);setAdminMessage('Denúncias atualizadas.');return}
-      if(action==='update_report_status'||action==='delete_report'){
-        setAdminMessage(action==='delete_report'?'Denúncia apagada.':'Status da denúncia atualizado.');
-        const {data:refreshed,error:refreshError}=await supabase.functions.invoke('admin-panel',{body:{action:'list_reports'}});
-        if(refreshError||refreshed?.error)throw new Error(refreshed?.error||refreshError?.message||'A alteração foi feita, mas não foi possível atualizar a lista.');
-        setAdminReports(refreshed.reports||[]);
+      if(action==='update_report_status'){
+        const reportType=extra.report_type;
+        const reportId=String(extra.report_id||'');
+        const nextStatus=extra.status;
+        if(!reportId||!['profile','content'].includes(reportType)||!['open','reviewing','resolved','dismissed'].includes(nextStatus)){
+          throw new Error('Não foi possível identificar a denúncia ou o novo status.');
+        }
+        // Atualiza somente o cartão afetado. Evita uma segunda chamada de listagem
+        // logo após a alteração, que podia provocar falha durante a atualização da tela.
+        setAdminReports(current=>current.map(report=>
+          report.report_type===reportType&&String(report.id)===reportId
+            ? {...report,status:nextStatus}
+            : report
+        ));
+        setAdminMessage('Status da denúncia atualizado.');
+        return;
+      }
+      if(action==='delete_report'){
+        const reportType=extra.report_type;
+        const reportId=String(extra.report_id||'');
+        setAdminReports(current=>current.filter(report=>
+          !(report.report_type===reportType&&String(report.id)===reportId)
+        ));
+        setAdminMessage('Denúncia apagada.');
         return;
       }
       if(action==='moderate_social_profile'||action==='delete_social_profile'){
