@@ -75,13 +75,21 @@ declare
   fn text;
 begin
   select pg_get_functiondef('public.nexus_award_loot_drop(text,text)'::regprocedure) into fn;
-  fn:=replace(fn,'0.00002*chance_factor','0.00008*chance_factor');
-  fn:=replace(fn,'0.00008*chance_factor','0.00030*chance_factor');
-  fn:=replace(fn,'0.0003*chance_factor','0.0010*chance_factor');
-  fn:=replace(fn,'0.0015*chance_factor','0.0040*chance_factor');
-  fn:=replace(fn,'0.006*chance_factor','0.015*chance_factor');
-  fn:=replace(fn,'0.018*chance_factor','0.035*chance_factor');
-  fn:=replace(fn,'0.04*chance_factor','0.08*chance_factor');
+  -- Use temporary markers so threshold replacements cannot cascade.
+  fn:=replace(fn,'0.00002*chance_factor','__DROP_A__');
+  fn:=replace(fn,'0.00008*chance_factor','__DROP_B__');
+  fn:=replace(fn,'0.0003*chance_factor','__DROP_C__');
+  fn:=replace(fn,'0.0015*chance_factor','__DROP_D__');
+  fn:=replace(fn,'0.006*chance_factor','__DROP_E__');
+  fn:=replace(fn,'0.018*chance_factor','__DROP_F__');
+  fn:=replace(fn,'0.04*chance_factor','__DROP_G__');
+  fn:=replace(fn,'__DROP_A__','0.00008*chance_factor');
+  fn:=replace(fn,'__DROP_B__','0.00030*chance_factor');
+  fn:=replace(fn,'__DROP_C__','0.0010*chance_factor');
+  fn:=replace(fn,'__DROP_D__','0.0040*chance_factor');
+  fn:=replace(fn,'__DROP_E__','0.015*chance_factor');
+  fn:=replace(fn,'__DROP_F__','0.035*chance_factor');
+  fn:=replace(fn,'__DROP_G__','0.08*chance_factor');
   execute fn;
 end;
 $drops$;
