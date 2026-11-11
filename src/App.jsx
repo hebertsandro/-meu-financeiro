@@ -1199,7 +1199,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
     }
     if(!hit&&g.boss&&Math.abs(shot.x-g.boss.x)<18&&shot.y>=g.boss.y-3&&shot.y<=g.boss.y+17){
      g.boss.hp--;hit=true;
-     if(g.boss.hp<=0){g.score+=300+g.wave*20;g.bossesDefeated++;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');g.phase='boss-cleared';setMessage('CHEFÃO DERROTADO! Recompensa liberada!')}
+     if(g.boss.hp<=0){void Promise.resolve(onLoot?.('space-nexus','boss_kill')).then(item=>{if(item)setMessage('DROP DE CHEFÃO! '+item.icon+' '+item.item_name+' · +'+Number(item.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}).catch(()=>{});g.score+=300+g.wave*20;g.bossesDefeated++;g.drops.push({id:'boss-drop-'+n,type:['shield','rapid','double','repair'][Math.floor(Math.random()*4)],x:g.boss.x,y:g.boss.y});g.boss=null;g.enemyShots=g.enemyShots.filter(s=>s.kind!=='boss');g.phase='boss-cleared';setMessage('CHEFÃO DERROTADO! Recompensa liberada!')}
      else if(g.boss.hp===Math.ceil(g.boss.max*.5))setMessage('FASE 2! O chefão mudou seu padrão de ataque!');
     }
     if(!hit&&shot.y>0)remainingShots.push(shot);
