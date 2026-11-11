@@ -72,7 +72,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
  const myFriendRank=sortedFriends.findIndex(x=>x.user_id===userId)+1;
  const mySeasonRank=seasonRows.findIndex(x=>x.user_id===userId)+1;
  const myTournamentRank=tournamentRows.findIndex(x=>x.user_id===userId)+1;
- const myMedals=medals.reduce((n,m)=>n+Number(m.medals_count||0),0);
+ const myMedals=medals.reduce((n,m)=>n+Number(m.medals_count||0),0)+rankMedals.reduce((n,m)=>n+Number(m.medals_count||0),0);
  const display=p=>p?.display_name||p?.username||'Jogador';
  const rankRow=(p,index,score,detail='XP')=><div className={'nc-rank-row '+(p?.user_id===userId?'is-me':'')} key={p?.user_id||index}>
   <span className={'nc-rank-position rank-'+(index+1)}>{index+1<=3?['🥇','🥈','🥉'][index]:index+1}</span>
