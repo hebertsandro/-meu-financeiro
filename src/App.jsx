@@ -1156,12 +1156,12 @@ function App(){
               <span className="player-profile-rank">{gameXp>=4500?"LENDÁRIO":gameXp>=2000?"ELITE":gameXp>=1000?"VETERANO":gameXp>=500?"EXPLORADOR":"JOGADOR"}</span>
               <div className="player-profile-name-row"><h2>{playerProfile.name||"Sua jornada começa aqui"}</h2></div>
               {playerProfile.username&&<div className="player-social-identity"><b>@{playerProfile.username}</b></div>}
-              <div className="player-profile-stats profile-social-stats">
-                <div><b>{gameCorrect}</b><span>Desafios</span></div>
-                <div><b>{Math.floor(gameXp/500)+1}</b><span>Nível</span></div>
-                <div><b>{(playerProfile.gems||[]).length}</b><span>Joias</span></div>
-              </div>
             </div>
+          </div>
+          <div className="player-profile-stats profile-social-stats">
+            <div><b>{gameCorrect}</b><span>Desafios concluídos</span></div>
+            <div><b>{Math.floor(gameXp/500)+1}</b><span>Nível atual</span></div>
+            <div><b>{(playerProfile.gems||[]).length}</b><span>Joias equipadas</span></div>
           </div>
           {playerProfile.bio&&<p className="player-social-bio profile-social-bio">{playerProfile.bio}</p>}
           {playerProfile.clan&&<div className="player-clan-badge">{playerProfile.clan.clan_emblem} {playerProfile.clan.clan_name} [{playerProfile.clan.clan_tag}] · {playerProfile.clan.clan_role==='leader'?'ADM':playerProfile.clan.clan_role==='officer'?'OFICIAL':'MEMBRO'}</div>}
@@ -1171,8 +1171,10 @@ function App(){
             {profileRankMedals.filter(m=>profileEquippedMedals.includes('rank:'+m.medal_key)).map(m=><span className="profile-honor-chip equipped-honor" key={'inline-r-'+m.medal_key}>🏆 {({'global-season':'Campeão global','weekly-tournament':'Campeão semanal','friends-weekly':'Campeão dos amigos'})[m.medal_key]||'Campeão'} ×{Number(m.medals_count||0)}</span>)}
             {!isAdmin&&!profileMedalsLoading&&!profileGameMedals.length&&!profileRankMedals.length&&<span className="profile-honor-empty-inline">Suas medalhas de competição aparecerão aqui.</span>}
           </div>
-          <div className="profile-xp-progress"><div><b>{gameXp} XP</b><span>NÍVEL {Math.floor(gameXp/500)+1} · {gameXp%500}/500 XP para o próximo nível</span></div><div className="player-xp-track"><i style={{width:((gameXp%500)/500*100)+'%'}}/></div></div>
-          <div className="profile-social-edit-row"><button type="button" onClick={()=>setProfileEditorOpen(true)}><Pencil size={15}/> Editar perfil</button><span>Seu espaço · suas conquistas</span></div>
+          <div className="profile-xp-progress">
+            <div className="profile-xp-copy"><b>{gameXp} XP</b><span>Nível {Math.floor(gameXp/500)+1} · {gameXp%500}/500 XP para o próximo nível</span></div>
+            <div className="player-xp-track"><i style={{width:((gameXp%500)/500*100)+'%'}}/></div>
+          </div>
         </div>
         <PlayerPostGrid userId={session?.user?.id} displayName={playerProfile.name||'jogador'}/>
         </>}
