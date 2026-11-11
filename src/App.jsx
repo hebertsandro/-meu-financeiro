@@ -1148,7 +1148,6 @@ function App(){
 {page==='profile'&&<ProfileRenderBoundary><section className="opportunities-page gamer-world player-profile-page">
         {!profileEditorOpen&&<>
         <div className={`game-world-hero player-card-frame frame-${playerProfile.cardFrame||"cyan"} ${playerProfile.gems?.length===4?"frame-chromatic":""} ${gameXp>=4500?"level-legendary":gameXp>=2000?"level-elite":gameXp>=1000?"level-avatar":gameXp>=500?"level-neon":""}`}>
-          <div className={`frame-gem-ornament ornament-${playerProfile.cardFrame||"cyan"}`} aria-hidden="true">{(playerProfile.gems||[]).map(id=><i key={id} className={`gemstone gem-${id}`}/>)}</div>
           <div className="game-world-top player-profile-topline"><span className="world-label"><span className="live-pulse"/> NEXUS PLAYER</span><button type="button" className="player-profile-edit-pencil" onClick={()=>setProfileEditorOpen(true)} aria-label="Editar perfil oficial" title="Editar perfil"><Pencil size={16}/><span>Editar perfil</span></button></div>
           <div className="player-identity player-social-identity-layout">
             <div className={`player-avatar profile-big-avatar frame-${playerProfile.frame} ${(playerProfile.gems||[]).length===4?"frame-chromatic":""}`}><span>{playerProfile.avatar}</span><i><Zap size={12}/></i></div>
@@ -1174,6 +1173,7 @@ function App(){
           <div className="profile-xp-progress">
             <div className="profile-xp-copy"><b>{gameXp} XP</b><span>Nível {Math.floor(gameXp/500)+1} · {gameXp%500}/500 XP para o próximo nível</span></div>
             <div className="player-xp-track"><i style={{width:((gameXp%500)/500*100)+'%'}}/></div>
+            {(playerProfile.gems||[]).length>0&&<div className="profile-xp-gems" aria-label="Joias equipadas">{(playerProfile.gems||[]).map(id=><i key={id} className={`gemstone gem-${id}`}/>)}</div>}
           </div>
         </div>
         <PlayerPostGrid userId={session?.user?.id} displayName={playerProfile.name||'jogador'}/>
