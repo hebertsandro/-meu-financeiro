@@ -898,3 +898,43 @@
 
 /* Keep the profile heading below the fixed mobile app bar */
 @media(max-width:760px){.player-profile-page{padding-top:70px!important}}
+
+
+/* FINAL MOBILE GAP FIX — prevent flex distribution from stretching the profile sections */
+@media(max-width:760px){
+  .player-profile-page .game-world-hero{
+    display:flex!important;
+    flex-direction:column!important;
+    justify-content:flex-start!important;
+    align-content:flex-start!important;
+    align-items:stretch!important;
+    gap:0!important;
+    height:auto!important;
+    min-height:0!important;
+    max-height:none!important;
+  }
+  .player-profile-page .game-world-hero > .player-profile-topline,
+  .player-profile-page .game-world-hero > .player-social-identity-layout,
+  .player-profile-page .game-world-hero > .profile-social-stats,
+  .player-profile-page .game-world-hero > .profile-social-bio,
+  .player-profile-page .game-world-hero > .player-clan-badge,
+  .player-profile-page .game-world-hero > .profile-honors-inline,
+  .player-profile-page .game-world-hero > .profile-xp-progress{
+    flex:0 0 auto!important;
+    align-self:stretch!important;
+    position:relative!important;
+    inset:auto!important;
+  }
+  .player-profile-page .game-world-hero > .profile-social-stats{
+    margin-top:0!important;
+    margin-bottom:13px!important;
+  }
+  .player-profile-page .game-world-hero > .profile-social-bio{
+    margin-top:0!important;
+    margin-bottom:12px!important;
+  }
+  .player-profile-page .game-world-hero > .profile-honors-inline{
+    margin-top:0!important;
+    margin-bottom:12px!important;
+  }
+}
