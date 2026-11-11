@@ -1232,7 +1232,7 @@ function SpaceNexusGame({onReward,onMatch}){
    if(tookHit){if(g.shield){g.shield=false;setShieldActive(false);setMessage('Escudo absorveu o impacto!')}else{g.lives=Math.max(0,g.lives-1);setMessage('A nave foi atingida! -1 vida. Desvie!')}}
    if(g.lives<=0){g.phase='finished';setScore(g.score);setLives(0);setShots([]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(null);finish(false,g);return}
    if(g.phase==='boss-cleared'){
-    g.phase='wave';g.wave++;g.spawned=0;g.killed=0;setWave(g.wave);setMessage('ONDA '+g.wave+' — inimigos mais velozes e resistentes!');
+    g.phase='wave';g.wave++;g.spawned=0;g.killed=0;if(g.wave>cfg.waves){g.phase='finished';finish(true,g);return}setWave(g.wave);setMessage('ONDA '+g.wave+' — inimigos mais velozes e resistentes!');
    }else if(!bossWave&&g.spawned>=waveTarget&&g.foes.length===0){
     g.wave++;g.spawned=0;g.killed=0;
     if(g.wave>cfg.waves){g.phase='finished';finish(true,g);return}
