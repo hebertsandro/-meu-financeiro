@@ -953,7 +953,7 @@ function App(){
   if(cardUsed>0)suggestions.push(`Você registrou ${brl(cardUsed)} como valor utilizado nos cartões. Confira os limites antes de novas compras.`);
   if(!suggestions.length)suggestions.push('Registre suas entradas e gastos para receber dicas financeiras baseadas nos seus próprios dados.');
   const onboardingSteps=[
-    {eyebrow:'BOAS-VINDAS',title:'Seu espaço, sem complicação',body:'Este tour mostra onde encontrar o essencial. Você pode pular agora e rever o tutorial quando quiser.',page:'overview',icon:Wallet,tip:'A Visão geral reúne seu saldo, entradas, saídas e próximos compromissos.'},
+    {eyebrow:'BOAS-VINDAS',title:'Seu espaço, sem complicação',body:'Este tour mostra onde encontrar o essencial. Você pode pular a qualquer momento e continuar usando o app normalmente.',page:'overview',icon:Wallet,tip:'A Visão geral reúne seu saldo, entradas, saídas e próximos compromissos.'},
     {eyebrow:'PASSO 1 DE 5',title:'Registre o que entra e sai',body:'Adicione salário, mesada, vendas e gastos. Assim o painel calcula seu saldo e mostra para onde o dinheiro está indo.',page:'transactions',icon:Activity,tip:'Use “Nova movimentação” para registrar sua primeira entrada ou despesa.'},
     {eyebrow:'PASSO 2 DE 5',title:'Organize cartões e parcelas',body:'Cadastre cartões, limites, vencimentos, compras parceladas e assinaturas para acompanhar seus compromissos.',page:'cards',icon:CreditCard,tip:'Você pode começar sem cartão e cadastrar depois.'},
     {eyebrow:'PASSO 3 DE 5',title:'Crie metas possíveis',body:'Defina um objetivo, quanto quer juntar e acompanhe seu progresso. Pequenos passos também contam.',page:'planning',icon:Target,tip:'Exemplo: guardar R$ 20 por semana para uma compra ou reserva.'},
