@@ -1321,7 +1321,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
  };
  useEffect(()=>{
   if(!running)return;
-  let raf=0,last=0,accumulator=0;const frame=(timestamp)=>{raf=requestAnimationFrame(frame);if(!last)last=timestamp;accumulator+=Math.min(100,timestamp-last);last=timestamp;let steps=0;while(accumulator>=1000/120&&steps<8){accumulator-=1000/120;steps++;
+  let raf=0,last=0,accumulator=0;const STEP=1000/120;const frame=(timestamp)=>{raf=requestAnimationFrame(frame);if(!last)last=timestamp;const elapsed=Math.min(50,Math.max(0,timestamp-last));last=timestamp;accumulator=Math.min(STEP*4,accumulator+elapsed);let steps=0;while(accumulator>=STEP&&steps<4){accumulator-=1000/120;steps++;
    const g=game.current;if(!g||g.phase==='finished')return;
    g.tick++;const n=g.tick,cfg=modes[g.mode],w=g.wave;
    const fireRate=Math.max(14,Math.round((17*cfg.fire-Math.floor(w/5))*2));
@@ -1419,7 +1419,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
     if(g.wave>cfg.waves){g.phase='finished';finish(true,g);return}
     setWave(g.wave);setMessage('ONDA '+g.wave+' — a ameaça está evoluindo!');
    }
-   if(n%2===0){setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
+   if(n%4===0){setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
   }
   };
   raf=requestAnimationFrame(frame);
