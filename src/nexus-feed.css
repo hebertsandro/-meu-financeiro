@@ -284,7 +284,7 @@
 .nexus-feed .nxf-photo-carousel{position:relative;width:100%;overflow:hidden;background:#090a10}
 .nexus-feed .nxf-photo-track{display:flex;width:100%;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scrollbar-width:none;-webkit-overflow-scrolling:touch}
 .nexus-feed .nxf-photo-track::-webkit-scrollbar{display:none}
-.nexus-feed .nxf-photo-track img{display:block;flex:0 0 100%;width:100%;max-height:640px;aspect-ratio:1/1;object-fit:cover;scroll-snap-align:start;user-select:none;-webkit-user-drag:none}
+.nexus-feed .nxf-photo-track img{display:block;box-sizing:border-box;flex:0 0 100%;min-width:100%;width:100%;height:auto;max-height:640px;aspect-ratio:1/1;object-fit:cover;scroll-snap-align:start;user-select:none;-webkit-user-drag:none}
 .nexus-feed .nxf-photo-arrow{position:absolute;top:50%;z-index:2;display:grid;place-items:center;width:36px;height:36px;transform:translateY(-50%);border:1px solid #ffffff38;border-radius:50%;background:#090a10a8;color:#fff;backdrop-filter:blur(8px)}
 .nexus-feed .nxf-photo-arrow:disabled{opacity:0;pointer-events:none}
 .nexus-feed .nxf-photo-arrow.prev{left:12px}

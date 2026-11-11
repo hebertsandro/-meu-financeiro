@@ -10,11 +10,11 @@ const initials=name=>String(name||'NX').trim().split(/\s+/).slice(0,2).map(x=>x[
 const profileName=p=>p?.display_name||p?.username||'Jogador';
 function PostImageCarousel({images,onDoubleTap}) {
  const [active,setActive]=useState(0), track=useRef(null);
- const move=index=>{const next=Math.max(0,Math.min(images.length-1,index));setActive(next);track.current?.children?.[next]?.scrollIntoView({behavior:'smooth',block:'nearest',inline:'start'});};
+ const move=index=>{const next=Math.max(0,Math.min(images.length-1,index));setActive(next);const el=track.current;if(el)el.scrollTo({left:next*el.clientWidth,behavior:'smooth'});};
  if(!images?.length)return null;
  return <div className="nxf-photo-carousel">
-  <div className="nxf-photo-track" ref={track} onScroll={e=>{const el=e.currentTarget;const w=el.clientWidth||1;setActive(Math.round(el.scrollLeft/w));}}>
-   {images.map((src,i)=><img key={i} src={src} alt={images.length>1?'Foto '+(i+1)+' da publicação':'Imagem da publicação'} loading="lazy" onDoubleClick={onDoubleTap} onTouchEnd={onDoubleTap}/>)}
+  <div className="nxf-photo-track" ref={track} onScroll={e=>{const el=e.currentTarget;const w=el.clientWidth||1;setActive(Math.max(0,Math.min(images.length-1,Math.round(el.scrollLeft/w))));}}>
+   {images.map((src,i)=><img key={i} src={src} alt={images.length>1?'Foto '+(i+1)+' da publicação':'Imagem da publicação'} loading="eager" decoding="async" fetchPriority={i===0?'high':'auto'} draggable="false" onDoubleClick={onDoubleTap} onTouchEnd={onDoubleTap} onError={e=>{e.currentTarget.dataset.loadError='true';}}/>)}
   </div>
   {images.length>1&&<><button type="button" className="nxf-photo-arrow prev" onClick={()=>move(active-1)} aria-label="Foto anterior" disabled={active===0}><ChevronLeft size={20}/></button><button type="button" className="nxf-photo-arrow next" onClick={()=>move(active+1)} aria-label="Próxima foto" disabled={active===images.length-1}><ChevronLeft size={20}/></button><span className="nxf-photo-count">{active+1}/{images.length}</span><div className="nxf-photo-dots">{images.map((_,i)=><button type="button" key={i} className={i===active?'active':''} onClick={()=>move(i)} aria-label={'Ir para foto '+(i+1)}/>)}</div></>}
  </div>;
