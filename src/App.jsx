@@ -567,6 +567,8 @@ function App(){
   const [adminTab,setAdminTab]=useState('overview');
   const [adminUserSearch,setAdminUserSearch]=useState('');
   const [adminSocialSearch,setAdminSocialSearch]=useState('');
+  const [adminAnnouncementTitle,setAdminAnnouncementTitle]=useState('');
+  const [adminAnnouncementBody,setAdminAnnouncementBody]=useState('');
   const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);
   const [assistantOpen,setAssistantOpen]=useState(false);
   const [assistantInput,setAssistantInput]=useState('');
@@ -812,6 +814,7 @@ function App(){
 
   async function adminAction(action,userId,extra={}){
     if(action==='delete_user'&&!window.confirm('ATENÇÃO: excluir esta conta é definitivo. Os dados vinculados também poderão ser removidos. Deseja continuar?'))return;
+    if(action==='broadcast_announcement'&&!window.confirm('Enviar este comunicado para todos os usuários ativos? Essa ação não pode ser desfeita.'))return;
     setAdminBusy(true);setAdminError('');setAdminMessage('');
     const {data:result,error}=await supabase.functions.invoke('admin-panel',{body:{action,user_id:userId,...extra}});
     setAdminBusy(false);
@@ -821,6 +824,7 @@ function App(){
      if(action==='moderate_social_profile'||action==='delete_social_profile'){setAdminMessage(action==='delete_social_profile'?'Perfil social removido.':extra.suspended?'Perfil social suspenso.':'Perfil social reativado.');await adminAction('list_social_profiles');return}
     if(action==='get_maintenance'){setMaintenance(!!result.settings?.maintenance_mode);setMaintenanceMessage(result.settings?.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.');return}
     if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
+    if(action==='broadcast_announcement'){setAdminMessage('Comunicado enviado para '+Number(result.sent||0)+' contas ativas.');setAdminAnnouncementTitle('');setAdminAnnouncementBody('');return}
     if(action==='reset_password'){setAdminMessage('Link de redefinição gerado: '+(result.action_link||'Confira o e-mail do usuário.'));return}
     setAdminMessage(action==='ban_user'?'Conta bloqueada.':action==='unban_user'?'Conta desbloqueada.':'Conta excluída definitivamente.');
     await adminAction('list_users');
@@ -966,11 +970,12 @@ function App(){
           <div className="admin-stat"><span><Gamepad2 size={17}/> MODO DE TESTE</span><b>{adminTestMode?'Ativado':'Desativado'}</b><small>Somente neste navegador</small></div>
         </div>
         <nav className="admin-tabs" aria-label="Seções administrativas">
-          {[['overview','Visão geral',LayoutDashboard],['users','Usuários',Users],['social','NEXUS Social',MessageCircle],['operations','Operações e segurança',ShieldCheck]].map(([key,label,Icon])=><button type="button" key={key} className={adminTab===key?'active':''} onClick={()=>setAdminTab(key)}><Icon size={16}/>{label}</button>)}
+          {[['overview','Visão geral',LayoutDashboard],['users','Usuários',Users],['social','NEXUS Social',MessageCircle],['announcements','Comunicados',Newspaper],['operations','Operações e segurança',ShieldCheck]].map(([key,label,Icon])=><button type="button" key={key} className={adminTab===key?'active':''} onClick={()=>setAdminTab(key)}><Icon size={16}/>{label}</button>)}
         </nav>
         {adminTab==='overview'&&<div className="admin-section-grid">
           <button className="admin-action-tile" onClick={()=>setAdminTab('users')}><span className="admin-tile-icon"><Users size={20}/></span><b>Gerenciar usuários</b><small>Bloqueio, recuperação de acesso e exclusão com confirmação.</small><em>Abrir gerenciamento <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>{setAdminTab('social');if(!adminSocialProfiles.length)adminAction('list_social_profiles')}}><span className="admin-tile-icon purple"><MessageCircle size={20}/></span><b>Moderação social</b><small>Revise perfis públicos e suspenda contas que violem as regras.</small><em>Moderar comunidade <ChevronRight size={15}/></em></button>
+          <button className="admin-action-tile" onClick={()=>setAdminTab('announcements')}><span className="admin-tile-icon purple"><Newspaper size={20}/></span><b>Central de comunicados</b><small>Envie avisos importantes para todos os usuários ativos.</small><em>Criar comunicado <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>setAdminTab('operations')}><span className="admin-tile-icon green"><SlidersHorizontal size={20}/></span><b>Operações do site</b><small>Manutenção, aviso aos usuários e ferramentas de teste.</small><em>Configurar operações <ChevronRight size={15}/></em></button>
         </div>}
         {adminTab==='users'&&<div className="admin-section">
@@ -984,6 +989,19 @@ function App(){
           <label className="admin-search"><Search size={17}/><input value={adminSocialSearch} onChange={e=>setAdminSocialSearch(e.target.value)} placeholder="Buscar por nome, @ ou e-mail"/></label>
           {!adminSocialProfiles.length?<Empty icon={Users} title="Perfis ainda não carregados" text="Atualize para consultar os perfis da comunidade."/>:<div className="admin-record-list">{adminSocialProfiles.filter(p=>[p.display_name,p.username,p.email].some(v=>String(v||'').toLowerCase().includes(adminSocialSearch.toLowerCase()))).map(p=><div className="admin-record" key={p.user_id}><div className="admin-record-avatar social">{p.avatar||'👾'}</div><div className="admin-record-main"><b>{p.display_name} · @{p.username}</b><span>{p.email||p.user_id}</span>{p.bio&&<small>{p.bio}</small>}<small className={p.is_suspended?'admin-danger-text':'admin-good-text'}>{p.is_suspended?'Perfil suspenso':'Perfil visível na comunidade'}</small></div><div className="admin-record-actions"><button className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('moderate_social_profile',p.user_id,{suspended:!p.is_suspended})}>{p.is_suspended?<><UserCheck size={15}/> Reativar</>:<><Ban size={15}/> Suspender</>}</button><button className="delete-btn danger" disabled={adminBusy} onClick={()=>{if(window.confirm('Remover somente o perfil social de @'+p.username+'? A conta e os dados financeiros serão mantidos.'))adminAction('delete_social_profile',p.user_id)}}><X size={15}/> Remover perfil</button></div></div>)}</div>}
           <p className="admin-note"><ShieldCheck size={15}/> Suspender oculta o perfil público. Remover perfil social não apaga a conta nem os dados financeiros.</p>
+        </div>}
+        {adminTab==='announcements'&&<div className="admin-section">
+          <div className="admin-section-heading"><div><h3>Central de comunicados</h3><p>Publique avisos importantes diretamente na área de notificações dos usuários ativos.</p></div><span className="admin-secure-pill"><ShieldCheck size={14}/> Envio administrativo</span></div>
+          <div className="admin-announcement-preview"><span><Newspaper size={17}/> PRÉVIA DO COMUNICADO</span><b>{adminAnnouncementTitle.trim()||'Título do aviso'}</b><p>{adminAnnouncementBody.trim()||'A mensagem aparecerá aqui antes de ser enviada.'}</p><small>MEU FINANCEIRO · COMUNICADO OFICIAL</small></div>
+          <div className="admin-announcement-form">
+            <label className="field-label" htmlFor="admin-announcement-title">Título do comunicado</label>
+            <input id="admin-announcement-title" value={adminAnnouncementTitle} maxLength={80} onChange={e=>setAdminAnnouncementTitle(e.target.value)} placeholder="Ex.: Novidade no NEXUS Social"/>
+            <div className="admin-announcement-counter">{adminAnnouncementTitle.length}/80</div>
+            <label className="field-label" htmlFor="admin-announcement-body">Mensagem</label>
+            <textarea id="admin-announcement-body" value={adminAnnouncementBody} maxLength={500} onChange={e=>setAdminAnnouncementBody(e.target.value)} placeholder="Escreva um aviso claro e objetivo para a comunidade."/>
+            <div className="admin-announcement-counter">{adminAnnouncementBody.length}/500</div>
+            <div className="admin-operation-foot"><small>O comunicado será salvo no histórico de notificações de cada conta ativa. Não envia e-mail nem push.</small><button className="primary" disabled={adminBusy||adminAnnouncementTitle.trim().length<3||adminAnnouncementBody.trim().length<5} onClick={()=>adminAction('broadcast_announcement',null,{title:adminAnnouncementTitle.trim(),message:adminAnnouncementBody.trim()})}><Send size={15}/> Enviar para usuários ativos</button></div>
+          </div>
         </div>}
         {adminTab==='operations'&&<div className="admin-section">
           <div className="admin-section-heading"><div><h3>Operações e segurança</h3><p>Ferramentas administrativas que afetam a disponibilidade e a experiência do site.</p></div><span className="admin-secure-pill"><ShieldCheck size={14}/> Acesso restrito</span></div>
