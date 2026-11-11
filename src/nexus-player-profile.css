@@ -979,3 +979,24 @@
   }
   .player-profile-page .profile-honor-chip{position:static!important;transform:none!important}
 }
+
+
+/* Lower the identity block slightly so avatar/name align with the content below */
+@media(max-width:760px){
+  .player-profile-page .game-world-hero .player-social-identity-layout{
+    margin-top:12px!important;margin-bottom:5px!important;
+  }
+  .player-profile-page .game-world-hero .profile-big-avatar,
+  .player-profile-page .game-world-hero .player-info{
+    transform:translateY(10px)!important;
+  }
+}
+@media(max-width:390px){
+  .player-profile-page .game-world-hero .player-social-identity-layout{
+    margin-top:10px!important;margin-bottom:5px!important;
+  }
+  .player-profile-page .game-world-hero .profile-big-avatar,
+  .player-profile-page .game-world-hero .player-info{
+    transform:translateY(8px)!important;
+  }
+}
