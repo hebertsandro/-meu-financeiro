@@ -1451,7 +1451,7 @@ function FinanceFlapGame({onReward,onMatch,onLoot}){
  function begin(){const s=stateRef.current;s.pigY=190;s.velocity=0;s.obstacles=[{x:360,gapY:145,passed:false}];s.items=[];s.shield=0;s.shieldFlash=0;s.slow=0;s.frame=0;s.spawnTimer=0;s.score=0;s.rewarded=false;s.xpEarned=0;s.passedObstacles=0;setScore(0);setStatus('playing')}
  function flap(){if(status==='ready'||status==='over'||status==='won'){begin();return}if(status==='playing')stateRef.current.velocity=-6.2}
  function backToModes(){setStatus('choose');setMode(null)}
- useEffect(()=>{if(status!=='playing'||!mode)return;const canvas=canvasRef.current,ctx=canvas?.getContext('2d');if(!ctx)return;let raf,lastFrame=0;const W=320,H=420;
+ useEffect(()=>{if(status!=='playing'||!mode)return;const canvas=canvasRef.current,ctx=canvas?.getContext('2d',{alpha:false,desynchronized:true});if(!ctx)return;let raf,lastFrame=0;const W=320,H=420;
  const roundRect=(x,y,w,h,r)=>{ctx.beginPath();ctx.roundRect(x,y,w,h,r)};
  const drawPig=(y,velocity,frame)=>{
   ctx.save();ctx.translate(67,y);ctx.rotate(Math.max(-.38,Math.min(.62,velocity*.045)));
@@ -1490,7 +1490,7 @@ function FinanceFlapGame({onReward,onMatch,onLoot}){
   const bg=ctx.createLinearGradient(0,0,W,H);bg.addColorStop(0,'#15234a');bg.addColorStop(.55,'#101b39');bg.addColorStop(1,'#091327');ctx.fillStyle=bg;ctx.fillRect(0,0,W,H);
   // céu em camadas, estrelas cintilantes e partículas de profundidade
   const glow=ctx.createRadialGradient(245,82,8,245,82,190);glow.addColorStop(0,'#6256a855');glow.addColorStop(1,'#6256a800');ctx.fillStyle=glow;ctx.fillRect(0,0,W,H);
-  for(let i=0;i<34;i++){const x=(i*47+s.frame*(speed*.09*(i%2?1:.45)))%W,y=(i*73)%H;const twinkle=.55+Math.sin(s.frame*.07+i)*.35;ctx.globalAlpha=twinkle;ctx.fillStyle=i%3===0?'#d6caff':'#9deaff';ctx.beginPath();ctx.arc(x,y,i%5===0?1.8:1,0,Math.PI*2);ctx.fill();if(i%8===0){ctx.strokeStyle='#d6caff';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(x-4,y);ctx.lineTo(x+4,y);ctx.moveTo(x,y-4);ctx.lineTo(x,y+4);ctx.stroke()}}ctx.globalAlpha=1;
+  for(let i=0;i<26;i++){const x=(i*47+s.frame*(speed*.09*(i%2?1:.45)))%W,y=(i*73)%H;const twinkle=.55+Math.sin(s.frame*.07+i)*.35;ctx.globalAlpha=twinkle;ctx.fillStyle=i%3===0?'#d6caff':'#9deaff';ctx.beginPath();ctx.arc(x,y,i%5===0?1.8:1,0,Math.PI*2);ctx.fill();if(i%8===0){ctx.strokeStyle='#d6caff';ctx.lineWidth=.7;ctx.beginPath();ctx.moveTo(x-4,y);ctx.lineTo(x+4,y);ctx.moveTo(x,y-4);ctx.lineTo(x,y+4);ctx.stroke()}}ctx.globalAlpha=1;
   ctx.save();ctx.globalAlpha=.13;ctx.fillStyle='#8e9eff';for(let i=0;i<4;i++){const x=(i*105-s.frame*.25+W*2)%W;ctx.beginPath();ctx.ellipse(x,75+i*87,34,9,0,0,Math.PI*2);ctx.fill()}ctx.restore();
   // cofres dourados com moldura, rebites e placas ornamentais — versão corrigida
   s.obstacles.forEach(o=>{
