@@ -356,3 +356,115 @@
   .player-profile-page .profile-social-edit-row button{min-height:36px!important;font-size:11px!important}
   .player-profile-page .profile-social-edit-row>span{font-size:9px!important}
 }
+
+
+/* Editor do perfil NEXUS — organização inspirada em redes sociais */
+.player-profile-page .profile-editor-social{
+  margin:0!important;padding:0!important;overflow:hidden!important;
+  border:1px solid rgba(155,143,205,.16)!important;border-radius:20px!important;
+  background:#10131c!important;
+}
+.player-profile-page .profile-edit-topbar{
+  min-height:66px;display:grid;grid-template-columns:44px 1fr 76px;
+  align-items:center;gap:8px;padding:0 13px;
+  border-bottom:1px solid rgba(255,255,255,.09);
+  background:rgba(9,12,20,.92);
+}
+.player-profile-page .profile-edit-topbar h3{
+  margin:0!important;text-align:center!important;font-size:19px!important;
+  font-weight:800!important;color:#f5f4fb!important;
+}
+.player-profile-page .profile-edit-topbar button{
+  min-width:38px;min-height:38px;border:0;background:transparent;
+  color:#9e8cff;font-size:13px;font-weight:800;cursor:pointer;
+}
+.player-profile-page .profile-edit-topbar button:first-child{
+  color:#e8e7f0;font-size:35px;font-weight:300;line-height:1;
+}
+.player-profile-page .profile-edit-topbar button:last-child{text-align:right}
+.player-profile-page .profile-edit-photo{
+  min-height:205px;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:13px;padding:24px 16px 20px;
+  border-bottom:1px solid rgba(255,255,255,.08);
+}
+.player-profile-page .profile-edit-current-avatar{
+  position:relative;width:112px;height:112px;border-radius:50%;
+  display:grid;place-items:center;border:2px solid rgba(155,132,255,.65);
+  background:radial-gradient(circle at 30% 20%,#51458c,#1d2340 65%,#101725);
+  box-shadow:0 0 0 5px rgba(140,111,255,.08),0 10px 32px rgba(0,0,0,.28);
+  cursor:pointer;
+}
+.player-profile-page .profile-edit-current-avatar>span{font-size:53px;line-height:1}
+.player-profile-page .profile-edit-current-avatar>i{
+  position:absolute;right:-2px;bottom:2px;width:30px;height:30px;
+  display:grid;place-items:center;border-radius:50%;border:2px solid #10131c;
+  background:#8d78f4;color:white;font-style:normal;
+}
+.player-profile-page .profile-edit-photo-action{
+  border:0;background:transparent;color:#9b9cff;font-size:15px;
+  font-weight:800;cursor:pointer;
+}
+.player-profile-page .profile-edit-fields{padding:0 17px}
+.player-profile-page .profile-edit-row{
+  display:grid;grid-template-columns:112px minmax(0,1fr);gap:12px;
+  align-items:start;padding:17px 0;border-bottom:1px solid rgba(255,255,255,.075);
+}
+.player-profile-page .profile-edit-row>label{
+  padding-top:9px;color:#e6e6ef;font-size:15px;font-weight:500;
+}
+.player-profile-page .profile-edit-row>div{min-width:0}
+.player-profile-page .profile-edit-row input,
+.player-profile-page .profile-edit-row textarea{
+  width:100%;min-width:0;padding:8px 1px;border:0!important;border-radius:0!important;
+  outline:none!important;background:transparent!important;box-shadow:none!important;
+  color:#f4f2ff!important;font-size:15px!important;
+}
+.player-profile-page .profile-edit-row input:focus,
+.player-profile-page .profile-edit-row textarea:focus{border:0!important;box-shadow:none!important}
+.player-profile-page .profile-edit-row textarea{resize:vertical;min-height:76px;line-height:1.45}
+.player-profile-page .profile-edit-row .profile-username-label{
+  display:flex;align-items:center;gap:5px;color:#a8a2c2;font-size:15px;
+}
+.player-profile-page .profile-edit-row .profile-username-label input{font-size:15px!important}
+.player-profile-page .profile-edit-inline-action{
+  display:flex;align-items:center;justify-content:space-between;gap:8px;margin-top:6px;
+}
+.player-profile-page .profile-edit-inline-action small{
+  color:#9294a8;font-size:10px;line-height:1.35;
+}
+.player-profile-page .profile-edit-inline-action .primary{
+  flex:0 0 auto;padding:7px 11px!important;border-radius:9px!important;
+  font-size:11px!important;
+}
+.player-profile-page .profile-edit-shortcuts{
+  display:grid;margin:0;padding:0 17px;
+}
+.player-profile-page .profile-edit-shortcuts button{
+  display:flex;align-items:center;justify-content:space-between;gap:12px;
+  min-height:65px;padding:12px 0;border:0;border-bottom:1px solid rgba(255,255,255,.075);
+  background:transparent;color:#e9e8f1;text-align:left;cursor:pointer;
+}
+.player-profile-page .profile-edit-shortcuts button>span{display:grid;gap:4px}
+.player-profile-page .profile-edit-shortcuts b{font-size:14px;font-weight:600}
+.player-profile-page .profile-edit-shortcuts small{font-size:11px;color:#999daf}
+.player-profile-page .profile-edit-shortcuts svg{color:#9299ad}
+.player-profile-page .profile-editor-social>.profile-choice-group{
+  margin:0 17px!important;padding:19px 0!important;
+  border-top:0!important;border-bottom:1px solid rgba(255,255,255,.075);
+}
+.player-profile-page .profile-editor-social>.profile-choice-group>b{font-size:14px}
+.player-profile-page .profile-editor-social .profile-avatar-choices{margin-top:12px}
+.player-profile-page .profile-editor-social .profile-medal-loadout-group{border-bottom:0}
+@media(max-width:640px){
+  .player-profile-page .profile-editor-social{border-radius:0!important;margin:0 -2px!important}
+  .player-profile-page .profile-edit-topbar{min-height:64px;padding:0 12px}
+  .player-profile-page .profile-edit-photo{min-height:190px}
+  .player-profile-page .profile-edit-current-avatar{width:104px;height:104px}
+  .player-profile-page .profile-edit-fields{padding:0 14px}
+  .player-profile-page .profile-edit-row{grid-template-columns:94px minmax(0,1fr);gap:9px;padding:15px 0}
+  .player-profile-page .profile-edit-row>label{font-size:14px}
+  .player-profile-page .profile-edit-row input,.player-profile-page .profile-edit-row textarea{font-size:14px!important}
+  .player-profile-page .profile-edit-inline-action{align-items:flex-start;flex-direction:column}
+  .player-profile-page .profile-edit-inline-action .primary{align-self:flex-end}
+  .player-profile-page .profile-edit-shortcuts{padding:0 14px}
+}
