@@ -70,7 +70,7 @@ Deno.serve(async (req) => {
     let sent = 0;
     for (let offset = 0; offset < recipients.length; offset += 250) {
       const rows = recipients.slice(offset, offset + 250).map((user_id) => ({
-        user_id, title, message, category: "anuncios",
+        user_id, title, message, category: "geral",
       }));
       const { error } = await admin.from("notifications").insert(rows);
       if (error) return respond({ error: "Falha após enviar para " + sent + " contas. Verifique antes de tentar novamente.", sent_partial: sent }, 500);
