@@ -848,21 +848,42 @@ function App(){
     if(action==='update_report_status'&&!window.confirm('Confirmar a atualização do status desta denúncia?'))return;
     if(action==='delete_report'&&!window.confirm('Apagar esta denúncia permanentemente? Esta ação não pode ser desfeita.'))return;
     setAdminBusy(true);setAdminError('');setAdminMessage('');
-    const {data:result,error}=await supabase.functions.invoke('admin-panel',{body:{action,user_id:userId,...extra}});
-    setAdminBusy(false);
-    if(error||result?.error){let detail=result?.error||error?.message||'Falha sem detalhes retornados.';try{const ctx=error?.context;if(ctx&&typeof ctx.clone==='function'){const payload=await ctx.clone().json();detail=payload?.error||payload?.message||detail}}catch{}setAdminError(detail);return}
-    if(action==='list_users'){setAdminUsers(result.users||[]);setAdminMessage('Lista de contas atualizada.');return}
-     if(action==='list_social_profiles'){setAdminSocialProfiles(result.profiles||[]);setAdminMessage('Perfis sociais atualizados.');return}
-     if(action==='list_reports'){setAdminReports(result.reports||[]);setAdminMessage('Denúncias atualizadas.');return}
-     if(action==='update_report_status'){setAdminMessage('Status da denúncia atualizado.');await adminAction('list_reports');return}
-     if(action==='delete_report'){setAdminMessage('Denúncia apagada.');await adminAction('list_reports');return}
-     if(action==='moderate_social_profile'||action==='delete_social_profile'){setAdminMessage(action==='delete_social_profile'?'Perfil social removido.':extra.suspended?'Perfil social suspenso.':'Perfil social reativado.');await adminAction('list_social_profiles');return}
-    if(action==='get_maintenance'){setMaintenance(!!result.settings?.maintenance_mode);setMaintenanceMessage(result.settings?.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.');return}
-    if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
-    if(action==='broadcast_announcement'){setAdminMessage('Comunicado enviado para '+Number(result.sent||0)+' contas ativas.');setAdminAnnouncementTitle('');setAdminAnnouncementBody('');return}
-    if(action==='reset_password'){setAdminMessage('Link de redefinição gerado: '+(result.action_link||'Confira o e-mail do usuário.'));return}
-    setAdminMessage(action==='ban_user'?'Conta bloqueada.':action==='unban_user'?'Conta desbloqueada.':'Conta excluída definitivamente.');
-    await adminAction('list_users');
+    try{
+      const {data:result,error}=await supabase.functions.invoke('admin-panel',{body:{action,user_id:userId,...extra}});
+      if(error||result?.error){
+        let detail=result?.error||error?.message||'Falha sem detalhes retornados.';
+        try{const ctx=error?.context;if(ctx&&typeof ctx.clone==='function'){const payload=await ctx.clone().json();detail=payload?.error||payload?.message||detail}}catch{}
+        throw new Error(detail);
+      }
+      if(action==='list_users'){setAdminUsers(result.users||[]);setAdminMessage('Lista de contas atualizada.');return}
+      if(action==='list_social_profiles'){setAdminSocialProfiles(result.profiles||[]);setAdminMessage('Perfis sociais atualizados.');return}
+      if(action==='list_reports'){setAdminReports(result.reports||[]);setAdminMessage('Denúncias atualizadas.');return}
+      if(action==='update_report_status'||action==='delete_report'){
+        setAdminMessage(action==='delete_report'?'Denúncia apagada.':'Status da denúncia atualizado.');
+        const {data:refreshed,error:refreshError}=await supabase.functions.invoke('admin-panel',{body:{action:'list_reports'}});
+        if(refreshError||refreshed?.error)throw new Error(refreshed?.error||refreshError?.message||'A alteração foi feita, mas não foi possível atualizar a lista.');
+        setAdminReports(refreshed.reports||[]);
+        return;
+      }
+      if(action==='moderate_social_profile'||action==='delete_social_profile'){
+        setAdminMessage(action==='delete_social_profile'?'Perfil social removido.':extra.suspended?'Perfil social suspenso.':'Perfil social reativado.');
+        const {data:refreshed,error:refreshError}=await supabase.functions.invoke('admin-panel',{body:{action:'list_social_profiles'}});
+        if(refreshError||refreshed?.error)throw new Error(refreshed?.error||refreshError?.message||'A alteração foi feita, mas não foi possível atualizar os perfis.');
+        setAdminSocialProfiles(refreshed.profiles||[]);
+        return;
+      }
+      if(action==='get_maintenance'){setMaintenance(!!result.settings?.maintenance_mode);setMaintenanceMessage(result.settings?.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.');return}
+      if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
+      if(action==='broadcast_announcement'){setAdminMessage('Comunicado enviado para '+Number(result.sent||0)+' contas ativas.');setAdminAnnouncementTitle('');setAdminAnnouncementBody('');return}
+      if(action==='reset_password'){setAdminMessage('Link de redefinição gerado: '+(result.action_link||'Confira o e-mail do usuário.'));return}
+      setAdminMessage(action==='ban_user'?'Conta bloqueada.':action==='unban_user'?'Conta desbloqueada.':'Conta excluída definitivamente.');
+      const {data:refreshed,error:refreshError}=await supabase.functions.invoke('admin-panel',{body:{action:'list_users'}});
+      if(refreshError||refreshed?.error)throw new Error(refreshed?.error||refreshError?.message||'A ação foi feita, mas não foi possível atualizar as contas.');
+      setAdminUsers(refreshed.users||[]);
+    }catch(err){
+      console.error('Falha na ação administrativa:',action,err);
+      setAdminError(err?.message||'Não foi possível concluir esta ação. Tente novamente.');
+    }finally{setAdminBusy(false)}
   }
   useEffect(()=>{if(session&&isAdmin&&page==='admin'&&!adminUsers.length&&!adminBusy&&!adminError)adminAction('list_users')},[session,page]);
 
