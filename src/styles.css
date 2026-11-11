@@ -3809,3 +3809,22 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
     bottom:86px!important;
   }
 }
+
+
+/* SPACE NEXUS — campanha por ondas e classes de inimigos */
+.space-mode-picker{display:grid;gap:9px;margin:0 0 14px;padding:13px;border:1px solid #647bd455;border-radius:15px;background:linear-gradient(120deg,#172448,#101a33)}
+.space-mode-picker>b{font-size:.66rem;letter-spacing:.14em;color:#a8c5ff}
+.space-mode-picker>div{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.space-mode-picker button{display:grid;gap:4px;padding:10px 7px;border:1px solid #7284b544;border-radius:11px;background:#0b1429;color:#c9d8fa;cursor:pointer}
+.space-mode-picker button strong{font-size:.82rem}.space-mode-picker button small{font-size:.58rem;color:#91a8d9}
+.space-mode-picker button.active{border-color:#78e9ff;background:linear-gradient(145deg,#16456a,#28265e);box-shadow:0 0 16px #3fdcff30;color:#fff}
+.space-enemy.tank{font-size:39px;filter:drop-shadow(0 0 14px #ff9a42)}
+.space-enemy.phantom{font-size:29px;filter:drop-shadow(0 0 13px #bd7bff);opacity:.92}
+.space-enemy-hp{position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);height:3px;max-width:35px;background:linear-gradient(90deg,#5df6ff,#b5ff9b);border-radius:4px;box-shadow:0 0 6px #5df6ff}
+.space-boss.boss-vortex span{filter:hue-rotate(75deg) drop-shadow(0 0 15px #62eaff)}
+.space-boss.boss-titan span{filter:hue-rotate(145deg) drop-shadow(0 0 18px #9d72ff);transform:scale(1.12)}
+.space-boss.boss-queen span{filter:hue-rotate(260deg) drop-shadow(0 0 18px #e48aff)}
+.space-boss.boss-omega span{filter:grayscale(.25) drop-shadow(0 0 20px #ffb34f);transform:scale(1.18)}
+.space-result-medal{display:block;color:#ffe69a;font-size:.72rem;font-weight:900;margin:-8px 0 15px;text-shadow:0 0 12px #ffbd45}
+.space-lives-block span{letter-spacing:2px}
+@media(max-width:480px){.space-mode-picker{padding:10px}.space-mode-picker button{padding:9px 4px}.space-mode-picker button strong{font-size:.72rem}.space-mode-picker button small{font-size:.52rem}.space-boss i{width:108px}}
