@@ -4171,3 +4171,23 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
     width:50px!important;height:50px!important;flex-basis:50px!important;
   }
 }
+
+
+/* NEXUS REWARDS — result screen shared by all arcade games */
+.nexus-reward-backdrop{position:fixed;inset:0;z-index:10050;display:grid;place-items:center;padding:18px;background:rgba(3,7,20,.78);backdrop-filter:blur(12px)}
+.nexus-reward-modal{width:min(100%,440px);max-height:min(82dvh,720px);overflow:auto;padding:26px 22px;border:1px solid rgba(105,220,255,.75);border-radius:25px;background:radial-gradient(ellipse at 90% 0%,rgba(117,68,210,.28),transparent 48%),linear-gradient(155deg,#171a38,#0b1426 78%);box-shadow:0 0 34px rgba(44,202,255,.18),inset 0 1px rgba(255,255,255,.08);color:#f4f1ff}
+.nexus-reward-kicker{font-size:11px;letter-spacing:.24em;font-weight:900;color:#a9a0ff}
+.nexus-reward-modal h2{margin:8px 0 5px;font-size:25px;letter-spacing:.02em}
+.nexus-reward-modal>p{margin:0 0 18px;color:#aeb7ce;font-size:13px}
+.nexus-reward-stats{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.nexus-reward-stats>div{display:flex;flex-direction:column;gap:5px;padding:16px 12px;border:1px solid rgba(153,126,235,.28);border-radius:16px;background:rgba(115,85,190,.13)}
+.nexus-reward-stats b{font-size:21px;color:#fff}
+.nexus-reward-stats small,.nexus-reward-items small{font-size:10px;letter-spacing:.13em;color:#aaa6c7}
+.nexus-reward-items{margin:18px 0;display:grid;gap:8px}
+.nexus-reward-items>strong{font-size:10px;letter-spacing:.18em;color:#a9a0ff}
+.nexus-reward-items>div{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;background:rgba(255,255,255,.045)}
+.nexus-reward-items>div span{font-size:22px}
+.nexus-reward-items>div b{flex:1;font-size:13px}
+.nexus-reward-empty{margin:18px 0;padding:13px;border:1px solid rgba(153,126,235,.2);border-radius:13px;color:#aaaec4;font-size:12px;line-height:1.5}
+.nexus-reward-modal>.primary{width:100%;margin-top:8px}
+@media(max-width:480px){.nexus-reward-modal{padding:22px 17px;border-radius:21px}.nexus-reward-modal h2{font-size:22px}}
