@@ -1149,16 +1149,31 @@ function App(){
         {!profileEditorOpen&&<>
         <div className={`game-world-hero player-card-frame frame-${playerProfile.cardFrame||"cyan"} ${playerProfile.gems?.length===4?"frame-chromatic":""} ${gameXp>=4500?"level-legendary":gameXp>=2000?"level-elite":gameXp>=1000?"level-avatar":gameXp>=500?"level-neon":""}`}>
           <div className={`frame-gem-ornament ornament-${playerProfile.cardFrame||"cyan"}`} aria-hidden="true">{(playerProfile.gems||[]).map(id=><i key={id} className={`gemstone gem-${id}`}/>)}</div>
-          <div className="game-world-top player-profile-topline"><span className="world-label"><span className="live-pulse"/> PERFIL DO JOGADOR</span><div className="player-profile-top-actions"><span className="season-pill">TEMPORADA 01</span><button type="button" className="player-profile-edit-pencil" onClick={()=>setProfileEditorOpen(true)} aria-label="Editar perfil oficial" title="Editar perfil"><Pencil size={16}/><span>Editar perfil</span></button></div></div>
-          <div className="player-identity player-social-identity-layout"><div className={`player-avatar profile-big-avatar frame-${playerProfile.frame} ${(playerProfile.gems||[]).length===4?"frame-chromatic":""}`}><span>{playerProfile.avatar}</span><i><Zap size={12}/></i></div><div className="player-info"><span>{gameXp>=4500?"LENDÁRIO":gameXp>=2000?"ELITE":gameXp>=1000?"VETERANO":gameXp>=500?"EXPLORADOR":"JOGADOR"}</span><div className="player-profile-name-row"><h2>{playerProfile.name||"Sua jornada começa aqui"}</h2></div>{playerProfile.username&&<div className="player-social-identity"><b>@{playerProfile.username}</b></div>}{playerProfile.bio&&<p className="player-social-bio">{playerProfile.bio}</p>}{playerProfile.clan&&<div className="player-clan-badge">{playerProfile.clan.clan_emblem} {playerProfile.clan.clan_name} [{playerProfile.clan.clan_tag}] · {playerProfile.clan.clan_role==='leader'?'ADM':playerProfile.clan.clan_role==='officer'?'OFICIAL':'MEMBRO'}</div>}<div className="player-level-line"><b>NÍVEL {Math.floor(gameXp/500)+1}</b><span>{gameXp%500}/500 XP para o próximo nível</span></div><div className="player-xp-track"><i style={{width:((gameXp%500)/500*100)+'%'}}/></div></div></div><div className="profile-honors-inline" aria-label="Medalhas e honrarias">
-          {isAdmin&&<><span className="profile-honor-chip founder">👑 Fundador</span><span className="profile-honor-chip founder">⚡ Fundador NEXUS</span><span className="profile-honor-chip founder">🛡️ Admin oficial</span></>}
-          {profileGameMedals.filter(m=>profileEquippedMedals.includes('game:'+m.game_key)).map(m=><span className="profile-honor-chip equipped-honor" key={'inline-g-'+m.game_key}>🏅 {({'space-nexus':'Space Nexus','piggy-run':'Asas da Fortuna',quiz:'Quiz'})[m.game_key]||m.game_key} ×{Number(m.medals_count||0)}</span>)}
-          {profileRankMedals.filter(m=>profileEquippedMedals.includes('rank:'+m.medal_key)).map(m=><span className="profile-honor-chip equipped-honor" key={'inline-r-'+m.medal_key}>🏆 {({'global-season':'Campeão global','weekly-tournament':'Campeão semanal','friends-weekly':'Campeão dos amigos'})[m.medal_key]||'Campeão'} ×{Number(m.medals_count||0)}</span>)}
-          {!isAdmin&&!profileMedalsLoading&&!profileGameMedals.length&&!profileRankMedals.length&&<span className="profile-honor-empty-inline">Suas medalhas de competição aparecerão aqui.</span>}
-        </div><div className="player-profile-summary-row"><div className="player-xp-total"><strong>{gameXp}</strong><small>XP TOTAL</small></div>
-        <div className="world-stats player-profile-stats"><div><Flame size={17}/><span><b>{gameCorrect}</b> desafios concluídos</span></div><div><Trophy size={17}/><span><b>{Math.floor(gameXp/500)}</b> níveis conquistados</span></div><div><Star size={17}/><span><b>{(playerProfile.gems||[]).length}</b> joias equipadas</span></div></div></div>
-        
-</div>
+          <div className="game-world-top player-profile-topline"><span className="world-label"><span className="live-pulse"/> NEXUS PLAYER</span><button type="button" className="player-profile-edit-pencil" onClick={()=>setProfileEditorOpen(true)} aria-label="Editar perfil oficial" title="Editar perfil"><Pencil size={16}/><span>Editar perfil</span></button></div>
+          <div className="player-identity player-social-identity-layout">
+            <div className={`player-avatar profile-big-avatar frame-${playerProfile.frame} ${(playerProfile.gems||[]).length===4?"frame-chromatic":""}`}><span>{playerProfile.avatar}</span><i><Zap size={12}/></i></div>
+            <div className="player-info">
+              <span className="player-profile-rank">{gameXp>=4500?"LENDÁRIO":gameXp>=2000?"ELITE":gameXp>=1000?"VETERANO":gameXp>=500?"EXPLORADOR":"JOGADOR"}</span>
+              <div className="player-profile-name-row"><h2>{playerProfile.name||"Sua jornada começa aqui"}</h2></div>
+              {playerProfile.username&&<div className="player-social-identity"><b>@{playerProfile.username}</b></div>}
+              <div className="player-profile-stats profile-social-stats">
+                <div><b>{gameCorrect}</b><span>Desafios</span></div>
+                <div><b>{Math.floor(gameXp/500)+1}</b><span>Nível</span></div>
+                <div><b>{(playerProfile.gems||[]).length}</b><span>Joias</span></div>
+              </div>
+            </div>
+          </div>
+          {playerProfile.bio&&<p className="player-social-bio profile-social-bio">{playerProfile.bio}</p>}
+          {playerProfile.clan&&<div className="player-clan-badge">{playerProfile.clan.clan_emblem} {playerProfile.clan.clan_name} [{playerProfile.clan.clan_tag}] · {playerProfile.clan.clan_role==='leader'?'ADM':playerProfile.clan.clan_role==='officer'?'OFICIAL':'MEMBRO'}</div>}
+          <div className="profile-honors-inline" aria-label="Medalhas e honrarias">
+            {isAdmin&&<><span className="profile-honor-chip founder">👑 Fundador</span><span className="profile-honor-chip founder">⚡ Fundador NEXUS</span><span className="profile-honor-chip founder">🛡️ Admin oficial</span></>}
+            {profileGameMedals.filter(m=>profileEquippedMedals.includes('game:'+m.game_key)).map(m=><span className="profile-honor-chip equipped-honor" key={'inline-g-'+m.game_key}>🏅 {({'space-nexus':'Space Nexus','piggy-run':'Asas da Fortuna',quiz:'Quiz'})[m.game_key]||m.game_key} ×{Number(m.medals_count||0)}</span>)}
+            {profileRankMedals.filter(m=>profileEquippedMedals.includes('rank:'+m.medal_key)).map(m=><span className="profile-honor-chip equipped-honor" key={'inline-r-'+m.medal_key}>🏆 {({'global-season':'Campeão global','weekly-tournament':'Campeão semanal','friends-weekly':'Campeão dos amigos'})[m.medal_key]||'Campeão'} ×{Number(m.medals_count||0)}</span>)}
+            {!isAdmin&&!profileMedalsLoading&&!profileGameMedals.length&&!profileRankMedals.length&&<span className="profile-honor-empty-inline">Suas medalhas de competição aparecerão aqui.</span>}
+          </div>
+          <div className="profile-xp-progress"><div><b>{gameXp} XP</b><span>NÍVEL {Math.floor(gameXp/500)+1} · {gameXp%500}/500 XP para o próximo nível</span></div><div className="player-xp-track"><i style={{width:((gameXp%500)/500*100)+'%'}}/></div></div>
+          <div className="profile-social-edit-row"><button type="button" onClick={()=>setProfileEditorOpen(true)}><Pencil size={15}/> Editar perfil</button><span>Seu espaço · suas conquistas</span></div>
+        </div>
         <PlayerPostGrid userId={session?.user?.id} displayName={playerProfile.name||'jogador'}/>
         </>}
  {profileEditorOpen&&<div className="profile-editor panel"><div className="panel-head"><div><h3>Editar perfil</h3><p>Atualize sua identidade, biografia, avatar e molduras.</p></div><button type="button" className="text-button" onClick={()=>setProfileEditorOpen(false)}>Concluir</button></div>
