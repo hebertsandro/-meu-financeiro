@@ -8,7 +8,7 @@ import {
   Activity, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined, Search, SlidersHorizontal, Power, Flag,
   Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock, Bot, Sparkles, Send,
   Gamepad2, Trophy, Coins, Brain, Gift, ClipboardList, Star, Zap, Flame, MessageCircle, Newspaper, Shield, ChevronDown,
-  LogOut, Menu, Plus, ReceiptText, ShieldCheck, Target, TrendingUp, Wallet, X, Users, Ban, UserCheck, KeyRound, RefreshCw
+  LogOut, Menu, Plus, ReceiptText, ShieldCheck, Target, TrendingUp, Wallet, X, Users, Ban, UserCheck, KeyRound, RefreshCw, Trash2
 } from 'lucide-react';
 import {
   ResponsiveContainer, AreaChart, Area, CartesianGrid, Tooltip, XAxis, YAxis,
