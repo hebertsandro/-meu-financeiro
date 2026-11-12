@@ -1139,7 +1139,6 @@ function App(){
 
   if(loading||!maintenanceCheckDone||!splashReady)return <div className="mf-splash mf-launch-screen" role="status" aria-label="Carregando Meu Financeiro" style={{position:'fixed',inset:0,zIndex:2147483000,width:'100%',height:'100dvh',minHeight:'100vh',display:'grid',placeItems:'center',overflow:'hidden',isolation:'isolate',background:'#080D18',color:'#f8faff'}}>
     <style>{`
-      .mf-launch-screen:before{content:'';position:absolute;width:min(78vw,360px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(125,91,255,.2),rgba(35,190,225,.07) 46%,transparent 72%);filter:blur(8px);animation:mfGlow 4s ease-in-out infinite}
       .mf-launch-screen .mf-launch-center{position:relative;z-index:2;width:min(88vw,360px);display:flex;flex-direction:column;align-items:center;text-align:center;animation:mfEnter .9s cubic-bezier(.2,.8,.2,1) both}
       .mf-launch-screen .mf-launch-symbol{width:104px;height:104px;display:grid;place-items:center;background:transparent;border:0;box-shadow:none}
       .mf-launch-screen .mf-launch-symbol .brand-icon{width:94px;height:94px;border-radius:0;box-shadow:none;background:transparent}
@@ -1150,15 +1149,10 @@ function App(){
       .mf-launch-screen .mf-launch-track{width:174px;height:4px;margin-top:38px;border-radius:8px;background:rgba(152,166,199,.18);overflow:hidden}
       .mf-launch-screen .mf-launch-track i{display:block;width:38%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a78bfa,#67ddec);box-shadow:0 0 12px rgba(103,221,236,.7);animation:mfTrack 1.6s ease-in-out infinite}
       .mf-launch-screen .mf-launch-caption{margin-top:15px;color:#7484a2;font:600 9px/1.5 Manrope,system-ui,sans-serif;letter-spacing:1.8px}
-      .mf-launch-screen .mf-launch-orbit{position:absolute;z-index:1;width:min(82vw,390px);height:min(32vw,150px);border:1px solid rgba(142,123,255,.2);border-radius:50%;transform:rotate(-18deg);animation:mfOrbit 12s linear infinite}
-      .mf-launch-screen .mf-launch-orbit:after{content:'';position:absolute;right:12%;top:4%;width:7px;height:7px;border-radius:50%;background:#72e5f4;box-shadow:0 0 16px #72e5f4}
       @keyframes mfEnter{from{opacity:0;transform:translateY(16px) scale(.96);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
-      @keyframes mfGlow{0%,100%{opacity:.65;transform:scale(.94)}50%{opacity:1;transform:scale(1.06)}}
       @keyframes mfTrack{0%{transform:translateX(-110%)}100%{transform:translateX(300%)}}
-      @keyframes mfOrbit{to{transform:rotate(342deg)}}
       @media(prefers-reduced-motion:reduce){.mf-launch-screen *,.mf-launch-screen:before{animation:none!important}}
     `}</style>
-    <div className="mf-launch-orbit" aria-hidden="true"/>
     <div className="mf-launch-center">
       <div className="mf-launch-symbol"><BrandMark/></div>
       <div className="mf-launch-name">meu<span>financeiro</span></div>
