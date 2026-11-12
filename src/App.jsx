@@ -1123,9 +1123,41 @@ function App(){
   const currentOnboarding=onboardingSteps[Math.min(onboardingStep,onboardingSteps.length-1)];
   function finishOnboarding(){if(session?.user?.id)window.localStorage.setItem('mf_onboarding_done:'+session.user.id,'true');if(session?.user?.email)window.localStorage.removeItem('mf_onboarding_pending:'+String(session.user.email).toLowerCase());setShowOnboarding(false);}
 
-  if(loading||!maintenanceCheckDone||!splashReady)return <div className="mf-splash" role="status" aria-label="Carregando Meu Financeiro">
-    <div className="mf-splash-orbit mf-splash-orbit-one"/><div className="mf-splash-orbit mf-splash-orbit-two"/>
-    <div className="mf-splash-center"><BrandMark/><div className="mf-splash-wordmark">meu<span>financeiro</span></div><div className="mf-splash-progress"><i/></div><small>SEU DINHEIRO. SEU UNIVERSO.</small></div>
+  if(loading||!maintenanceCheckDone||!splashReady)return <div className="mf-splash mf-launch-screen" role="status" aria-label="Carregando Meu Financeiro" style={{position:'fixed',inset:0,zIndex:2147483000,width:'100%',height:'100dvh',minHeight:'100vh',display:'grid',placeItems:'center',overflow:'hidden',isolation:'isolate',background:'radial-gradient(ellipse at 50% 48%,rgba(92,73,220,.28),transparent 42%),radial-gradient(ellipse at 18% 82%,rgba(20,190,220,.16),transparent 38%),#070b16',color:'#f8faff'}}>
+    <style>{`
+      .mf-launch-screen *{box-sizing:border-box}
+      .mf-launch-screen .mf-launch-center{position:relative;z-index:2;width:min(88vw,390px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;animation:mfLaunchReveal 1.15s cubic-bezier(.16,1,.3,1) both}
+      .mf-launch-screen .mf-launch-mark{width:112px;height:112px;display:grid;place-items:center;border-radius:34px;background:linear-gradient(145deg,#182345,#080d18);border:1px solid rgba(180,164,255,.85);box-shadow:0 0 0 8px rgba(128,105,255,.08),0 0 38px rgba(113,92,255,.42),0 0 90px rgba(34,211,238,.19);animation:mfLaunchPulse 2.4s ease-in-out infinite}
+      .mf-launch-screen .mf-launch-mark .brand-icon{width:100%!important;height:100%!important;border-radius:inherit!important;display:block!important}
+      .mf-launch-screen .mf-launch-mark svg{width:100%;height:100%}
+      .mf-launch-screen .mf-launch-name{margin-top:30px;font:800 clamp(30px,8vw,42px)/1.05 Manrope,system-ui,sans-serif;letter-spacing:-1.8px;color:#fff}
+      .mf-launch-screen .mf-launch-name span{background:linear-gradient(95deg,#b9a5ff,#8294ff 52%,#55deed);-webkit-background-clip:text;background-clip:text;color:transparent}
+      .mf-launch-screen .mf-launch-tagline{margin-top:13px;color:#aab6d4;font:600 10px/1.5 Manrope,system-ui,sans-serif;letter-spacing:3px}
+      .mf-launch-screen .mf-launch-loader{width:176px;height:3px;margin-top:42px;border-radius:10px;background:rgba(155,169,205,.2);overflow:hidden}
+      .mf-launch-screen .mf-launch-loader i{display:block;width:36%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a78bfa,#5ee5f4);box-shadow:0 0 14px #6dceff;animation:mfLaunchLoad 1.35s ease-in-out infinite}
+      .mf-launch-screen .mf-launch-caption{margin-top:18px;color:#7283a8;font:700 9px/1.4 Manrope,system-ui,sans-serif;letter-spacing:2.6px}
+      .mf-launch-screen .mf-launch-ring{position:absolute;left:50%;top:50%;width:min(82vw,470px);aspect-ratio:1;border:1px solid rgba(151,133,255,.17);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 70px rgba(91,76,232,.08),inset 0 0 55px rgba(48,209,235,.04);animation:mfLaunchOrbit 22s linear infinite}
+      .mf-launch-screen .mf-launch-ring:before,.mf-launch-screen .mf-launch-ring:after{content:'';position:absolute;width:8px;height:8px;border-radius:50%;background:#a78bfa;box-shadow:0 0 18px #9277ff;top:13%;left:20%}
+      .mf-launch-screen .mf-launch-ring:after{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 16px #22d3ee;top:auto;left:auto;right:13%;bottom:18%}
+      .mf-launch-screen .mf-launch-ring-two{width:min(62vw,350px);border-style:dashed;border-color:rgba(34,211,238,.17);animation-duration:30s;animation-direction:reverse}
+      .mf-launch-screen .mf-launch-stars{position:absolute;inset:0;opacity:.45;background-image:radial-gradient(1px 1px at 17% 22%,#9aa9ff 99%,transparent),radial-gradient(1px 1px at 78% 31%,#67ddeb 99%,transparent),radial-gradient(1px 1px at 28% 76%,#a78bfa 99%,transparent),radial-gradient(1px 1px at 84% 82%,#9aa9ff 99%,transparent);background-size:190px 210px;animation:mfLaunchDrift 18s linear infinite}
+      @keyframes mfLaunchReveal{from{opacity:0;transform:translateY(24px) scale(.88);filter:blur(12px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+      @keyframes mfLaunchPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.045);filter:brightness(1.2)}}
+      @keyframes mfLaunchLoad{0%{transform:translateX(-120%)}100%{transform:translateX(340%)}}
+      @keyframes mfLaunchOrbit{to{transform:translate(-50%,-50%) rotate(360deg)}}
+      @keyframes mfLaunchDrift{to{background-position:190px 210px}}
+      @media(prefers-reduced-motion:reduce){.mf-launch-screen *{animation:none!important}}
+    `}</style>
+    <div className="mf-launch-stars"/>
+    <div className="mf-launch-ring mf-launch-ring-one"/>
+    <div className="mf-launch-ring mf-launch-ring-two"/>
+    <div className="mf-launch-center">
+      <div className="mf-launch-mark"><BrandMark/></div>
+      <div className="mf-launch-name">meu<span>financeiro</span></div>
+      <div className="mf-launch-tagline">SEU DINHEIRO. SEU UNIVERSO.</div>
+      <div className="mf-launch-loader"><i/></div>
+      <div className="mf-launch-caption">PREPARANDO SEU UNIVERSO FINANCEIRO</div>
+    </div>
   </div>;
   if(!isConfigured)return <SetupScreen/>;
   if(maintenance&&!isAdmin)return <div className="setup-shell"><div className="setup-card"><div className="brand"><BrandMark /><span>meu<span className="brand-accent">financeiro</span></span></div><div className="setup-symbol"><LockKeyhole size={28}/></div><h1>Estamos em manutenção</h1><p>{maintenanceMessage}</p><p>Estamos trabalhando para melhorar sua experiência. Tente novamente mais tarde.</p></div></div>;
