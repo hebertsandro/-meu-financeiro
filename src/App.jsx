@@ -923,7 +923,7 @@ function App(){
   useEffect(()=>{if(session&&isAdmin&&page==='admin'&&!adminUsers.length&&!adminBusy&&!adminError)adminAction('list_users')},[session,page]);
 
   async function deleteItem(table,id){
-    const {error}=await supabase.from(table).delete().eq('id',id);
+    const {error}=await supabase.from(table).delete().eq('id',id).eq('user_id',session.user.id);
     if(error){notify('Não foi possível excluir.');return}
     await loadData();notify('Registro excluído.');
   }
