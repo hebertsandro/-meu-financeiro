@@ -1,6 +1,6 @@
 /* Identidade visual NEXUS — Meu Financeiro */
 .brand-icon{background:linear-gradient(145deg,#121b34,#080d18)!important;border:1px solid rgba(153,133,255,.55);box-shadow:0 0 0 3px rgba(111,91,255,.08),0 8px 28px rgba(79,111,255,.28),inset 0 1px rgba(255,255,255,.14)!important}
-.mf-brand-mark svg{display:block;width:100%;height:100%;filter:drop-shadow(0 0 8px rgba(104,132,255,.28))}
+.mf-brand-mark{background:transparent!important;border:0!important;box-shadow:none!important}.mf-brand-mark svg{display:block;width:100%;height:100%;filter:none!important}
 .mf-brand-mark.compact{width:32px;height:32px}
 .mf-splash{position:fixed;inset:0;z-index:99999;display:grid;place-items:center;overflow:hidden;isolation:isolate;background:radial-gradient(ellipse at 50% 43%,rgba(83,65,190,.25),transparent 36%),radial-gradient(ellipse at 15% 85%,rgba(20,174,214,.12),transparent 36%),#070b16;color:#f8faff}
 .mf-splash:before,.mf-splash:after{content:"";position:absolute;inset:-35%;z-index:-1;pointer-events:none;border-radius:50%;border:1px solid rgba(134,119,255,.13);animation:mfSplashOrbit 18s linear infinite}
