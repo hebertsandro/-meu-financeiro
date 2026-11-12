@@ -606,8 +606,8 @@ function App(){
 
   useEffect(()=>{
     setProfileLoadedUserId(null);
-    if(!session?.user?.id)return;
-    const metadataName=String(session.user.user_metadata?.name||'').trim();
+    setGameXp(0);setGameCorrect(0);
+    const metadataName=String(session?.user?.user_metadata?.name||'').trim();
     setPlayerProfile({name:metadataName||'Meu jogador',avatar:'👾',frame:'violet',cardFrame:'cyan',username:'',bio:'',gems:[]});
   },[session?.user?.id]);
   useEffect(()=>{if(!session?.user?.id||profileLoadedUserId!==session.user.id||!supabase||!profileMedalsLoaded||profileMedalsLoading)return;const timer=window.setTimeout(()=>{supabase.from('social_profiles').update({display_name:String(playerProfile.name||'').trim().slice(0,40),avatar:playerProfile.avatar||'👾',avatar_frame:playerProfile.frame||'violet',card_frame:playerProfile.cardFrame||'cyan',equipped_gems:Array.isArray(playerProfile.gems)?playerProfile.gems:[],equipped_medals:profileEquippedMedals,game_xp:gameXp,game_correct:gameCorrect,updated_at:new Date().toISOString()}).eq('user_id',session.user.id).then(({error})=>{if(error)console.warn('NEXUS Social profile sync:',error.message)})},700);return()=>window.clearTimeout(timer)},[session?.user?.id,profileLoadedUserId,playerProfile,profileEquippedMedals,profileMedalsLoaded,profileMedalsLoading,gameXp,gameCorrect]);
@@ -663,13 +663,13 @@ function App(){
       const {data:existing,error}=await supabase.from('social_profiles').select('*').eq('user_id',user.id).maybeSingle();
       if(!active)return;
       if(error){console.warn('NEXUS Social profile load:',error.message);return;}
-      if(existing){setPlayerProfile(p=>({...p,name:existing.display_name||p.name,avatar:existing.avatar||'👾',frame:existing.avatar_frame||'violet',cardFrame:existing.card_frame||'cyan',gems:Array.isArray(existing.equipped_gems)?existing.equipped_gems:[],username:existing.username||'',bio:existing.bio||''}));setProfileLoadedUserId(user.id);setUsernameDraft(existing.username||'');setUsernameChangedAt(existing.username_changed_at||null);return;}
+      if(existing){setPlayerProfile(p=>({...p,name:existing.display_name||p.name,avatar:existing.avatar||'👾',frame:existing.avatar_frame||'violet',cardFrame:existing.card_frame||'cyan',gems:Array.isArray(existing.equipped_gems)?existing.equipped_gems:[],username:existing.username||'',bio:existing.bio||''}));setGameXp(Number(existing.game_xp||0));setGameCorrect(Number(existing.game_correct||0));setProfileLoadedUserId(user.id);setUsernameDraft(existing.username||'');setUsernameChangedAt(existing.username_changed_at||null);return;}
       const metadata=user.user_metadata||{};const username=String(metadata.social_username||'').trim().toLowerCase();
       if(!/^[a-z0-9_]{3,20}$/.test(username))return;
       const {data:created,error:createError}=await supabase.from('social_profiles').insert({user_id:user.id,username,display_name:String(playerProfile.name||metadata.name||'Meu jogador').trim().slice(0,40)||'Meu jogador',bio:String(metadata.social_bio||'').trim().slice(0,160),avatar:playerProfile.avatar||'👾',avatar_frame:playerProfile.frame||'violet',card_frame:playerProfile.cardFrame||'cyan',equipped_gems:Array.isArray(playerProfile.gems)?playerProfile.gems:[],game_xp:Number(gameXp||0),game_correct:Number(gameCorrect||0)}).select('*').single();
       if(!active)return;
       if(createError){console.warn('NEXUS Social profile creation:',createError.message);if(createError.code==='23505')notify('Esse @ já está em uso. Abra o NEXUS Social e escolha outro identificador.');else notify('Não foi possível criar seu perfil social: '+createError.message);return;}
-      if(created){setPlayerProfile(p=>({...p,name:created.display_name||p.name,avatar:created.avatar||'👾',frame:created.avatar_frame||'violet',cardFrame:created.card_frame||'cyan',gems:Array.isArray(created.equipped_gems)?created.equipped_gems:[],username:created.username||'',bio:created.bio||''}));setProfileLoadedUserId(user.id);setUsernameDraft(created.username||'');setUsernameChangedAt(created.username_changed_at||null);}
+      if(created){setPlayerProfile(p=>({...p,name:created.display_name||p.name,avatar:created.avatar||'👾',frame:created.avatar_frame||'violet',cardFrame:created.card_frame||'cyan',gems:Array.isArray(created.equipped_gems)?created.equipped_gems:[],username:created.username||'',bio:created.bio||''}));setGameXp(Number(created.game_xp||0));setGameCorrect(Number(created.game_correct||0));setProfileLoadedUserId(user.id);setUsernameDraft(created.username||'');setUsernameChangedAt(created.username_changed_at||null);}
     })();
     return()=>{active=false;};
   },[session?.user?.id]);
