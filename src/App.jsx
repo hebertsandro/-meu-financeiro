@@ -768,9 +768,13 @@ function App(){
     };
     const results=await Promise.all(tables.map(fetchAllUserRows));
     if(activeUserIdRef.current!==userId)return;
-    const next={};
-    results.forEach((r,i)=>{next[tables[i]]=r.data||[]});
+    const next={};const failedTables=[];
+    results.forEach((result,i)=>{
+      if(result.error){failedTables.push(tables[i]);next[tables[i]]=data[tables[i]]||[];}
+      else next[tables[i]]=result.data||[];
+    });
     setData(next);
+    if(failedTables.length)notify('Não foi possível atualizar: '+failedTables.join(', ')+'. Seus dados anteriores foram preservados.');
   }
   useEffect(()=>{
     if(!session?.user?.id)return;
