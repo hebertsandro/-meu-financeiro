@@ -758,7 +758,19 @@ function App(){
     const userId=session?.user?.id;
     if(!userId||!supabase)return;
     const tables=['transactions','cards','debts','goals','installments','subscriptions','card_limit_history','goal_movements','notifications'];
-    const results=await Promise.all(tables.map(t=>supabase.from(t).select('*').eq('user_id',userId).order(t==='card_limit_history'?'changed_at':'created_at',{ascending:false})));
+    const fetchAllUserRows=async(table)=>{
+      const rows=[];let offset=0;const pageSize=1000;
+      while(true){
+        const orderColumn=table==='card_limit_history'?'changed_at':'created_at';
+        const {data:page,error}=await supabase.from(table).select('*').eq('user_id',userId).order(orderColumn,{ascending:false}).order('id',{ascending:true}).range(offset,offset+pageSize-1);
+        if(error)return {data:null,error};
+        rows.push(...(page||[]));
+        if(!page||page.length<pageSize)break;
+        offset+=pageSize;
+      }
+      return {data:rows,error:null};
+    };
+    const results=await Promise.all(tables.map(fetchAllUserRows));
     if(activeUserIdRef.current!==userId)return;
     const next={};
     results.forEach((r,i)=>{next[tables[i]]=r.data||[]});
