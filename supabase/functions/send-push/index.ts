@@ -24,18 +24,20 @@ Deno.serve(async(req)=>{
     const {data:subscriptions,error}=await admin.from("push_subscriptions").select("id,endpoint,p256dh,auth").eq("user_id",user.id);
     if(error)throw error;
     let sent=0;
+    let failed=0;
+    const failureStatuses:number[]=[];
     const expired:string[]=[];
     for(const row of subscriptions||[]){
       try{
-        await webpush.sendNotification({endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}},{title,body,url,tag});
+        await webpush.sendNotification({endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}},{title,body,url,tag},{TTL:3600,urgency:"normal"});
         sent++;
       }catch(err){
         const status=(err as {statusCode?:number})?.statusCode;
         if(status===404||status===410)expired.push(row.id);
-        else console.error("Push delivery failed",status);
+        else {failed++;if(typeof status==="number"&&!failureStatuses.includes(status))failureStatuses.push(status);console.error("Push delivery failed",status);}
       }
     }
     if(expired.length)await admin.from("push_subscriptions").delete().in("id",expired);
-    return reply({sent,removed:expired.length});
+    return reply({sent,failed,removed:expired.length,subscriptions:(subscriptions||[]).length,failureStatuses,message:sent===0?(subscriptions?.length?"O serviço não conseguiu entregar o push ao provedor do aparelho.":"Nenhuma inscrição push encontrada para esta conta."):undefined});
   }catch(error){console.error(error);return reply({error:error instanceof Error?error.message:"Internal error"},500);}
 });
