@@ -551,22 +551,12 @@ function generateNexusReply(question, finance={}, history=[]) {
   return greet+'Estou aqui para conversar. 💙 Pode falar do seu dia, de uma dúvida, de uma ideia ou de algo que esteja te preocupando. Não precisa escrever perfeitamente — eu tento entender e, se faltar contexto, pergunto.';
 }
 function BrandMark({compact=false}) {
-  return <span className={'brand-icon mf-brand-mark'+(compact?' compact':'')} aria-label="Meu Financeiro">
-    <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
-      <defs>
-        <linearGradient id="mf-symbol-bars" x1="16" y1="12" x2="48" y2="54" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FFFFFF"/><stop offset=".55" stopColor="#C9B8FF"/><stop offset="1" stopColor="#73E6F4"/>
-        </linearGradient>
-        <linearGradient id="mf-symbol-orbit" x1="8" y1="24" x2="57" y2="45" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#A78BFA"/><stop offset=".55" stopColor="#7775FF"/><stop offset="1" stopColor="#22D3EE"/>
-        </linearGradient>
-      </defs>
-      <path d="M10 39c4-14 17-23 31-22 8 1 13 5 14 11" fill="none" stroke="url(#mf-symbol-orbit)" strokeWidth="3.4" strokeLinecap="round"/>
-      <path d="M10 39c4 10 17 16 29 14 8-1 13-5 16-11" fill="none" stroke="url(#mf-symbol-orbit)" strokeWidth="3.4" strokeLinecap="round"/>
-      <rect x="19" y="34" width="7" height="13" rx="2.2" fill="url(#mf-symbol-bars)"/>
-      <rect x="29" y="27" width="7" height="20" rx="2.2" fill="url(#mf-symbol-bars)"/>
-      <rect x="39" y="18" width="7" height="29" rx="2.2" fill="url(#mf-symbol-bars)"/>
-      <path d="m49 10 2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.7L49 10Z" fill="#8CEBFA"/>
+  return <span className={'brand-icon mf-brand-mark'+(compact?' compact':'')} aria-label="Meu Financeiro" style={{background:'transparent',border:0,boxShadow:'none',width:compact?32:54,height:compact?32:54,display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
+    <svg viewBox="0 0 64 64" role="img" aria-hidden="true" style={{display:'block',width:'100%',height:'100%'}}>
+      <defs><linearGradient id="mf-three-bars" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse"><stop stopColor="#C7B5FF"/><stop offset=".58" stopColor="#9275FF"/><stop offset="1" stopColor="#55D9EA"/></linearGradient></defs>
+      <rect x="9" y="39" width="12" height="16" rx="3.5" fill="url(#mf-three-bars)"/>
+      <rect x="26" y="25" width="12" height="30" rx="3.5" fill="url(#mf-three-bars)"/>
+      <rect x="43" y="9" width="12" height="46" rx="3.5" fill="url(#mf-three-bars)"/>
     </svg>
   </span>;
 }
@@ -665,9 +655,26 @@ function App(){
 
   useEffect(()=>{
     if(!isConfigured){setLoading(false);return}
-    supabase.auth.getSession().then(({data})=>{setSession(data.session);const n=String(data.session?.user?.user_metadata?.name||'').trim();if(n)setPlayerProfile(p=>({...p,name:n}));setLoading(false)});
-    const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,s)=>{setSession(s);const n=String(s?.user?.user_metadata?.name||'').trim();if(n)setPlayerProfile(p=>({...p,name:n}));});
-    return ()=>subscription.unsubscribe();
+    let active=true;
+    const timeout=new Promise(resolve=>window.setTimeout(()=>resolve({data:{session:null},error:new Error('Tempo limite ao consultar a sessão')}),6000));
+    Promise.race([supabase.auth.getSession(),timeout])
+      .then(({data,error})=>{
+        if(!active)return;
+        if(error)console.warn('Sessão Supabase:',error.message);
+        const nextSession=data?.session||null;
+        setSession(nextSession);
+        const n=String(nextSession?.user?.user_metadata?.name||'').trim();
+        if(n)setPlayerProfile(p=>({...p,name:n}));
+      })
+      .catch(error=>{if(active)console.warn('Não foi possível recuperar a sessão:',error)})
+      .finally(()=>{if(active)setLoading(false)});
+    const {data:{subscription}}=supabase.auth.onAuthStateChange((_event,s)=>{
+      if(!active)return;
+      setSession(s);
+      const n=String(s?.user?.user_metadata?.name||'').trim();
+      if(n)setPlayerProfile(p=>({...p,name:n}));
+    });
+    return ()=>{active=false;subscription.unsubscribe();};
   },[]);
   useEffect(()=>{
     const user=session?.user;if(!user?.id)return;
@@ -702,12 +709,18 @@ function App(){
   useEffect(()=>{
     if(!isConfigured){setMaintenanceCheckDone(true);return}
     let active=true;
-    supabase.from('app_settings').select('maintenance_mode,maintenance_message').eq('id',true).maybeSingle()
-      .then(({data,error})=>{
-        if(!active)return;
-        if(!error&&data){setMaintenance(!!data.maintenance_mode);setMaintenanceMessage(data.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.')}
-        setMaintenanceCheckDone(true);
-      }).catch(()=>{if(active)setMaintenanceCheckDone(true)});
+    const timeout=new Promise(resolve=>window.setTimeout(()=>resolve({data:null,error:new Error('Tempo limite ao verificar manutenção')}),5000));
+    Promise.race([
+      supabase.from('app_settings').select('maintenance_mode,maintenance_message').eq('id',true).maybeSingle(),
+      timeout
+    ]).then(({data,error})=>{
+      if(!active)return;
+      if(!error&&data){setMaintenance(!!data.maintenance_mode);setMaintenanceMessage(data.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.')}
+      if(error)console.warn('Verificação de manutenção:',error.message);
+      setMaintenanceCheckDone(true);
+    }).catch(error=>{
+      if(active){console.warn('Falha ao verificar manutenção:',error);setMaintenanceCheckDone(true)}
+    });
     return ()=>{active=false};
   },[]);
   const notify=(s)=>{setToast(s);setTimeout(()=>setToast(''),3200)};
@@ -1128,8 +1141,8 @@ function App(){
     <style>{`
       .mf-launch-screen:before{content:'';position:absolute;width:min(78vw,360px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(125,91,255,.2),rgba(35,190,225,.07) 46%,transparent 72%);filter:blur(8px);animation:mfGlow 4s ease-in-out infinite}
       .mf-launch-screen .mf-launch-center{position:relative;z-index:2;width:min(88vw,360px);display:flex;flex-direction:column;align-items:center;text-align:center;animation:mfEnter .9s cubic-bezier(.2,.8,.2,1) both}
-      .mf-launch-screen .mf-launch-symbol{width:104px;height:104px;display:grid;place-items:center;border-radius:30px;background:linear-gradient(145deg,#18213a,#0b1120);border:1px solid rgba(167,139,250,.55);box-shadow:0 16px 48px rgba(0,0,0,.28),0 0 34px rgba(124,92,255,.18)}
-      .mf-launch-screen .mf-launch-symbol .brand-icon{width:82px;height:82px;border-radius:22px;box-shadow:none;background:transparent}
+      .mf-launch-screen .mf-launch-symbol{width:104px;height:104px;display:grid;place-items:center;background:transparent;border:0;box-shadow:none}
+      .mf-launch-screen .mf-launch-symbol .brand-icon{width:94px;height:94px;border-radius:0;box-shadow:none;background:transparent}
       .mf-launch-screen .mf-launch-symbol svg{width:100%;height:100%}
       .mf-launch-screen .mf-launch-name{margin-top:25px;font:800 clamp(29px,8vw,39px)/1.05 Manrope,system-ui,sans-serif;letter-spacing:-1.7px;color:#f7f8ff}
       .mf-launch-screen .mf-launch-name span{background:linear-gradient(95deg,#b8a1ff,#8b9cff 55%,#65dce9);-webkit-background-clip:text;background-clip:text;color:transparent}
