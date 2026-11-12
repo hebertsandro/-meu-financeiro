@@ -582,6 +582,9 @@ function App(){
   const [adminReportSearch,setAdminReportSearch]=useState('');
   const [adminAnnouncementTitle,setAdminAnnouncementTitle]=useState('');
   const [adminAnnouncementBody,setAdminAnnouncementBody]=useState('');
+  const [adminNotificationRecipient,setAdminNotificationRecipient]=useState('');
+  const [adminNotificationTitle,setAdminNotificationTitle]=useState('');
+  const [adminNotificationBody,setAdminNotificationBody]=useState('');
   const [maintenanceCheckDone,setMaintenanceCheckDone]=useState(false);
   const [assistantOpen,setAssistantOpen]=useState(false);
   const [assistantInput,setAssistantInput]=useState('');
@@ -889,6 +892,7 @@ function App(){
     }
     if(action==='delete_user'&&!window.confirm('ATENÇÃO: excluir esta conta é definitivo. Os dados vinculados também poderão ser removidos. Deseja continuar?'))return;
     if(action==='broadcast_announcement'&&!window.confirm('Enviar este comunicado para todos os usuários ativos? Essa ação não pode ser desfeita.'))return;
+    if(action==='send_custom_notification'&&!window.confirm('Enviar esta notificação para a conta selecionada? Ela aparecerá no histórico e poderá chegar como push ao celular.'))return;
     if(action==='update_report_status'&&!window.confirm('Confirmar a atualização do status desta denúncia?'))return;
     if(action==='delete_report'&&!window.confirm('Apagar esta denúncia permanentemente? Esta ação não pode ser desfeita.'))return;
     setAdminBusy(true);setAdminError('');setAdminMessage('');
@@ -938,6 +942,17 @@ function App(){
       if(action==='get_maintenance'){setMaintenance(!!result.settings?.maintenance_mode);setMaintenanceMessage(result.settings?.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.');return}
       if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
       if(action==='broadcast_announcement'){setAdminMessage('Comunicado enviado para '+Number(result.sent||0)+' contas ativas.');setAdminAnnouncementTitle('');setAdminAnnouncementBody('');return}
+      if(action==='send_custom_notification'){
+        let pushResult=null;
+        try{
+          const {data:pushData,error:pushError}=await supabase.functions.invoke('send-push',{body:{title:extra.title,body:extra.message,url:'/',tag:'admin-personalizada',target_user_id:userId}});
+          if(!pushError)pushResult=pushData;
+        }catch(pushError){console.warn('Push personalizado:',pushError)}
+        const delivered=Number(pushResult?.sent||0);
+        const subscriptions=Number(pushResult?.subscriptions||0);
+        setAdminMessage('Notificação salva para '+(result.email||'o usuário')+'. '+(delivered>0?'Push enviado ao aparelho.':subscriptions===0?'A notificação ficará disponível dentro do app; esta conta ainda não tem push ativo.':'Push não confirmado pelo aparelho; a notificação ficou salva no app.'));
+        setAdminNotificationTitle('');setAdminNotificationBody('');return;
+      }
       if(action==='reset_password'){setAdminMessage('Link de redefinição gerado: '+(result.action_link||'Confira o e-mail do usuário.'));return}
       setAdminMessage(action==='ban_user'?'Conta bloqueada.':action==='unban_user'?'Conta desbloqueada.':'Conta excluída definitivamente.');
       const {data:refreshed,error:refreshError}=await supabase.functions.invoke('admin-panel',{body:{action:'list_users'}});
@@ -1119,13 +1134,14 @@ function App(){
           <div className="admin-stat"><span><Gamepad2 size={17}/> MODO DE TESTE</span><b>{adminTestMode?'Ativado':'Desativado'}</b><small>Somente neste navegador</small></div>
         </div>
         <nav className="admin-tabs" aria-label="Seções administrativas">
-          {[['overview','Visão geral',LayoutDashboard],['users','Usuários',Users],['social','NEXUS Social',MessageCircle],['reports','Denúncias',Flag],['announcements','Comunicados',Newspaper],['operations','Operações e segurança',ShieldCheck]].map(([key,label,Icon])=><button type="button" key={key} className={adminTab===key?'active':''} onClick={()=>setAdminTab(key)}><Icon size={16}/>{label}</button>)}
+          {[['overview','Visão geral',LayoutDashboard],['users','Usuários',Users],['social','NEXUS Social',MessageCircle],['reports','Denúncias',Flag],['announcements','Comunicados',Newspaper],['notifications','Notificações',Bell],['operations','Operações e segurança',ShieldCheck]].map(([key,label,Icon])=><button type="button" key={key} className={adminTab===key?'active':''} onClick={()=>setAdminTab(key)}><Icon size={16}/>{label}</button>)}
         </nav>
         {adminTab==='overview'&&<div className="admin-section-grid">
           <button className="admin-action-tile" onClick={()=>setAdminTab('users')}><span className="admin-tile-icon"><Users size={20}/></span><b>Gerenciar usuários</b><small>Bloqueio, recuperação de acesso e exclusão com confirmação.</small><em>Abrir gerenciamento <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>{setAdminTab('social');if(!adminSocialProfiles.length)adminAction('list_social_profiles')}}><span className="admin-tile-icon purple"><MessageCircle size={20}/></span><b>Moderação social</b><small>Revise perfis públicos e suspenda contas que violem as regras.</small><em>Moderar comunidade <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>{setAdminTab('reports');if(!adminReports.length)adminAction('list_reports')}}><span className="admin-tile-icon purple"><Flag size={20}/></span><b>Central de denúncias</b><small>Analise denúncias de perfis, publicações e comentários do NEXUS Social.</small><em>Revisar denúncias <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>setAdminTab('announcements')}><span className="admin-tile-icon purple"><Newspaper size={20}/></span><b>Central de comunicados</b><small>Envie avisos importantes para todos os usuários ativos.</small><em>Criar comunicado <ChevronRight size={15}/></em></button>
+          <button className="admin-action-tile" onClick={()=>{setAdminTab('notifications');if(!adminUsers.length)adminAction('list_users')}}><span className="admin-tile-icon"><Bell size={20}/></span><b>Notificação personalizada</b><small>Envie uma mensagem privada para uma conta e tente entregar como push.</small><em>Enviar notificação <ChevronRight size={15}/></em></button>
           <button className="admin-action-tile" onClick={()=>setAdminTab('operations')}><span className="admin-tile-icon green"><SlidersHorizontal size={20}/></span><b>Operações do site</b><small>Manutenção, aviso aos usuários e ferramentas de teste.</small><em>Configurar operações <ChevronRight size={15}/></em></button>
         </div>}
         {adminTab==='users'&&<div className="admin-section">
@@ -1156,6 +1172,30 @@ function App(){
             <div className="admin-report-actions"><label><span>Status</span><select value={status} disabled={adminBusy} onChange={e=>adminAction('update_report_status',null,{report_type:r.report_type,report_id:r.id,status:e.target.value})}><option value="open">Aberta</option><option value="reviewing">Em análise</option><option value="resolved">Resolvida</option><option value="dismissed">Arquivada</option></select></label><button type="button" className="delete-btn danger" disabled={adminBusy} onClick={()=>adminAction('delete_report',null,{report_type:r.report_type,report_id:r.id})}><Trash2 size={14}/> Apagar denúncia</button></div>
           </article>})}</div>}
           <p className="admin-note"><ShieldCheck size={15}/> Alterar o status não bloqueia nem exclui automaticamente ninguém. Ações disciplinares continuam separadas e exigem análise.</p>
+        </div>}
+        {adminTab==='notifications'&&<div className="admin-section">
+          <div className="admin-section-heading"><div><h3>Enviar notificação personalizada</h3><p>Escolha uma conta e envie um aviso privado para ela.</p></div><span className="admin-secure-pill"><ShieldCheck size={14}/> Acesso restrito</span></div>
+          <div className="admin-personal-notification-card">
+            <div className="admin-notification-recipient-head"><span className="admin-tile-icon"><Users size={18}/></span><div><b>Destinatário</b><small>Somente a conta escolhida receberá esta notificação.</small></div><button type="button" className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('list_users')}><RefreshCw size={14}/> Atualizar</button></div>
+            <label className="field-label" htmlFor="admin-notification-recipient">Selecionar usuário</label>
+            <select id="admin-notification-recipient" value={adminNotificationRecipient} onChange={e=>setAdminNotificationRecipient(e.target.value)}>
+              <option value="">Escolha uma conta...</option>
+              {adminUsers.filter(u=>u.id&&u.email?.toLowerCase()!==ADMIN_EMAIL).map(u=><option key={u.id} value={u.id}>{u.email||u.id}</option>)}
+            </select>
+            <div className="admin-notification-preview">
+              <span><Bell size={15}/> PRÉVIA NO CELULAR</span>
+              <b>{adminNotificationTitle.trim()||'Título da notificação'}</b>
+              <p>{adminNotificationBody.trim()||'Sua mensagem aparecerá aqui.'}</p>
+              <small>MEU FINANCEIRO</small>
+            </div>
+            <label className="field-label" htmlFor="admin-notification-title">Título</label>
+            <input id="admin-notification-title" value={adminNotificationTitle} maxLength={80} onChange={e=>setAdminNotificationTitle(e.target.value)} placeholder="Ex.: Uma novidade chegou!"/>
+            <div className="admin-announcement-counter">{adminNotificationTitle.length}/80</div>
+            <label className="field-label" htmlFor="admin-notification-body">Mensagem</label>
+            <textarea id="admin-notification-body" value={adminNotificationBody} maxLength={500} onChange={e=>setAdminNotificationBody(e.target.value)} placeholder="Escreva a mensagem que o usuário vai receber."/>
+            <div className="admin-announcement-counter">{adminNotificationBody.length}/500</div>
+            <div className="admin-operation-foot"><small>A notificação será salva no sino do usuário. Se ele tiver permitido notificações no aparelho, também tentaremos enviar um push.</small><button className="primary" disabled={adminBusy||!adminNotificationRecipient||adminNotificationTitle.trim().length<3||adminNotificationBody.trim().length<5} onClick={()=>adminAction('send_custom_notification',adminNotificationRecipient,{title:adminNotificationTitle.trim(),message:adminNotificationBody.trim()})}><Send size={15}/> Enviar notificação</button></div>
+          </div>
         </div>}
         {adminTab==='announcements'&&<div className="admin-section">
           <div className="admin-section-heading"><div><h3>Central de comunicados</h3><p>Publique avisos importantes diretamente na área de notificações dos usuários ativos.</p></div><span className="admin-secure-pill"><ShieldCheck size={14}/> Envio administrativo</span></div>
