@@ -4308,3 +4308,18 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 
 
 .chart-loading{display:grid;place-items:center;min-height:260px;color:#8290a8;font-size:13px}
+
+
+/* Central de notificações personalizadas do administrador */
+.admin-personal-notification-card{display:grid;gap:12px;max-width:760px;padding:18px;border:1px solid rgba(135,155,255,.2);border-radius:20px;background:linear-gradient(145deg,rgba(24,32,58,.88),rgba(12,18,34,.92));}
+.admin-notification-recipient-head{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-bottom:4px;}
+.admin-notification-recipient-head>div{display:grid;gap:3px;flex:1;min-width:150px;}
+.admin-notification-recipient-head>div b{font-size:14px;color:#f4f6ff;}
+.admin-notification-recipient-head>div small{font-size:12px;color:#9ba8c8;}
+.admin-personal-notification-card select,.admin-personal-notification-card input,.admin-personal-notification-card textarea{width:100%;box-sizing:border-box;}
+.admin-notification-preview{display:grid;gap:8px;padding:16px;border:1px solid rgba(126,153,255,.22);border-radius:16px;background:radial-gradient(ellipse at top left,rgba(85,104,210,.18),transparent 65%),rgba(7,12,25,.9);}
+.admin-notification-preview>span{display:flex;align-items:center;gap:7px;font-size:10px;font-weight:800;letter-spacing:.12em;color:#aebcff;}
+.admin-notification-preview>b{font-size:15px;color:#fff;}
+.admin-notification-preview>p{margin:0;color:#d4dcf5;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;}
+.admin-notification-preview>small{font-size:9px;letter-spacing:.12em;color:#7f8db0;}
+@media(max-width:600px){.admin-personal-notification-card{padding:13px;border-radius:16px}.admin-notification-recipient-head{align-items:flex-start}.admin-notification-recipient-head .delete-btn{font-size:11px;padding:7px}}
