@@ -4299,8 +4299,9 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
  .admin-tabs{overflow-x:auto;flex-wrap:nowrap;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
  .admin-tabs button{flex:0 0 auto;min-height:42px}
  .social-layout{grid-template-columns:minmax(0,1fr)}
- .social-side{display:none}
+ .social-side{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
  .social-person{align-items:flex-start;flex-wrap:wrap}
  .social-person-actions{width:100%;justify-content:flex-end}
 }
 @media(max-width:390px){.content{padding-left:11px;padding-right:11px}.stat-card{padding:13px 11px}.stat-value{font-size:16px}.page-heading h1{font-size:22px}}
+@media(max-width:390px){.social-side{grid-template-columns:minmax(0,1fr)}}
