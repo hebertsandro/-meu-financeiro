@@ -644,7 +644,11 @@ function App(){
     if(window.localStorage.getItem(doneKey)==='true'){window.localStorage.removeItem(pendingKey);return;}
     if(window.localStorage.getItem(pendingKey)==='true'){setOnboardingStep(0);setPage('overview');setShowOnboarding(true);}
   },[session?.user?.id]);
-  useEffect(()=>{if(session) loadData()},[session]);
+  useEffect(()=>{
+    // Nunca mantenha dados financeiros do usuário anterior visíveis ao trocar de conta.
+    setData({transactions:[],cards:[],debts:[],goals:[],installments:[],subscriptions:[],card_limit_history:[],goal_movements:[],notifications:[]});
+    if(session?.user?.id) loadData();
+  },[session?.user?.id]);
   useEffect(()=>{
     const user=session?.user;if(!user?.id||!supabase)return;
     let active=true;
