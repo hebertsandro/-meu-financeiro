@@ -14,5 +14,11 @@ export default defineConfig({
         });
       }
     }
-  ]
+  ],
+  // Diagnóstico temporário: preserva nomes de componentes/funções
+  // para que erros em produção apontem o arquivo e o componente reais.
+  build: {
+    minify: false,
+    sourcemap: true
+  }
 });
