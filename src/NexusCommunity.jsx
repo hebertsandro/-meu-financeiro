@@ -86,10 +86,27 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
    loadChats().catch(()=>{});
   };
   fetch();
-  channel=supabase.channel('social-chat-'+activeChat.id).on('postgres_changes',{event:'*',schema:'public',table:'social_messages',filter:'conversation_id=eq.'+activeChat.id},async payload=>{const fresh=await signedMessage(payload.new);setMessages(prev=>{const found=prev.some(m=>m.id===fresh.id);return found?prev.map(m=>m.id===fresh.id?fresh:m):[...prev,fresh];});if(payload.eventType==='INSERT'&&payload.new.sender_id!==userId)supabase.rpc('social_mark_conversation_read',{target_conversation:activeChat.id});}).on('postgres_changes',{event:'*',schema:'public',table:'social_message_reactions'},()=>fetch()).subscribe();
+  let chatPoll;
+  channel=supabase.channel('social-chat-'+activeChat.id)
+   .on('postgres_changes',{event:'*',schema:'public',table:'social_messages',filter:'conversation_id=eq.'+activeChat.id},()=>{
+    // Reconsulta o histórico autorizado em vez de depender do payload parcial do Realtime.
+    fetch().catch(e=>setError(errText(e)));
+   })
+   .on('postgres_changes',{event:'*',schema:'public',table:'social_message_reactions'},()=>fetch().catch(e=>setError(errText(e))))
+   .subscribe(status=>{
+    if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
+     setError('Conexão em tempo real instável. O chat continuará sincronizando automaticamente.');
+    }else if(status==='SUBSCRIBED'){
+     setError('');
+     fetch().catch(e=>setError(errText(e)));
+    }
+   });
+  // Rede de segurança: se o WebSocket cair ou o Realtime não entregar um evento,
+  // o histórico ainda é sincronizado enquanto esta conversa estiver aberta.
+  chatPoll=window.setInterval(()=>fetch().catch(e=>setError(errText(e))),5000);
   presence=supabase.channel('social-presence-'+activeChat.id,{config:{presence:{key:userId}}}).on('presence',{event:'sync'},()=>{const state=presence.presenceState();const active=Object.values(state).flat().filter(x=>x.user_id!==userId&&x.typing);setTypingUsers(active.map(x=>x.user_id));}).subscribe(async status=>{if(status==='SUBSCRIBED')await presence.track({user_id:userId,typing:false});});
   setTypingChannel(presence);
-  return()=>{setTypingChannel(null);setTypingUsers([]);if(channel)supabase.removeChannel(channel);if(presence)supabase.removeChannel(presence);};
+  return()=>{setTypingChannel(null);setTypingUsers([]);if(chatPoll)window.clearInterval(chatPoll);if(channel)supabase.removeChannel(channel);if(presence)supabase.removeChannel(presence);};
  },[activeChat?.id,userId,loadChats]);
  useEffect(()=>{
   if(!activeRoom)return;
