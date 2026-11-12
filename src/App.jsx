@@ -941,17 +941,18 @@ function App(){
       }
       if(action==='get_maintenance'){setMaintenance(!!result.settings?.maintenance_mode);setMaintenanceMessage(result.settings?.maintenance_message||'Estamos realizando uma manutenção. Voltaremos em breve.');return}
       if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
-      if(action==='broadcast_announcement'){setAdminMessage('Comunicado enviado para '+Number(result.sent||0)+' contas ativas.');setAdminAnnouncementTitle('');setAdminAnnouncementBody('');return}
-      if(action==='send_custom_notification'){
+      if(action==='broadcast_announcement'){
         let pushResult=null,pushFailed=false;
-        try{
-          const {data:pushData,error:pushError}=await supabase.functions.invoke('send-push',{body:{title:extra.title,body:extra.message,url:'/',tag:'admin-personalizada',target_user_id:userId}});
-          if(pushError){pushFailed=true;console.warn('Push personalizado:',pushError.message)}else pushResult=pushData;
-        }catch(pushError){pushFailed=true;console.warn('Push personalizado:',pushError)}
-        const delivered=Number(pushResult?.sent||0);
+        if(extra.send_push){
+          try{
+            const {data:pushData,error:pushError}=await supabase.functions.invoke('send-push',{body:{title:extra.title,body:extra.message,url:'/',tag:'aviso-geral-meu-financeiro',target_all:true}});
+            if(pushError){pushFailed=true;console.warn('Push geral:',pushError.message)}else pushResult=pushData;
+          }catch(pushError){pushFailed=true;console.warn('Push geral:',pushError)}
+        }
+        const pushSent=Number(pushResult?.sent||0);
         const subscriptions=Number(pushResult?.subscriptions||0);
-        setAdminMessage('Notificação salva para '+(result.email||'o usuário')+'. '+(delivered>0?'Push enviado ao aparelho.':pushFailed?'O push não pôde ser enviado; a notificação ficou salva dentro do app.':subscriptions===0?'A notificação ficará disponível dentro do app; esta conta ainda não tem push ativo.':'Push não confirmado pelo aparelho; a notificação ficou salva no app.'));
-        setAdminNotificationTitle('');setAdminNotificationBody('');return;
+        setAdminMessage('Notificação salva para '+Number(result.sent||0)+' usuários ativos. '+(pushSent>0?'Push enviado para '+pushSent+' aparelhos.':pushFailed?'O push não pôde ser enviado; o aviso continua disponível no sino do app.':subscriptions===0?'Nenhum aparelho tinha push ativo; o aviso continua disponível no sino do app.':'Push não confirmado; o aviso continua disponível no sino do app.'));
+        setAdminNotificationTitle('');setAdminNotificationBody('');setAdminAnnouncementTitle('');setAdminAnnouncementBody('');return;
       }
       if(action==='reset_password'){setAdminMessage('Link de redefinição gerado: '+(result.action_link||'Confira o e-mail do usuário.'));return}
       setAdminMessage(action==='ban_user'?'Conta bloqueada.':action==='unban_user'?'Conta desbloqueada.':'Conta excluída definitivamente.');
@@ -1174,27 +1175,22 @@ function App(){
           <p className="admin-note"><ShieldCheck size={15}/> Alterar o status não bloqueia nem exclui automaticamente ninguém. Ações disciplinares continuam separadas e exigem análise.</p>
         </div>}
         {adminTab==='notifications'&&<div className="admin-section">
-          <div className="admin-section-heading"><div><h3>Enviar notificação personalizada</h3><p>Escolha uma conta e envie um aviso privado para ela.</p></div><span className="admin-secure-pill"><ShieldCheck size={14}/> Acesso restrito</span></div>
+          <div className="admin-section-heading"><div><h3>Notificação para todos</h3><p>Envie um aviso oficial para todas as contas ativas do Meu Financeiro.</p></div><span className="admin-secure-pill"><ShieldCheck size={14}/> Acesso restrito</span></div>
           <div className="admin-personal-notification-card">
-            <div className="admin-notification-recipient-head"><span className="admin-tile-icon"><Users size={18}/></span><div><b>Destinatário</b><small>Somente a conta escolhida receberá esta notificação.</small></div><button type="button" className="delete-btn" disabled={adminBusy} onClick={()=>adminAction('list_users')}><RefreshCw size={14}/> Atualizar</button></div>
-            <label className="field-label" htmlFor="admin-notification-recipient">Selecionar usuário</label>
-            <select id="admin-notification-recipient" value={adminNotificationRecipient} onChange={e=>setAdminNotificationRecipient(e.target.value)}>
-              <option value="">Escolha uma conta...</option>
-              {adminUsers.filter(u=>u.id&&u.email?.toLowerCase()!==ADMIN_EMAIL).map(u=><option key={u.id} value={u.id}>{u.email||u.id}</option>)}
-            </select>
+            <div className="admin-notification-recipient-head"><span className="admin-tile-icon"><Users size={18}/></span><div><b>Todos os usuários ativos</b><small>Uma única mensagem será enviada para toda a comunidade. Contas bloqueadas e a conta administrativa ficam de fora.</small></div></div>
             <div className="admin-notification-preview">
-              <span><Bell size={15}/> PRÉVIA NO CELULAR</span>
+              <span><Bell size={15}/> PRÉVIA DA NOTIFICAÇÃO</span>
               <b>{adminNotificationTitle.trim()||'Título da notificação'}</b>
               <p>{adminNotificationBody.trim()||'Sua mensagem aparecerá aqui.'}</p>
-              <small>MEU FINANCEIRO</small>
+              <small>MEU FINANCEIRO · AVISO OFICIAL</small>
             </div>
             <label className="field-label" htmlFor="admin-notification-title">Título</label>
-            <input id="admin-notification-title" value={adminNotificationTitle} maxLength={80} onChange={e=>setAdminNotificationTitle(e.target.value)} placeholder="Ex.: Uma novidade chegou!"/>
+            <input id="admin-notification-title" value={adminNotificationTitle} maxLength={80} onChange={e=>setAdminNotificationTitle(e.target.value)} placeholder="Ex.: Novidade no Meu Financeiro!"/>
             <div className="admin-announcement-counter">{adminNotificationTitle.length}/80</div>
             <label className="field-label" htmlFor="admin-notification-body">Mensagem</label>
-            <textarea id="admin-notification-body" value={adminNotificationBody} maxLength={500} onChange={e=>setAdminNotificationBody(e.target.value)} placeholder="Escreva a mensagem que o usuário vai receber."/>
+            <textarea id="admin-notification-body" value={adminNotificationBody} maxLength={500} onChange={e=>setAdminNotificationBody(e.target.value)} placeholder="Escreva o aviso que todos os usuários receberão."/>
             <div className="admin-announcement-counter">{adminNotificationBody.length}/500</div>
-            <div className="admin-operation-foot"><small>A notificação será salva no sino do usuário. Se ele tiver permitido notificações no aparelho, também tentaremos enviar um push.</small><button className="primary" disabled={adminBusy||!adminNotificationRecipient||adminNotificationTitle.trim().length<3||adminNotificationBody.trim().length<5} onClick={()=>adminAction('send_custom_notification',adminNotificationRecipient,{title:adminNotificationTitle.trim(),message:adminNotificationBody.trim()})}><Send size={15}/> Enviar notificação</button></div>
+            <div className="admin-operation-foot"><small>O aviso ficará salvo no sino de todos os usuários ativos. Também tentaremos enviar uma notificação push para os aparelhos que permitiram notificações.</small><button className="primary" disabled={adminBusy||adminNotificationTitle.trim().length<3||adminNotificationBody.trim().length<5} onClick={()=>adminAction('broadcast_announcement',null,{title:adminNotificationTitle.trim(),message:adminNotificationBody.trim(),send_push:true})}><Send size={15}/> Enviar para todos</button></div>
           </div>
         </div>}
         {adminTab==='announcements'&&<div className="admin-section">
