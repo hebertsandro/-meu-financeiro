@@ -91,9 +91,9 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
    listRefresh=setTimeout(()=>{if(alive)loadChats().catch(()=>{});},700);
   };
   const loadInitial=async()=>{
-   const {data,error:e}=await supabase.from('social_messages').select('*').eq('conversation_id',activeChat.id).order('created_at',{ascending:true}).limit(100);
+   const {data,error:e}=await supabase.from('social_messages').select('*').eq('conversation_id',activeChat.id).order('created_at',{ascending:false}).limit(100);
    if(e)throw e;
-   const rows=await Promise.all((data||[]).map(signedMessage));
+   const rows=(await Promise.all((data||[]).map(signedMessage))).reverse();
    if(!alive)return;
    setMessages(rows);
    latestTimestamp=rows.reduce((latest,m)=>m.created_at>latest?m.created_at:latest,'');
@@ -120,15 +120,13 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
    .on('postgres_changes',{event:'DELETE',schema:'public',table:'social_messages',filter:'conversation_id=eq.'+activeChat.id},payload=>{
     const id=payload.old?.id;if(id)setMessages(old=>old.filter(m=>m.id!==id));
    })
-   .on('postgres_changes',{event:'*',schema:'public',table:'social_message_reactions'},async payload=>{
-    const row=payload.new?.message_id?payload.new:payload.old;
-    if(!row?.message_id)return;
-    const belongs=messages.some(m=>m.id===row.message_id);
-    if(!belongs)return;
-    const {data}=await supabase.from('social_message_reactions').select('message_id,user_id,reaction').eq('message_id',row.message_id);
-    if(!alive)return;
-    const next={};(data||[]).forEach(x=>{next[x.reaction]=(next[x.reaction]||0)+1;if(x.user_id===userId)next.mine=x.reaction;});
-    setMessageReactions(old=>({...old,[row.message_id]:next}));
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'social_message_reactions'},payload=>{
+    const row=payload.new;if(!row?.message_id)return;
+    setMessageReactions(old=>{const prev=old[row.message_id]||{};const next={...prev,[row.reaction]:(prev[row.reaction]||0)+1};if(row.user_id===userId)next.mine=row.reaction;return {...old,[row.message_id]:next};});
+   })
+   .on('postgres_changes',{event:'DELETE',schema:'public',table:'social_message_reactions'},payload=>{
+    const row=payload.old;if(!row?.message_id)return;
+    setMessageReactions(old=>{const prev=old[row.message_id]||{};const next={...prev,[row.reaction]:Math.max(0,(prev[row.reaction]||0)-1)};if(row.user_id===userId)delete next.mine;return {...old,[row.message_id]:next};});
    })
    .subscribe(status=>{
     if(!alive)return;
@@ -172,7 +170,7 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
  async function triggerPush(payload){try{await supabase.functions.invoke('nexus-push',{body:payload});}catch(e){console.warn('NEXUS push:',e?.message||e);}}
  async function startChat(person){await run(async()=>{const {data,error:e}=await supabase.rpc('social_start_private_chat',{target_user:person.user_id});if(e)throw e;await loadChats();setActiveRoom(null);setActiveChat({id:data,person});setSection('chat');setMobileChatOpen(true);});}
  async function uploadChatAttachment(file,folder){if(!file)return null;if(file.size>10*1024*1024)throw new Error('O arquivo deve ter no máximo 10 MB.');const ext=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)||'bin',path=userId+'/'+folder+'/'+crypto.randomUUID()+'.'+ext;const {error:e}=await supabase.storage.from('nexus-posts').upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false});if(e)throw e;return path;}
- async function sendMessage(e){e.preventDefault();const body=draft.trim();if((!body&&!chatFile)||!activeChat)return;const sentDraft=draft;const sentFile=chatFile;await run(async()=>{const attachment_path=await uploadChatAttachment(sentFile,'chat');const {data:msg,error:e1}=await supabase.from('social_messages').insert({conversation_id:activeChat.id,sender_id:userId,body:body||(sentFile?.name||'Arquivo enviado'),attachment_path,reply_to_id:replyTarget?.scope==='private'?replyTarget.id:null}).select('*').single();if(e1)throw e1;setDraft('');setChatFile(null);setReplyTarget(null);typingChannel?.track({user_id:userId,typing:false});const visible=await signedMessage(msg);setMessages(old=>old.some(m=>m.id===visible.id)?old:[...old,visible].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).slice(-200));triggerPush({type:'message',record_id:msg.id});loadChats().catch(()=>{});});}
+ async function sendMessage(e){e.preventDefault();const body=draft.trim();if((!body&&!chatFile)||!activeChat)return;const sentFile=chatFile;await run(async()=>{const attachment_path=await uploadChatAttachment(sentFile,'chat');const {data:msg,error:e1}=await supabase.from('social_messages').insert({conversation_id:activeChat.id,sender_id:userId,body:body||(sentFile?.name||'Arquivo enviado'),attachment_path,reply_to_id:replyTarget?.scope==='private'?replyTarget.id:null}).select('*').single();if(e1)throw e1;setDraft('');setChatFile(null);setReplyTarget(null);typingChannel?.track({user_id:userId,typing:false});const visible=await signedMessage(msg);setMessages(old=>old.some(m=>m.id===visible.id)?old:[...old,visible].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).slice(-200));triggerPush({type:'message',record_id:msg.id});loadChats().catch(()=>{});});}
  async function savePrivateMessage(message){const body=messageEditDraft.trim();if(!body){setError('A mensagem não pode ficar vazia.');return;}await run(async()=>{const {error:e}=await supabase.from('social_messages').update({body,edited_at:new Date().toISOString()}).eq('id',message.id).eq('sender_id',userId);if(e)throw e;setMessages(old=>old.map(m=>m.id===message.id?{...m,body,edited_at:new Date().toISOString()}:m));setEditingMessage(null);setMessageEditDraft('');onToast('Mensagem editada.');});}
  async function deletePrivateMessage(message){if(!confirm('Apagar esta mensagem para todos?'))return;await run(async()=>{const {error:e}=await supabase.from('social_messages').update({body:'Esta mensagem foi apagada.',deleted_at:new Date().toISOString()}).eq('id',message.id).eq('sender_id',userId);if(e)throw e;setMessages(old=>old.map(m=>m.id===message.id?{...m,body:'Esta mensagem foi apagada.',deleted_at:new Date().toISOString()}:m));});}
  async function togglePrivateReaction(message,reaction){const mine=messageReactions[message.id]?.mine;const result=mine===reaction?await supabase.from('social_message_reactions').delete().eq('message_id',message.id).eq('user_id',userId):await supabase.from('social_message_reactions').upsert({message_id:message.id,user_id:userId,reaction},{onConflict:'message_id,user_id'});if(result.error)setError(result.error.message);else{const {data}=await supabase.from('social_message_reactions').select('message_id,user_id,reaction').eq('message_id',message.id);const next={};(data||[]).forEach(x=>{next[x.reaction]=(next[x.reaction]||0)+1;if(x.user_id===userId)next.mine=x.reaction;});setMessageReactions(old=>({...old,[message.id]:next}));}}
