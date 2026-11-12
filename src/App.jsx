@@ -593,6 +593,7 @@ function App(){
   const [activeArcadeGame,setActiveArcadeGame]=useState(null);
   const [gameQuestionIndex,setGameQuestionIndex]=useState(0),[gameAnswer,setGameAnswer]=useState(null),[gameFeedback,setGameFeedback]=useState(''),[gameXp,setGameXp]=useState(()=>Number(window.localStorage.getItem('mf_game_xp')||0)),[gameCorrect,setGameCorrect]=useState(()=>Number(window.localStorage.getItem('mf_game_correct')||0)),[roundCorrect,setRoundCorrect]=useState(0);
   const [quizLastPlayed,setQuizLastPlayed]=useState(()=>Number(window.localStorage.getItem('mf_quiz_last')||0)),[quizClock,setQuizClock]=useState(Date.now()),[quizActive,setQuizActive]=useState(false),[roundQuestions,setRoundQuestions]=useState([]);
+  const quizStorageKey='mf_quiz_last:'+(session?.user?.id||'guest');
   const [dailyGameXp,setDailyGameXp]=useState(0);const [rewardSummary,setRewardSummary]=useState(null);const [liveGameLoot,setLiveGameLoot]=useState({coins:0,items:[]});
   const [profileEditorOpen,setProfileEditorOpen]=useState(false);
   const [playerProfile,setPlayerProfile]=useState(()=>{try{return JSON.parse(window.localStorage.getItem('mf_player_profile')||'{"name":"Meu jogador","avatar":"👾","frame":"violet","cardFrame":"cyan","username":"","bio":""}')}catch{return {name:'Meu jogador',avatar:'👾',frame:'violet',cardFrame:'cyan'}}});
@@ -610,6 +611,7 @@ function App(){
     const metadataName=String(session?.user?.user_metadata?.name||'').trim();
     setPlayerProfile({name:metadataName||'Meu jogador',avatar:'👾',frame:'violet',cardFrame:'cyan',username:'',bio:'',gems:[]});
   },[session?.user?.id]);
+  useEffect(()=>{setQuizLastPlayed(Number(window.localStorage.getItem(quizStorageKey)||0));},[quizStorageKey]);
   useEffect(()=>{if(!session?.user?.id||profileLoadedUserId!==session.user.id||!supabase||!profileMedalsLoaded||profileMedalsLoading)return;const timer=window.setTimeout(()=>{supabase.from('social_profiles').update({display_name:String(playerProfile.name||'').trim().slice(0,40),avatar:playerProfile.avatar||'👾',avatar_frame:playerProfile.frame||'violet',card_frame:playerProfile.cardFrame||'cyan',equipped_gems:Array.isArray(playerProfile.gems)?playerProfile.gems:[],equipped_medals:profileEquippedMedals,game_xp:gameXp,game_correct:gameCorrect,updated_at:new Date().toISOString()}).eq('user_id',session.user.id).then(({error})=>{if(error)console.warn('NEXUS Social profile sync:',error.message)})},700);return()=>window.clearTimeout(timer)},[session?.user?.id,profileLoadedUserId,playerProfile,profileEquippedMedals,profileMedalsLoaded,profileMedalsLoading,gameXp,gameCorrect]);
   const nexusWelcomeMessage={role:'assistant',text:'Olá! Eu sou a NEXUS. ⚡ Estou aqui para conversar sobre sua vida, estudos, sentimentos, ideias e também ajudar com suas finanças. Pode falar naturalmente, sem medo de errar!'};
   const nexusStorageKey='mf_nexus_messages:'+(session?.user?.id||'guest');
@@ -824,13 +826,13 @@ function App(){
   }
   function toggleAdminTestMode(){
     if(!isAdmin)return;
-    const keys=['mf_game_xp','mf_game_correct','mf_quiz_last','mf_flap_daily','mf_flap_best','mf_flap_best_infinite','mf_flap_bird','mf_flap_pipe','mf_flap_story_unlocks','mf_player_profile'];
+    const keys=['mf_game_xp','mf_game_correct',quizStorageKey,'mf_flap_daily','mf_flap_best','mf_flap_best_infinite','mf_flap_bird','mf_flap_pipe','mf_flap_story_unlocks','mf_player_profile'];
     if(!adminTestMode){
       const backup={};keys.forEach(key=>{backup[key]=window.localStorage.getItem(key)});
       window.localStorage.setItem('mf_admin_test_backup',JSON.stringify(backup));
       window.localStorage.setItem('mf_game_xp','10000');
       window.localStorage.setItem('mf_game_correct','100');
-      window.localStorage.setItem('mf_quiz_last','0');
+      window.localStorage.setItem(quizStorageKey,'0');
       window.localStorage.setItem('mf_flap_daily',JSON.stringify({day:new Date().toLocaleDateString('en-CA'),xp:0}));
       window.localStorage.setItem('mf_flap_best','100');
       window.localStorage.setItem('mf_flap_best_infinite','100');
@@ -849,7 +851,7 @@ function App(){
       window.localStorage.removeItem('mf_admin_test_backup');
       window.localStorage.removeItem('mf_admin_test_mode');
       setGameXp(Number(backup.mf_game_xp||0));setGameCorrect(Number(backup.mf_game_correct||0));
-      setQuizLastPlayed(Number(backup.mf_quiz_last||0));
+      setQuizLastPlayed(Number(backup[quizStorageKey]||0));
       try{const daily=JSON.parse(backup.mf_flap_daily||'{}');setDailyGameXp(daily.day===new Date().toLocaleDateString('en-CA')?Number(daily.xp||0):0)}catch{setDailyGameXp(0)}
       try{setPlayerProfile(JSON.parse(backup.mf_player_profile||'{"name":"Meu jogador","avatar":"👾","frame":"violet","cardFrame":"cyan","username":"","bio":""}'))}catch{}
       setAdminTestMode(false);
@@ -940,7 +942,7 @@ function App(){
   }
 
   const quizAvailable=!quizLastPlayed||quizClock-quizLastPlayed>=2*60*60*1000;
-  function startQuiz(){if(!quizAvailable)return;const selected=[...gameQuestions].sort(()=>Math.random()-.5).slice(0,5);const now=Date.now();setRoundQuestions(selected);setGameQuestionIndex(0);setGameAnswer(null);setGameFeedback('');setRoundCorrect(0);setQuizLastPlayed(now);window.localStorage.setItem('mf_quiz_last',String(now));setQuizActive(true)}
+  function startQuiz(){if(!quizAvailable)return;const selected=[...gameQuestions].sort(()=>Math.random()-.5).slice(0,5);const now=Date.now();setRoundQuestions(selected);setGameQuestionIndex(0);setGameAnswer(null);setGameFeedback('');setRoundCorrect(0);setQuizLastPlayed(now);window.localStorage.setItem(quizStorageKey,String(now));setQuizActive(true)}
   function answerGame(index){if(gameAnswer!==null||!quizActive)return;setGameAnswer(index);const q=roundQuestions[gameQuestionIndex];if(index===q.correct){setGameXp(v=>v+5);setGameCorrect(v=>v+1);setRoundCorrect(v=>v+1);if(session?.user?.id&&supabase)void supabase.rpc('social_record_clan_game_xp',{target_game:'quiz',xp_delta:5});setGameFeedback('Resposta certa! +5 XP. '+q.explanation)}else{setGameFeedback('Quase! '+q.explanation)}}
   function nextGameQuestion(){if(gameQuestionIndex>=roundQuestions.length-1){setQuizActive(false);setGameFeedback('');void recordCompetitionMatch({gameKey:'quiz',score:roundCorrect,xpEarned:roundCorrect*5,mode:'5-perguntas',won:roundCorrect>=4});return}setGameQuestionIndex(v=>v+1);setGameAnswer(null);setGameFeedback('')}
   async function awardLootDrop(gameKey,sourceKey){if(!session?.user?.id||!supabase)return null;const {data,error}=sourceKey==='coin_pickup'?await supabase.rpc('nexus_award_coin_drop',{selected_game:gameKey}):await supabase.rpc('nexus_award_loot_drop',{selected_game:gameKey,source_key:sourceKey});if(error){console.warn('Loot drop:',error.message);return null}if(data?.coins){setLiveGameLoot(v=>({...v,coins:v.coins+Number(data.coins||0)}));notify('MOEDAS NEXUS! +'+data.coins+' moedas')}else if(data?.item_name){setLiveGameLoot(v=>({...v,items:[...v.items,data]}));notify('DROP RARO! '+(data.icon||'🎁')+' '+data.item_name+' · +'+Number(data.score_value||0).toLocaleString('pt-BR')+' pontos na coleção')}return data||null}
