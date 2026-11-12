@@ -8,6 +8,7 @@ export default function NexusMultiplayer({userId,onToast=()=>{}}){
  const me=members.find(x=>x.user_id===userId),question=room?.questions?.[room.current_question],myAnswer=answers.find(x=>x.user_id===userId&&x.question_index===room?.current_question);
  const load=useCallback(async(roomId)=>{
   if(!roomId)return;
+  await supabase.rpc('competition_mp_sync_room',{room_id_input:roomId});
   const [{data:r,error:re},{data:m,error:me},{data:a}]=await Promise.all([
    supabase.from('competition_mp_rooms').select('*').eq('id',roomId).maybeSingle(),
    supabase.from('competition_mp_members').select('room_id,user_id,score,joined_at').eq('room_id',roomId).order('joined_at'),
