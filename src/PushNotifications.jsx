@@ -19,6 +19,7 @@ function iosVersion(){
 export default function PushNotifications({session,onToast}){
   const [status,setStatus]=useState('checking');
   const [busy,setBusy]=useState(false);
+  const [testing,setTesting]=useState(false);
   const [message,setMessage]=useState('');
   useEffect(()=>{
     let active=true;
@@ -74,6 +75,20 @@ export default function PushNotifications({session,onToast}){
     }finally{setBusy(false);}
   }
 
+  async function sendTest(){
+    if(testing||!session?.user?.id)return;
+    setTesting(true);setMessage('Enviando uma notificação de teste…');
+    try{
+      const {data,error}=await supabase.functions.invoke('send-push',{body:{title:'Teste do Meu Financeiro',body:'Se esta mensagem apareceu na tela do iPhone, as notificações push estão funcionando! 🔔',url:'/',tag:'teste-meu-financeiro-'+Date.now()}});
+      if(error)throw error;
+      if(Number(data?.sent)>0)setMessage('O serviço aceitou o envio para '+data.sent+' aparelho(s). Confira a Central de Notificações do iPhone.');
+      else setMessage(data?.message||'O servidor não encontrou um aparelho válido para receber o push. Reative as notificações neste aparelho.');
+    }catch(error){
+      console.error('Push test failed:',error);
+      setMessage(error?.message||'Falha ao enviar o teste. Verifique a conexão e tente novamente.');
+    }finally{setTesting(false);}
+  }
+
   async function disable(){
     setBusy(true);
     try{
@@ -96,7 +111,7 @@ export default function PushNotifications({session,onToast}){
         <b style={{display:'block',color:'var(--text,#f4f5ff)'}}>Notificações no aparelho</b>
         <span style={{display:'block',fontSize:12,opacity:.72,marginTop:3}}>{status==='enabled'?'Este aparelho está inscrito para receber avisos.':status==='denied'?'A permissão foi bloqueada nas configurações.':'Receba avisos importantes mesmo com o site fechado.'}</span>
       </div>
-      {status==='enabled'?<button className="delete-btn" disabled={busy} onClick={disable}>Desativar neste aparelho</button>:<button className="primary" disabled={busy||status==='unsupported'||status==='checking'||status==='denied'} onClick={activate}><Smartphone size={16}/>{busy?'Ativando…':'Ativar notificações'}</button>}
+      {status==='enabled'?<><button className="primary" disabled={testing} onClick={sendTest}>{testing?'Enviando…':'Enviar teste'}</button><button className="delete-btn" disabled={busy||testing} onClick={disable}>Desativar</button></>:<button className="primary" disabled={busy||status==='unsupported'||status==='checking'||status==='denied'} onClick={activate}><Smartphone size={16}/>{busy?'Ativando…':'Ativar notificações'}</button>}
     </div>
     {isIos()&&status!=='enabled'&&<p style={{fontSize:12,margin:'12px 0 0',opacity:.78}}>No iPhone: abra no Safari → Compartilhar → Adicionar à Tela de Início → abra o ícone criado. O recurso exige iOS 16.4 ou superior.</p>}
     {status==='unsupported'&&<p style={{fontSize:12,margin:'10px 0 0',color:'#f2bd70'}}>Este navegador ou versão do sistema não oferece suporte a notificações push do site. A Central de Notificações do Meu Financeiro continua disponível.</p>}
