@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase, isConfigured } from './supabase';
-import { improveNexusFallback } from './nexus-cognition';
 const NexusSocial = React.lazy(() => import('./NexusSocial'));
 const PlayerPostGrid = React.lazy(() => import('./NexusSocial').then(module => ({ default: module.PlayerPostGrid })));
 const NexusCompetition = React.lazy(() => import('./NexusCompetition'));
@@ -1008,6 +1007,7 @@ function App(){
       const legacyReply=generateNexusReply(question,financeContext,nextHistory);
       // A camada composicional revisa apenas respostas genéricas ou pouco contextualizadas.
       // Todo o processamento permanece no navegador; nenhum modelo/API externo é chamado.
+      const { improveNexusFallback } = await import('./nexus-cognition.js');
       const reply=improveNexusFallback(question,nextHistory,legacyReply);
       setAssistantMessages(old=>[...old,{role:'assistant',text:reply}]);
     }catch(error){
