@@ -32,7 +32,7 @@ export default function NexusLoot({userId,view='collection'}){
     supabase.from('nexus_loot_wallets').select('user_id',{count:'exact',head:true}).gt('collection_score',score),
     Promise.resolve(rows.some(row=>row.user_id===userId))
    ]);
-   if(!ahead.error)setGlobalRank((ahead.count||0)+1);else setGlobalRank(null);
+   if(!w.error&&w.data&&!ahead.error)setGlobalRank((ahead.count||0)+1);else setGlobalRank(null);
    const ids=[...new Set([...rows.map(x=>x.user_id),...(!ownInTop?[userId]:[])])];
    if(ids.length){
     const p=await supabase.from('social_profiles').select('user_id,username,display_name,avatar').in('user_id',ids);
