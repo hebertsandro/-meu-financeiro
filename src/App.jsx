@@ -554,18 +554,19 @@ function BrandMark({compact=false}) {
   return <span className={'brand-icon mf-brand-mark'+(compact?' compact':'')} aria-label="Meu Financeiro">
     <svg viewBox="0 0 64 64" role="img" aria-hidden="true">
       <defs>
-        <linearGradient id="mf-mark-gradient" x1="8" y1="8" x2="58" y2="58" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#A78BFA"/><stop offset=".52" stopColor="#6477FF"/><stop offset="1" stopColor="#22D3EE"/>
+        <linearGradient id="mf-symbol-bars" x1="16" y1="12" x2="48" y2="54" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#FFFFFF"/><stop offset=".55" stopColor="#C9B8FF"/><stop offset="1" stopColor="#73E6F4"/>
         </linearGradient>
-        <linearGradient id="mf-mark-glow" x1="14" y1="10" x2="50" y2="54" gradientUnits="userSpaceOnUse">
-          <stop stopColor="#FFFFFF"/><stop offset="1" stopColor="#D8D5FF"/>
+        <linearGradient id="mf-symbol-orbit" x1="8" y1="24" x2="57" y2="45" gradientUnits="userSpaceOnUse">
+          <stop stopColor="#A78BFA"/><stop offset=".55" stopColor="#7775FF"/><stop offset="1" stopColor="#22D3EE"/>
         </linearGradient>
       </defs>
-      <rect x="3" y="3" width="58" height="58" rx="19" fill="#080D18" stroke="url(#mf-mark-gradient)" strokeWidth="2.5"/>
-      <path d="M13 46V20c0-2.7 3.4-4 5.2-2l13.8 15 13.8-15c1.8-2 5.2-.7 5.2 2v26" fill="none" stroke="url(#mf-mark-glow)" strokeWidth="7" strokeLinecap="round" strokeLinejoin="round"/>
-      <path d="M13 46V20c0-2.7 3.4-4 5.2-2l13.8 15 13.8-15c1.8-2 5.2-.7 5.2 2v26" fill="none" stroke="url(#mf-mark-gradient)" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"/>
-      <circle cx="50" cy="13" r="5" fill="#22D3EE" stroke="#DDFBFF" strokeWidth="1.4"/>
-      <path d="M50 5.5v-2M57.5 13h2M50 20.5v2M42.5 13h-2" stroke="#B8F5FF" strokeWidth="1.5" strokeLinecap="round"/>
+      <path d="M10 39c4-14 17-23 31-22 8 1 13 5 14 11" fill="none" stroke="url(#mf-symbol-orbit)" strokeWidth="3.4" strokeLinecap="round"/>
+      <path d="M10 39c4 10 17 16 29 14 8-1 13-5 16-11" fill="none" stroke="url(#mf-symbol-orbit)" strokeWidth="3.4" strokeLinecap="round"/>
+      <rect x="19" y="34" width="7" height="13" rx="2.2" fill="url(#mf-symbol-bars)"/>
+      <rect x="29" y="27" width="7" height="20" rx="2.2" fill="url(#mf-symbol-bars)"/>
+      <rect x="39" y="18" width="7" height="29" rx="2.2" fill="url(#mf-symbol-bars)"/>
+      <path d="m49 10 2.1 4.3 4.7.7-3.4 3.3.8 4.7-4.2-2.2-4.2 2.2.8-4.7-3.4-3.3 4.7-.7L49 10Z" fill="#8CEBFA"/>
     </svg>
   </span>;
 }
@@ -1123,40 +1124,34 @@ function App(){
   const currentOnboarding=onboardingSteps[Math.min(onboardingStep,onboardingSteps.length-1)];
   function finishOnboarding(){if(session?.user?.id)window.localStorage.setItem('mf_onboarding_done:'+session.user.id,'true');if(session?.user?.email)window.localStorage.removeItem('mf_onboarding_pending:'+String(session.user.email).toLowerCase());setShowOnboarding(false);}
 
-  if(loading||!maintenanceCheckDone||!splashReady)return <div className="mf-splash mf-launch-screen" role="status" aria-label="Carregando Meu Financeiro" style={{position:'fixed',inset:0,zIndex:2147483000,width:'100%',height:'100dvh',minHeight:'100vh',display:'grid',placeItems:'center',overflow:'hidden',isolation:'isolate',background:'radial-gradient(ellipse at 50% 48%,rgba(92,73,220,.28),transparent 42%),radial-gradient(ellipse at 18% 82%,rgba(20,190,220,.16),transparent 38%),#070b16',color:'#f8faff'}}>
+  if(loading||!maintenanceCheckDone||!splashReady)return <div className="mf-splash mf-launch-screen" role="status" aria-label="Carregando Meu Financeiro" style={{position:'fixed',inset:0,zIndex:2147483000,width:'100%',height:'100dvh',minHeight:'100vh',display:'grid',placeItems:'center',overflow:'hidden',isolation:'isolate',background:'#080D18',color:'#f8faff'}}>
     <style>{`
-      .mf-launch-screen *{box-sizing:border-box}
-      .mf-launch-screen .mf-launch-center{position:relative;z-index:2;width:min(88vw,390px);display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;animation:mfLaunchReveal 1.15s cubic-bezier(.16,1,.3,1) both}
-      .mf-launch-screen .mf-launch-mark{width:112px;height:112px;display:grid;place-items:center;border-radius:34px;background:linear-gradient(145deg,#182345,#080d18);border:1px solid rgba(180,164,255,.85);box-shadow:0 0 0 8px rgba(128,105,255,.08),0 0 38px rgba(113,92,255,.42),0 0 90px rgba(34,211,238,.19);animation:mfLaunchPulse 2.4s ease-in-out infinite}
-      .mf-launch-screen .mf-launch-mark .brand-icon{width:100%!important;height:100%!important;border-radius:inherit!important;display:block!important}
-      .mf-launch-screen .mf-launch-mark svg{width:100%;height:100%}
-      .mf-launch-screen .mf-launch-name{margin-top:30px;font:800 clamp(30px,8vw,42px)/1.05 Manrope,system-ui,sans-serif;letter-spacing:-1.8px;color:#fff}
-      .mf-launch-screen .mf-launch-name span{background:linear-gradient(95deg,#b9a5ff,#8294ff 52%,#55deed);-webkit-background-clip:text;background-clip:text;color:transparent}
-      .mf-launch-screen .mf-launch-tagline{margin-top:13px;color:#aab6d4;font:600 10px/1.5 Manrope,system-ui,sans-serif;letter-spacing:3px}
-      .mf-launch-screen .mf-launch-loader{width:176px;height:3px;margin-top:42px;border-radius:10px;background:rgba(155,169,205,.2);overflow:hidden}
-      .mf-launch-screen .mf-launch-loader i{display:block;width:36%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a78bfa,#5ee5f4);box-shadow:0 0 14px #6dceff;animation:mfLaunchLoad 1.35s ease-in-out infinite}
-      .mf-launch-screen .mf-launch-caption{margin-top:18px;color:#7283a8;font:700 9px/1.4 Manrope,system-ui,sans-serif;letter-spacing:2.6px}
-      .mf-launch-screen .mf-launch-ring{position:absolute;left:50%;top:50%;width:min(82vw,470px);aspect-ratio:1;border:1px solid rgba(151,133,255,.17);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 70px rgba(91,76,232,.08),inset 0 0 55px rgba(48,209,235,.04);animation:mfLaunchOrbit 22s linear infinite}
-      .mf-launch-screen .mf-launch-ring:before,.mf-launch-screen .mf-launch-ring:after{content:'';position:absolute;width:8px;height:8px;border-radius:50%;background:#a78bfa;box-shadow:0 0 18px #9277ff;top:13%;left:20%}
-      .mf-launch-screen .mf-launch-ring:after{width:6px;height:6px;background:#22d3ee;box-shadow:0 0 16px #22d3ee;top:auto;left:auto;right:13%;bottom:18%}
-      .mf-launch-screen .mf-launch-ring-two{width:min(62vw,350px);border-style:dashed;border-color:rgba(34,211,238,.17);animation-duration:30s;animation-direction:reverse}
-      .mf-launch-screen .mf-launch-stars{position:absolute;inset:0;opacity:.45;background-image:radial-gradient(1px 1px at 17% 22%,#9aa9ff 99%,transparent),radial-gradient(1px 1px at 78% 31%,#67ddeb 99%,transparent),radial-gradient(1px 1px at 28% 76%,#a78bfa 99%,transparent),radial-gradient(1px 1px at 84% 82%,#9aa9ff 99%,transparent);background-size:190px 210px;animation:mfLaunchDrift 18s linear infinite}
-      @keyframes mfLaunchReveal{from{opacity:0;transform:translateY(24px) scale(.88);filter:blur(12px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
-      @keyframes mfLaunchPulse{0%,100%{transform:scale(1);filter:brightness(1)}50%{transform:scale(1.045);filter:brightness(1.2)}}
-      @keyframes mfLaunchLoad{0%{transform:translateX(-120%)}100%{transform:translateX(340%)}}
-      @keyframes mfLaunchOrbit{to{transform:translate(-50%,-50%) rotate(360deg)}}
-      @keyframes mfLaunchDrift{to{background-position:190px 210px}}
-      @media(prefers-reduced-motion:reduce){.mf-launch-screen *{animation:none!important}}
+      .mf-launch-screen:before{content:'';position:absolute;width:min(78vw,360px);aspect-ratio:1;border-radius:50%;background:radial-gradient(circle,rgba(125,91,255,.2),rgba(35,190,225,.07) 46%,transparent 72%);filter:blur(8px);animation:mfGlow 4s ease-in-out infinite}
+      .mf-launch-screen .mf-launch-center{position:relative;z-index:2;width:min(88vw,360px);display:flex;flex-direction:column;align-items:center;text-align:center;animation:mfEnter .9s cubic-bezier(.2,.8,.2,1) both}
+      .mf-launch-screen .mf-launch-symbol{width:104px;height:104px;display:grid;place-items:center;border-radius:30px;background:linear-gradient(145deg,#18213a,#0b1120);border:1px solid rgba(167,139,250,.55);box-shadow:0 16px 48px rgba(0,0,0,.28),0 0 34px rgba(124,92,255,.18)}
+      .mf-launch-screen .mf-launch-symbol .brand-icon{width:82px;height:82px;border-radius:22px;box-shadow:none;background:transparent}
+      .mf-launch-screen .mf-launch-symbol svg{width:100%;height:100%}
+      .mf-launch-screen .mf-launch-name{margin-top:25px;font:800 clamp(29px,8vw,39px)/1.05 Manrope,system-ui,sans-serif;letter-spacing:-1.7px;color:#f7f8ff}
+      .mf-launch-screen .mf-launch-name span{background:linear-gradient(95deg,#b8a1ff,#8b9cff 55%,#65dce9);-webkit-background-clip:text;background-clip:text;color:transparent}
+      .mf-launch-screen .mf-launch-tagline{margin-top:12px;color:#aab6ce;font:600 10px/1.5 Manrope,system-ui,sans-serif;letter-spacing:2.4px}
+      .mf-launch-screen .mf-launch-track{width:174px;height:4px;margin-top:38px;border-radius:8px;background:rgba(152,166,199,.18);overflow:hidden}
+      .mf-launch-screen .mf-launch-track i{display:block;width:38%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a78bfa,#67ddec);box-shadow:0 0 12px rgba(103,221,236,.7);animation:mfTrack 1.6s ease-in-out infinite}
+      .mf-launch-screen .mf-launch-caption{margin-top:15px;color:#7484a2;font:600 9px/1.5 Manrope,system-ui,sans-serif;letter-spacing:1.8px}
+      .mf-launch-screen .mf-launch-orbit{position:absolute;z-index:1;width:min(82vw,390px);height:min(32vw,150px);border:1px solid rgba(142,123,255,.2);border-radius:50%;transform:rotate(-18deg);animation:mfOrbit 12s linear infinite}
+      .mf-launch-screen .mf-launch-orbit:after{content:'';position:absolute;right:12%;top:4%;width:7px;height:7px;border-radius:50%;background:#72e5f4;box-shadow:0 0 16px #72e5f4}
+      @keyframes mfEnter{from{opacity:0;transform:translateY(16px) scale(.96);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+      @keyframes mfGlow{0%,100%{opacity:.65;transform:scale(.94)}50%{opacity:1;transform:scale(1.06)}}
+      @keyframes mfTrack{0%{transform:translateX(-110%)}100%{transform:translateX(300%)}}
+      @keyframes mfOrbit{to{transform:rotate(342deg)}}
+      @media(prefers-reduced-motion:reduce){.mf-launch-screen *,.mf-launch-screen:before{animation:none!important}}
     `}</style>
-    <div className="mf-launch-stars"/>
-    <div className="mf-launch-ring mf-launch-ring-one"/>
-    <div className="mf-launch-ring mf-launch-ring-two"/>
+    <div className="mf-launch-orbit" aria-hidden="true"/>
     <div className="mf-launch-center">
-      <div className="mf-launch-mark"><BrandMark/></div>
+      <div className="mf-launch-symbol"><BrandMark/></div>
       <div className="mf-launch-name">meu<span>financeiro</span></div>
-      <div className="mf-launch-tagline">SEU DINHEIRO. SEU UNIVERSO.</div>
-      <div className="mf-launch-loader"><i/></div>
-      <div className="mf-launch-caption">PREPARANDO SEU UNIVERSO FINANCEIRO</div>
+      <div className="mf-launch-tagline">PLANEJE · EVOLUA · CONQUISTE</div>
+      <div className="mf-launch-track"><i/></div>
+      <div className="mf-launch-caption">CARREGANDO SEU UNIVERSO FINANCEIRO</div>
     </div>
   </div>;
   if(!isConfigured)return <SetupScreen/>;
