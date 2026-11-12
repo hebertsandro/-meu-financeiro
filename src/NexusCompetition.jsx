@@ -24,8 +24,8 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
   setError('');
   try{
    await supabase.rpc('competition_finalize_periods');
-   const [profilesRes,friendshipsRes,seasonRes,tournamentRes,matchRes,medalRes,rankMedalRes,challengeRes]=await Promise.all([
-    supabase.from('social_profiles').select('user_id,username,display_name,avatar,game_xp,game_correct').order('game_xp',{ascending:false}).limit(50),
+   const [walletRankingRes,friendshipsRes,seasonRes,tournamentRes,matchRes,medalRes,rankMedalRes,challengeRes]=await Promise.all([
+    supabase.from('nexus_loot_wallets').select('user_id,collection_score').order('collection_score',{ascending:false}).order('user_id',{ascending:true}).limit(50),
     supabase.from('social_friendships').select('user_a,user_b').or('user_a.eq.'+userId+',user_b.eq.'+userId),
     supabase.from('competition_seasons').select('*').eq('status','active').gt('ends_at',new Date().toISOString()).order('starts_at',{ascending:false}).limit(1).maybeSingle(),
     supabase.from('competition_weekly_tournaments').select('*').eq('status','active').gt('ends_at',new Date().toISOString()).order('starts_at',{ascending:false}).limit(1).maybeSingle(),
@@ -68,8 +68,15 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
   finally{setLoading(false);setRefreshing(false)}
  },[userId]);
 
- useEffect(()=>{load()},[load]);
- const sortedGlobal=useMemo(()=>globalRows.slice().sort((a,b)=>Number(b.game_xp||0)-Number(a.game_xp||0)),[globalRows]);
+ useEffect(()=>{
+   load();
+   const channel=supabase.channel('competition-global-rank-'+userId)
+    .on('postgres_changes',{event:'*',schema:'public',table:'nexus_loot_wallets'},()=>load(true))
+    .subscribe();
+   const interval=window.setInterval(()=>load(true),15000);
+   return()=>{window.clearInterval(interval);supabase.removeChannel(channel)};
+  },[load,userId]);
+ const sortedGlobal=useMemo(()=>globalRows.slice().sort((a,b)=>Number(b.collection_score||0)-Number(a.collection_score||0)),[globalRows]);
  const sortedFriends=useMemo(()=>friendRows.slice().sort((a,b)=>Number(b.collection_score||0)-Number(a.collection_score||0)),[friendRows]);
  const myGlobalRank=sortedGlobal.findIndex(x=>x.user_id===userId)+1;
  const myFriendRank=sortedFriends.findIndex(x=>x.user_id===userId)+1;
