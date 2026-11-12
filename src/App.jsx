@@ -550,13 +550,13 @@ function generateNexusReply(question, finance={}, history=[]) {
   if (questionMark || words.length > 7) return 'Quero entender direito para não te responder com algo inventado. Pelo que consegui captar, você está falando de: “'+raw.slice(0,180)+'”. Você quer uma explicação, um conselho, ajuda para fazer algo ou só conversar sobre isso?';
   return greet+'Estou aqui para conversar. 💙 Pode falar do seu dia, de uma dúvida, de uma ideia ou de algo que esteja te preocupando. Não precisa escrever perfeitamente — eu tento entender e, se faltar contexto, pergunto.';
 }
-function BrandMark({compact=false}) {
+function BrandMark({compact=false,animated=false}) {
   return <span className={'brand-icon mf-brand-mark'+(compact?' compact':'')} aria-label="Meu Financeiro" style={{background:'transparent',border:0,boxShadow:'none',width:compact?32:54,height:compact?32:54,display:'inline-flex',alignItems:'center',justifyContent:'center',flexShrink:0}}>
-    <svg viewBox="0 0 64 64" role="img" aria-hidden="true" style={{display:'block',width:'100%',height:'100%'}}>
+    <svg className={animated?'mf-three-bars-animated':''} viewBox="0 0 64 64" role="img" aria-hidden="true" style={{display:'block',width:'100%',height:'100%'}}>
       <defs><linearGradient id="mf-three-bars" x1="10" y1="8" x2="54" y2="58" gradientUnits="userSpaceOnUse"><stop stopColor="#C7B5FF"/><stop offset=".58" stopColor="#9275FF"/><stop offset="1" stopColor="#55D9EA"/></linearGradient></defs>
-      <rect x="9" y="39" width="12" height="16" rx="3.5" fill="url(#mf-three-bars)"/>
-      <rect x="26" y="25" width="12" height="30" rx="3.5" fill="url(#mf-three-bars)"/>
-      <rect x="43" y="9" width="12" height="46" rx="3.5" fill="url(#mf-three-bars)"/>
+      <rect className="mf-bar-one" x="9" y="39" width="12" height="16" rx="3.5" fill="url(#mf-three-bars)"/>
+      <rect className="mf-bar-two" x="26" y="25" width="12" height="30" rx="3.5" fill="url(#mf-three-bars)"/>
+      <rect className="mf-bar-three" x="43" y="9" width="12" height="46" rx="3.5" fill="url(#mf-three-bars)"/>
     </svg>
   </span>;
 }
@@ -575,6 +575,7 @@ function App(){
   const [session,setSession]=useState(null), [loading,setLoading]=useState(true);
   const [splashReady,setSplashReady]=useState(false);
   useEffect(()=>{const timer=window.setTimeout(()=>setSplashReady(true),1600);return()=>window.clearTimeout(timer)},[]);
+  useEffect(()=>{const watchdog=window.setTimeout(()=>{setLoading(false);setMaintenanceCheckDone(true);setSplashReady(true);},9000);return()=>window.clearTimeout(watchdog)},[]);
   const activeUserIdRef=React.useRef(null);
   const [page,setPage]=useState(()=>window.location.hash.startsWith('#post-')?'social-feed':'overview'), [mobileMenu,setMobileMenu]=useState(false), [financeExpanded,setFinanceExpanded]=useState(true), [nexusExpanded,setNexusExpanded]=useState(true), [socialExpanded,setSocialExpanded]=useState(true);
   const [data,setData]=useState({transactions:[],cards:[],debts:[],goals:[],installments:[],subscriptions:[],card_limit_history:[],goal_movements:[],notifications:[]});
@@ -1143,6 +1144,10 @@ function App(){
       .mf-launch-screen .mf-launch-symbol{width:104px;height:104px;display:grid;place-items:center;background:transparent;border:0;box-shadow:none}
       .mf-launch-screen .mf-launch-symbol .brand-icon{width:94px;height:94px;border-radius:0;box-shadow:none;background:transparent}
       .mf-launch-screen .mf-launch-symbol svg{width:100%;height:100%}
+      .mf-launch-screen .mf-three-bars-animated rect{transform-box:fill-box;transform-origin:center bottom;animation:mfBarRise .42s cubic-bezier(.18,.78,.25,1) both}
+      .mf-launch-screen .mf-three-bars-animated .mf-bar-one{animation-delay:0s}
+      .mf-launch-screen .mf-three-bars-animated .mf-bar-two{animation-delay:.34s}
+      .mf-launch-screen .mf-three-bars-animated .mf-bar-three{animation-delay:.68s}
       .mf-launch-screen .mf-launch-name{margin-top:25px;font:800 clamp(29px,8vw,39px)/1.05 Manrope,system-ui,sans-serif;letter-spacing:-1.7px;color:#f7f8ff}
       .mf-launch-screen .mf-launch-name span{background:linear-gradient(95deg,#b8a1ff,#8b9cff 55%,#65dce9);-webkit-background-clip:text;background-clip:text;color:transparent}
       .mf-launch-screen .mf-launch-tagline{margin-top:12px;color:#aab6ce;font:600 10px/1.5 Manrope,system-ui,sans-serif;letter-spacing:2.4px}
@@ -1150,11 +1155,12 @@ function App(){
       .mf-launch-screen .mf-launch-track i{display:block;width:38%;height:100%;border-radius:inherit;background:linear-gradient(90deg,#a78bfa,#67ddec);box-shadow:0 0 12px rgba(103,221,236,.7);animation:mfTrack 1.6s ease-in-out infinite}
       .mf-launch-screen .mf-launch-caption{margin-top:15px;color:#7484a2;font:600 9px/1.5 Manrope,system-ui,sans-serif;letter-spacing:1.8px}
       @keyframes mfEnter{from{opacity:0;transform:translateY(16px) scale(.96);filter:blur(5px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
+      @keyframes mfBarRise{from{transform:scaleY(0);opacity:.35}to{transform:scaleY(1);opacity:1}}
       @keyframes mfTrack{0%{transform:translateX(-110%)}100%{transform:translateX(300%)}}
       @media(prefers-reduced-motion:reduce){.mf-launch-screen *,.mf-launch-screen:before{animation:none!important}}
     `}</style>
     <div className="mf-launch-center">
-      <div className="mf-launch-symbol"><BrandMark/></div>
+      <div className="mf-launch-symbol"><BrandMark animated/></div>
       <div className="mf-launch-name">meu<span>financeiro</span></div>
       <div className="mf-launch-tagline">PLANEJE · EVOLUA · CONQUISTE</div>
       <div className="mf-launch-track"><i/></div>
