@@ -1,7 +1,13 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
-<defs><linearGradient id="g" x1="12" y1="8" x2="116" y2="120" gradientUnits="userSpaceOnUse"><stop stop-color="#A78BFA"/><stop offset=".55" stop-color="#6477FF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient><linearGradient id="w" x1="26" y1="22" x2="100" y2="106" gradientUnits="userSpaceOnUse"><stop stop-color="#fff"/><stop offset="1" stop-color="#c9f8ff"/></linearGradient></defs>
-<rect x="4" y="4" width="120" height="120" rx="34" fill="#080D18" stroke="url(#g)" stroke-width="4"/>
-<path d="M25 94V37c0-6 7-9 11-4l28 30 28-30c4-5 11-2 11 4v57" fill="none" stroke="url(#w)" stroke-width="13" stroke-linecap="round" stroke-linejoin="round"/>
-<path d="M25 94V37c0-6 7-9 11-4l28 30 28-30c4-5 11-2 11 4v57" fill="none" stroke="url(#g)" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/>
-<circle cx="101" cy="24" r="9" fill="#22D3EE" stroke="#e8fdff" stroke-width="2"/><path d="M101 9V5m15 19h4m-19 15v4m-15-19h-4" stroke="#bdf8ff" stroke-width="2.5" stroke-linecap="round"/>
+<defs>
+ <linearGradient id="bg" x1="12" y1="8" x2="116" y2="120" gradientUnits="userSpaceOnUse"><stop stop-color="#17152F"/><stop offset="1" stop-color="#080D18"/></linearGradient>
+ <linearGradient id="bars" x1="35" y1="25" x2="88" y2="99" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset=".55" stop-color="#C9B8FF"/><stop offset="1" stop-color="#73E6F4"/></linearGradient>
+ <linearGradient id="orbit" x1="12" y1="32" x2="115" y2="92" gradientUnits="userSpaceOnUse"><stop stop-color="#A78BFA"/><stop offset=".55" stop-color="#7775FF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient>
+</defs>
+<rect x="4" y="4" width="120" height="120" rx="34" fill="url(#bg)" stroke="#39345F" stroke-width="2"/>
+<path d="M17 75c9-31 38-48 66-39 13 4 23 13 27 24M17 75c9 24 38 35 62 25 14-6 24-17 29-31" fill="none" stroke="url(#orbit)" stroke-width="5" stroke-linecap="round"/>
+<rect x="35" y="62" width="13" height="30" rx="4" fill="url(#bars)"/>
+<rect x="56" y="47" width="13" height="45" rx="4" fill="url(#bars)"/>
+<rect x="77" y="29" width="13" height="63" rx="4" fill="url(#bars)"/>
+<path d="m99 16 3.5 7.2 8 1.2-5.8 5.6 1.4 7.9-7.1-3.7-7.1 3.7 1.4-7.9-5.8-5.6 8-1.2L99 16Z" fill="#8CEBFA"/>
 </svg>
