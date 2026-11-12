@@ -2,11 +2,18 @@
   "id": "/",
   "name": "Meu Financeiro",
   "short_name": "Meu Financeiro",
-  "description": "Seu controle financeiro e comunidade NEXUS.",
+  "description": "Planeje. Evolua. Conquiste.",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
   "background_color": "#080d18",
   "theme_color": "#080d18",
-  "icons": [{ "src": "/icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
 }
