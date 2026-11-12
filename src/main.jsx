@@ -1,7 +1,6 @@
 import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
-import AutoUpdate from './AutoUpdate.jsx';
 import './styles.css';
 import './phase1-visual-refinement.css';
 import './nexus-player-profile.css';
@@ -47,7 +46,7 @@ if (root) {
   createRoot(root).render(
     <React.StrictMode>
       <AppStartupBoundary>
-        <><App /><AutoUpdate /></>
+        <App />
       </AppStartupBoundary>
     </React.StrictMode>
   );
