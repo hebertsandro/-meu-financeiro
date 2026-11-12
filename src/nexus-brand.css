@@ -8,7 +8,7 @@
 .mf-splash-orbit{position:absolute;left:50%;top:50%;width:min(78vw,520px);aspect-ratio:1;border:1px solid rgba(145,132,255,.15);border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 70px rgba(91,76,232,.08),inset 0 0 55px rgba(48,209,235,.035)}
 .mf-splash-orbit:before,.mf-splash-orbit:after{content:"";position:absolute;width:7px;height:7px;border-radius:50%;background:#a78bfa;box-shadow:0 0 15px #9277ff;top:14%;left:18%}
 .mf-splash-orbit:after{width:5px;height:5px;background:#22d3ee;box-shadow:0 0 14px #22d3ee;top:auto;left:auto;right:13%;bottom:18%}
-.mf-splash-orbit-two{width:min(58vw,390px);border-style:dashed;border-color:rgba(34,211,238,.13);animation:mfSplashOrbit 32s linear infinite reverse}
+.mf-splash-orbit-two{width:min(58vw,390px);border-style:dashed;border-color:rgba(34,211,238,.13);animation:mfSplashOrbitCentered 32s linear infinite reverse}
 .mf-splash-center{width:min(86vw,360px);display:flex;flex-direction:column;align-items:center;text-align:center;animation:mfSplashEnter .9s cubic-bezier(.2,.8,.2,1) both}
 .mf-splash-center .brand-icon{width:94px;height:94px;border-radius:29px;background:linear-gradient(145deg,#141d39,#080d18)!important;border:1px solid rgba(166,151,255,.78);box-shadow:0 0 0 7px rgba(119,96,255,.07),0 0 45px rgba(111,91,255,.34),0 0 90px rgba(34,211,238,.13)!important}
 .mf-splash-wordmark{margin-top:24px;font:800 clamp(27px,7vw,37px)/1.1 Manrope,system-ui,sans-serif;letter-spacing:-1.7px;color:#f8faff}
@@ -18,5 +18,6 @@
 .mf-splash-center small{margin-top:17px;color:#8996b4;font:700 9px/1.4 Manrope,system-ui,sans-serif;letter-spacing:2.8px}
 @keyframes mfSplashEnter{from{opacity:0;transform:translateY(18px) scale(.94);filter:blur(8px)}to{opacity:1;transform:translateY(0) scale(1);filter:blur(0)}}
 @keyframes mfSplashOrbit{to{transform:rotate(360deg)}}
+@keyframes mfSplashOrbitCentered{to{transform:translate(-50%,-50%) rotate(360deg)}}
 @keyframes mfSplashProgress{0%{transform:translateX(-110%)}100%{transform:translateX(260%)}}
 @media(prefers-reduced-motion:reduce){.mf-splash:before,.mf-splash:after,.mf-splash-orbit-two,.mf-splash-progress i{animation:none!important}.mf-splash-center{animation:none!important}}
