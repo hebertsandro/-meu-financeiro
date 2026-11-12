@@ -49,6 +49,21 @@ Deno.serve(async (req) => {
     return respond({ success: true, maintenance_mode: enabled });
   }
 
+  if (body.action === "send_custom_notification") {
+    const targetId = body.user_id;
+    const title = typeof body.title === "string" ? body.title.trim().slice(0, 80) : "";
+    const message = typeof body.message === "string" ? body.message.trim().slice(0, 500) : "";
+    if (!targetId || title.length < 3 || message.length < 5) return respond({ error: "Selecione um usuário e informe um título e uma mensagem válidos." }, 400);
+    if (targetId === authData.user.id) return respond({ error: "Selecione outra conta para enviar uma notificação administrativa." }, 400);
+    const { data: target, error: targetError } = await admin.auth.admin.getUserById(targetId);
+    if (targetError || !target.user) return respond({ error: "Usuário não encontrado." }, 404);
+    const isBanned = !!target.user.banned_until && new Date(target.user.banned_until).getTime() > Date.now();
+    if (isBanned) return respond({ error: "Esta conta está bloqueada e não pode receber notificações." }, 409);
+    const { error } = await admin.from("notifications").insert({ user_id: targetId, title, message, category: "admin" });
+    if (error) return respond({ error: "Não foi possível salvar a notificação: " + error.message }, 500);
+    return respond({ success: true, user_id: targetId, email: target.user.email ?? "usuário" });
+  }
+
   if (body.action === "broadcast_announcement") {
     const title = typeof body.title === "string" ? body.title.trim().slice(0, 80) : "";
     const message = typeof body.message === "string" ? body.message.trim().slice(0, 500) : "";
