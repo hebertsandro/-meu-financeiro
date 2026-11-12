@@ -14,14 +14,16 @@ Deno.serve(async(req)=>{
     const supabase=createClient(Deno.env.get("SUPABASE_URL")!,anonKey,{global:{headers:{Authorization:authHeader}}});
     const {data:{user},error:userError}=await supabase.auth.getUser();
     if(userError||!user)return reply({error:"Unauthorized"},401);
-    const {title,body,url="/",tag="meu-financeiro"}=await req.json();
+    const {title,body,url="/",tag="meu-financeiro",target_user_id}=await req.json();
     if(!title||!body)return reply({error:"title and body are required"},400);
+    const targetUserId=typeof target_user_id==="string"&&target_user_id.trim()?target_user_id:user.id;
+    if(targetUserId!==user.id&&user.email?.toLowerCase()!==Deno.env.get("ADMIN_EMAIL")?.toLowerCase())return reply({error:"Forbidden: only the administrator can send a push to another account"},403);
     const publicKey="BCay49BvqxHdAPmTOEwxxyUhU7Brg0ElRvU9QdLMEwIorYHa7uOutg9DVZu9HiBGxftBr0VZwfKk9n12YdTD8Cs";
     const privateKey=Deno.env.get("VAPID_PRIVATE_KEY");
     if(!privateKey)return reply({error:"Push service is not configured"},503);
     webpush.setVapidDetails("https://meu-financeiro.hebertsandro877.workers.dev",publicKey,privateKey);
     const admin=createClient(Deno.env.get("SUPABASE_URL")!,Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!);
-    const {data:subscriptions,error}=await admin.from("push_subscriptions").select("id,endpoint,p256dh,auth").eq("user_id",user.id);
+    const {data:subscriptions,error}=await admin.from("push_subscriptions").select("id,endpoint,p256dh,auth").eq("user_id",targetUserId);
     if(error)throw error;
     let sent=0;
     let failed=0;
