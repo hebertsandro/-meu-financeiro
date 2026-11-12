@@ -17,8 +17,9 @@ import {
 } from 'recharts';
 
 const brl = n => new Intl.NumberFormat('pt-BR',{style:'currency',currency:'BRL'}).format(Number(n)||0);
-const today = () => new Date().toISOString().slice(0,10);
-const monthStart = () => new Date(new Date().getFullYear(),new Date().getMonth(),1).toISOString().slice(0,10);
+const localDate = (date = new Date()) => `${date.getFullYear()}-${String(date.getMonth()+1).padStart(2,'0')}-${String(date.getDate()).padStart(2,'0')}`;
+const today = () => localDate();
+const monthStart = () => `${new Date().getFullYear()}-${String(new Date().getMonth()+1).padStart(2,'0')}-01`;
 const ADMIN_EMAIL = 'hebertsandro877@gmail.com'; // Apenas controla a exibição; a Edge Function valida o acesso no servidor.
 const menu = [
   ['Visão geral',LayoutDashboard,'overview'],['Cartões e compromissos',CreditCard,'cards'],
