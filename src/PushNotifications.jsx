@@ -30,7 +30,22 @@ export default function PushNotifications({session,onToast}){
         await navigator.serviceWorker.ready;
         const subscription=await registration.pushManager.getSubscription();
         if(!active)return;
-        if(subscription){setStatus('enabled');return;}
+        if(subscription){
+          // A assinatura do navegador pode existir sem estar vinculada à conta atual no banco.
+          const json=subscription.toJSON();
+          const keys=json.keys||{};
+          const {error}=await supabase.from('push_subscriptions').upsert({
+            user_id:session.user.id,
+            endpoint:json.endpoint,
+            p256dh:keys.p256dh,
+            auth:keys.auth,
+            device_info:navigator.userAgent.slice(0,500),
+            updated_at:new Date().toISOString()
+          },{onConflict:'endpoint'});
+          if(error)throw error;
+          if(active){setStatus('enabled');setMessage('Este aparelho foi vinculado à sua conta para receber notificações.');}
+          return;
+        }
         if(!('PushManager' in window) || !('Notification' in window)){setStatus('unsupported');return;}
         if(Notification.permission==='denied'){setStatus('denied');return;}
         setStatus('off');
