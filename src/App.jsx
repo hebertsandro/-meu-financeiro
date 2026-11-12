@@ -676,8 +676,8 @@ function App(){
   const notify=(s)=>{setToast(s);setTimeout(()=>setToast(''),3200)};
   const unreadCount=data.notifications.filter(n=>!n.is_read).length;
   async function addNotification(title,message,category='geral'){if(!session?.user?.id)return;const {error}=await supabase.from('notifications').insert({user_id:session.user.id,title,message,category});if(!error){await loadData();supabase.functions.invoke('send-push',{body:{title,body:message,url:'/',tag:category||'meu-financeiro'}}).then(({error:pushError})=>{if(pushError)console.warn('Push notification:',pushError.message)}).catch(error=>console.warn('Push notification:',error))}}
-  async function markNotificationRead(id){const {error}=await supabase.from('notifications').update({is_read:true}).eq('id',id);if(!error)await loadData()}
-  async function markAllNotificationsRead(){const {error}=await supabase.from('notifications').update({is_read:true}).eq('is_read',false);if(!error){await loadData();notify('Todas as notificações foram marcadas como lidas.')}}
+  async function markNotificationRead(id){const {error}=await supabase.from('notifications').update({is_read:true}).eq('id',id).eq('user_id',session.user.id);if(!error)await loadData()}
+  async function markAllNotificationsRead(){const {error}=await supabase.from('notifications').update({is_read:true}).eq('user_id',session.user.id).eq('is_read',false);if(!error){await loadData();notify('Todas as notificações foram marcadas como lidas.')}}
   async function handleAuth(e){
     e.preventDefault();setBusy(true);setAuthError('');setAuthNotice('');
     const cleanEmail=email.trim();
@@ -740,8 +740,10 @@ function App(){
     setUsernameBusy(false);
   }
   async function loadData(){
+    const userId=session?.user?.id;
+    if(!userId||!supabase)return;
     const tables=['transactions','cards','debts','goals','installments','subscriptions','card_limit_history','goal_movements','notifications'];
-    const results=await Promise.all(tables.map(t=>supabase.from(t).select('*').order(t==='card_limit_history'?'changed_at':'created_at',{ascending:false})));
+    const results=await Promise.all(tables.map(t=>supabase.from(t).select('*').eq('user_id',userId).order(t==='card_limit_history'?'changed_at':'created_at',{ascending:false})));
     const next={};
     results.forEach((r,i)=>{next[tables[i]]=r.data||[]});
     setData(next);
@@ -762,7 +764,7 @@ function App(){
       if(nextSaved<0){setBusy(false);notify('A retirada não pode ser maior que o valor guardado.');return false}
       const movement=await supabase.from('goal_movements').insert({...values,user_id:session.user.id}).select('id').single();
       if(movement.error||!movement.data){setBusy(false);notify('Não foi possível registrar a movimentação.');return false}
-      const update=await supabase.from('goals').update({saved:nextSaved}).eq('id',goal.id);
+      const update=await supabase.from('goals').update({saved:nextSaved}).eq('id',goal.id).eq('user_id',session.user.id);
       if(update.error){await supabase.from('goal_movements').delete().eq('id',movement.data.id);setBusy(false);notify('Não foi possível atualizar a meta.');return false}
       setBusy(false);await loadData();setModal(null);notify('Movimentação da meta registrada!');await addNotification(values.movement_type==='deposito'?'Depósito na meta':'Retirada da meta',(values.movement_type==='deposito'?'Você adicionou ':'Você retirou ')+brl(values.amount)+' da meta.','metas');return true;
     }
@@ -804,7 +806,7 @@ function App(){
     setBusy(true);
     const history=await supabase.from('card_limit_history').insert({user_id:session.user.id,card_id:card.id,previous_limit:Number(card.limit_amount),new_limit:next});
     if(history.error){setBusy(false);notify('Não foi possível registrar o histórico do limite.');return}
-    const update=await supabase.from('cards').update({limit_amount:next}).eq('id',card.id);
+    const update=await supabase.from('cards').update({limit_amount:next}).eq('id',card.id).eq('user_id',session.user.id);
     setBusy(false);
     if(update.error){notify('O histórico foi salvo, mas não foi possível atualizar o cartão.');return}
     await loadData();notify('Limite atualizado e histórico registrado!');await addNotification('Limite do cartão alterado',card.name+': '+brl(card.limit_amount)+' → '+brl(next)+'.','cartoes');
