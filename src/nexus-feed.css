@@ -316,3 +316,17 @@
 .nxf-report-dialog>div button[type=submit]{border-color:#7c6de8;background:linear-gradient(110deg,#586ee9,#8c58db);color:#fff}
 .nxf-report-dialog>div button:disabled{opacity:.55}
 @media(max-width:600px){.nxf-report-backdrop{align-items:end;padding:10px}.nxf-report-dialog{width:100%;max-height:88dvh;padding:17px;border-radius:20px 20px 14px 14px}}
+
+
+/* Story viewer usability: visible back action, scrollable viewer list and swipe affordance */
+.nexus-feed .nxf-story-viewer{box-sizing:border-box!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;padding:calc(env(safe-area-inset-top,0px) + 54px) 14px calc(env(safe-area-inset-bottom,0px) + 18px)!important}
+.nexus-feed .nxf-story-viewer article{box-sizing:border-box!important;width:min(100%,440px)!important;max-height:calc(100dvh - 78px)!important;overflow-y:auto!important;overflow-x:hidden!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important;border-radius:20px!important}
+.nexus-feed .nxf-story-viewer article>img{max-height:min(54dvh,620px)!important;object-fit:contain!important}
+.nexus-feed .nxf-story-back{position:fixed!important;top:max(14px,env(safe-area-inset-top))!important;left:14px!important;z-index:10052!important;display:inline-flex!important;align-items:center!important;gap:7px!important;min-height:40px!important;padding:0 13px!important;border:1px solid #ffffff35!important;border-radius:12px!important;background:#111827ef!important;color:#fff!important;font-size:12px!important;font-weight:800!important;backdrop-filter:blur(12px)!important;box-shadow:0 8px 24px #0005!important}
+.nexus-feed .nxf-story-viewer>button.nxf-story-close{top:max(14px,env(safe-area-inset-top))!important;right:14px!important;width:40px!important;height:40px!important;border:1px solid #ffffff35!important;border-radius:12px!important;background:#111827ef!important;color:#fff!important}
+.nexus-feed .nxf-story-viewers{max-height:30dvh!important;overflow-y:auto!important;overscroll-behavior:contain!important;-webkit-overflow-scrolling:touch!important}
+.nexus-feed .nxf-story-viewers-heading{display:flex;align-items:center;justify-content:space-between;gap:8px;position:sticky;top:0;padding-bottom:8px;background:#0c111f}
+.nexus-feed .nxf-story-viewers-heading small,.nexus-feed .nxf-story-swipe-hint{font-size:10px!important;opacity:.65!important}
+.nexus-feed .nxf-story-swipe-hint{display:block;margin-top:6px}
+.nexus-feed .nxf-story-viewers-trigger{min-height:42px}
+@media(max-width:600px){.nexus-feed .nxf-story-viewer{padding-left:10px!important;padding-right:10px!important}.nexus-feed .nxf-story-viewer article{width:100%!important;max-height:calc(100dvh - 70px)!important;border-radius:16px!important}.nexus-feed .nxf-story-viewer article>img{max-height:46dvh!important}.nexus-feed .nxf-story-text-only{min-height:42dvh!important}.nexus-feed .nxf-story-viewers{max-height:34dvh!important}}

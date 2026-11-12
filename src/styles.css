@@ -4275,3 +4275,32 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 .nexus-vault-note b{color:#c8d5e9}
 @media(max-width:1050px){.nexus-vault-hero{grid-template-columns:minmax(0,1fr) 220px;gap:15px;padding:25px}.nexus-vault-center{grid-column:2;grid-row:1 / span 2;width:215px;height:215px}.nexus-vault-orbit-one{width:205px;height:205px}.nexus-vault-orbit-two{width:177px;height:177px}.nexus-vault-door{width:148px;height:148px}.nexus-vault-door-inner{width:112px;height:112px}.nexus-vault-balance{grid-column:1;grid-row:2}}
 @media(max-width:760px){.nexus-vault-page{gap:14px}.nexus-vault-hero{grid-template-columns:minmax(0,1fr);gap:12px;padding:20px 16px;border-radius:18px}.nexus-vault-copy{max-width:none}.nexus-vault-copy h2{font-size:25px;margin:10px 0 7px}.nexus-vault-copy p{font-size:10px;max-width:340px}.nexus-vault-tags{margin-top:12px;gap:6px}.nexus-vault-tags span{font-size:8px;padding:6px 8px}.nexus-vault-center{grid-column:auto;grid-row:auto;width:190px;height:190px;margin:0 auto}.nexus-vault-orbit-one{width:180px;height:180px}.nexus-vault-orbit-two{width:158px;height:158px}.nexus-vault-door{width:132px;height:132px;border-width:6px}.nexus-vault-door-inner{width:100px;height:100px}.nexus-vault-handle{inset:10px}.nexus-vault-lock{width:47px;height:47px;border-radius:14px}.nexus-vault-lock svg{width:23px;height:23px}.nexus-vault-spark-a{top:15px;right:17px}.nexus-vault-spark-b{bottom:17px;left:14px}.nexus-vault-balance{grid-column:auto;grid-row:auto;padding:14px}.nexus-vault-balance>strong{font-size:29px}.nexus-vault-stats{gap:7px}.nexus-vault-stats>div{padding:12px 9px;gap:7px;border-radius:12px}.nexus-vault-stats span{font-size:7px;letter-spacing:.3px;gap:4px}.nexus-vault-stats span svg{width:12px;height:12px}.nexus-vault-stats b{font-size:13px}.nexus-goals-heading{align-items:flex-start;gap:10px}.nexus-goals-heading h3{font-size:18px}.nexus-goals-heading p{font-size:9px;max-width:220px}.nexus-goals-heading .primary{min-height:39px;padding:9px 10px;font-size:10px}.nexus-goals-grid{grid-template-columns:minmax(0,1fr);gap:11px}.nexus-goal-card{padding:15px;border-radius:14px}.nexus-goal-card h4{font-size:14px;margin:12px 0 9px}.nexus-goal-values strong{font-size:21px}.nexus-goal-actions button{min-height:42px;font-size:10px}.nexus-vault-empty{padding:26px 15px}.nexus-vault-empty h3{font-size:15px}.nexus-vault-note{font-size:9px;padding:10px 11px}}
+
+
+/* NEXUS quality pass — navigation, mobile ergonomics and consistent page rhythm */
+.page-back-button{display:inline-flex;align-items:center;justify-content:center;gap:8px;flex:0 0 auto;min-height:42px;padding:0 14px;border:1px solid #2b3b56;border-radius:12px;background:linear-gradient(145deg,#17243a,#111b2c);color:#cbd8ed;font-size:12px;font-weight:700;cursor:pointer;transition:background .18s,border-color .18s,transform .18s}
+.page-back-button:hover{background:#203250;border-color:#5c7db2;transform:translateX(-2px)}
+.page-heading{flex-wrap:wrap;align-items:center}
+.page-heading>div{min-width:0;flex:1}
+.page-heading h1,.page-heading p{overflow-wrap:anywhere}
+button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,select:focus-visible{outline:2px solid #8caeff!important;outline-offset:3px}
+@media(max-width:760px){
+ .content{padding:18px 14px 26px}
+ .page-heading{align-items:flex-start;gap:12px;margin-bottom:18px}
+ .page-heading>div{flex-basis:100%}
+ .page-back-button{min-height:40px;padding:0 12px;font-size:11px}
+ .page-heading h1{font-size:24px;line-height:1.18}
+ .page-heading p{font-size:11px;line-height:1.55}
+ .stat-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+ .two-col{grid-template-columns:minmax(0,1fr);gap:12px}
+ .panel{padding:16px;border-radius:14px}
+ .admin-stat-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .admin-section-grid{grid-template-columns:minmax(0,1fr)}
+ .admin-tabs{overflow-x:auto;flex-wrap:nowrap;overscroll-behavior-x:contain;-webkit-overflow-scrolling:touch}
+ .admin-tabs button{flex:0 0 auto;min-height:42px}
+ .social-layout{grid-template-columns:minmax(0,1fr)}
+ .social-side{display:none}
+ .social-person{align-items:flex-start;flex-wrap:wrap}
+ .social-person-actions{width:100%;justify-content:flex-end}
+}
+@media(max-width:390px){.content{padding-left:11px;padding-right:11px}.stat-card{padding:13px 11px}.stat-value{font-size:16px}.page-heading h1{font-size:22px}}
