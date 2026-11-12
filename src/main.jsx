@@ -33,7 +33,7 @@ class AppStartupBoundary extends React.Component {
             </div>
             <h1 style={{ fontSize: 23, margin: '0 0 10px' }}>Não foi possível abrir o aplicativo</h1>
             <p style={{ color: '#aab6ce', lineHeight: 1.5 }}>Ocorreu um erro durante a inicialização. A mensagem abaixo vai ajudar a corrigir o problema.</p>
-            <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', textAlign: 'left', padding: 14, borderRadius: 12, background: '#111a2b', color: '#ffb4b4', fontSize: 12 }}>{message}{this.state.details ? '\\n\\n' + this.state.details : ''}</pre>
+            <pre style={{ whiteSpace: 'pre-wrap', overflowWrap: 'anywhere', textAlign: 'left', maxHeight: '32dvh', overflowY: 'auto', padding: 14, borderRadius: 12, background: '#111a2b', color: '#ffb4b4', fontSize: 12 }}>{message}{this.state.details ? '\n\n' + this.state.details : ''}</pre>
             <button type="button" onClick={() => window.location.reload()} style={{ marginTop: 12, border: 0, borderRadius: 10, padding: '13px 20px', background: 'linear-gradient(100deg,#9275ff,#55d9ea)', color: '#080d18', fontWeight: 800 }}>Tentar novamente</button>
           </section>
         </main>
