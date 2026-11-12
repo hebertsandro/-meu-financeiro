@@ -29,7 +29,7 @@ export default function NexusLoot({userId,view='collection'}){
    const rows=r.data||[];setRanking(rows);
    const score=Number(ownWallet.collection_score||0);
    const [ahead,ownInTop]=await Promise.all([
-    supabase.from('nexus_loot_wallets').select('user_id',{count:'exact',head:true}).gt('collection_score',score),
+    supabase.from('nexus_loot_wallets').select('user_id',{count:'exact',head:true}).or('collection_score.gt.'+score+',and(collection_score.eq.'+score+',user_id.lt.'+userId)),
     Promise.resolve(rows.some(row=>row.user_id===userId))
    ]);
    if(!w.error&&w.data&&!ahead.error)setGlobalRank((ahead.count||0)+1);else setGlobalRank(null);
