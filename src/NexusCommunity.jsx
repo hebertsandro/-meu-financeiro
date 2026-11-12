@@ -75,38 +75,84 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
  useEffect(()=>{
   if(!activeChat)return;
   setMessageSearch('');
-  let channel;let presence;
-  const fetch=async()=>{
-   const {data,error:e}=await supabase.from('social_messages').select('*').eq('conversation_id',activeChat.id).order('created_at',{ascending:true}).limit(200);
-   if(e){setError(errText(e));return;}
-   setMessages(await Promise.all((data||[]).map(signedMessage)));
-   const ids=(data||[]).map(m=>m.id);
-   if(ids.length){const {data:rx,error:re}=await supabase.from('social_message_reactions').select('message_id,user_id,reaction').in('message_id',ids);if(!re){const map={};(rx||[]).forEach(x=>{map[x.message_id] ||= {};map[x.message_id][x.reaction]=(map[x.message_id][x.reaction]||0)+1;if(x.user_id===userId)map[x.message_id].mine=x.reaction;});setMessageReactions(map);}}
-   await supabase.rpc('social_mark_conversation_read',{target_conversation:activeChat.id});
-   loadChats().catch(()=>{});
-  };
-  fetch();
-  let chatPoll;
-  channel=supabase.channel('social-chat-'+activeChat.id)
-   .on('postgres_changes',{event:'*',schema:'public',table:'social_messages',filter:'conversation_id=eq.'+activeChat.id},()=>{
-    // Reconsulta o histórico autorizado em vez de depender do payload parcial do Realtime.
-    fetch().catch(e=>setError(errText(e)));
-   })
-   .on('postgres_changes',{event:'*',schema:'public',table:'social_message_reactions'},()=>fetch().catch(e=>setError(errText(e))))
-   .subscribe(status=>{
-    if(status==='CHANNEL_ERROR'||status==='TIMED_OUT'){
-     setError('Conexão em tempo real instável. O chat continuará sincronizando automaticamente.');
-    }else if(status==='SUBSCRIBED'){
-     setError('');
-     fetch().catch(e=>setError(errText(e)));
-    }
+  let channel=null,presence=null,chatPoll=null,listRefresh=null,alive=true;
+  let latestTimestamp='';
+  const mergeMessages=rows=>{
+   if(!alive||!rows?.length)return;
+   setMessages(old=>{
+    const byId=new Map(old.map(m=>[m.id,m]));
+    rows.forEach(m=>byId.set(m.id,{...byId.get(m.id),...m}));
+    return [...byId.values()].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).slice(-200);
    });
-  // Rede de segurança: se o WebSocket cair ou o Realtime não entregar um evento,
-  // o histórico ainda é sincronizado enquanto esta conversa estiver aberta.
-  chatPoll=window.setInterval(()=>fetch().catch(e=>setError(errText(e))),5000);
+   rows.forEach(m=>{if(m.created_at>latestTimestamp)latestTimestamp=m.created_at;});
+  };
+  const refreshConversationList=()=>{
+   clearTimeout(listRefresh);
+   listRefresh=setTimeout(()=>{if(alive)loadChats().catch(()=>{});},700);
+  };
+  const loadInitial=async()=>{
+   const {data,error:e}=await supabase.from('social_messages').select('*').eq('conversation_id',activeChat.id).order('created_at',{ascending:true}).limit(100);
+   if(e)throw e;
+   const rows=await Promise.all((data||[]).map(signedMessage));
+   if(!alive)return;
+   setMessages(rows);
+   latestTimestamp=rows.reduce((latest,m)=>m.created_at>latest?m.created_at:latest,'');
+   const ids=rows.map(m=>m.id);
+   if(ids.length){
+    const {data:rx,error:re}=await supabase.from('social_message_reactions').select('message_id,user_id,reaction').in('message_id',ids);
+    if(!re&&alive){const map={};(rx||[]).forEach(x=>{map[x.message_id] ||= {};map[x.message_id][x.reaction]=(map[x.message_id][x.reaction]||0)+1;if(x.user_id===userId)map[x.message_id].mine=x.reaction;});setMessageReactions(map);}
+   }
+   await supabase.rpc('social_mark_conversation_read',{target_conversation:activeChat.id});
+   refreshConversationList();
+  };
+  loadInitial().catch(e=>{if(alive)setError(errText(e));});
+  channel=supabase.channel('social-chat-'+activeChat.id)
+   .on('postgres_changes',{event:'INSERT',schema:'public',table:'social_messages',filter:'conversation_id=eq.'+activeChat.id},async payload=>{
+    const fresh=await signedMessage(payload.new);
+    mergeMessages([fresh]);
+    refreshConversationList();
+    if(fresh.sender_id!==userId)supabase.rpc('social_mark_conversation_read',{target_conversation:activeChat.id}).catch(()=>{});
+   })
+   .on('postgres_changes',{event:'UPDATE',schema:'public',table:'social_messages',filter:'conversation_id=eq.'+activeChat.id},payload=>{
+    if(!alive)return;
+    setMessages(old=>old.map(m=>m.id===payload.new.id?{...m,...payload.new}:m));
+   })
+   .on('postgres_changes',{event:'DELETE',schema:'public',table:'social_messages',filter:'conversation_id=eq.'+activeChat.id},payload=>{
+    const id=payload.old?.id;if(id)setMessages(old=>old.filter(m=>m.id!==id));
+   })
+   .on('postgres_changes',{event:'*',schema:'public',table:'social_message_reactions'},async payload=>{
+    const row=payload.new?.message_id?payload.new:payload.old;
+    if(!row?.message_id)return;
+    const belongs=messages.some(m=>m.id===row.message_id);
+    if(!belongs)return;
+    const {data}=await supabase.from('social_message_reactions').select('message_id,user_id,reaction').eq('message_id',row.message_id);
+    if(!alive)return;
+    const next={};(data||[]).forEach(x=>{next[x.reaction]=(next[x.reaction]||0)+1;if(x.user_id===userId)next.mine=x.reaction;});
+    setMessageReactions(old=>({...old,[row.message_id]:next}));
+   })
+   .subscribe(status=>{
+    if(!alive)return;
+    if(status==='CHANNEL_ERROR'||status==='TIMED_OUT')setError('Conexão em tempo real instável. O chat tentará sincronizar novamente.');
+    else if(status==='SUBSCRIBED')setError('');
+   });
+  // Recuperação leve: busca somente as mensagens recentes, sem baixar todo o histórico a cada ciclo.
+  chatPoll=window.setInterval(async()=>{
+   if(!alive)return;
+   const query=supabase.from('social_messages').select('*').eq('conversation_id',activeChat.id).order('created_at',{ascending:false}).limit(20);
+   const {data,error:e}=latestTimestamp?await query.gt('created_at',latestTimestamp):await query;
+   if(e||!data?.length)return;
+   const rows=await Promise.all(data.map(signedMessage));
+   mergeMessages(rows);
+   refreshConversationList();
+   if(rows.some(m=>m.sender_id!==userId))await supabase.rpc('social_mark_conversation_read',{target_conversation:activeChat.id});
+  },15000);
   presence=supabase.channel('social-presence-'+activeChat.id,{config:{presence:{key:userId}}}).on('presence',{event:'sync'},()=>{const state=presence.presenceState();const active=Object.values(state).flat().filter(x=>x.user_id!==userId&&x.typing);setTypingUsers(active.map(x=>x.user_id));}).subscribe(async status=>{if(status==='SUBSCRIBED')await presence.track({user_id:userId,typing:false});});
   setTypingChannel(presence);
-  return()=>{setTypingChannel(null);setTypingUsers([]);if(chatPoll)window.clearInterval(chatPoll);if(channel)supabase.removeChannel(channel);if(presence)supabase.removeChannel(presence);};
+  return()=>{
+   alive=false;setTypingChannel(null);setTypingUsers([]);
+   if(chatPoll)window.clearInterval(chatPoll);if(listRefresh)clearTimeout(listRefresh);
+   if(channel)supabase.removeChannel(channel);if(presence)supabase.removeChannel(presence);
+  };
  },[activeChat?.id,userId,loadChats]);
  useEffect(()=>{
   if(!activeRoom)return;
@@ -126,7 +172,7 @@ function NexusCommunityContent({mode='all',userId,playerProfile=null,friends=[],
  async function triggerPush(payload){try{await supabase.functions.invoke('nexus-push',{body:payload});}catch(e){console.warn('NEXUS push:',e?.message||e);}}
  async function startChat(person){await run(async()=>{const {data,error:e}=await supabase.rpc('social_start_private_chat',{target_user:person.user_id});if(e)throw e;await loadChats();setActiveRoom(null);setActiveChat({id:data,person});setSection('chat');setMobileChatOpen(true);});}
  async function uploadChatAttachment(file,folder){if(!file)return null;if(file.size>10*1024*1024)throw new Error('O arquivo deve ter no máximo 10 MB.');const ext=(file.name.split('.').pop()||'bin').toLowerCase().replace(/[^a-z0-9]/g,'').slice(0,8)||'bin',path=userId+'/'+folder+'/'+crypto.randomUUID()+'.'+ext;const {error:e}=await supabase.storage.from('nexus-posts').upload(path,file,{contentType:file.type||'application/octet-stream',upsert:false});if(e)throw e;return path;}
- async function sendMessage(e){e.preventDefault();const body=draft.trim();if((!body&&!chatFile)||!activeChat)return;await run(async()=>{const attachment_path=await uploadChatAttachment(chatFile,'chat');const {data:msg,error:e1}=await supabase.from('social_messages').insert({conversation_id:activeChat.id,sender_id:userId,body:body||(chatFile?.name||'Arquivo enviado'),attachment_path,reply_to_id:replyTarget?.scope==='private'?replyTarget.id:null}).select('id').single();if(e1)throw e1;setDraft('');setChatFile(null);setReplyTarget(null);typingChannel?.track({user_id:userId,typing:false});await triggerPush({type:'message',record_id:msg.id});await loadChats();});}
+ async function sendMessage(e){e.preventDefault();const body=draft.trim();if((!body&&!chatFile)||!activeChat)return;const sentDraft=draft;const sentFile=chatFile;await run(async()=>{const attachment_path=await uploadChatAttachment(sentFile,'chat');const {data:msg,error:e1}=await supabase.from('social_messages').insert({conversation_id:activeChat.id,sender_id:userId,body:body||(sentFile?.name||'Arquivo enviado'),attachment_path,reply_to_id:replyTarget?.scope==='private'?replyTarget.id:null}).select('*').single();if(e1)throw e1;setDraft('');setChatFile(null);setReplyTarget(null);typingChannel?.track({user_id:userId,typing:false});const visible=await signedMessage(msg);setMessages(old=>old.some(m=>m.id===visible.id)?old:[...old,visible].sort((a,b)=>new Date(a.created_at)-new Date(b.created_at)).slice(-200));triggerPush({type:'message',record_id:msg.id});loadChats().catch(()=>{});});}
  async function savePrivateMessage(message){const body=messageEditDraft.trim();if(!body){setError('A mensagem não pode ficar vazia.');return;}await run(async()=>{const {error:e}=await supabase.from('social_messages').update({body,edited_at:new Date().toISOString()}).eq('id',message.id).eq('sender_id',userId);if(e)throw e;setMessages(old=>old.map(m=>m.id===message.id?{...m,body,edited_at:new Date().toISOString()}:m));setEditingMessage(null);setMessageEditDraft('');onToast('Mensagem editada.');});}
  async function deletePrivateMessage(message){if(!confirm('Apagar esta mensagem para todos?'))return;await run(async()=>{const {error:e}=await supabase.from('social_messages').update({body:'Esta mensagem foi apagada.',deleted_at:new Date().toISOString()}).eq('id',message.id).eq('sender_id',userId);if(e)throw e;setMessages(old=>old.map(m=>m.id===message.id?{...m,body:'Esta mensagem foi apagada.',deleted_at:new Date().toISOString()}:m));});}
  async function togglePrivateReaction(message,reaction){const mine=messageReactions[message.id]?.mine;const result=mine===reaction?await supabase.from('social_message_reactions').delete().eq('message_id',message.id).eq('user_id',userId):await supabase.from('social_message_reactions').upsert({message_id:message.id,user_id:userId,reaction},{onConflict:'message_id,user_id'});if(result.error)setError(result.error.message);else{const {data}=await supabase.from('social_message_reactions').select('message_id,user_id,reaction').eq('message_id',message.id);const next={};(data||[]).forEach(x=>{next[x.reaction]=(next[x.reaction]||0)+1;if(x.user_id===userId)next.mine=x.reaction;});setMessageReactions(old=>({...old,[message.id]:next}));}}
