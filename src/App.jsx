@@ -566,6 +566,7 @@ class ProfileRenderBoundary extends React.Component {
 
 function App(){
   const [session,setSession]=useState(null), [loading,setLoading]=useState(true);
+  const activeUserIdRef=React.useRef(null);
   const [page,setPage]=useState(()=>window.location.hash.startsWith('#post-')?'social-feed':'overview'), [mobileMenu,setMobileMenu]=useState(false), [financeExpanded,setFinanceExpanded]=useState(true), [nexusExpanded,setNexusExpanded]=useState(true), [socialExpanded,setSocialExpanded]=useState(true);
   const [data,setData]=useState({transactions:[],cards:[],debts:[],goals:[],installments:[],subscriptions:[],card_limit_history:[],goal_movements:[],notifications:[]});
   const [modal,setModal]=useState(null), [toast,setToast]=useState('');
@@ -655,6 +656,7 @@ function App(){
   },[session?.user?.id]);
   useEffect(()=>{
     // Nunca mantenha dados financeiros do usuário anterior visíveis ao trocar de conta.
+    activeUserIdRef.current=session?.user?.id||null;
     setData({transactions:[],cards:[],debts:[],goals:[],installments:[],subscriptions:[],card_limit_history:[],goal_movements:[],notifications:[]});
     if(session?.user?.id) loadData();
   },[session?.user?.id]);
@@ -757,6 +759,7 @@ function App(){
     if(!userId||!supabase)return;
     const tables=['transactions','cards','debts','goals','installments','subscriptions','card_limit_history','goal_movements','notifications'];
     const results=await Promise.all(tables.map(t=>supabase.from(t).select('*').eq('user_id',userId).order(t==='card_limit_history'?'changed_at':'created_at',{ascending:false})));
+    if(activeUserIdRef.current!==userId)return;
     const next={};
     results.forEach((r,i)=>{next[tables[i]]=r.data||[]});
     setData(next);
