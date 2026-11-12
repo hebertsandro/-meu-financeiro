@@ -1,0 +1,1 @@
+revoke all on table public.competition_mp_answer_keys from anon,authenticated;
