@@ -30,7 +30,7 @@ Deno.serve(async(req)=>{
     const expired:string[]=[];
     for(const row of subscriptions||[]){
       try{
-        await webpush.sendNotification({endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}},{title,body,url,tag},{TTL:3600,urgency:"normal"});
+        await webpush.sendNotification({endpoint:row.endpoint,keys:{p256dh:row.p256dh,auth:row.auth}},JSON.stringify({title,body,url,tag}),{TTL:3600,urgency:"normal"});
         sent++;
       }catch(err){
         const pushError=err as {statusCode?:number;status?:number;message?:string;body?:string};
