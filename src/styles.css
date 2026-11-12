@@ -4200,3 +4200,78 @@ header.topbar button.avatar.profile-avatar-button[class*="frame-"]>span img{
 .space-mode-picker>div{grid-template-columns:repeat(4,minmax(0,1fr))}
 @media(max-width:760px){.space-mode-picker>div{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:380px){.space-mode-picker button{padding:10px 6px}.space-mode-picker button strong{font-size:.76rem}.space-mode-picker button small{font-size:.55rem}}
+
+
+/* NEXUS COFRINHO — planejamento visual */
+.nexus-vault-page{display:grid;gap:20px;min-width:0}
+.nexus-vault-hero{position:relative;isolation:isolate;display:grid;grid-template-columns:minmax(0,1fr) 260px minmax(0,1fr);align-items:center;gap:24px;min-height:300px;overflow:hidden;padding:30px 34px;border:1px solid #403b70;border-radius:23px;background:radial-gradient(ellipse at 50% 52%,#5036a344 0,transparent 38%),radial-gradient(ellipse at 8% 0%,#167f9a22,transparent 42%),linear-gradient(130deg,#111a30 0%,#17172f 52%,#101d31 100%);box-shadow:0 18px 55px #080b1b55}
+.nexus-vault-hero:before,.nexus-vault-hero:after{content:"";position:absolute;z-index:-1;border:1px solid #8b78ff20;border-radius:50%;pointer-events:none}
+.nexus-vault-hero:before{width:430px;height:430px;left:calc(50% - 215px);top:-75px}
+.nexus-vault-hero:after{width:540px;height:540px;left:calc(50% - 270px);top:-130px;border-color:#43d9e514}
+.nexus-vault-copy{min-width:0;max-width:390px}
+.nexus-vault-kicker{display:inline-flex;align-items:center;gap:7px;color:#9f9aff;font-size:9px;font-weight:900;letter-spacing:1.7px}
+.nexus-vault-copy h2{margin:13px 0 10px;color:#f4f2ff;font:800 clamp(23px,2.5vw,34px)/1.12 Manrope,sans-serif;letter-spacing:-1.1px}
+.nexus-vault-copy p{max-width:370px;margin:0;color:#a8b2ca;font-size:12px;line-height:1.75}
+.nexus-vault-tags{display:flex;flex-wrap:wrap;gap:8px;margin-top:19px}
+.nexus-vault-tags span{display:inline-flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid #514a7b;border-radius:99px;background:#28244788;color:#c9c5ff;font-size:9px;font-weight:700}
+.nexus-vault-center{position:relative;display:grid;place-items:center;width:250px;height:250px;justify-self:center}
+.nexus-vault-orbit{position:absolute;border:1px solid #9d8cff55;border-radius:50%;box-shadow:0 0 25px #806aff18,inset 0 0 20px #806aff10}
+.nexus-vault-orbit-one{width:230px;height:230px;border-style:dashed;transform:rotate(-17deg)}
+.nexus-vault-orbit-two{width:198px;height:198px;border-color:#54d9e45c;box-shadow:0 0 28px #37c9d51c}
+.nexus-vault-door{position:relative;display:grid;place-items:center;width:166px;height:166px;border:7px solid #a99cff;border-radius:50%;background:linear-gradient(145deg,#8c7be7,#302b66 43%,#161d3b 75%);box-shadow:0 0 0 5px #403a79,0 0 0 10px #171d39,0 0 42px #806aff77,inset 0 0 20px #c3baff55}
+.nexus-vault-door-inner{position:relative;display:grid;place-items:center;width:126px;height:126px;border:3px solid #b7b0ff;border-radius:50%;background:radial-gradient(circle at 34% 27%,#55518e,#25274e 58%,#111a32);box-shadow:inset 0 0 0 5px #171b3b,inset 0 0 20px #080d20,0 0 15px #8d7aff55}
+.nexus-vault-handle{position:absolute;inset:13px;border:2px solid #8e8bd1;border-radius:50%}
+.nexus-vault-handle span{position:absolute;width:8px;height:8px;border-radius:50%;background:#c4c0ff;box-shadow:0 0 8px #b9b1ff}
+.nexus-vault-handle span:nth-child(1){top:-4px;left:calc(50% - 4px)}.nexus-vault-handle span:nth-child(2){right:-4px;top:calc(50% - 4px)}.nexus-vault-handle span:nth-child(3){bottom:-4px;left:calc(50% - 4px)}.nexus-vault-handle span:nth-child(4){left:-4px;top:calc(50% - 4px)}
+.nexus-vault-lock{position:relative;z-index:1;display:grid;place-items:center;width:57px;height:57px;border:1px solid #aaa5ff;border-radius:17px;background:linear-gradient(145deg,#7771ca,#393c78);color:#f1efff;box-shadow:0 0 22px #8e7dff66}
+.nexus-vault-spark{position:absolute;color:#77e8ef;text-shadow:0 0 12px #5ce6ff;font-size:22px}
+.nexus-vault-spark-a{top:27px;right:22px}.nexus-vault-spark-b{bottom:28px;left:17px;color:#c1a7ff}
+.nexus-vault-balance{display:grid;gap:10px;min-width:0;padding:19px 20px;border:1px solid #3b4566;border-radius:17px;background:#10182bbf;box-shadow:inset 0 1px #ffffff08}
+.nexus-vault-balance>span{color:#8998b7;font-size:9px;font-weight:800;letter-spacing:1.1px;line-height:1.5}
+.nexus-vault-balance>strong{color:#f5f4ff;font:800 clamp(25px,3vw,34px)/1.1 Manrope,sans-serif;letter-spacing:-1px;overflow-wrap:anywhere}
+.nexus-vault-progress,.nexus-goal-track{height:8px;overflow:hidden;border-radius:99px;background:#29314a}
+.nexus-vault-progress i,.nexus-goal-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#8d70ff,#4bd8df);box-shadow:0 0 13px #7c69ff77}
+.nexus-vault-balance small{color:#9aa8c2;font-size:10px;line-height:1.55}
+.nexus-vault-stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px}
+.nexus-vault-stats>div{display:grid;gap:9px;min-width:0;padding:16px 18px;border:1px solid #293750;border-radius:15px;background:linear-gradient(145deg,#17233a,#111b2d)}
+.nexus-vault-stats span{display:flex;align-items:center;gap:7px;color:#8fa1bd;font-size:9px;font-weight:800;letter-spacing:.7px}
+.nexus-vault-stats span svg{color:#a99aff}
+.nexus-vault-stats b{color:#f1f4ff;font:800 20px Manrope;overflow-wrap:anywhere}
+.nexus-goals-heading{display:flex;align-items:end;justify-content:space-between;gap:16px;margin-top:7px}
+.nexus-goals-heading>div>span{color:#9b91ed;font-size:9px;font-weight:900;letter-spacing:1.5px}
+.nexus-goals-heading h3{margin:6px 0 4px;color:#edf1ff;font:800 21px Manrope;letter-spacing:-.5px}
+.nexus-goals-heading p{margin:0;color:#8494ad;font-size:11px;line-height:1.6}
+.nexus-goals-heading .primary{display:inline-flex;align-items:center;justify-content:center;gap:7px;min-height:42px;white-space:nowrap}
+.nexus-goals-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:14px}
+.nexus-goal-card{min-width:0;padding:19px;border:1px solid #2d3b55;border-radius:17px;background:linear-gradient(145deg,#17243a,#111b2c 75%);box-shadow:0 10px 28px #050b1a22}
+.nexus-goal-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nexus-goal-icon{display:grid;place-items:center;width:39px;height:39px;border:1px solid #514b82;border-radius:12px;background:#302b55;color:#b9adff}
+.nexus-goal-status{padding:6px 8px;border:1px solid #3b5570;border-radius:99px;background:#1b3040;color:#8ed9e3;font-size:8px;font-weight:900;letter-spacing:.7px}
+.nexus-goal-status.done{border-color:#326b59;background:#16372f;color:#7be2b7}
+.nexus-goal-card h4{margin:15px 0 11px;color:#edf2ff;font:750 16px Manrope;overflow-wrap:anywhere}
+.nexus-goal-values{display:flex;align-items:baseline;gap:7px;flex-wrap:wrap}
+.nexus-goal-values strong{color:#f4f2ff;font:800 23px Manrope;letter-spacing:-.5px}
+.nexus-goal-values span{color:#8798b2;font-size:10px}
+.nexus-goal-track{height:7px;margin:13px 0 9px}
+.nexus-goal-meta{display:flex;justify-content:space-between;gap:8px;color:#8b9bb5;font-size:9px}
+.nexus-goal-meta b{color:#c7c4ff;text-align:right}
+.nexus-goal-deadline{display:flex;align-items:center;gap:6px;margin-top:12px;color:#8b9bb5;font-size:10px}
+.nexus-goal-actions{display:flex;gap:8px;margin-top:16px}
+.nexus-goal-actions button{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:39px;padding:8px 12px;border:1px solid #4b4778;border-radius:10px;background:#292747;color:#d5d0ff;font-size:10px;font-weight:800;cursor:pointer;transition:background .18s,border-color .18s}
+.nexus-goal-actions button:first-child{flex:1;border-color:#456b78;background:#193746;color:#a8eced}
+.nexus-goal-actions button:hover{border-color:#9b8dff;background:#37325e}
+.nexus-goal-actions .nexus-goal-delete{width:39px;padding:0;border-color:#573849;background:#2a202f;color:#e5a2b2}
+.nexus-goal-history{display:grid;gap:6px;margin-top:15px;padding-top:12px;border-top:1px solid #293750}
+.nexus-goal-history>b{color:#9eacc4;font-size:9px}
+.nexus-goal-history>span{color:#b9c6da;font-size:10px}
+.nexus-goal-history small{color:#788ba7}
+.nexus-vault-empty{display:grid;justify-items:center;gap:10px;padding:34px 20px;border:1px dashed #514b7d;border-radius:18px;background:radial-gradient(circle at 50% 0,#5b4a9b22,transparent 60%),#141d31;text-align:center}
+.nexus-vault-empty-icon{display:grid;place-items:center;width:55px;height:55px;border:1px solid #665b9c;border-radius:17px;background:#30294f;color:#b9adff;box-shadow:0 0 25px #8c70ff25}
+.nexus-vault-empty h3{margin:4px 0 0;color:#eef0ff;font:800 17px Manrope}
+.nexus-vault-empty p{max-width:390px;margin:0;color:#91a0b8;font-size:11px;line-height:1.65}
+.nexus-vault-empty .primary{display:inline-flex;align-items:center;gap:7px;margin-top:7px}
+.nexus-vault-note{display:flex;align-items:flex-start;gap:9px;padding:12px 14px;border:1px solid #34465b;border-radius:12px;background:#111c2b;color:#91a4bd;font-size:10px;line-height:1.6}
+.nexus-vault-note svg{flex:none;margin-top:1px;color:#8b9fff}
+.nexus-vault-note b{color:#c8d5e9}
+@media(max-width:1050px){.nexus-vault-hero{grid-template-columns:minmax(0,1fr) 220px;gap:15px;padding:25px}.nexus-vault-center{grid-column:2;grid-row:1 / span 2;width:215px;height:215px}.nexus-vault-orbit-one{width:205px;height:205px}.nexus-vault-orbit-two{width:177px;height:177px}.nexus-vault-door{width:148px;height:148px}.nexus-vault-door-inner{width:112px;height:112px}.nexus-vault-balance{grid-column:1;grid-row:2}}
+@media(max-width:760px){.nexus-vault-page{gap:14px}.nexus-vault-hero{grid-template-columns:minmax(0,1fr);gap:12px;padding:20px 16px;border-radius:18px}.nexus-vault-copy{max-width:none}.nexus-vault-copy h2{font-size:25px;margin:10px 0 7px}.nexus-vault-copy p{font-size:10px;max-width:340px}.nexus-vault-tags{margin-top:12px;gap:6px}.nexus-vault-tags span{font-size:8px;padding:6px 8px}.nexus-vault-center{grid-column:auto;grid-row:auto;width:190px;height:190px;margin:0 auto}.nexus-vault-orbit-one{width:180px;height:180px}.nexus-vault-orbit-two{width:158px;height:158px}.nexus-vault-door{width:132px;height:132px;border-width:6px}.nexus-vault-door-inner{width:100px;height:100px}.nexus-vault-handle{inset:10px}.nexus-vault-lock{width:47px;height:47px;border-radius:14px}.nexus-vault-lock svg{width:23px;height:23px}.nexus-vault-spark-a{top:15px;right:17px}.nexus-vault-spark-b{bottom:17px;left:14px}.nexus-vault-balance{grid-column:auto;grid-row:auto;padding:14px}.nexus-vault-balance>strong{font-size:29px}.nexus-vault-stats{gap:7px}.nexus-vault-stats>div{padding:12px 9px;gap:7px;border-radius:12px}.nexus-vault-stats span{font-size:7px;letter-spacing:.3px;gap:4px}.nexus-vault-stats span svg{width:12px;height:12px}.nexus-vault-stats b{font-size:13px}.nexus-goals-heading{align-items:flex-start;gap:10px}.nexus-goals-heading h3{font-size:18px}.nexus-goals-heading p{font-size:9px;max-width:220px}.nexus-goals-heading .primary{min-height:39px;padding:9px 10px;font-size:10px}.nexus-goals-grid{grid-template-columns:minmax(0,1fr);gap:11px}.nexus-goal-card{padding:15px;border-radius:14px}.nexus-goal-card h4{font-size:14px;margin:12px 0 9px}.nexus-goal-values strong{font-size:21px}.nexus-goal-actions button{min-height:42px;font-size:10px}.nexus-vault-empty{padding:26px 15px}.nexus-vault-empty h3{font-size:15px}.nexus-vault-note{font-size:9px;padding:10px 11px}}
