@@ -34,7 +34,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
     supabase.from('competition_rank_medals').select('*').eq('user_id',userId).order('medals_count',{ascending:false}),
     supabase.from('competition_challenges').select('*').or('creator_id.eq.'+userId+',opponent_id.eq.'+userId).order('created_at',{ascending:false}).limit(30)
    ]);
-   const profileRows=profilesRes.data||[];
+   const profileRows=walletRankingRes.data||[];
    setGlobalRows(profileRows);
    const friendIds=[...new Set([userId,...(friendshipsRes.data||[]).map(f=>f.user_a===userId?f.user_b:f.user_a)])];
    const friendProfiles=friendIds.length?await supabase.from('social_profiles').select('user_id,username,display_name,avatar,game_xp,game_correct').in('user_id',friendIds):{data:[]};
@@ -76,8 +76,8 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
    const interval=window.setInterval(()=>load(true),15000);
    return()=>{window.clearInterval(interval);supabase.removeChannel(channel)};
   },[load,userId]);
- const sortedGlobal=useMemo(()=>globalRows.slice().sort((a,b)=>Number(b.collection_score||0)-Number(a.collection_score||0)),[globalRows]);
- const sortedFriends=useMemo(()=>friendRows.slice().sort((a,b)=>Number(b.collection_score||0)-Number(a.collection_score||0)),[friendRows]);
+ const sortedGlobal=useMemo(()=>globalRows.slice().sort((a,b)=>Number(b.collection_score||0)-Number(a.collection_score||0)||String(a.user_id).localeCompare(String(b.user_id))),[globalRows]);
+ const sortedFriends=useMemo(()=>friendRows.slice().sort((a,b)=>Number(b.collection_score||0)-Number(a.collection_score||0)||String(a.user_id).localeCompare(String(b.user_id))),[friendRows]);
  const myGlobalRank=sortedGlobal.findIndex(x=>x.user_id===userId)+1;
  const myFriendRank=sortedFriends.findIndex(x=>x.user_id===userId)+1;
  const mySeasonRank=seasonRows.findIndex(x=>x.user_id===userId)+1;
