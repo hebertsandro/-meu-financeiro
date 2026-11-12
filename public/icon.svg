@@ -1,13 +1,9 @@
 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 128 128">
 <defs>
- <linearGradient id="bg" x1="12" y1="8" x2="116" y2="120" gradientUnits="userSpaceOnUse"><stop stop-color="#17152F"/><stop offset="1" stop-color="#080D18"/></linearGradient>
- <linearGradient id="bars" x1="35" y1="25" x2="88" y2="99" gradientUnits="userSpaceOnUse"><stop stop-color="#FFFFFF"/><stop offset=".55" stop-color="#C9B8FF"/><stop offset="1" stop-color="#73E6F4"/></linearGradient>
- <linearGradient id="orbit" x1="12" y1="32" x2="115" y2="92" gradientUnits="userSpaceOnUse"><stop stop-color="#A78BFA"/><stop offset=".55" stop-color="#7775FF"/><stop offset="1" stop-color="#22D3EE"/></linearGradient>
+ <linearGradient id="bars" x1="30" y1="18" x2="98" y2="112" gradientUnits="userSpaceOnUse"><stop stop-color="#C7B5FF"/><stop offset=".58" stop-color="#9275FF"/><stop offset="1" stop-color="#55D9EA"/></linearGradient>
 </defs>
-<rect x="4" y="4" width="120" height="120" rx="34" fill="url(#bg)" stroke="#39345F" stroke-width="2"/>
-<path d="M17 75c9-31 38-48 66-39 13 4 23 13 27 24M17 75c9 24 38 35 62 25 14-6 24-17 29-31" fill="none" stroke="url(#orbit)" stroke-width="5" stroke-linecap="round"/>
-<rect x="35" y="62" width="13" height="30" rx="4" fill="url(#bars)"/>
-<rect x="56" y="47" width="13" height="45" rx="4" fill="url(#bars)"/>
-<rect x="77" y="29" width="13" height="63" rx="4" fill="url(#bars)"/>
-<path d="m99 16 3.5 7.2 8 1.2-5.8 5.6 1.4 7.9-7.1-3.7-7.1 3.7 1.4-7.9-5.8-5.6 8-1.2L99 16Z" fill="#8CEBFA"/>
+<rect x="4" y="4" width="120" height="120" rx="32" fill="#0B1020"/>
+<rect x="25" y="77" width="19" height="29" rx="5" fill="url(#bars)"/>
+<rect x="55" y="51" width="19" height="55" rx="5" fill="url(#bars)"/>
+<rect x="85" y="22" width="19" height="84" rx="5" fill="url(#bars)"/>
 </svg>
