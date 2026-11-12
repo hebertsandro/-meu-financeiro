@@ -943,14 +943,14 @@ function App(){
       if(action==='set_maintenance'){setMaintenance(!!result.maintenance_mode);setAdminMessage(result.maintenance_mode?'Modo manutenção ativado.':'Modo manutenção desativado.');return}
       if(action==='broadcast_announcement'){setAdminMessage('Comunicado enviado para '+Number(result.sent||0)+' contas ativas.');setAdminAnnouncementTitle('');setAdminAnnouncementBody('');return}
       if(action==='send_custom_notification'){
-        let pushResult=null;
+        let pushResult=null,pushFailed=false;
         try{
           const {data:pushData,error:pushError}=await supabase.functions.invoke('send-push',{body:{title:extra.title,body:extra.message,url:'/',tag:'admin-personalizada',target_user_id:userId}});
-          if(!pushError)pushResult=pushData;
-        }catch(pushError){console.warn('Push personalizado:',pushError)}
+          if(pushError){pushFailed=true;console.warn('Push personalizado:',pushError.message)}else pushResult=pushData;
+        }catch(pushError){pushFailed=true;console.warn('Push personalizado:',pushError)}
         const delivered=Number(pushResult?.sent||0);
         const subscriptions=Number(pushResult?.subscriptions||0);
-        setAdminMessage('Notificação salva para '+(result.email||'o usuário')+'. '+(delivered>0?'Push enviado ao aparelho.':subscriptions===0?'A notificação ficará disponível dentro do app; esta conta ainda não tem push ativo.':'Push não confirmado pelo aparelho; a notificação ficou salva no app.'));
+        setAdminMessage('Notificação salva para '+(result.email||'o usuário')+'. '+(delivered>0?'Push enviado ao aparelho.':pushFailed?'O push não pôde ser enviado; a notificação ficou salva dentro do app.':subscriptions===0?'A notificação ficará disponível dentro do app; esta conta ainda não tem push ativo.':'Push não confirmado pelo aparelho; a notificação ficou salva no app.'));
         setAdminNotificationTitle('');setAdminNotificationBody('');return;
       }
       if(action==='reset_password'){setAdminMessage('Link de redefinição gerado: '+(result.action_link||'Confira o e-mail do usuário.'));return}
