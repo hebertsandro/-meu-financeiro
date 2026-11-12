@@ -4,7 +4,7 @@ import {Swords,Users,Copy,Plus,LogIn,Play,RefreshCw,Trophy,Clock3,CheckCircle2} 
 
 const names=['Jogador','Piloto','Comandante','Lenda'];
 export default function NexusMultiplayer({userId,onToast=()=>{}}){
- const [room,setRoom]=useState(null),[members,setMembers]=useState([]),[answers,setAnswers]=useState([]),[code,setCode]=useState(''),[busy,setBusy]=useState(false),[selected,setSelected]=useState(null),[error,setError]=useState('');
+ const [room,setRoom]=useState(null),[members,setMembers]=useState([]),[profiles,setProfiles]=useState({}),[answers,setAnswers]=useState([]),[code,setCode]=useState(''),[busy,setBusy]=useState(false),[selected,setSelected]=useState(null),[error,setError]=useState('');
  const me=members.find(x=>x.user_id===userId),question=room?.questions?.[room.current_question],myAnswer=answers.find(x=>x.user_id===userId&&x.question_index===room?.current_question);
  const load=useCallback(async(roomId)=>{
   if(!roomId)return;
@@ -14,7 +14,7 @@ export default function NexusMultiplayer({userId,onToast=()=>{}}){
    supabase.from('competition_mp_answers').select('user_id,question_index,is_correct').eq('room_id',roomId)
   ]);
   if(re){setError(re.message);return;}if(me){setError(me.message);return;}
-  if(!r){setRoom(null);return;}setRoom(r);setMembers(m||[]);setAnswers(a||[]);
+  if(!r){setRoom(null);return;}setRoom(r);setMembers(m||[]);setAnswers(a||[]);const ids=(m||[]).map(x=>x.user_id);if(ids.length){const {data:ps}=await supabase.from('social_profiles').select('user_id,display_name,username,avatar').in('user_id',ids);setProfiles(Object.fromEntries((ps||[]).map(p=>[p.user_id,p])));}else setProfiles({});
  },[]);
  useEffect(()=>{
   if(!room?.id)return;
@@ -49,14 +49,14 @@ export default function NexusMultiplayer({userId,onToast=()=>{}}){
  }
  async function leave(){
   // Leaving a live match would invalidate the shared player count, so the room stays available until it finishes.
-  setRoom(null);setMembers([]);setAnswers([]);setCode('');setSelected(null);setError('');
+  setRoom(null);setMembers([]);setProfiles({});setAnswers([]);setCode('');setSelected(null);setError('');
  }
  const copy=async()=>{try{await navigator.clipboard.writeText(room.room_code);onToast('Código copiado!');}catch{onToast('Código da sala: '+room.room_code)}};
  const sorted=members.slice().sort((a,b)=>b.score-a.score);
  return <section className="nc-multiplayer">
   {!room?<div className="nc-mp-landing"><div className="nc-mp-art"><div className="nc-mp-orbit">⚡</div><Swords size={34}/><span>2–4 JOGADORES</span></div><div className="nc-mp-intro"><span className="nc-eyebrow">NEXUS · JOGO EM TEMPO REAL</span><h3>Quiz Battle</h3><p>Monte uma sala, chame seus amigos e disputem 5 perguntas. Cada acerto vale 100 pontos. Vence quem somar mais!</p><div className="nc-mp-actions"><button className="nc-primary" onClick={createRoom} disabled={busy}><Plus size={17}/>{busy?'Criando…':'Criar sala'}</button><form onSubmit={joinRoom}><input value={code} onChange={e=>setCode(e.target.value.toUpperCase().slice(0,6))} placeholder="Código da sala" maxLength={6}/><button type="submit" disabled={busy||code.trim().length!==6}><LogIn size={16}/> Entrar</button></form></div><small>Compartilhe o código de 6 caracteres. Até 4 jogadores podem participar.</small></div></div>:<div className="nc-mp-room">
    <div className="nc-mp-room-head"><div><span className="nc-eyebrow">SALA MULTIPLAYER</span><h3>{room.status==='waiting'?'Aguardando jogadores':room.status==='playing'?'Partida em andamento':'Partida finalizada'}</h3></div><div className="nc-mp-code"><small>CÓDIGO DA SALA</small><b>{room.room_code}</b><button onClick={copy}><Copy size={14}/> Copiar</button></div></div>
-   <div className="nc-mp-roster">{sorted.map((p,i)=><div className={'nc-mp-player '+(p.user_id===userId?'is-me':'')} key={p.user_id}><span>{['👑','🎮','🚀','⚡'][i]}</span><div><b>{p.user_id===userId?'Você':names[i]+' '+(i+1)}</b><small>{p.user_id===room.host_id?'Anfitrião':p.user_id===userId?'Você':'Na partida'}</small></div><strong>{p.score} pts</strong></div>)}</div>
+   <div className="nc-mp-roster">{sorted.map((p,i)=><div className={'nc-mp-player '+(p.user_id===userId?'is-me':'')} key={p.user_id}><span>{profiles[p.user_id]?.avatar||['👑','🎮','🚀','⚡'][i]}</span><div><b>{p.user_id===userId?'Você':profiles[p.user_id]?.display_name||profiles[p.user_id]?.username||'Jogador '+(i+1)}</b><small>{p.user_id===room.host_id?'Anfitrião':profiles[p.user_id]?.username?'@'+profiles[p.user_id].username:'Na partida'}</small></div><strong>{p.score} pts</strong></div>)}</div>
    {room.status==='waiting'&&<div className="nc-mp-wait"><Users size={24}/><b>{members.length}/4 jogadores</b><p>Envie o código para seus amigos entrarem. O anfitrião inicia quando houver pelo menos 2 jogadores.</p>{room.host_id===userId?<button className="nc-primary" onClick={start} disabled={busy||members.length<2}><Play size={16}/> Iniciar partida</button>:<small>Aguardando o anfitrião iniciar…</small>}</div>}
    {room.status==='playing'&&question&&<div className="nc-mp-question"><div className="nc-mp-progress"><span>PERGUNTA {room.current_question+1} DE {room.questions.length}</span><span><Clock3 size={13}/> Ao vivo</span></div><div className="nc-mp-track"><i style={{width:((room.current_question+1)/room.questions.length*100)+'%'}}/></div><h4>{question.question}</h4><div className="nc-mp-options">{question.options.map((option,i)=><button key={i} className={(myAnswer&&selected===i?'selected':'')} onClick={()=>answer(i)} disabled={!!myAnswer||busy}>{String.fromCharCode(65+i)} <span>{option}</span></button>)}</div>{myAnswer?<p className="nc-mp-waiting"><CheckCircle2 size={16}/> Resposta registrada. Aguardando os outros jogadores…</p>:<small>Escolha uma resposta. A pergunta avança quando todos responderem.</small>}</div>}
    {room.status==='completed'&&<div className="nc-mp-result"><Trophy size={36}/><h3>{sorted[0]?.user_id===userId?'Você venceu!':'Partida concluída!'}</h3><p>{sorted[0]?.user_id===userId?'Mandou bem! Você ficou em primeiro lugar.':'Confira o placar final da partida.'}</p>{sorted.map((p,i)=><div key={p.user_id}><b>{i+1}º · {p.user_id===userId?'Você':'Jogador '+(i+1)}</b><strong>{p.score} pts</strong></div>)}</div>}
