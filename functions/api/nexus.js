@@ -36,9 +36,15 @@ export async function onRequest(context) {
 
     let projectUrl;
     try { projectUrl = new URL(supabaseUrl); } catch { return json({ error: "Configuração de autenticação inválida." }, 400); }
-    if (projectUrl.protocol !== "https:") return json({ error: "A conexão segura do Supabase é obrigatória." }, 400);
+    // Nunca encaminhe o token do usuário para um host informado livremente no corpo.
+    // Sem esta lista de permissão, qualquer pessoa poderia apontar a validação para um
+    // servidor próprio que responda 200 e usar a cota do Workers AI sem autenticação real.
+    const allowedSupabaseOrigin = "https://daakxwcxgajqzdehybha.supabase.co";
+    if (projectUrl.origin !== allowedSupabaseOrigin || projectUrl.username || projectUrl.password) {
+      return json({ error: "A origem de autenticação não é reconhecida." }, 400);
+    }
 
-    const authResponse = await fetch(projectUrl.origin + "/auth/v1/user", {
+    const authResponse = await fetch(allowedSupabaseOrigin + "/auth/v1/user", {
       headers: { apikey: anonKey, Authorization: "Bearer " + accessToken },
     });
     if (!authResponse.ok) return json({ error: "Sua sessão expirou. Entre novamente para continuar." }, 401);
