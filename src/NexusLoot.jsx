@@ -18,24 +18,36 @@ export default function NexusLoot({userId,view='collection'}){
   if(!userId||!supabase)return;
   if(initial)setLoading(true);else setRefreshing(true);
   try{
-   const [w,i,d,r]=await Promise.all([
+   const [w,i,d]=await Promise.all([
     supabase.from('nexus_loot_wallets').select('coins,collection_score').eq('user_id',userId).maybeSingle(),
     view==='collection'?supabase.from('nexus_loot_inventory').select('*').eq('user_id',userId).order('score_value',{ascending:false}):Promise.resolve({data:[]}),
-    view==='collection'?supabase.from('nexus_loot_drops').select('*').eq('user_id',userId).order('created_at',{ascending:false}).limit(12):Promise.resolve({data:[]}),
-    supabase.from('nexus_loot_wallets').select('user_id,coins,collection_score').order('collection_score',{ascending:false}).order('user_id',{ascending:true}).limit(50)
+    view==='collection'?supabase.from('nexus_loot_drops').select('*').eq('user_id',userId).order('created_at',{ascending:false}).limit(12):Promise.resolve({data:[]})
    ]);
    const ownWallet=w.data||{coins:0,collection_score:0};
    setWallet(ownWallet);setItems(i.data||[]);setDrops(d.data||[]);
-   const rows=r.data||[];setRanking(rows);
-   const score=Number(ownWallet.collection_score||0);
-   const [ahead,ownInTop]=await Promise.all([
-    supabase.from('nexus_loot_wallets').select('user_id',{count:'exact',head:true}).or('collection_score.gt.'+score+',and(collection_score.eq.'+score+',user_id.lt.'+userId),
-    Promise.resolve(rows.some(row=>row.user_id===userId))
-   ]);
-   if(!w.error&&w.data&&!ahead.error)setGlobalRank((ahead.count||0)+1);else setGlobalRank(null);
-   const ids=[...new Set([...rows.map(x=>x.user_id),...(!ownInTop?[userId]:[])])];
+
+   // Busca o placar completo em páginas para calcular a posição real, inclusive fora do top 50.
+   const allRows=[];
+   const pageSize=500;
+   for(let from=0;;from+=pageSize){
+    const page=await supabase.from('nexus_loot_wallets')
+     .select('user_id,coins,collection_score')
+     .order('collection_score',{ascending:false})
+     .order('user_id',{ascending:true})
+     .range(from,from+pageSize-1);
+    if(page.error)throw page.error;
+    const batch=page.data||[];
+    allRows.push(...batch);
+    if(batch.length<pageSize)break;
+   }
+   const ownIndex=allRows.findIndex(row=>row.user_id===userId);
+   setGlobalRank(ownIndex>=0?ownIndex+1:null);
+   const topRows=allRows.slice(0,50);
+   setRanking(topRows);
+   const ids=[...new Set([...topRows.map(x=>x.user_id),userId])];
    if(ids.length){
     const p=await supabase.from('social_profiles').select('user_id,username,display_name,avatar').in('user_id',ids);
+    if(p.error)throw p.error;
     setProfiles(Object.fromEntries((p.data||[]).map(x=>[x.user_id,x])));
    }else setProfiles({});
   }catch(error){console.warn('NEXUS ranking refresh:',error?.message||error)}
@@ -50,7 +62,7 @@ export default function NexusLoot({userId,view='collection'}){
   const channel=supabase.channel('nexus-global-ranking-'+userId)
    .on('postgres_changes',{event:'*',schema:'public',table:'nexus_loot_wallets'},refresh)
    .subscribe();
-  // Fallback: keeps the board current even if Realtime is not enabled for this table.
+  // Atualização periódica como alternativa caso o Realtime não esteja habilitado.
   const interval=window.setInterval(refresh,10000);
   return()=>{active=false;window.clearInterval(interval);supabase.removeChannel(channel)};
  },[userId,load]);
