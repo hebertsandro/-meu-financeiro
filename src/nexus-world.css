@@ -272,3 +272,24 @@
 .nwi-region-card.discovered{border-color:rgba(109,220,171,.34)!important}.nwi-create-theme{border-color:rgba(128,218,181,.22)!important;background:rgba(16,43,47,.65)!important}.nwi-create-theme>span{color:#c5e8d7!important}.nwi-create-theme select{border-color:rgba(128,218,181,.28)!important;background:#173c40!important;color:#effff7!important}
 @media(max-width:650px){.nwi-lobby-head{padding:20px 16px!important}.nwi-lobby-toolbar{align-items:stretch;flex-direction:column}.nwi-lobby-toolbar>button{justify-content:center}.nwi-builder{max-height:calc(100dvh - 28px)!important;padding:16px!important}.nwi-building-options{grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:8px!important}.nwi-building-options>button{min-height:125px!important;padding:11px!important}.nwi-builder-foot{align-items:stretch;flex-direction:column}.nwi-builder-foot>button{width:100%}}
 @media(prefers-reduced-motion:reduce){.nwi-clan-card,.nwi-building,.nwi-worker-sprite{animation:none!important;transition:none!important}}
+
+/* Polimento dos sistemas complementares do universo */
+.nwi-codex{border-color:rgba(119,218,180,.2)!important;background:radial-gradient(ellipse at 100% 0,rgba(67,165,132,.12),transparent 45%),linear-gradient(145deg,#17383d,#102932)!important}
+.nwi-codex-count{border-color:rgba(135,224,185,.26)!important;background:radial-gradient(circle at 30% 20%,rgba(126,219,174,.2),rgba(60,130,121,.12))!important;color:#eafff4}
+.nwi-codex-count small{color:#9ccbb7!important}
+.nwi-world-event{border-color:rgba(128,220,183,.25)!important;background:radial-gradient(ellipse at 0 0,rgba(69,165,127,.18),transparent 55%),rgba(9,29,34,.68)!important}
+.nwi-event-icon{background:linear-gradient(145deg,rgba(72,175,135,.28),rgba(52,129,139,.2))!important;color:#b9f2d5!important}
+.nwi-event-copy>span{color:#9fe4c2!important}
+.nwi-event-progress i{background:linear-gradient(90deg,#55bd91,#e0c27d)!important}
+.nwi-event-copy>small,.nwi-region-copy>span{color:#9bbfae!important}
+.nwi-region-reward{color:#e7d49a!important}
+.nwi-portal-awake{border-color:rgba(117,230,188,.3)!important;background:linear-gradient(110deg,rgba(55,160,124,.17),rgba(27,96,95,.15))!important;color:#c8f6df!important}
+.nwi-portal-awake span{color:#a7d5c1!important}
+.social-clan-rewards .social-clan-reward{border-color:rgba(125,212,177,.2)!important;background:linear-gradient(145deg,rgba(29,76,67,.45),rgba(11,34,39,.72))!important}
+.social-clan-rewards .social-clan-reward.unlocked{border-color:rgba(137,230,185,.42)!important;background:linear-gradient(145deg,rgba(48,125,92,.28),rgba(14,44,43,.8))!important}
+.social-clan-rewards .social-clan-reward small{color:#a5cdb7!important}
+.social-clan-admin,.social-clan-rank{color:#a8e5c4!important}
+.social-clan-detail .social-clan-season h4{color:#f1fff8!important}
+.social-clan-season-board>div{border-color:rgba(126,213,177,.14)!important;background:rgba(8,30,34,.45)!important}
+.social-clan-season-board>div>b{color:#d7c68e!important}
+.social-clan-edit-toggle .social-view-button{border-color:rgba(128,218,181,.24)!important;color:#d9f7e8!important}
