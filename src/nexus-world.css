@@ -1,0 +1,54 @@
+/* NEXUS WORLD — visual próprio das ilhas dos clãs */
+.nexus-world-island,.nwi-lobby{--nwi-ink:#edf6ff;--nwi-muted:#9bb0c9;color:var(--nwi-ink);width:100%;min-width:0}
+.nwi-kicker{display:flex;align-items:center;gap:7px;color:#91bfff;font-size:10px;font-weight:900;letter-spacing:.17em;text-transform:uppercase}
+.nwi-island-head{display:flex;align-items:flex-end;justify-content:space-between;gap:18px;padding:20px 2px 16px}
+.nwi-island-head h2,.nwi-lobby-head h2{font-size:clamp(23px,4vw,34px);letter-spacing:-.045em;line-height:1.05;margin:9px 0 7px;font-weight:900}
+.nwi-island-head p,.nwi-lobby-head p{color:var(--nwi-muted);font-size:13px;line-height:1.55;margin:0;max-width:570px}
+.nwi-island-stats{display:flex;flex-direction:column;align-items:flex-end;gap:7px;white-space:nowrap}
+.nwi-island-stats span{display:flex;align-items:center;gap:7px;padding:9px 12px;border:1px solid #355879;border-radius:999px;background:#10223b;color:#dff6ff;font-size:12px;font-weight:800}
+.nwi-island-stats small{font-size:9px;letter-spacing:.16em;color:#83a5c9;font-weight:800}
+.nwi-scene{position:relative;overflow:hidden;isolation:isolate;min-height:320px;border-radius:25px;border:1px solid rgba(116,193,255,.24);background:radial-gradient(ellipse at 50% 72%,#1a5271 0%,#142e54 43%,#10172f 100%);box-shadow:0 24px 65px rgba(0,0,0,.25),inset 0 1px rgba(255,255,255,.08)}
+.nwi-sky-glow{position:absolute;width:75%;height:65%;left:12%;top:7%;border-radius:50%;background:radial-gradient(ellipse,rgba(91,181,255,.19),rgba(123,98,255,.08) 45%,transparent 72%);filter:blur(16px);pointer-events:none}
+.nwi-starfield{position:absolute;inset:0;pointer-events:none}
+.nwi-starfield i{position:absolute;width:3px;height:3px;border-radius:50%;background:#d9f8ff;box-shadow:0 0 9px #9beaff;opacity:.8}
+.nwi-starfield i:nth-child(1){left:12%;top:22%}.nwi-starfield i:nth-child(2){left:27%;top:12%;width:2px;height:2px}.nwi-starfield i:nth-child(3){left:73%;top:16%}.nwi-starfield i:nth-child(4){left:88%;top:37%;width:2px;height:2px}.nwi-starfield i:nth-child(5){left:62%;top:9%}.nwi-starfield i:nth-child(6){left:43%;top:23%;width:2px;height:2px}.nwi-starfield i:nth-child(7){left:8%;top:55%}
+.nwi-island-svg{position:relative;z-index:1;display:block;width:100%;height:auto;max-height:520px;margin:0 auto;overflow:visible}
+.nwi-building{filter:drop-shadow(0 7px 4px rgba(4,22,34,.25));cursor:default}
+.nwi-remove{cursor:pointer;opacity:0;transition:opacity .18s}
+.nwi-building:hover .nwi-remove,.nwi-remove:focus{opacity:1}
+.nwi-scene-caption{position:absolute;z-index:2;left:17px;right:17px;bottom:14px;display:flex;justify-content:space-between;align-items:center;gap:10px;pointer-events:none;font-size:9px;letter-spacing:.14em;font-weight:900;color:#c9edff;text-shadow:0 2px 8px #07172c}
+.nwi-scene-caption span{display:flex;align-items:center;gap:7px}.nwi-scene-caption i{width:6px;height:6px;border-radius:50%;background:#76ffc1;box-shadow:0 0 10px #76ffc1}
+.nwi-loading{position:absolute;z-index:3;right:14px;top:14px;display:flex;align-items:center;gap:8px;padding:8px 11px;border-radius:999px;background:rgba(7,20,40,.76);color:#d8f2ff;font-size:11px;backdrop-filter:blur(10px)}
+.nwi-spin{animation:nwiSpin 1s linear infinite}@keyframes nwiSpin{to{transform:rotate(360deg)}}
+.nwi-build-bar{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 3px 13px}
+.nwi-build-bar>div{display:flex;flex-direction:column;gap:5px;min-width:0}.nwi-build-bar b{font-size:14px}.nwi-build-bar small{font-size:11px;color:var(--nwi-muted)}
+.nwi-build-bar>button,.nwi-builder-foot>button{display:inline-flex;align-items:center;justify-content:center;gap:8px;border:0;border-radius:13px;padding:12px 16px;background:linear-gradient(135deg,#8c73ff,#4d8cff);color:white;font-size:12px;font-weight:900;box-shadow:0 8px 24px rgba(90,105,255,.25);white-space:nowrap}
+.nwi-build-bar>button:disabled{opacity:.5;cursor:not-allowed}
+.nwi-error{padding:10px 12px;border-radius:12px;background:rgba(174,53,79,.14);border:1px solid rgba(255,116,147,.3);color:#ffc4d1;font-size:12px;margin:8px 0}
+.nwi-island-note,.nwi-lobby-foot{display:flex;align-items:center;gap:8px;padding:12px 3px;color:#9eb5d0;font-size:11px;line-height:1.5}
+.nwi-island-note svg,.nwi-lobby-foot svg{color:#a99bff;flex:0 0 auto}
+.nwi-builder-backdrop{position:fixed;z-index:10000;inset:0;display:grid;place-items:center;padding:18px;background:rgba(3,8,20,.72);backdrop-filter:blur(10px)}
+.nwi-builder{width:min(100%,520px);padding:20px;border-radius:23px;background:linear-gradient(155deg,#172946,#10182e);border:1px solid rgba(145,192,255,.28);box-shadow:0 28px 90px rgba(0,0,0,.55)}
+.nwi-builder>header{display:flex;align-items:flex-start;justify-content:space-between;gap:12px;margin-bottom:18px}.nwi-builder h3{margin:7px 0 0;font-size:21px;letter-spacing:-.03em}
+.nwi-builder>header>button{display:grid;place-items:center;width:34px;height:34px;border-radius:10px;background:#263b5b;color:white;border:1px solid #3b5275}
+.nwi-building-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.nwi-building-options>button{display:flex;flex-direction:column;align-items:flex-start;text-align:left;gap:6px;padding:13px;border-radius:15px;border:1px solid #314a6a;background:rgba(255,255,255,.035);color:#eef6ff;min-height:112px}
+.nwi-building-options>button.selected{border-color:#a79aff;background:linear-gradient(145deg,rgba(142,119,255,.22),rgba(70,151,255,.1));box-shadow:inset 0 0 0 1px rgba(173,157,255,.16)}
+.nwi-building-options>button>span{display:grid;place-items:center;width:34px;height:34px;border-radius:11px;background:#283b61;color:#b9caff}
+.nwi-building-options b{font-size:13px}.nwi-building-options small{font-size:10px;line-height:1.4;color:#9eb3ce}
+.nwi-builder-foot{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px}.nwi-builder-foot small{color:#a7bad0;font-size:10px}
+.nwi-lobby{padding:4px 0 12px}.nwi-lobby-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:14px 2px 20px}.nwi-lobby-head h2{max-width:450px}.nwi-world-mark{flex:0 0 auto;display:grid;place-items:center;width:68px;height:68px;border-radius:22px;background:radial-gradient(circle at 30% 25%,#8cecff,#6374e9 43%,#25275d 78%);box-shadow:0 12px 35px rgba(91,121,255,.3);font-size:22px;font-weight:1000;letter-spacing:-.1em;color:#fff}.nwi-world-mark span{font-size:12px;color:#fff5ba}
+.nwi-lobby-actions{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:12px 14px;margin-bottom:13px;border:1px solid rgba(123,174,228,.18);border-radius:15px;background:linear-gradient(100deg,rgba(48,83,126,.3),rgba(24,38,70,.3))}
+.nwi-lobby-actions>div{display:flex;flex-direction:column;gap:3px}.nwi-lobby-actions b{font-size:12px}.nwi-lobby-actions small{font-size:10px;color:var(--nwi-muted)}
+.nwi-lobby-actions button{display:flex;align-items:center;gap:7px;border:1px solid rgba(160,148,255,.4);background:rgba(116,97,230,.18);color:#e9e5ff;border-radius:11px;padding:10px 12px;font-size:11px;font-weight:900}
+.nwi-clan-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:13px}
+.nwi-clan-card{overflow:hidden;border:1px solid rgba(118,173,223,.2);border-radius:19px;background:linear-gradient(150deg,rgba(29,49,81,.85),rgba(15,25,48,.9));box-shadow:0 12px 30px rgba(0,0,0,.14)}
+.nwi-card-island{position:relative;height:112px;overflow:hidden;background:radial-gradient(ellipse at 50% 45%,#285d81,#162b53 62%,#131a34)}
+.nwi-mini-water{position:absolute;left:17%;right:17%;top:20px;height:75px;border-radius:50%;background:linear-gradient(135deg,#2ca7b7,#265e91 55%,#252f68);transform:rotate(-8deg);box-shadow:0 10px 20px rgba(0,0,0,.3)}
+.nwi-mini-land{position:absolute;left:26%;right:26%;top:30px;height:54px;border-radius:50%;background:linear-gradient(135deg,#b5d99c,#4d9b82 70%);transform:rotate(-8deg);box-shadow:0 9px 0 #385c62}
+.nwi-mini-land i{position:absolute;width:11px;height:18px;border-radius:50% 50% 40% 40%;background:#287b65;top:12px;left:20%}.nwi-mini-land i:nth-child(2){left:48%;top:6px}.nwi-mini-land i:nth-child(3){left:72%;top:18px}
+.nwi-card-island>span{position:absolute;right:15%;top:13px;display:grid;place-items:center;width:35px;height:35px;border-radius:12px;background:rgba(9,22,42,.65);border:1px solid rgba(255,255,255,.15);font-size:19px}
+.nwi-card-copy{padding:13px}.nwi-card-tag{font-size:9px;letter-spacing:.13em;color:#8dbbdf;font-weight:900}.nwi-card-copy h3{font-size:17px;margin:6px 0 5px}.nwi-card-copy p{font-size:11px;line-height:1.45;color:#a9bad0;min-height:32px;margin:0 0 12px}.nwi-card-copy button{display:flex;align-items:center;gap:7px;width:100%;justify-content:center;padding:10px;border:1px solid rgba(135,170,255,.25);border-radius:11px;background:rgba(103,125,230,.14);color:#e7eaff;font-size:11px;font-weight:900}
+.nwi-empty{display:flex;flex-direction:column;align-items:center;gap:10px;text-align:center;padding:36px 18px;border:1px dashed rgba(132,180,227,.3);border-radius:18px;background:rgba(20,38,67,.25);color:#bcd5ed}.nwi-empty svg{color:#9d9cff}.nwi-empty b{font-size:14px}.nwi-empty span{max-width:330px;color:#92a9c5;font-size:11px;line-height:1.5}
+@media(max-width:620px){.nwi-island-head{align-items:flex-start;flex-direction:column;gap:10px;padding-top:12px}.nwi-island-stats{align-items:flex-start;flex-direction:row;gap:10px}.nwi-scene{min-height:220px;border-radius:18px}.nwi-island-svg{width:118%;max-width:none;margin-left:-9%;margin-top:8px}.nwi-scene-caption{font-size:8px;bottom:10px;left:11px;right:11px}.nwi-build-bar{align-items:flex-start;flex-direction:column}.nwi-build-bar>button{width:100%}.nwi-lobby-head{align-items:flex-start}.nwi-world-mark{width:53px;height:53px;border-radius:17px;font-size:18px}.nwi-clan-grid{grid-template-columns:1fr}.nwi-card-island{height:120px}.nwi-builder{padding:16px}.nwi-building-options{gap:7px}.nwi-building-options>button{min-height:104px;padding:10px}.nwi-builder-foot{align-items:stretch;flex-direction:column}.nwi-builder-foot>button{width:100%}}
+@media(prefers-reduced-motion:no-preference){.nwi-scene{animation:nwiSceneIn .7s ease both}@keyframes nwiSceneIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}.nwi-starfield i{animation:nwiTwinkle 3.8s ease-in-out infinite alternate}.nwi-starfield i:nth-child(2n){animation-delay:1.2s}@keyframes nwiTwinkle{from{opacity:.25;transform:scale(.75)}to{opacity:.95;transform:scale(1.35)}}}
