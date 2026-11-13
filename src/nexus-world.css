@@ -186,3 +186,35 @@
 .nwi-create-theme{display:flex;flex-direction:column;gap:7px;padding:12px;border:1px solid rgba(139,184,231,.2);border-radius:13px;background:rgba(16,31,55,.55)}
 .nwi-create-theme>span{font-size:11px;font-weight:900;color:#b8cce2}
 .nwi-create-theme select{width:100%;min-height:42px;padding:9px 11px;border:1px solid rgba(140,177,220,.28);border-radius:10px;background:#142742;color:#eff7ff;font-size:12px}
+
+/* NPC workers and the island economy */
+.nwi-worker-sprite{filter:drop-shadow(0 3px 4px rgba(0,0,0,.35));animation:nwiWorkerBob 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+@keyframes nwiWorkerBob{0%,100%{translate:0 0}50%{translate:0 -2px}}
+.nwi-worker-economy{margin:18px 0;padding:19px;border:1px solid rgba(132,188,235,.2);border-radius:22px;background:radial-gradient(ellipse at 100% 0,rgba(116,128,255,.13),transparent 42%),linear-gradient(145deg,rgba(23,43,72,.94),rgba(11,23,44,.96));box-shadow:0 18px 42px rgba(0,0,0,.17);color:#edf6ff}
+.nwi-worker-head{display:flex;align-items:flex-start;justify-content:space-between;gap:14px;margin-bottom:15px}
+.nwi-worker-head h3{margin:7px 0 5px;font-size:22px;letter-spacing:-.04em}
+.nwi-worker-head p{margin:0;max-width:430px;color:#9fb5cf;font-size:11px;line-height:1.5}
+.nwi-worker-balances{display:flex;flex-direction:column;gap:7px;flex:0 0 auto}
+.nwi-worker-balances span{display:flex;align-items:center;gap:7px;padding:8px 11px;border:1px solid rgba(142,184,236,.2);border-radius:12px;background:rgba(10,22,42,.65);font-size:11px;font-weight:900;font-variant-numeric:tabular-nums}
+.nwi-worker-balances span:first-child svg{color:#a8a0ff}.nwi-worker-balances span:last-child svg{color:#ffd37a}
+.nwi-worker-summary{display:grid;grid-template-columns:repeat(3,minmax(0,1fr)) auto;align-items:center;gap:9px;padding:12px;margin-bottom:13px;border:1px solid rgba(135,179,227,.15);border-radius:15px;background:rgba(7,18,36,.45)}
+.nwi-worker-summary>div{display:flex;flex-direction:column;gap:4px}.nwi-worker-summary b{display:flex;align-items:center;gap:4px;font-size:16px}.nwi-worker-summary small{font-size:8px;letter-spacing:.1em;color:#8fa9c6;font-weight:900}
+.nwi-worker-summary>div:nth-child(2) b{color:#c3b8ff}.nwi-worker-summary>div:nth-child(3) b{color:#ffdb8e}
+.nwi-worker-summary>button{display:flex;align-items:center;justify-content:center;gap:7px;min-height:40px;padding:9px 12px;border:1px solid rgba(145,139,255,.32);border-radius:11px;background:linear-gradient(110deg,rgba(112,102,224,.28),rgba(59,159,190,.15));color:#f0efff;font-size:10px;font-weight:900;white-space:nowrap}
+.nwi-worker-summary>button:disabled{opacity:.45;cursor:not-allowed}
+.nwi-worker-list{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.nwi-worker-card{display:flex;align-items:center;gap:10px;min-width:0;padding:11px;border:1px solid rgba(128,171,219,.15);border-radius:15px;background:rgba(8,19,37,.48)}
+.nwi-worker-card.is-staffed{border-color:rgba(105,220,170,.23);background:linear-gradient(110deg,rgba(41,111,93,.15),rgba(8,19,37,.5))}
+.nwi-worker-avatar{display:grid;place-items:center;flex:0 0 39px;width:39px;height:39px;border:1px solid rgba(157,195,255,.2);border-radius:13px;background:linear-gradient(145deg,rgba(116,139,235,.23),rgba(60,170,185,.13));font-size:21px}
+.nwi-worker-info{display:flex;flex:1;flex-direction:column;gap:3px;min-width:0}
+.nwi-worker-info b{font-size:11px}.nwi-worker-info>span{font-size:10px;color:#c6d8ec}.nwi-worker-info small{font-size:9px;line-height:1.4;color:#8fa8c4}
+.nwi-worker-status{display:flex;align-items:center;gap:5px;flex:0 0 auto;color:#8ee5b7;font-size:8px;font-weight:1000;letter-spacing:.08em}
+.nwi-worker-status i{width:6px;height:6px;border-radius:50%;background:#7ce5ad;box-shadow:0 0 9px #62e4a2}
+.nwi-hire-actions{display:flex;flex-direction:column;gap:5px;flex:0 0 auto}
+.nwi-hire-actions button{display:flex;align-items:center;justify-content:center;gap:4px;min-width:76px;padding:6px 8px;border:1px solid rgba(140,177,231,.22);border-radius:9px;background:rgba(78,105,160,.18);color:#e8f2ff;font-size:9px;font-weight:900}
+.nwi-hire-actions button:first-child svg{color:#ffdc8b}.nwi-hire-actions button:last-child svg{color:#c3baff}
+.nwi-hire-actions button:disabled{opacity:.35;cursor:not-allowed}
+.nwi-workers-empty{grid-column:1/-1;margin:0;padding:16px;border:1px dashed rgba(141,183,228,.2);border-radius:13px;color:#9eb5d0;text-align:center;font-size:11px}
+.nwi-worker-foot{display:flex;align-items:flex-start;gap:7px;margin:12px 0 0;color:#849fbd;font-size:9px;line-height:1.5}.nwi-worker-foot svg{flex:0 0 auto;color:#a8b7ff}
+@media(max-width:650px){.nwi-worker-economy{padding:14px;border-radius:18px}.nwi-worker-head{flex-direction:column}.nwi-worker-balances{flex-direction:row;width:100%}.nwi-worker-balances span{flex:1;justify-content:center;padding:8px 7px;font-size:10px}.nwi-worker-summary{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;padding:10px}.nwi-worker-summary>button{grid-column:1/-1;width:100%}.nwi-worker-summary small{font-size:7px}.nwi-worker-list{grid-template-columns:1fr}.nwi-worker-card{padding:10px}.nwi-hire-actions button{min-width:80px}}
+@media(prefers-reduced-motion:reduce){.nwi-worker-sprite{animation:none}}
