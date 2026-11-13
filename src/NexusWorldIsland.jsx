@@ -26,13 +26,69 @@ function IslandBuilding({type,x,y,onRemove,canRemove}){
 
 function Tree({x,y,scale=1}){return <g transform={`translate(${x} ${y}) scale(${scale})`}><path d="M0 0 V20" stroke="#72513d" strokeWidth="6" strokeLinecap="round"/><path d="M0 -27 C-25 -28 -24 -8 -8 -8 C-24 4 -8 13 2 3 C12 15 27 3 13 -9 C30 -22 13 -35 0 -27Z" fill="#318e70" stroke="#79d6a8" strokeWidth="2"/><path d="M-7 -22 Q0 -31 9 -22" fill="none" stroke="#b0f0c8" strokeWidth="2"/></g>}
 
+function ClanIslandPreview({clan,index=0}){
+ const uid=String(clan.id||index).replace(/[^a-zA-Z0-9_-]/g,'').slice(0,28)||String(index);
+ const palettes=[
+  {sea:'#123d66',sea2:'#257c94',grass:'#b6d99b',grass2:'#438e78',rock:'#315d66',roof:'#8e79d9',glow:'#9deaff'},
+  {sea:'#17365f',sea2:'#387a9a',grass:'#c2dba0',grass2:'#559879',rock:'#395b69',roof:'#d68b75',glow:'#ffe0a6'},
+  {sea:'#1c376b',sea2:'#367f98',grass:'#b8d6a0',grass2:'#4e997c',rock:'#34586a',roof:'#69a8d5',glow:'#b7d8ff'}
+ ];
+ const p=palettes[index%palettes.length];
+ return <div className="nwi-preview-art" aria-hidden="true">
+  <div className="nwi-preview-aurora"/>
+  <svg viewBox="0 0 640 300" preserveAspectRatio="xMidYMid slice">
+   <defs>
+    <linearGradient id={uid+'sea'} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={p.sea2}/><stop offset=".58" stopColor={p.sea}/><stop offset="1" stopColor="#111c43"/></linearGradient>
+    <linearGradient id={uid+'land'} x1="0" y1="0" x2="1" y2="1"><stop offset="0" stopColor={p.grass}/><stop offset=".55" stopColor="#78b98e"/><stop offset="1" stopColor={p.grass2}/></linearGradient>
+    <linearGradient id={uid+'cliff'} x1="0" y1="0" x2="0" y2="1"><stop offset="0" stopColor={p.rock}/><stop offset="1" stopColor="#172c4a"/></linearGradient>
+    <filter id={uid+'shadow'}><feGaussianBlur stdDeviation="10"/></filter>
+    <filter id={uid+'shine'}><feGaussianBlur stdDeviation="4" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>
+   </defs>
+   <path d="M0 0H640V300H0Z" fill={'url(#'+uid+'sea)'}/>
+   <g opacity=".24" fill="none" stroke="#9beeff"><path d="M-20 75Q90 45 190 76T390 73T670 67" strokeWidth="2"/><path d="M-10 245Q110 213 230 244T470 240T670 230"/><path d="M40 110Q115 92 185 111M430 54Q500 37 580 53"/></g>
+   <ellipse cx="325" cy="246" rx="240" ry="28" fill="#06172d" opacity=".5" filter={'url(#'+uid+'shadow)'}/>
+   <path d="M85 164Q108 75 225 71Q310 19 397 70Q515 50 566 139Q612 207 526 242Q414 288 287 258Q153 283 94 218Z" fill={'url(#'+uid+'cliff)'} stroke="#77c6c2" strokeWidth="3"/>
+   <path d="M103 150Q132 82 230 80Q316 34 397 79Q504 63 548 143Q580 194 510 223Q405 258 290 235Q165 255 116 207Z" fill={'url(#'+uid+'land)'} stroke="#d2efb5" strokeWidth="3"/>
+   <path d="M138 151Q195 99 263 105Q344 58 424 105Q488 95 520 145" fill="none" stroke="#e8f6c8" strokeWidth="4" opacity=".45"/>
+   <path d="M190 191Q260 155 322 176Q393 201 467 151" fill="none" stroke="#e6d8a8" strokeWidth="12" strokeLinecap="round"/>
+   <path d="M190 191Q260 155 322 176Q393 201 467 151" fill="none" stroke="#fff0c9" strokeWidth="2" strokeLinecap="round" opacity=".8"/>
+   <g transform="translate(300 130)">
+    <ellipse cy="36" rx="43" ry="10" fill="#18384b" opacity=".3"/>
+    <path d="M-30 0L0 -19L30 0V31L-30 31Z" fill="#dbe7df" stroke="#739b9a" strokeWidth="2"/>
+    <path d="M-30 0L0 -24L30 0L0 16Z" fill={p.roof} stroke="#d9d0ff" strokeWidth="2"/>
+    <path d="M-30 0L0 16V44L-30 28Z" fill="#6faaa0"/><path d="M0 16L30 0V29L0 44Z" fill="#477e79"/>
+    <path d="M-9 8V34L2 40V15Z" fill="#315366"/><path d="M12 2L23 -5V8L12 14Z" fill={p.glow}/>
+   </g>
+   <g transform="translate(420 118)"><path d="M0 10V-15" stroke="#76563f" strokeWidth="6"/><path d="M0 -42C-25 -40 -28 -20 -9 -17C-27 -4 -8 11 3 -1C17 13 31 -4 15 -18C34 -34 15 -50 0 -42Z" fill="#287d69" stroke="#8cd6a1" strokeWidth="2"/></g>
+   <g transform="translate(208 135) scale(.8)"><path d="M0 10V-15" stroke="#76563f" strokeWidth="6"/><path d="M0 -42C-25 -40 -28 -20 -9 -17C-27 -4 -8 11 3 -1C17 13 31 -4 15 -18C34 -34 15 -50 0 -42Z" fill="#328b70" stroke="#9ce0a7" strokeWidth="2"/></g>
+   <g transform="translate(475 172) scale(.65)"><path d="M0 10V-15" stroke="#76563f" strokeWidth="6"/><path d="M0 -42C-25 -40 -28 -20 -9 -17C-27 -4 -8 11 3 -1C17 13 31 -4 15 -18C34 -34 15 -50 0 -42Z" fill="#328b70"/></g>
+   <path d="M85 222Q125 247 175 247M485 256Q548 236 575 204" fill="none" stroke="#7beaff" strokeWidth="2" opacity=".6"/>
+   <g fill="#e5faff" filter={'url(#'+uid+'shine)'}><circle cx="145" cy="75" r="2"/><circle cx="525" cy="82" r="2"/><circle cx="570" cy="177" r="2"/></g>
+   <g transform="translate(510 65)"><circle r="24" fill="#0b1c38" opacity=".72" stroke="#9fdcff" strokeOpacity=".5"/><path d="M0 -13L4 -4L13 0L4 4L0 13L-4 4L-13 0L-4 -4Z" fill="#e6f8ff"/><circle r="3" fill="#fff"/></g>
+  </svg>
+  <div className="nwi-preview-emblem">{clan.emblem||'✦'}</div>
+  <div className="nwi-preview-overlay"><span>ILHA EXPLORÁVEL</span><b>{String(clan.tag||'NEXUS').toUpperCase()}</b></div>
+ </div>;
+}
+
 export function NexusWorldLobby({clans=[],memberships=[],onOpenClan=()=>{},onJoinClan=()=>{},onCreate=()=>{}}){
  const myIds=new Set(memberships.map(m=>m.clan_id));
  return <section className="nwi-lobby">
-  <header className="nwi-lobby-head"><div><span className="nwi-kicker"><Compass size={13}/> NEXUS WORLD · ARQUIPÉLAGO</span><h2>Seu universo começa aqui.</h2><p>Descubra organizações, encontre sua comunidade e construa uma ilha que tenha a cara do seu clã.</p></div><div className="nwi-world-mark">NW<span>✦</span></div></header>
-  <div className="nwi-lobby-actions"><div><b>{clans.length.toLocaleString('pt-BR')} organizações</b><small>no arquipélago conhecido</small></div><button type="button" onClick={onCreate}><Plus size={17}/> Fundar organização</button></div>
-  {clans.length===0?<div className="nwi-empty"><Ship size={30}/><b>O arquipélago ainda está esperando por você.</b><span>Seja o primeiro a fundar uma organização e dar vida a uma nova ilha.</span></div>:<div className="nwi-clan-grid">{clans.map(cl=>{const mine=myIds.has(cl.id);return <article className="nwi-clan-card" key={cl.id}><div className="nwi-card-island"><div className="nwi-mini-water"/><div className="nwi-mini-land"><i/><i/><i/></div><span>{cl.emblem||'✦'}</span></div><div className="nwi-card-copy"><div className="nwi-card-tag">{mine?'SUA ORGANIZAÇÃO':'ORGANIZAÇÃO NEXUS'} · [{cl.tag}]</div><h3>{cl.name}</h3><p>{cl.description||'Uma nova história começa nesta ilha.'}</p><button type="button" onClick={()=>mine?onOpenClan(cl):onJoinClan(cl)}>{mine?'Visitar ilha':'Entrar na organização'} <ArrowUpRight size={15}/></button></div></article>})}</div>}
-  <div className="nwi-lobby-foot"><Sparkles size={15}/> Cada ilha evolui com as construções escolhidas por seus integrantes.</div>
+  <header className="nwi-lobby-head">
+   <div><span className="nwi-kicker"><Compass size={13}/> NEXUS WORLD <i/> ARQUIPÉLAGO</span><h2>Um universo. <span>Mil possibilidades.</span></h2><p>Ilhas criadas por comunidades. Cada clã constrói seu próprio lugar e deixa sua marca no universo.</p></div>
+   <div className="nwi-world-mark"><span className="nwi-world-orbit"/><b>NW</b><i>✦</i></div>
+  </header>
+  <div className="nwi-lobby-toolbar"><div className="nwi-world-count"><span className="nwi-count-icon"><Map size={17}/></span><div><b>{clans.length.toLocaleString('pt-BR')} {clans.length===1?'ilha descoberta':'ilhas descobertas'}</b><small>ARQUIPÉLAGO CONHECIDO</small></div></div><button type="button" onClick={onCreate}><Plus size={17}/> Fundar meu clã</button></div>
+  {clans.length===0?<div className="nwi-empty"><div className="nwi-empty-orb"><Ship size={28}/></div><b>Um mundo inteiro espera para nascer.</b><span>Fundar o primeiro clã é dar vida à primeira ilha do arquipélago.</span><button type="button" onClick={onCreate}><Plus size={16}/> Criar a primeira ilha</button></div>:<div className="nwi-clan-grid">{clans.map((cl,index)=>{const mine=myIds.has(cl.id);return <article className="nwi-clan-card" key={cl.id}>
+   <ClanIslandPreview clan={cl} index={index}/>
+   <div className="nwi-card-copy">
+    <div className="nwi-card-meta"><span>{mine?'SUA ILHA':'ILHA DO ARQUIPÉLAGO'}</span><i>·</i><b>[{cl.tag||'NEXUS'}]</b></div>
+    <h3>{cl.name}</h3>
+    <p>{cl.description||'Uma comunidade. Uma ilha. Uma história que ainda vai ser construída.'}</p>
+    <button type="button" onClick={()=>mine?onOpenClan(cl):onJoinClan(cl)}><span>{mine?'Explorar minha ilha':'Descobrir esta ilha'}</span><ArrowUpRight size={16}/></button>
+   </div>
+  </article>})}</div>}
+  <footer className="nwi-lobby-foot"><Sparkles size={15}/><span>O arquipélago cresce conforme novas comunidades surgem e transformam suas ilhas.</span></footer>
  </section>;
 }
 
