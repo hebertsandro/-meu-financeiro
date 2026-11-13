@@ -161,3 +161,24 @@
 .nwi-portal-awake>div{display:flex;flex-direction:column;gap:3px}.nwi-portal-awake span{font-size:10px;color:#9fcbb9;line-height:1.45}
 .nwi-codex-loading{display:flex;align-items:center;justify-content:center;gap:8px;padding:30px;color:#a9bfd7;font-size:12px}
 @media(max-width:620px){.nwi-codex{padding:15px;border-radius:18px}.nwi-region-grid{grid-template-columns:1fr}.nwi-codex-head{align-items:flex-start}.nwi-codex-count{min-width:58px;height:58px;border-radius:16px}.nwi-region-art{height:76px}.nwi-world-event{padding:12px}}
+
+/* Biomas selecionáveis: cada comunidade define uma paisagem própria */
+.nexus-world-island[data-theme="cyan"] .nwi-island-svg{filter:hue-rotate(18deg) saturate(1.16) drop-shadow(0 12px 18px rgba(0,0,0,.2))}
+.nexus-world-island[data-theme="gold"] .nwi-island-svg{filter:hue-rotate(48deg) saturate(1.18) drop-shadow(0 12px 18px rgba(0,0,0,.2))}
+.nexus-world-island[data-theme="crimson"] .nwi-island-svg{filter:hue-rotate(292deg) saturate(1.2) drop-shadow(0 12px 18px rgba(0,0,0,.2))}
+.nexus-world-island[data-theme="emerald"] .nwi-island-svg{filter:hue-rotate(75deg) saturate(1.2) drop-shadow(0 12px 18px rgba(0,0,0,.2))}
+.nexus-world-island[data-theme="violet"] .nwi-island-svg{filter:hue-rotate(0deg) saturate(1.08) drop-shadow(0 12px 18px rgba(0,0,0,.2))}
+.nwi-hub-nav{position:sticky;top:8px;z-index:20;display:flex;gap:7px;overflow-x:auto;padding:9px;margin:12px 0 17px;border:1px solid rgba(131,178,226,.2);border-radius:15px;background:rgba(10,22,42,.91);backdrop-filter:blur(14px);scrollbar-width:none}
+.nwi-hub-nav::-webkit-scrollbar{display:none}
+.nwi-hub-nav a{flex:0 0 auto;padding:9px 12px;border:1px solid transparent;border-radius:10px;color:#a9bfd8;text-decoration:none;font-size:10px;font-weight:900;white-space:nowrap;transition:background .18s,color .18s,border-color .18s}
+.nwi-hub-nav a:hover{background:rgba(115,142,225,.16);border-color:rgba(146,178,255,.24);color:#f0f5ff}
+.nwi-hub-section{scroll-margin-top:80px}
+#nwi-members-section,#nwi-chat-section{scroll-margin-top:80px}
+.social-clan-detail{display:flex;flex-direction:column;gap:13px}
+.social-clan-detail>h4{margin:14px 0 0;padding:12px 14px;border-left:3px solid #8c8aff;border-radius:0 12px 12px 0;background:linear-gradient(90deg,rgba(111,112,222,.14),transparent);color:#eaf3ff;font-size:14px;letter-spacing:-.02em}
+.social-clan-detail-actions{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.social-clan-detail .social-clan-season{margin-top:10px;padding:17px;border:1px solid rgba(133,180,225,.19);border-radius:18px;background:linear-gradient(145deg,rgba(27,47,77,.86),rgba(14,26,49,.9))}
+.social-clan-detail .social-clan-members{padding:8px;border:1px solid rgba(133,180,225,.16);border-radius:17px;background:rgba(10,21,40,.48)}
+.social-clan-detail .social-clan-chat{min-height:220px;max-height:420px;padding:13px;border:1px solid rgba(133,180,225,.16);border-radius:17px;background:rgba(8,18,36,.55)}
+.social-clan-detail .social-chat-compose{padding:10px;border:1px solid rgba(133,180,225,.16);border-radius:15px;background:rgba(17,33,58,.8)}
+@media(max-width:620px){.nwi-hub-nav{margin:8px -2px 12px;padding:7px}.nwi-hub-nav a{padding:9px 10px}.social-clan-detail-actions{align-items:stretch;flex-wrap:wrap}.social-clan-detail-actions button{flex:1}.social-clan-detail .social-clan-chat{max-height:360px}}
