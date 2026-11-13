@@ -97,3 +97,12 @@
 @media(max-width:700px){.nwi-lobby-head{min-height:0;padding:21px 17px;border-radius:19px}.nwi-lobby-head h2{font-size:27px;max-width:320px}.nwi-lobby-head p{font-size:11px;max-width:300px}.nwi-world-mark{width:62px;height:62px;border-radius:20px}.nwi-world-mark b{font-size:19px}.nwi-world-orbit{left:-18px;top:20px;width:96px;height:27px}.nwi-clan-grid{grid-template-columns:1fr;gap:13px}.nwi-preview-art{height:165px}.nwi-card-copy{padding:14px}.nwi-card-copy h3{font-size:18px}}
 @media(max-width:380px){.nwi-lobby-head{padding:18px 14px}.nwi-lobby-head h2{font-size:24px}.nwi-world-mark{width:50px;height:50px;border-radius:16px}.nwi-world-mark b{font-size:16px}.nwi-world-mark>i{right:8px;top:6px}.nwi-lobby-toolbar>button{padding:10px 11px;font-size:10px}.nwi-preview-art{height:145px}}
 @media(prefers-reduced-motion:no-preference){.nwi-clan-card{animation:nwiCardRise .5s ease both}.nwi-clan-card:nth-child(2){animation-delay:.06s}.nwi-clan-card:nth-child(3){animation-delay:.12s}.nwi-clan-card:nth-child(4){animation-delay:.18s}@keyframes nwiCardRise{from{opacity:0;transform:translateY(9px)}to{opacity:1;transform:translateY(0)}}}
+
+/* A vitrine externa reutiliza o cenário real da ilha do clã. */
+.nwi-clan-card>.nexus-world-island{width:100%;min-width:0}
+.nwi-clan-card .nwi-scene-preview{height:174px;min-height:0;border:0;border-radius:0;box-shadow:none;animation:none}
+.nwi-clan-card .nwi-scene-preview .nwi-island-svg{display:block;width:100%;height:100%;max-height:none;margin:0;object-fit:cover}
+.nwi-clan-card .nwi-scene-preview .nwi-scene-caption{left:15px;right:15px;bottom:12px;font-size:8px}
+.nwi-clan-card .nwi-scene-preview .nwi-loading{top:10px;right:10px;padding:6px 9px;font-size:9px}
+@media(max-width:700px){.nwi-clan-card .nwi-scene-preview{height:165px}}
+@media(max-width:380px){.nwi-clan-card .nwi-scene-preview{height:145px}}
