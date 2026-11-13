@@ -8,7 +8,10 @@ const BUILDINGS=[
  {id:'observatory',name:'Observatório',desc:'Um domo para observar os mistérios do universo.',icon:Telescope},
  {id:'garden',name:'Jardim',desc:'Um refúgio vivo de natureza e energia.',icon:Sprout},
  {id:'lighthouse',name:'Farol',desc:'Uma luz que guia exploradores.',icon:RadioTower},
- {id:'workshop',name:'Oficina',desc:'O centro criativo da comunidade.',icon:Wrench}
+ {id:'workshop',name:'Oficina',desc:'O centro criativo da comunidade.',icon:Wrench},
+ {id:'archive',name:'Arquivo antigo',desc:'Guarda as memórias da equipe.',icon:BookOpen},
+ {id:'portal',name:'Portal dimensional',desc:'Um elo com territórios distantes.',icon:Orbit},
+ {id:'dock',name:'Porto aéreo',desc:'Ponto de chegada dos visitantes.',icon:Anchor}
 ];
 const SLOTS=[{x:285,y:220},{x:430,y:178},{x:570,y:218},{x:680,y:270},{x:525,y:300},{x:370,y:315},{x:220,y:300},{x:620,y:350}];
 
