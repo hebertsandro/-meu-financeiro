@@ -31,3 +31,5 @@ revoke all on public.social_world_events from anon;
 insert into public.social_world_events(event_key,title,description,starts_at,ends_at,target_discoveries)
 values ('first_contact_2026','O Primeiro Contato','Explore os cinco territórios ocultos e ajude a ativar o portal central do NEXUS World.',now(),now()+interval '30 days',5)
 on conflict (event_key) do nothing;
+
+do $$ begin if not exists (select 1 from pg_publication_tables where pubname='supabase_realtime' and schemaname='public' and tablename='social_world_discoveries') then alter publication supabase_realtime add table public.social_world_discoveries; end if; end $$;
