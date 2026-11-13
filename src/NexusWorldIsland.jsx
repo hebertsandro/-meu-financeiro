@@ -12,7 +12,7 @@ const BUILDINGS=[
 ];
 const SLOTS=[{x:285,y:220},{x:430,y:178},{x:570,y:218},{x:680,y:270},{x:525,y:300},{x:370,y:315},{x:220,y:300},{x:620,y:350}];
 
-function IslandBuilding({type,x,y,onRemove,canRemove}){
+function IslandBuilding({type,x,y,onRemove,canRemove,glowId='nwiGlow'}){
  const common={strokeLinejoin:'round',strokeLinecap:'round'};
  return <g transform={`translate(${x} ${y})`} className="nwi-building">
   {type==='house'&&<><ellipse cx="0" cy="33" rx="43" ry="10" fill="#061b2a" opacity=".3"/><path d="M-31 0 L0 -19 L31 0 L31 31 L-31 31Z" fill="#d9e7e9" stroke="#6c9b9d" strokeWidth="2"/><path d="M-31 0 L0 -23 L31 0 L0 17Z" fill="#8d70d8" stroke="#c7b6ff" strokeWidth="2"/><path d="M-31 0 L0 17 L0 45 L-31 28Z" fill="#7ca9a5"/><path d="M0 17 L31 0 L31 29 L0 45Z" fill="#477f82"/><path d="M-10 8 L-10 33 L2 39 L2 15Z" fill="#2b5260"/><path d="M11 3 L23 -4 L23 8 L11 15Z" fill="#9eeaff"/><path d="M-23 -2 L-12 -9 L-12 3 L-23 10Z" fill="#9eeaff"/></>}
@@ -84,8 +84,8 @@ export default function NexusWorldIsland({clan,userId,onToast=()=>{},preview=fal
     <path d="M540 183 Q590 142 632 176 Q652 193 652 219" fill="#4a9b80" opacity=".7"/>
     <g opacity=".95"><Tree x={210} y={265} scale={1.05}/><Tree x={265} y={220} scale={.82}/><Tree x={690} y={265} scale={.9}/><Tree x={650} y={320} scale={.7}/><Tree x={470} y={185} scale={.62}/><Tree x={330} y={330} scale={.72}/><Tree x={570} y={345} scale={.78}/></g>
     <g opacity=".8" fill="#e5fff0"><circle cx="178" cy="304" r="3"/><circle cx="716" cy="296" r="3"/><circle cx="602" cy="190" r="3"/><circle cx="378" cy="350" r="3"/></g>
-    {buildings.map(item=>{const pos=SLOTS[Number(item.slot)-1];return pos?<IslandBuilding key={item.id} type={item.building_type} x={pos.x} y={pos.y} canRemove={item.created_by===userId||clan?.created_by===userId} onRemove={()=>removeBuilding(item)}/>:null;})}
-    <g className="nwi-island-marker" transform="translate(440 115)"><path d="M0 0 L0 -22" stroke="#d7f8ff" strokeWidth="2"/><circle cy="-29" r="8" fill="#e9fbff" filter="url(#nwiGlow)"/><circle cy="-29" r="3" fill="#fff"/></g>
+    {buildings.map(item=>{const pos=SLOTS[Number(item.slot)-1];return pos?<IslandBuilding key={item.id} type={item.building_type} x={pos.x} y={pos.y} canRemove={!preview&&(item.created_by===userId||clan?.created_by===userId)} glowId={`${sceneKey}-glow`} onRemove={()=>removeBuilding(item)}/>:null;})}
+    <g className="nwi-island-marker" transform="translate(440 115)"><path d="M0 0 L0 -22" stroke="#d7f8ff" strokeWidth="2"/><circle cy="-29" r="8" fill="#e9fbff" filter={`url(#${glowId})`}/><circle cy="-29" r="3" fill="#fff"/></g>
     <path d="M115 350 Q180 395 255 395 M690 380 Q750 355 780 310" fill="none" stroke="#77e9ff" strokeWidth="2" opacity=".7" strokeLinecap="round"/>
    </svg>
    <div className="nwi-scene-caption"><span><i/> UNIVERSO COMPARTILHADO</span><b>{clan?.tag||'NEXUS'} · SETOR 01</b></div>
