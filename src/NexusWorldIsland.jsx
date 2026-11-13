@@ -11,8 +11,8 @@ const BUILDINGS=[
  {id:'lighthouse',name:'Farol',desc:'Uma luz que guia exploradores.',icon:RadioTower},
  {id:'workshop',name:'Oficina',desc:'O centro criativo da comunidade.',icon:Wrench},
  {id:'archive',name:'Arquivo antigo',desc:'Guarda as memórias da equipe.',icon:BookOpen},
- {id:'portal',name:'Portal dimensional',desc:'Um elo com territórios distantes.',icon:Orbit},
- {id:'dock',name:'Porto aéreo',desc:'Ponto de chegada dos visitantes.',icon:Anchor}
+ {id:'portal',name:'Portal de expedições',desc:'Atravesse o portal para descobrir territórios e registrar achados no Codex.',icon:Orbit},
+ {id:'dock',name:'Hangar de exploração',desc:'Uma plataforma de pouso para os exploradores e seus equipamentos.',icon:Anchor}
 ];
 const SLOTS=[{x:285,y:220},{x:430,y:178},{x:570,y:218},{x:680,y:270},{x:525,y:300},{x:370,y:315},{x:220,y:300},{x:620,y:350}];
 
@@ -117,7 +117,7 @@ export default function NexusWorldIsland({clan,userId,onToast=()=>{},preview=fal
    <p className="nwi-worker-foot"><Clock size={13}/> A produção é acumulada por até 8 horas. Qualquer integrante pode recolher a produção; os recursos são divididos igualmente entre todos os membros da ilha.</p>
   </section>}
   {!preview&&error&&<div className="nwi-error" role="alert">{error}</div>}
-  {!preview&&adding&&createPortal(<div className="nwi-builder-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setAdding(false);}}><section className="nwi-builder" role="dialog" aria-modal="true" aria-label="Adicionar construção"><header><div><span className="nwi-kicker">EXPANSÃO DA ILHA</span><h3>O que vamos construir?</h3></div><button type="button" onClick={()=>setAdding(false)} aria-label="Fechar"><X size={20}/></button></header><div className="nwi-building-options">{BUILDINGS.map(item=>{const Icon=item.icon;return <button type="button" key={item.id} className={selectedType===item.id?'selected':''} onClick={()=>setSelectedType(item.id)}><span><Icon size={21}/></span><b>{item.name}</b><small>{item.desc}</small></button>})}</div><div className="nwi-builder-foot"><small>Espaço {nextSlot} de 8 · escolha visual compartilhada</small><button type="button" onClick={addBuilding} disabled={saving}>{saving?<LoaderCircle className="nwi-spin" size={16}/>:<Hammer size={16}/>} Construir</button></div></section></div>,document.body)}
-  {!preview&&<div className="nwi-island-note"><Sparkles size={15}/> A ilha é compartilhada: qualquer integrante pode contribuir. O portal central abre o Codex de expedições. Quem construiu ou fundou a comunidade pode remover estruturas.</div>}
+  {!preview&&adding&&createPortal(<div className="nwi-builder-backdrop" role="presentation" onMouseDown={e=>{if(e.target===e.currentTarget)setAdding(false);}}><section className="nwi-builder" role="dialog" aria-modal="true" aria-label="Adicionar construção"><header><div><span className="nwi-kicker">EXPANSÃO DA ILHA</span><h3>Escolha a próxima estrutura</h3></div><button type="button" onClick={()=>setAdding(false)} aria-label="Fechar"><X size={20}/></button></header><div className="nwi-building-options">{BUILDINGS.map(item=>{const Icon=item.icon;return <button type="button" key={item.id} className={selectedType===item.id?'selected':''} onClick={()=>setSelectedType(item.id)}><span><Icon size={21}/></span><b>{item.name}</b><small>{item.desc}</small></button>})}</div><div className="nwi-builder-foot"><small>Terreno {nextSlot} de 8 · construção compartilhada</small><button type="button" onClick={addBuilding} disabled={saving}>{saving?<LoaderCircle className="nwi-spin" size={16}/>:<Hammer size={16}/>} Construir</button></div></section></div>,document.body)}
+  {!preview&&<div className="nwi-island-note"><Sparkles size={15}/> Cada estrutura muda a silhueta da ilha. O portal abre as expedições e o Codex da comunidade. O portal central abre o Codex de expedições. Quem construiu ou fundou a comunidade pode remover estruturas.</div>}
  </section>;
 }
