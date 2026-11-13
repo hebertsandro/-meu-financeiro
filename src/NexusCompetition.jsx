@@ -101,7 +101,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
   if(e2){onToast(e2.message||'Não foi possível criar o desafio.');return}
   onToast('Desafio enviado! ⚔️');setTab('challenges');await load(true);
  }
- const tabs=[['ranking','Rankings',Globe],['collection','Coleção',Package],['challenges','Desafios',Swords],['multiplayer','Multiplayer',Gamepad2],['history','Partidas',History]];
+ const tabs=[['ranking','Rankings',Globe],['collection','Coleção',Package],['multiplayer','Multiplayer',Gamepad2],['history','Partidas',History]];
  if(!userId)return <section className="nc-panel"><p>Entre na sua conta para participar das competições NEXUS.</p></section>;
  return <section className="nexus-competition">
   <div className="nc-hero"><div><span className="nc-eyebrow">NEXUS · ARENA COMPETITIVA</span><h2>Competição</h2><p>Suba no ranking, dispute torneios e conquiste medalhas jogando.</p></div><div className="nc-hero-xp"><Trophy size={21}/><b>{Number(gameXp).toLocaleString('pt-BR')} XP</b><small>{myMedals} medalhas colecionadas</small></div></div>
