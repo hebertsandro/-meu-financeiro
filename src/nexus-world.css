@@ -182,3 +182,7 @@
 .social-clan-detail .social-clan-chat{min-height:220px;max-height:420px;padding:13px;border:1px solid rgba(133,180,225,.16);border-radius:17px;background:rgba(8,18,36,.55)}
 .social-clan-detail .social-chat-compose{padding:10px;border:1px solid rgba(133,180,225,.16);border-radius:15px;background:rgba(17,33,58,.8)}
 @media(max-width:620px){.nwi-hub-nav{margin:8px -2px 12px;padding:7px}.nwi-hub-nav a{padding:9px 10px}.social-clan-detail-actions{align-items:stretch;flex-wrap:wrap}.social-clan-detail-actions button{flex:1}.social-clan-detail .social-clan-chat{max-height:360px}}
+
+.nwi-create-theme{display:flex;flex-direction:column;gap:7px;padding:12px;border:1px solid rgba(139,184,231,.2);border-radius:13px;background:rgba(16,31,55,.55)}
+.nwi-create-theme>span{font-size:11px;font-weight:900;color:#b8cce2}
+.nwi-create-theme select{width:100%;min-height:42px;padding:9px 11px;border:1px solid rgba(140,177,220,.28);border-radius:10px;background:#142742;color:#eff7ff;font-size:12px}
