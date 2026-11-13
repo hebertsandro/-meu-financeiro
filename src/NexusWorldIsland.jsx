@@ -4,11 +4,11 @@ import {Compass,Home,Telescope,Sprout,RadioTower,Wrench,Plus,X,LoaderCircle,Spar
 import './nexus-world.css';
 
 const BUILDINGS=[
- {id:'house',name:'Casa',desc:'Um novo lar para a comunidade.',icon:Home},
- {id:'observatory',name:'Observatório',desc:'Um ponto de observação do universo.',icon:Telescope},
- {id:'garden',name:'Jardim',desc:'Um espaço verde para a ilha.',icon:Sprout},
+ {id:'house',name:'Casa',desc:'Um conjunto de casas conectado por passarelas.',icon:Home},
+ {id:'observatory',name:'Observatório',desc:'Um domo para observar os mistérios do universo.',icon:Telescope},
+ {id:'garden',name:'Jardim',desc:'Um refúgio vivo de natureza e energia.',icon:Sprout},
  {id:'lighthouse',name:'Farol',desc:'Uma luz que guia exploradores.',icon:RadioTower},
- {id:'workshop',name:'Oficina',desc:'Onde novas ideias ganham forma.',icon:Wrench}
+ {id:'workshop',name:'Oficina',desc:'O centro criativo da comunidade.',icon:Wrench}
 ];
 const SLOTS=[{x:285,y:220},{x:430,y:178},{x:570,y:218},{x:680,y:270},{x:525,y:300},{x:370,y:315},{x:220,y:300},{x:620,y:350}];
 
@@ -59,8 +59,8 @@ export default function NexusWorldIsland({clan,userId,onToast=()=>{},preview=fal
  const removeBuilding=async item=>{const {error:e}=await supabase.from('social_clan_world_buildings').delete().eq('id',item.id);if(e)setError(e.message);else{setBuildings(old=>old.filter(x=>x.id!==item.id));onToast('Construção removida.');}};
  const count=buildings.length;
  const sceneKey=String(clan?.id||"nexus-world").replace(/[^a-zA-Z0-9_-]/g,"");
- return <section className={preview?"nexus-world-island nwi-island-preview":"nexus-world-island"}>
-  {!preview&&<header className="nwi-island-head"><div><span className="nwi-kicker"><Compass size={13}/> NEXUS WORLD · ILHA DO CLÃ</span><h2>{clan?.name||'Ilha desconhecida'}</h2><p>{clan?.motto||clan?.description||'Um lugar para construir algo que só pertence a vocês.'}</p></div><div className="nwi-island-stats"><span><Users size={14}/>{count} / 8 estruturas</span><small>ILHA EM EVOLUÇÃO</small></div></header>}
+ return <section className={preview?"nexus-world-island nwi-island-preview":"nexus-world-island"} data-theme={clan?.color_theme||"violet"}>
+  {!preview&&<header className="nwi-island-head"><div><span className="nwi-kicker"><Compass size={13}/> NEXUS WORLD · TERRITÓRIO COMPARTILHADO</span><h2>{clan?.name||'Ilha desconhecida'}</h2><p>{clan?.motto||clan?.description||'Um lugar para construir algo que só pertence a vocês.'}</p></div><div className="nwi-island-stats"><span><Users size={14}/>{count} / 8 estruturas</span><small>ILHA EM EVOLUÇÃO</small></div></header>}
   <div className={preview?"nwi-scene nwi-scene-preview":"nwi-scene"}>
    <div className="nwi-sky-glow"/><div className="nwi-starfield"><i/><i/><i/><i/><i/><i/><i/></div>
    <svg className="nwi-island-svg" viewBox="0 0 900 520" role="img" aria-label={`Ilha 3D do clã ${clan?.name||''}, com ${count} construções`}>
