@@ -1,6 +1,6 @@
 import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {supabase} from './supabase';
-import {Compass,Home,Telescope,Sprout,RadioTower,Wrench,Plus,X,LoaderCircle,Sparkles,Hammer,Trash2,Users,ArrowUpRight,Map,Ship} from 'lucide-react';
+import {Compass,Home,Telescope,Sprout,RadioTower,Wrench,Plus,X,LoaderCircle,Sparkles,Hammer,Trash2,Users,ArrowUpRight,Map,Ship,BookOpen,Orbit,Anchor} from 'lucide-react';
 import './nexus-world.css';
 
 const BUILDINGS=[
@@ -20,6 +20,9 @@ function IslandBuilding({type,x,y,onRemove,canRemove,glowId='nwiGlow'}){
   {type==='garden'&&<><ellipse cx="0" cy="28" rx="39" ry="10" fill="#061b2a" opacity=".25"/><path d="M-34 0 Q0 -18 34 0 L27 25 Q0 38 -27 25Z" fill="#347d64" stroke="#7fd6a7" strokeWidth="2"/>{[-20,0,19].map((v,i)=><g key={i} transform={`translate(${v} ${i===1?-4:3})`}><path d="M0 10 V-10" stroke="#704c37" strokeWidth="5"/><circle cx="0" cy="-14" r="12" fill={i===1?'#8ee5a9':'#54b887'}/><circle cx="-7" cy="-18" r="6" fill="#b4f1c6"/></g>)}</>}
   {type==='lighthouse'&&<><ellipse cx="0" cy="36" rx="35" ry="9" fill="#061b2a" opacity=".3"/><path d="M-20 3 L20 3 L14 39 L-14 39Z" fill="#f0e6d5" stroke="#b9a88f" strokeWidth="2"/><path d="M-17 12 L17 12 L14 23 L-15 23Z" fill="#d66c76"/><path d="M-18 2 L0 -16 L18 2Z" fill="#d66c76" stroke="#f3b6ad" strokeWidth="2"/><rect x="-10" y="-7" width="20" height="12" rx="3" fill="#a6ecff" stroke="#effcff" strokeWidth="2"/><path d="M0 -8 L-44 -20 M0 -8 L44 -20" stroke="#b6f4ff" strokeWidth="2" opacity=".7" filter={`url(#${glowId})`}/></>}
   {type==='workshop'&&<><ellipse cx="0" cy="33" rx="43" ry="10" fill="#061b2a" opacity=".3"/><path d="M-33 0 L0 -19 L33 0 L33 30 L-33 30Z" fill="#647e91" stroke="#b2cbd8" strokeWidth="2"/><path d="M-33 0 L0 -20 L33 0 L0 18Z" fill="#d49b65" stroke="#f5d2a6" strokeWidth="2"/><path d="M-12 8 L12 -6 L12 30 L-12 40Z" fill="#314b60"/><path d="M-26 1 L-13 -6 L-13 7 L-26 14Z" fill="#9fe9ff"/><path d="M17 0 L26 -5 L26 7 L17 12Z" fill="#9fe9ff"/><path d="M-5 -21 L-5 -34 L5 -34 L5 -16" fill="#d7e4e7" stroke="#8199a6" strokeWidth="2"/></>}
+  {type==='archive'&&<><path d="M-36 4L0 -18 36 4V34L0 52 -36 34Z" fill="#6c688b" stroke="#e1d5ff" strokeWidth="2"/><path d="M-36 4L0 -18 36 4 0 27Z" fill="#a99bd6"/><path d="M-23 10V35M0 25V48M23 10V35" stroke="#f6eaff" strokeWidth="5"/><circle cy="-3" r="5" fill="#fff3b2"/></>}
+  {type==='portal'&&<><ellipse cy="18" rx="38" ry="14" fill="#1c5268" stroke="#80efff" strokeWidth="2"/><ellipse cy="-8" rx="24" ry="33" fill="#142d65" stroke="#a9eaff" strokeWidth="5"/><ellipse cy="-8" rx="15" ry="24" fill="#8b79ef" opacity=".7"/><path d="M-18 -23Q0 -41 18 -23M-18 7Q0 25 18 7" fill="none" stroke="#f1faff" strokeWidth="2"/></>}
+  {type==='dock'&&<><path d="M-42 3L0 -18 42 3 0 24Z" fill="#b78b61" stroke="#f0d4a8" strokeWidth="2"/><path d="M-31 8V27M0 25V43M31 8V27" stroke="#b78b61" strokeWidth="6"/><path d="M-45 28Q0 45 45 28" fill="none" stroke="#e9c18d" strokeWidth="5"/><path d="M-15 -4V-37M-15 -35L14 -22H-15" fill="#e8f4f7" stroke="#fff" strokeWidth="2"/></>}
   {canRemove&&<g className="nwi-remove" transform="translate(28 -31)" onClick={onRemove} role="button" tabIndex="0"><circle r="12" fill="#241b37" stroke="#ff9bba" strokeWidth="1.5"/><path d="M-4 -4 L4 4 M4 -4 L-4 4" stroke="#fff" strokeWidth="2.2"/></g>}
  </g>;
 }
