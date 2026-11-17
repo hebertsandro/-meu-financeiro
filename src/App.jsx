@@ -1654,7 +1654,7 @@ function SpaceNexusGame({onReward,onMatch,onLoot}){
     if(g.wave>cfg.waves){g.phase='finished';finish(true,g);return}
     setWave(g.wave);setMessage('ONDA '+g.wave+' — a ameaça está evoluindo!');
    }
-   if(n%4===0){setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
+   if(n%2===0){setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
   }
   };
   raf=requestAnimationFrame(frame);
