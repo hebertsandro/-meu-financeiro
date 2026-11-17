@@ -4323,3 +4323,13 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .admin-notification-preview>p{margin:0;color:#d4dcf5;font-size:13px;line-height:1.5;white-space:pre-wrap;overflow-wrap:anywhere;}
 .admin-notification-preview>small{font-size:9px;letter-spacing:.12em;color:#7f8db0;}
 @media(max-width:600px){.admin-personal-notification-card{padding:13px;border-radius:16px}.admin-notification-recipient-head{align-items:flex-start}.admin-notification-recipient-head .delete-btn{font-size:11px;padding:7px}}
+
+/* Evita o zoom automático do Safari no iPhone ao focar campos de escrita.
+   Mantém o zoom manual da página disponível para acessibilidade. */
+@media (max-width: 760px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]):not([type="color"]):not([type="file"]),
+  textarea,
+  select {
+    font-size: 16px !important;
+  }
+}
