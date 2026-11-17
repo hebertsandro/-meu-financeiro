@@ -1,5 +1,5 @@
 import React, { useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Wallet, TrendingDown, TrendingUp, Sparkles, Calculator, Info, Save, RefreshCw } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Wallet, TrendingDown, TrendingUp, Sparkles, Calculator, Info, Save, RefreshCw, CircleDollarSign, Target, ShieldCheck, Coins, ArrowUpRight } from 'lucide-react';
 
 const brl = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value) || 0);
 const monthLabel = value => new Date(value + '-15T12:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
