@@ -1,10 +1,36 @@
 import React, { useMemo, useState } from 'react';
-import { CalendarDays, ChevronLeft, ChevronRight, Wallet, TrendingDown, TrendingUp, Sparkles, Calculator, Info } from 'lucide-react';
+import { CalendarDays, ChevronLeft, ChevronRight, Wallet, TrendingDown, TrendingUp, Sparkles, Calculator, Info, Save, RefreshCw } from 'lucide-react';
 
 const brl = value => new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(Number(value) || 0);
 const monthLabel = value => new Date(value + '-15T12:00:00').toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' });
 
-export function SalaryCenter({ transactions = [] }) {
+export function SalaryCenter({ transactions = [], supabase, session, onRefresh }) {
+  const [salaryName,setSalaryName]=useState('Salário');
+  const [salaryAmount,setSalaryAmount]=useState('');
+  const [payDay,setPayDay]=useState('5');
+  const [firstPayDate,setFirstPayDate]=useState(()=>new Date().toISOString().slice(0,10));
+  const [salaryCategory,setSalaryCategory]=useState('Salário');
+  const [savingSalary,setSavingSalary]=useState(false);
+  const [salaryMessage,setSalaryMessage]=useState('');
+  const [allocationBills,setAllocationBills]=useState('50');
+  const [allocationGoals,setAllocationGoals]=useState('20');
+  const [allocationReserve,setAllocationReserve]=useState('10');
+  const allocationFree=100-(Number(allocationBills)||0)-(Number(allocationGoals)||0)-(Number(allocationReserve)||0);
+  async function saveSalaryAutomation(){
+    if(!supabase||!session?.user?.id){setSalaryMessage('Entre na sua conta para configurar o salário.');return;}
+    const amount=Number(salaryAmount), day=Number(payDay);
+    if(!(amount>0)||day<1||day>31){setSalaryMessage('Informe um salário válido e um dia entre 1 e 31.');return;}
+    if(allocationFree<0){setSalaryMessage('A distribuição não pode passar de 100%.');return;}
+    setSavingSalary(true);setSalaryMessage('');
+    const date=new Date(firstPayDate+'T12:00:00');
+    const first=await supabase.from('transactions').insert({user_id:session.user.id,date:firstPayDate,type:'entrada',category:salaryCategory||'Salário',description:salaryName||'Salário',amount}).select('id').single();
+    if(first.error){setSavingSalary(false);setSalaryMessage('Não foi possível registrar a primeira entrada: '+first.error.message);return;}
+    const nextMonth=new Date(date.getFullYear(),date.getMonth()+1,1).toISOString().slice(0,10);
+    const recurrence=await supabase.from('recurring_incomes').insert({user_id:session.user.id,description:salaryName||'Salário',amount,category:salaryCategory||'Salário',day_of_month:day,start_month:nextMonth,active:true});
+    if(recurrence.error){await supabase.from('transactions').delete().eq('id',first.data.id).eq('user_id',session.user.id);setSavingSalary(false);setSalaryMessage('A automação não foi ativada: '+recurrence.error.message);return;}
+    setSavingSalary(false);setSalaryMessage('Salário cadastrado! A primeira entrada foi registrada e a recorrência começa no próximo mês.');
+    await onRefresh?.();
+  }
   const [salary, setSalary] = useState('');
   const [months, setMonths] = useState('12');
   const [year, setYear] = useState(String(new Date().getFullYear()));
@@ -18,6 +44,30 @@ export function SalaryCenter({ transactions = [] }) {
       <div className="salary-kicker"><Sparkles size={15}/> PLANEJAMENTO INTELIGENTE</div>
       <h2>Salário e 13º Inteligente</h2>
       <p>O salário mensal automático continua usando a recorrência já disponível no cadastro de entradas. Aqui você simula seu décimo terceiro e acompanha o planejamento.</p>
+    </section>
+    <section className="panel salary-automation">
+      <div className="panel-head"><div><h3><RefreshCw size={18}/> Salário Automático</h3><p>Configure uma vez para gerar as próximas entradas mensais.</p></div></div>
+      <div className="form-row">
+        <label>Descrição<input value={salaryName} onChange={e=>setSalaryName(e.target.value)} placeholder="Ex.: Salário"/></label>
+        <label>Valor recebido (R$)<input type="number" min="0" step="0.01" value={salaryAmount} onChange={e=>setSalaryAmount(e.target.value)} placeholder="Ex.: 2500"/></label>
+      </div>
+      <div className="form-row">
+        <label>Categoria<input value={salaryCategory} onChange={e=>setSalaryCategory(e.target.value)}/></label>
+        <label>Dia habitual de pagamento<input type="number" min="1" max="31" value={payDay} onChange={e=>setPayDay(e.target.value)}/></label>
+      </div>
+      <label>Data do próximo recebimento<input type="date" value={firstPayDate} onChange={e=>setFirstPayDate(e.target.value)}/></label>
+      <h4>Planejamento da distribuição (percentuais)</h4>
+      <div className="form-row">
+        <label>Contas e compromissos (%)<input type="number" min="0" max="100" value={allocationBills} onChange={e=>setAllocationBills(e.target.value)}/></label>
+        <label>Metas (%)<input type="number" min="0" max="100" value={allocationGoals} onChange={e=>setAllocationGoals(e.target.value)}/></label>
+      </div>
+      <div className="form-row">
+        <label>Reserva (%)<input type="number" min="0" max="100" value={allocationReserve} onChange={e=>setAllocationReserve(e.target.value)}/></label>
+        <div className="salary-plan-row"><span>Disponível</span><b>{allocationFree}%</b></div>
+      </div>
+      <button type="button" className="primary" disabled={savingSalary} onClick={saveSalaryAutomation}><Save size={16}/>{savingSalary?'Salvando...':'Ativar salário automático'}</button>
+      {salaryMessage&&<p className="salary-note" role="status">{salaryMessage}</p>}
+      <p className="salary-note"><Info size={15}/> As entradas recorrentes são geradas quando o aplicativo sincroniza os dados. A distribuição é um planejamento: não transfere dinheiro nem quita contas automaticamente.</p>
     </section>
     <div className="two-col salary-columns">
       <section className="panel">
