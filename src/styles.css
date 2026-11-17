@@ -4333,3 +4333,123 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
     font-size: 16px !important;
   }
 }
+
+
+/* NEXUS ARCADE — camada de imersão, feedback visual e fluidez */
+.arcade-library-card{
+  position:relative;
+  isolation:isolate;
+  box-shadow:0 8px 24px #02061744;
+}
+.arcade-library-card:focus-visible,
+.arcade-back-button:focus-visible,
+.space-mode-picker button:focus-visible,
+.flap-mode-card:focus-visible,
+.quiz-answer:focus-visible{
+  outline:2px solid #9eeaff;
+  outline-offset:3px;
+}
+.arcade-library-card:not(:disabled):active{transform:translateY(-1px) scale(.985)}
+.arcade-library-art:after{
+  content:"";
+  position:absolute;
+  inset:0;
+  pointer-events:none;
+  background:linear-gradient(125deg,#ffffff18,transparent 38%,#00000020);
+  opacity:.7;
+}
+.arcade-library-art>span{
+  transform:translateZ(0);
+  animation:arcadeFloat 3.8s ease-in-out infinite;
+}
+.arcade-library-card:nth-child(2n) .arcade-library-art>span{animation-delay:-1.3s}
+.arcade-library-card:nth-child(3n) .arcade-library-art>span{animation-delay:-2.1s}
+.arcade-library-play{transition:letter-spacing .2s,filter .2s}
+.arcade-library-card:hover .arcade-library-play{letter-spacing:.08em;filter:drop-shadow(0 0 8px #8cbdff88)}
+.arcade-detail-cover{
+  box-shadow:0 18px 48px #02061755,inset 0 1px #ffffff35;
+}
+.arcade-detail-cover:before{animation:arcadeHalo 9s ease-in-out infinite alternate}
+.arcade-detail-emoji{
+  filter:drop-shadow(0 12px 18px #080b2488);
+  animation:arcadeFloat 4s ease-in-out infinite;
+}
+.space-nexus-card{
+  position:relative;
+  border-color:#6f8cff66;
+  box-shadow:0 20px 60px #02061788,0 0 28px #5979ff18,inset 0 1px #ffffff12;
+}
+.space-nexus-arena{
+  isolation:isolate;
+  box-shadow:inset 0 0 55px #050a1c99,0 10px 30px #02061766;
+}
+.space-stars{will-change:background-position}
+.space-nebula{will-change:transform,opacity;animation:nebulaPulse 7s ease-in-out infinite alternate}
+.space-player-ship,.space-enemy,.space-boss,.space-player-shot,.space-enemy-shot,.space-drop{
+  will-change:transform,left,top;
+}
+.space-player-ship{filter:drop-shadow(0 0 14px #68eaff) drop-shadow(0 0 26px #398dff66)}
+.space-player-ship.shielded:after{
+  content:"";
+  position:absolute;
+  inset:-13px;
+  border:2px solid #8ceeffaa;
+  border-radius:50%;
+  box-shadow:0 0 18px #54dfff99,inset 0 0 14px #54dfff55;
+  animation:shieldOrbit 1.5s linear infinite;
+  pointer-events:none;
+}
+.space-player-shot{height:18px;width:5px;box-shadow:0 0 12px 4px #42dfff,0 0 24px #42dfff88}
+.space-enemy-shot{box-shadow:0 0 12px 4px #ff3f75,0 0 22px #ff3f7566}
+.space-drop{filter:drop-shadow(0 0 9px #ffe58a);animation:dropFloat 1s ease-in-out infinite alternate}
+.space-boss{filter:drop-shadow(0 0 12px #ff547b77)}
+.space-boss i{box-shadow:0 0 12px #ff547b55}
+.space-overlay{background:radial-gradient(ellipse at center,#17234be8,#050916ed 78%);backdrop-filter:blur(8px)}
+.space-overlay-icon{animation:arcadeFloat 2.5s ease-in-out infinite}
+.space-mode-picker button,.flap-mode-card{
+  transition:transform .2s,border-color .2s,box-shadow .2s,background .2s;
+}
+.space-mode-picker button:hover,.flap-mode-card:hover{
+  transform:translateY(-3px);
+  box-shadow:0 12px 26px #02061777,0 0 18px #8b83ff22;
+}
+.flap-game{
+  border-color:#806fe966;
+  box-shadow:0 18px 45px #02081777,0 0 30px #9c82ff12,inset 0 1px #ffffff12;
+}
+.flap-game-stage{
+  box-shadow:0 15px 35px #02081788,0 0 28px #9d83ff22;
+}
+.flap-game-stage canvas{image-rendering:auto}
+.flap-overlay{background:linear-gradient(145deg,#080e1bdc,#17143bdc);backdrop-filter:blur(7px)}
+.quiz-hero,.quiz-start-panel,.quiz-question-panel{
+  box-shadow:0 16px 40px #02081766,inset 0 1px #ffffff12;
+}
+.quiz-answer{
+  transition:transform .18s,border-color .18s,background .18s,box-shadow .18s;
+}
+.quiz-answer:not(:disabled):hover{
+  transform:translateX(3px);
+  border-color:#a99aff;
+  box-shadow:0 7px 18px #02081755,0 0 16px #9d86ee18;
+}
+.quiz-answer.correct{box-shadow:0 0 18px #48c99a22}
+.quiz-answer.incorrect{box-shadow:0 0 18px #ed778822}
+@keyframes arcadeFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-7px)}}
+@keyframes arcadeHalo{from{transform:translate3d(-8px,0,0) scale(.94);opacity:.55}to{transform:translate3d(12px,8px,0) scale(1.08);opacity:.95}}
+@keyframes nebulaPulse{from{transform:scale(.94);opacity:.65}to{transform:scale(1.12);opacity:1}}
+@keyframes shieldOrbit{to{transform:rotate(360deg)}}
+@media(prefers-reduced-motion:reduce){
+  .arcade-library-art>span,.arcade-detail-cover:before,.arcade-detail-emoji,
+  .space-nebula,.space-stars,.space-player-ship.shielded:after,.space-drop,.space-overlay-icon{
+    animation:none!important;
+  }
+  .arcade-library-card,.space-mode-picker button,.flap-mode-card,.quiz-answer{
+    transition:none!important;
+  }
+}
+@media(max-width:600px){
+  .arcade-detail-cover{min-height:190px;padding:19px;border-radius:21px}
+  .space-nexus-card{box-shadow:0 14px 36px #02061777,0 0 20px #5979ff16}
+  .space-nexus-arena{box-shadow:inset 0 0 38px #050a1c99}
+}
