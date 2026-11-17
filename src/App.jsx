@@ -5,7 +5,8 @@ const PlayerPostGrid = React.lazy(() => import('./NexusSocial').then(module => (
 const NexusCompetition = React.lazy(() => import('./NexusCompetition'));
 const PushNotifications = React.lazy(() => import('./PushNotifications'));
 const ReportsChart = React.lazy(() => import('./ReportsChart.jsx'));
-const SalaryAndReports = React.lazy(() => import('./SalaryAndReports.jsx'));
+const SalaryCenter = React.lazy(() => import('./SalaryAndReports.jsx').then(module => ({ default: module.SalaryCenter })));
+const ReportsDashboard = React.lazy(() => import('./SalaryAndReports.jsx').then(module => ({ default: module.ReportsDashboard })));
 import {
   Activity, ArrowLeft, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined, Search, SlidersHorizontal, Power, Flag,
   Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock, Bot, Sparkles, Send,
@@ -1470,8 +1471,8 @@ function App(){
 </>}
 </section></ProfileRenderBoundary>}
 {page==='notifications'&&<section className="panel"><React.Suspense fallback={<div className="social-loading"><span className="spinner"/> Carregando notificações...</div>}><PushNotifications session={session} onToast={notify}/></React.Suspense><div className="panel-head"><div><h3>Central de notificações</h3><p>{unreadCount?unreadCount+' não lida(s)':'Você está em dia.'}</p></div>{unreadCount>0&&<button className="text-button" onClick={markAllNotificationsRead}>Marcar todas como lidas</button>}</div>{data.notifications.length?<div className="simple-list">{data.notifications.map(n=><div className={'simple-row notification-row '+(n.is_read?'read':'')} key={n.id}><div className="row-icon">{n.category==='social'?<MessageCircle size={18}/>:<Bell size={18}/>}</div><div className="row-main"><b>{n.title}</b><span>{n.message}</span><small>{new Date(n.created_at).toLocaleString('pt-BR')} · {n.category==='social'?'NEXUS Social':n.category}</small></div>{n.category==='social'&&<button className="delete-btn" onClick={()=>{setPage((n.title?.includes('publicação')||n.title==='Novo comentário')?'social-feed':'social-conversations');if(!n.is_read)markNotificationRead(n.id);}}>Abrir</button>}{!n.is_read&&<button className="delete-btn" onClick={()=>markNotificationRead(n.id)}>Marcar lida</button>}<button className="delete-btn" onClick={()=>deleteItem('notifications',n.id)}>Excluir</button></div>)}</div>:<Empty icon={Bell} title="Nenhuma notificação por enquanto" text="Avisos sobre seus registros aparecerão aqui."/>}</section>}
-      {page==='salary'&&<React.Suspense fallback={<div className="chart-loading">Carregando planejamento salarial...</div>}><SalaryAndReports.SalaryCenter transactions={data.transactions}/></React.Suspense>}
-      {page==='reports'&&<React.Suspense fallback={<div className="chart-loading">Carregando relatórios...</div>}><SalaryAndReports.ReportsDashboard transactions={data.transactions}/></React.Suspense>}
+      {page==='salary'&&<React.Suspense fallback={<div className="chart-loading">Carregando planejamento salarial...</div>}><SalaryCenter transactions={data.transactions}/></React.Suspense>}
+      {page==='reports'&&<React.Suspense fallback={<div className="chart-loading">Carregando relatórios...</div>}><ReportsDashboard transactions={data.transactions}/></React.Suspense>}
       <footer className="footer"><span>MEU FINANCEIRO <i>•</i> FEITO PARA SUA ROTINA</span><span><ShieldCheck size={14}/> Seus dados dependem da configuração segura da sua conta</span></footer>
     </div></main>
     <nav className="mobile-bottom-nav" aria-label="Navegação principal">{[['Início',LayoutDashboard,'overview'],['Movimentos',Activity,'transactions'],['Cartões',CreditCard,'cards'],['Metas',Target,'planning']].map(([label,Icon,key])=><button type="button" key={key} className={page===key?'active':''} onClick={()=>{setPage(key);setMobileMenu(false)}}><Icon size={19}/><span>{label}</span></button>)}<button type="button" className={mobileMenu?'active':''} onClick={()=>setMobileMenu(true)}><Menu size={19}/><span>Mais</span></button></nav>
