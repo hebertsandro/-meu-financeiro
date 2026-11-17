@@ -2,6 +2,7 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import App from './App.jsx';
 import './styles.css';
+import './salary-reports.css';
 import './phase1-visual-refinement.css';
 import './nexus-player-profile.css';
 import './nexus-motion.css';
