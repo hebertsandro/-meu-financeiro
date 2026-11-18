@@ -1,6 +1,5 @@
 import React,{useCallback,useEffect,useMemo,useState} from 'react';
 import {Shield,Heart,Timer,Coins,ArrowLeft,ArrowRight,Zap,RefreshCw,Trophy} from 'lucide-react';
-import './nexus-arcade-expansions.css';
 
 const CONFIG={
  'extra-dungeon':{title:'Dungeon Rush',icon:'⚔️',tag:'ROGUELIKE · SOBREVIVÊNCIA',desc:'Atravesse a masmorra, leia os padrões e escolha o caminho certo.',mode:'dungeon'},
