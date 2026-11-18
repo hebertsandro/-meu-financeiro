@@ -1,0 +1,278 @@
+import React,{useCallback,useEffect,useRef,useState} from 'react';
+import {Shield,Heart,Timer,Coins,ArrowLeft,ArrowRight,Zap,RefreshCw,Trophy,Swords,Footprints} from 'lucide-react';
+
+const CONFIG={
+ 'extra-dungeon':{title:'Dungeon Rush',icon:'DR',tag:'AVENTURA · MASMORRA',desc:'Explore corredores, enfrente criaturas e encontre a saída.',mode:'dungeon'},
+ 'extra-gems':{title:'Gem Match',icon:'GM',tag:'PUZZLE · COMBINAÇÃO',desc:'Faça combinações, provoque cascatas e aumente seus combos.',mode:'gems'},
+ 'extra-race':{title:'Corrida do Dinheiro',icon:'CR',tag:'ENDLESS RUNNER · CORRIDA',desc:'Corra pela cidade, pule, deslize e troque de pista para sobreviver.',mode:'race'},
+ 'extra-defense':{title:'Defesa do Cofrinho',icon:'DC',tag:'DEFESA · PRECISÃO',desc:'Proteja seu cofrinho tocando nos invasores antes que cheguem.',mode:'defense'}
+};
+const PALETTE=['#48d9ff','#a78bfa','#ff6fae','#ffd166','#65e6a7',' #ff875d'];
+const cleanPalette=PALETTE.map(x=>x.trim());
+const randomBoard=()=>Array.from({length:64},()=>Math.floor(Math.random()*5));
+const findMatches=board=>{
+ const found=new Set();
+ for(let r=0;r<8;r++)for(let c=0;c<8;c++){
+  const i=r*8+c,v=board[i];if(v==null)continue;
+  if(c<6&&board[i+1]===v&&board[i+2]===v){let k=c;while(k<8&&board[r*8+k]===v)found.add(r*8+k++);}
+  if(r<6&&board[i+8]===v&&board[i+16]===v){let k=r;while(k<8&&board[k*8+c]===v)found.add(k++*8+c);}
+ }
+ return found;
+};
+const adjacency=(a,b)=>Math.abs(a-b)===8||(Math.abs(a-b)===1&&Math.floor(a/8)===Math.floor(b/8));
+const STYLE=`
+.nax-td{height:clamp(390px,62vw,550px);border-radius:22px;background:radial-gradient(ellipse at 50% 45%,#214657,#0b1929 72%);box-shadow:inset 0 0 80px #020a14,0 18px 50px #0008}
+.nax-td:before{background-image:linear-gradient(#a2e9ff0a 1px,transparent 1px),linear-gradient(90deg,#a2e9ff0a 1px,transparent 1px);background-size:28px 28px}
+.td-atmosphere{position:absolute;inset:0;background:radial-gradient(ellipse at 15% 20%,#36b8b833,transparent 35%),radial-gradient(ellipse at 80% 78%,#8b58e633,transparent 34%);animation:td-atmo 7s ease-in-out infinite alternate;pointer-events:none}
+.nax-td-pathline{stroke:#0a1724;stroke-width:21;filter:drop-shadow(0 4px 8px #000)}.nax-td-pathedge{stroke:#a5c2d0;stroke-width:1;stroke-dasharray:2 2;opacity:.55}
+.nax-td-slot{width:34px;height:34px;border-radius:50%;border:1px dashed #80e8d8;background:#0b3037dd;color:#aaffed;box-shadow:0 0 18px #4fffd044;font-size:21px}
+.nax-td-tower{width:45px;height:45px;border-radius:14px;background:linear-gradient(145deg,#45657a,#172b42);border:1px solid #9ed9ee;box-shadow:0 7px 18px #000b,inset 0 1px #fff8}
+.nax-td-tower i{width:21px;height:21px;display:block;border-radius:7px 7px 12px 12px;background:linear-gradient(145deg,#9beaff,#287aa0);border:2px solid #c6f5ff;box-shadow:0 0 13px #55dfff}
+.nax-td-tower.arc i{background:linear-gradient(145deg,#f3b4ff,#8844d6);box-shadow:0 0 16px #bd69ff}.nax-td-tower.frost i{background:linear-gradient(145deg,#c8ffff,#43a9d8);box-shadow:0 0 16px #66eaff}
+.nax-td-tower b{position:absolute;right:-5px;top:-6px;border-radius:20px;background:#f3c76a;color:#20202a;font-size:9px;padding:2px 5px}
+.nax-td-enemy{width:23px;height:23px;border-radius:8px;background:linear-gradient(145deg,#f06b76,#742d54);border:2px solid #ffb0a5;box-shadow:0 0 18px #ff557788;display:grid;place-items:center}
+.nax-td-enemy i{width:7px;height:7px;border-radius:50%;background:#fff3bf;box-shadow:0 0 8px #fff}.nax-td-enemy b{position:absolute;bottom:-6px;width:28px;height:3px;background:#ff5c70;border-radius:9px}
+.nax-td-enemy.brute{width:31px;height:31px;border-radius:11px;background:linear-gradient(145deg,#f2a45b,#923d35)}.nax-td-enemy.boss{width:43px;height:43px;border-radius:13px;background:linear-gradient(145deg,#ffbd72,#9c315a);box-shadow:0 0 28px #ff5577}
+.nax-td-base{left:87%;top:86%;font-size:9px;gap:5px;color:#aeeeff;filter:none}.nax-td-base i{width:49px;height:49px;border-radius:16px;background:linear-gradient(145deg,#396b8d,#172b4c);border:2px solid #a4edff;box-shadow:0 0 28px #57dfff99,inset 0 0 18px #7ceaff55;position:relative}.nax-td-base i:after{content:'';position:absolute;width:18px;height:18px;left:13px;top:13px;transform:rotate(45deg);background:linear-gradient(145deg,#fff,#55dfff 55%,#3975d7);box-shadow:0 0 20px #71edff;animation:td-core 1.8s ease-in-out infinite}.nax-td-base strong{font-size:8px;letter-spacing:1.5px}
+.td-abilities{display:grid;grid-template-columns:1fr 1fr;gap:9px}.td-abilities button{min-height:57px;border:1px solid #9c83ff66;border-radius:13px;background:linear-gradient(120deg,#352d69,#182d48);color:#fff;font-size:11px;font-weight:900;padding:9px}.td-abilities button:disabled{opacity:.45}.td-abilities small{display:block;color:#b8c5df;font-size:8px;letter-spacing:1px;margin-top:4px}
+.nax-td-shop{grid-template-columns:repeat(4,1fr)}.nax-td-shop button{min-height:78px;background:linear-gradient(155deg,#1b4054,#111e34);border-color:#5e9bb1;font-size:9px}.nax-td-shop button.active{border-color:#d3c2ff;box-shadow:0 0 0 2px #9d83ff55,0 0 22px #9d83ff33}.nax-td-shop button i{display:block;width:20px;height:20px;margin:auto auto 5px;border-radius:7px;background:linear-gradient(145deg,#b1f1ff,#2785ad);box-shadow:0 0 12px #57dfff}.nax-td-shop button:nth-child(2) i{background:linear-gradient(145deg,#f0b6ff,#8844d6)}.nax-td-shop button:nth-child(3) i{background:linear-gradient(145deg,#d6ffff,#3bafd5)}.nax-td-shop button small{font-size:8px}
+.td-freeze-label{position:absolute;top:12px;left:50%;transform:translateX(-50%);padding:7px 12px;border:1px solid #a3f3ff;border-radius:30px;background:#16475ccc;color:#d8fbff;font-size:9px;letter-spacing:1px;font-weight:900}
+@keyframes td-atmo{to{transform:scale(1.08);opacity:.65}}@keyframes td-core{50%{transform:rotate(225deg) scale(1.15)}}
+@media(max-width:560px){.nax-td-shop{grid-template-columns:repeat(2,1fr)}.nax-td{height:410px}.nax-td-tower{width:38px;height:38px}}
+
+.nax-game{--cyan:#63e9ff;--violet:#9d83ff;position:relative;display:grid;gap:15px;padding:clamp(12px,3vw,22px);overflow:hidden;color:#f3f6ff;border:1px solid #8195ff35;border-radius:25px;background:radial-gradient(ellipse at 12% 0%,#3e5aff27,transparent 38%),radial-gradient(ellipse at 95% 65%,#8d3dff1c,transparent 35%),linear-gradient(150deg,#101a31,#080d19 70%,#111329);box-shadow:0 20px 55px #02061199,inset 0 1px #ffffff13}
+.nax-game *{box-sizing:border-box}.nax-game-head{display:flex;justify-content:space-between;align-items:center;gap:12px;padding-bottom:13px;border-bottom:1px solid #9baaff20}.nax-game-head>div:first-child>span{font-size:9px;font-weight:900;letter-spacing:1.6px;color:#bcb1ff}.nax-game-head h3{margin:5px 0;font-size:clamp(20px,4vw,27px);letter-spacing:-.7px}.nax-game-head p{margin:0;color:#9eacc6;font-size:12px;line-height:1.5}.nax-score{min-width:84px;padding:9px 12px;text-align:right;border:1px solid #9a86ff55;border-radius:13px;background:#8e7bff19}.nax-score small{display:block;color:#b6a9ff;font-size:8px;letter-spacing:1px}.nax-score b{font-size:23px;font-variant-numeric:tabular-nums}
+.nax-hud{display:flex;flex-wrap:wrap;gap:7px}.nax-hud span{display:flex;align-items:center;gap:6px;padding:7px 10px;border:1px solid #819acb28;border-radius:10px;background:#17243a;color:#d4def1;font-size:10px}.nax-hud svg{color:#91a9ff}
+.nax-start,.nax-result{min-height:245px;display:grid;align-content:center;justify-items:center;text-align:center;padding:25px 16px;border:1px solid #8e87ff55;border-radius:19px;background:radial-gradient(ellipse at 50% 0%,#6554c43b,transparent 60%),#101a2c}.nax-start-orb{display:grid;place-items:center;width:78px;height:78px;border-radius:25px;background:linear-gradient(145deg,#8c6aff,#167dba);font-size:40px;box-shadow:0 0 40px #7e67ff77;animation:nax-float 2.8s ease-in-out infinite}.nax-start h4{margin:14px 0 3px;font-size:19px}.nax-start p,.nax-result p{max-width:440px;color:#aab7cd;font-size:12px;line-height:1.7}.nax-start button,.nax-result button{display:flex;align-items:center;gap:8px;margin-top:9px;padding:13px 21px;border:1px solid #ffffff55;border-radius:12px;background:linear-gradient(110deg,#795fff,#298acb);color:#fff;font-size:10px;font-weight:950;letter-spacing:1px;box-shadow:0 8px 24px #4964d955}
+.nax-game-foot{display:flex;align-items:center;gap:7px;padding-top:10px;border-top:1px solid #8293b522;color:#71819b;font-size:9px}
+.nax-arena{position:relative;min-height:390px;overflow:hidden;border:1px solid #8197c94d;border-radius:19px;background:#080f20;isolation:isolate;touch-action:pan-y}
+.nax-dungeon-scene{position:absolute;inset:0;overflow:hidden;background:radial-gradient(ellipse at 50% 40%,#7251a7 0,#282448 28%,#101a2b 70%)}
+.nax-dungeon-scene:before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,#090e1c 0 9%,transparent 9% 91%,#090e1c 91%),repeating-linear-gradient(0deg,transparent 0 44px,#a38bd322 45px),linear-gradient(180deg,#11182a,#29213f 55%,#080d18)}
+.nax-corridor-wall{position:absolute;top:0;bottom:0;width:34%;background:linear-gradient(90deg,#090f1e,#4a3c65 45%,#171b32);border:2px solid #9e8bd044;box-shadow:inset 0 0 35px #000b}.nax-corridor-wall.left{left:0;clip-path:polygon(0 0,100% 18%,100% 82%,0 100%)}.nax-corridor-wall.right{right:0;clip-path:polygon(0 18%,100% 0,100% 100%,0 82%)}.nax-corridor-floor{position:absolute;left:12%;right:12%;bottom:-3%;height:55%;background:linear-gradient(180deg,#403451,#171a2a 75%);clip-path:polygon(45% 0,55% 0,100% 100%,0 100%);border-top:2px solid #b49aff55}.nax-floor-lines{position:absolute;left:50%;bottom:0;width:2px;height:56%;background:linear-gradient(transparent,#b9a1ff99);transform-origin:bottom;box-shadow:0 0 20px #b49aff}.nax-torch{position:absolute;top:24%;font-size:26px;filter:drop-shadow(0 0 16px #ffad53);animation:nax-flicker .25s infinite alternate}.nax-torch.l{left:17%}.nax-torch.r{right:17%}.nax-dungeon-top{position:absolute;top:13px;left:0;right:0;text-align:center;color:#d5c8ff;font-size:10px;font-weight:900;letter-spacing:2px;text-shadow:0 2px 10px #000}.nax-dungeon-foe{position:absolute;left:50%;top:43%;transform:translate(-50%,-50%);font-size:clamp(48px,10vw,76px);filter:drop-shadow(0 0 18px #ff557b);animation:nax-foe-bob .8s infinite alternate}.nax-dungeon-foe.hit{animation:nax-hit .25s}.nax-dungeon-hero{position:absolute;z-index:3;left:50%;bottom:8%;transform:translateX(-50%);font-size:clamp(54px,11vw,78px);filter:drop-shadow(0 0 17px #61dfff);animation:nax-hero-breathe 1.2s infinite alternate}.nax-dungeon-hero.guard{filter:drop-shadow(0 0 24px #4aeaff)}.nax-dungeon-message{position:absolute;z-index:4;left:50%;top:27%;transform:translateX(-50%);padding:7px 12px;border:1px solid #ffffff33;border-radius:99px;background:#090d20cc;color:#fff;font-size:10px;white-space:nowrap}.nax-dungeon-actions{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nax-dungeon-actions button,.nax-race-controls button{min-height:46px;display:flex;align-items:center;justify-content:center;gap:6px;border:1px solid #788dff66;border-radius:12px;background:linear-gradient(145deg,#25335b,#141d36);color:white;font-size:10px;font-weight:900}
+.nax-race-stage{position:relative;height:430px;overflow:hidden;border:1px solid #75dfff55;border-radius:19px;background:linear-gradient(#132a50,#3976a0 48%,#17243d 49%,#090e1c);perspective:600px;touch-action:none}.nax-sun{position:absolute;top:8%;left:50%;width:95px;height:95px;transform:translateX(-50%);border-radius:50%;background:radial-gradient(circle,#fff3bd,#ffb95a88 55%,transparent 72%);filter:blur(2px)}.nax-city{position:absolute;left:0;right:0;top:24%;height:32%;background:linear-gradient(90deg,#14233c 0 8%,transparent 8% 13%,#1c3150 13% 23%,transparent 23% 30%,#162942 30% 41%,transparent 41% 50%,#203a5a 50% 60%,transparent 60% 68%,#152841 68% 81%,transparent 81% 88%,#1c3150 88%);clip-path:polygon(0 45%,5% 45%,5% 10%,14% 10%,14% 35%,23% 35%,23% 0,31% 0,31% 40%,41% 40%,41% 18%,51% 18%,51% 44%,62% 44%,62% 5%,72% 5%,72% 38%,82% 38%,82% 13%,92% 13%,92% 43%,100% 43%,100% 100%,0 100%)}.nax-road{position:absolute;left:12%;right:12%;top:36%;bottom:-8%;transform:rotateX(22deg);transform-origin:top;background:linear-gradient(90deg,#252d3d,#353d4c 50%,#252d3d);clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);box-shadow:0 0 45px #050812}.nax-road:before,.nax-road:after{content:"";position:absolute;top:0;bottom:0;width:4px;background:repeating-linear-gradient(180deg,#e7e7e7 0 35px,transparent 35px 70px);opacity:.7}.nax-road:before{left:37%}.nax-road:after{right:37%}.nax-road-stripes{position:absolute;left:50%;top:38%;bottom:0;width:4px;background:repeating-linear-gradient(180deg,#ffeaa4 0 30px,transparent 30px 65px);animation:nax-road-move .35s linear infinite}.nax-run-obstacle{position:absolute;z-index:3;transform:translate(-50%,-50%);font-size:clamp(24px,6vw,38px);filter:drop-shadow(0 5px 5px #0009)}.nax-run-player{position:absolute;z-index:4;bottom:8%;font-size:clamp(44px,10vw,64px);transform:translateX(-50%);filter:drop-shadow(0 7px 5px #0009);transition:left .13s,transform .12s;animation:nax-run-bob .22s infinite alternate}.nax-run-player.jump{transform:translate(-50%,-65%) scale(1.1)}.nax-run-player.slide{transform:translateX(-50%) scaleY(.58) scaleX(1.12);transform-origin:bottom}.nax-race-controls{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.nax-race-controls button{min-height:43px;font-size:10px}.nax-race-controls button.action{background:linear-gradient(145deg,#365b82,#182b47);border-color:#6deaff77}
+.nax-gem-wrap{display:grid;grid-template-columns:1fr minmax(0,390px) 1fr;gap:10px;align-items:center}.nax-gem-side{display:grid;gap:10px}.nax-gem-stat{padding:12px 8px;text-align:center;border:1px solid #8d83ff44;border-radius:13px;background:#171e38}.nax-gem-stat small{display:block;color:#a99fff;font-size:8px;letter-spacing:1px}.nax-gem-stat b{font-size:20px}.nax-gem-board{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:5px;padding:9px;border:1px solid #8c8cff55;border-radius:17px;background:linear-gradient(145deg,#121b33,#080f20);box-shadow:0 14px 35px #0008}.nax-gem-board button{position:relative;aspect-ratio:1;min-width:0;border:1px solid #ffffff26;border-radius:10px;background:radial-gradient(circle at 35% 25%,#ffffff44,transparent 35%),linear-gradient(145deg,color-mix(in srgb,var(--gem),white 20%),var(--gem) 55%,color-mix(in srgb,var(--gem),black 35%));box-shadow:inset 0 2px 4px #ffffff44,inset 0 -5px 9px #0005,0 4px 8px #0007;transition:transform .16s,filter .16s;animation:nax-gem-in .22s both}.nax-gem-board button:before{content:"";position:absolute;inset:18%;border:1px solid #ffffff66;border-radius:40% 12% 40% 12%;transform:rotate(45deg)}.nax-gem-board button.selected{transform:scale(.82);outline:3px solid white;filter:brightness(1.35);z-index:2}.nax-gem-board button.matched{animation:nax-gem-pop .34s ease-out forwards}.nax-gem-board button:active{transform:scale(.86)}.nax-gem-help{text-align:center;color:#9eacc6;font-size:10px}.nax-combo{min-height:20px;text-align:center;color:#ffe28b;font-weight:950;font-size:13px;letter-spacing:2px;text-shadow:0 0 15px #ffb84d}
+.nax-defense{min-height:310px;display:grid;align-content:space-between;padding:18px;border:1px solid #8c7aff55;border-radius:18px;background:radial-gradient(ellipse at 50% 100%,#50366c,#10192c 65%)}.nax-castle{display:grid;justify-items:center;font-size:64px;filter:drop-shadow(0 0 16px #a88cff)}.nax-castle small{font-size:9px;color:#d5c8ff;letter-spacing:1px}.nax-enemies{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;min-height:90px;align-items:center}.nax-enemies button{justify-self:center;width:54px;height:54px;border:1px solid #a68aff;border-radius:15px;background:#372d5d;font-size:26px;animation:nax-float .8s infinite alternate}
+.nax-td{position:relative;height:420px;overflow:hidden;border:1px solid #5c9bce66;border-radius:18px;background:radial-gradient(ellipse at 50% 15%,#1b4962,#10283a 52%,#0b1727);isolation:isolate}
+.nax-td:before{content:'';position:absolute;inset:0;background-image:linear-gradient(#8edcff0d 1px,transparent 1px),linear-gradient(90deg,#8edcff0d 1px,transparent 1px);background-size:34px 34px;pointer-events:none}
+.nax-td-path{position:absolute;inset:0;width:100%;height:100%;pointer-events:none}
+.nax-td-pathline{fill:none;stroke:#263e4d;stroke-width:15;stroke-linecap:round;stroke-linejoin:round}
+.nax-td-pathedge{fill:none;stroke:#b3d6c8;stroke-width:2;stroke-dasharray:5 7;opacity:.5}
+.nax-td-tower,.nax-td-slot{position:absolute;z-index:3;transform:translate(-50%,-50%);width:42px;height:42px;border-radius:12px;display:grid;place-items:center;font-size:22px}
+.nax-td-tower{border:1px solid #8ceaff99;background:linear-gradient(145deg,#315b78,#172e46);box-shadow:0 0 17px #38cfff44;color:white}
+.nax-td-tower.selected{outline:3px solid #ffe08a;box-shadow:0 0 22px #ffe08a99}
+.nax-td-slot{width:36px;height:36px;border:1px dashed #9ad7c877;background:#173e3b88;color:#b9f9df}
+.nax-td-enemy{position:absolute;z-index:5;transform:translate(-50%,-50%);font-size:25px;filter:drop-shadow(0 3px 4px #000);transition:left .22s linear,top .22s linear}
+.nax-td-enemy.boss{font-size:35px;filter:drop-shadow(0 0 12px #ff4b75)}
+.nax-td-base{position:absolute;z-index:4;left:87%;top:86%;transform:translate(-50%,-50%);display:grid;justify-items:center;font-size:38px;filter:drop-shadow(0 0 15px #ffc75d)}
+.nax-td-base small{font-size:8px;letter-spacing:1px;color:#ffe4a4;font-weight:900}
+.nax-td-hud{display:flex;justify-content:space-between;gap:7px;flex-wrap:wrap}.nax-td-hud span{padding:7px 9px;border:1px solid #79c7df44;border-radius:9px;background:#122c40;color:#d8f3ff;font-size:10px;font-weight:800}
+.nax-td-shop{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}.nax-td-shop button{display:grid;justify-items:center;gap:3px;min-height:70px;padding:8px 4px;border:1px solid #78c9df55;border-radius:12px;background:linear-gradient(145deg,#214761,#142b40);color:#fff;font-size:10px;font-weight:900}.nax-td-shop button:disabled{opacity:.4}.nax-td-shop button b{font-size:19px}.nax-td-shop button small{color:#a7c6d9;font-size:9px}
+@media(max-width:560px){.nax-td{height:370px}.nax-td-tower{width:34px;height:34px;font-size:18px}.nax-td-slot{width:30px;height:30px}.nax-td-enemy{font-size:21px}}
+.nax-td-shot line{stroke:#9ff5ff;stroke-width:1.2;stroke-linecap:round;stroke-dasharray:3 2;filter:drop-shadow(0 0 2px #72eaff);animation:td-shot .22s ease-out forwards}.nax-td-shot circle{fill:#fff;filter:drop-shadow(0 0 4px #8ff)}.nax-td-shot.arc line{stroke:#d9a8ff;filter:drop-shadow(0 0 3px #b56cff)}.nax-td-shot.frost line{stroke:#a6f5ff;stroke-dasharray:1 1}@keyframes td-shot{from{opacity:1;stroke-width:2.4}to{opacity:0;stroke-width:.2}}.nax-td-legend{display:flex;justify-content:space-between;align-items:center;gap:8px;flex-wrap:wrap;color:#a9c8db;font-size:9px}.nax-td-legend span{display:flex;align-items:center;gap:6px}.nax-td-legend i{width:12px;height:12px;border-radius:50%;background:#69dfff33;border:1px solid #8ceaff;box-shadow:0 0 9px #69dfff66}
+@keyframes nax-float{to{transform:translateY(-7px)}}@keyframes nax-flicker{to{filter:drop-shadow(0 0 23px #ffdd8a);transform:scale(1.08)}}@keyframes nax-foe-bob{to{transform:translate(-50%,-57%) rotate(3deg)}}@keyframes nax-hero-breathe{to{transform:translateX(-50%) translateY(-4px)}}@keyframes nax-hit{50%{filter:brightness(3);transform:translate(-50%,-50%) scale(1.3)}}@keyframes nax-road-move{to{background-position-y:65px}}@keyframes nax-run-bob{to{margin-bottom:5px}}@keyframes nax-gem-in{from{transform:scale(.4);opacity:.2}to{transform:scale(1);opacity:1}}@keyframes nax-gem-pop{to{transform:scale(0);opacity:0;filter:brightness(3)}}@media(max-width:560px){.nax-arena{min-height:350px}.nax-race-stage{height:390px}.nax-gem-wrap{grid-template-columns:1fr}.nax-gem-side{grid-template-columns:repeat(3,1fr);order:2}.nax-gem-board{gap:4px;padding:6px}.nax-gem-board button{border-radius:7px}.nax-dungeon-actions{gap:5px}.nax-dungeon-actions button{font-size:9px;padding:5px}.nax-race-controls{grid-template-columns:repeat(4,1fr);gap:5px}.nax-race-controls button{font-size:9px;padding:4px}}
+@media(prefers-reduced-motion:reduce){.nax-game *{animation:none!important;transition:none!important}}
+
+/* Arcade gameplay polish */
+.nax-dungeon-actions{grid-template-columns:repeat(4,minmax(0,1fr))}
+.nax-dungeon-actions button{min-height:55px;flex-wrap:wrap;font-size:9px}
+.nax-dungeon-actions small{font-size:8px;color:#a9dfff}
+.nax-dungeon-mana{display:flex;align-items:center;gap:12px;color:#9fb9dc;font-size:9px;letter-spacing:1px}
+.nax-dungeon-mana i{height:7px;flex:1;border-radius:10px;background:#17263c;overflow:hidden}.nax-dungeon-mana b{display:block;height:100%;border-radius:10px;background:linear-gradient(90deg,#438bff,#b58aff);box-shadow:0 0 12px #8c83ff}
+.nax-dungeon-foe,.nax-dungeon-hero{width:62px;height:86px;font-size:0;left:50%;bottom:10%;top:auto;transform:translateX(-50%);border-radius:28px 28px 16px 16px;background:linear-gradient(100deg,#122d48,#2779a0 48%,#12233c);border:2px solid #83eaff;box-shadow:0 0 28px #39d9ff66;animation:arcade-idle 1.1s ease-in-out infinite alternate}
+.nax-dungeon-foe{top:37%;bottom:auto;width:75px;height:92px;background:linear-gradient(100deg,#351a38,#a83c64 50%,#321b37);border-color:#ff8ba5;box-shadow:0 0 32px #ff4f8877}
+.nax-dungeon-foe i,.nax-dungeon-hero i{position:absolute;left:17px;top:20px;width:9px;height:9px;border-radius:50%;background:#fff4b0;box-shadow:18px 0 #fff4b0,0 0 12px #ffdc8b}
+.nax-dungeon-foe b,.nax-dungeon-hero b{position:absolute;left:14px;top:43px;width:34px;height:18px;border-radius:5px 5px 16px 16px;background:linear-gradient(90deg,#191321,#ff7999,#191321)}.nax-dungeon-hero b{background:linear-gradient(90deg,#102b43,#d3efff,#102b43)}.nax-dungeon-hero em,.nax-dungeon-foe em{position:absolute;left:25px;bottom:-17px;width:12px;height:26px;background:linear-gradient(#c8e9ff,#334c70);border-radius:4px}
+.nax-dungeon-hero.guard{box-shadow:0 0 0 8px #69eaff44,0 0 35px #69eaff}
+.nax-race-stage{background:linear-gradient(#193b61 0%,#5e9db4 38%,#182b40 39%,#090f1c 100%)}
+.nax-road{background:linear-gradient(90deg,transparent 0 7%,#26394c 7% 93%,transparent 93%),linear-gradient(180deg,#36475b,#101827);clip-path:polygon(38% 0,62% 0,100% 100%,0 100%);left:0;right:0}
+.nax-road-stripes{background:repeating-linear-gradient(180deg,transparent 0 36px,#d9efff88 37px 42px,transparent 43px 76px);clip-path:polygon(47% 0,53% 0,100% 100%,0 100%);animation:arcade-road .35s linear infinite}
+.nax-run-player{width:34px;height:67px;font-size:0;border-radius:15px 15px 8px 8px;background:linear-gradient(90deg,#183a62,#5bd5ed 50%,#153b65);border:2px solid #b8f5ff;box-shadow:0 0 22px #4adfff88;animation:arcade-run .22s infinite alternate}
+.nax-run-player i{position:absolute;left:8px;top:8px;width:14px;height:14px;border-radius:50%;background:#f2c9a4;border:2px solid #fff}
+.nax-run-player b{position:absolute;left:5px;bottom:-9px;width:8px;height:17px;border-radius:5px;background:#dcefff;box-shadow:15px 0 #dcefff}
+.nax-run-player em{position:absolute;left:-7px;top:25px;width:12px;height:23px;border-radius:8px;background:#2479ad}
+.nax-run-player.jump{transform:translate(-50%,-34px) rotate(-8deg)}.nax-run-player.slide{height:32px;transform:translateX(-50%) skewX(-17deg)}
+.nax-run-player.boosted{box-shadow:0 0 10px #fff,0 0 35px #55eaff}.nax-run-player.shielded:after{content:'';position:absolute;inset:-12px;border:2px solid #83f6ff;border-radius:50%;box-shadow:0 0 20px #64eaff88}
+.nax-run-obstacle{font-size:0;width:29px;height:32px;border-radius:7px;background:linear-gradient(145deg,#f3b36c,#9d4e35);border:2px solid #ffd59c;box-shadow:0 5px 14px #0009}
+.nax-run-obstacle:after{content:'';position:absolute;inset:5px;border:2px solid #ffe4b5;border-radius:3px}
+.nax-runner-powerups{display:flex;justify-content:space-between;gap:8px;color:#9db6d8;font-size:8px;letter-spacing:1px}
+.nax-gem-board button{transition:transform .18s,filter .18s,opacity .18s;will-change:transform}
+.nax-gem-board button.matched{animation:arcade-gem-pop .34s ease-in forwards;filter:brightness(2.2)}
+.nax-gem-board button.selected{animation:arcade-gem-selected .7s ease-in-out infinite alternate}
+.nax-gem-board button:active{transform:scale(.86)}
+.nax-td{position:relative;isolation:isolate}.nax-td-path{position:absolute;inset:0;width:100%;height:100%;overflow:visible}
+.nax-td-slot,.nax-td-tower,.nax-td-enemy,.nax-td-base{position:absolute;transform:translate(-50%,-50%);z-index:2}
+.nax-td-tower{display:grid;place-items:center}.nax-td-tower.selected{outline:3px solid #fff;outline-offset:4px}
+.nax-td-enemy{z-index:3;animation:arcade-enemy .45s ease-in-out infinite alternate}
+.nax-td-base{display:grid;justify-items:center}
+@keyframes arcade-idle{to{translate:0 -5px}}@keyframes arcade-road{to{background-position:0 76px}}@keyframes arcade-run{to{translate:0 -3px}}@keyframes arcade-gem-pop{to{transform:scale(.15) rotate(160deg);opacity:0}}@keyframes arcade-gem-selected{to{filter:brightness(1.5);transform:scale(1.07)}}@keyframes arcade-enemy{to{translate:-50% -3px}}
+@media(max-width:560px){.nax-dungeon-actions{grid-template-columns:repeat(2,1fr)}.nax-runner-powerups{font-size:7px}.nax-gem-board{gap:4px;padding:7px}}
+
+/* Final interaction feedback */
+.nax-dungeon-message{z-index:5;top:24%;padding:8px 14px;border:1px solid #9b8bdb88;border-radius:20px;background:#080d1ddd;color:#f1edff;font-weight:800;box-shadow:0 5px 20px #0008}
+.nax-corridor-floor{animation:arcade-floor-flow .9s linear infinite}
+.nax-floor-lines{animation:arcade-floor-flow .7s linear infinite}
+.nax-torch{font-size:0;width:10px;height:27px;border-radius:5px;background:linear-gradient(#ffd99a,#a34c28);box-shadow:0 0 20px 7px #ff9c4388;animation:arcade-flame .3s infinite alternate}
+.nax-torch:after{content:'';position:absolute;left:1px;top:-13px;width:8px;height:15px;border-radius:70% 20% 70% 30%;background:linear-gradient(#fff4bd,#ff9b38 65%,transparent)}
+.nax-gem-board button.matched{animation:arcade-gem-pop .34s ease-in forwards}
+.nax-gem-board button i{transition:transform .2s}
+.nax-td-pathline{stroke-linecap:round;stroke-linejoin:round}
+.nax-td-enemy{transition:left .09s linear,top .09s linear}
+.nax-td-tower{transition:filter .2s,transform .2s}
+.nax-td-tower.selected{filter:brightness(1.4);transform:translate(-50%,-50%) scale(1.12)}
+.nax-td-slot:active{transform:translate(-50%,-50%) scale(.88)}
+@keyframes arcade-floor-flow{to{background-position:0 38px}}@keyframes arcade-flame{to{filter:brightness(1.5);box-shadow:0 0 27px 11px #ff9c4388}}
+
+.nax-run-obstacle.type-coin{width:20px;height:20px;border-radius:50%;background:radial-gradient(circle at 30% 25%,#fff2a5,#ffb52f 48%,#9a5a10);border:2px solid #fff0a2;box-shadow:0 0 18px #ffc34e}
+.nax-run-obstacle.type-coin:after{inset:3px;border:1px solid #fff5c8;border-radius:50%}
+.nax-run-obstacle.type-boost{width:26px;height:27px;background:linear-gradient(145deg,#a7ffed,#16a6a1);border-color:#b7fff2;clip-path:polygon(55% 0,100% 0,68% 42%,94% 42%,25% 100%,40% 57%,8% 57%)}
+.nax-run-obstacle.type-shield{width:27px;height:29px;background:linear-gradient(145deg,#d3faff,#3184c7);border-radius:7px 7px 13px 13px;clip-path:polygon(50% 0,100% 18%,88% 72%,50% 100%,12% 72%,0 18%)}
+.nax-run-obstacle.type-shield:after,.nax-run-obstacle.type-boost:after{display:none}
+`;
+export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{},onLoot=()=>{},skills=[]}){
+ const cfg=CONFIG[gameKey],extraHeart=skills.includes('extra-heart'),coinBoost=skills.includes('coin-boost');
+ const [started,setStarted]=useState(false),[finished,setFinished]=useState(false),[score,setScore]=useState(0),[elapsed,setElapsed]=useState(0),[result,setResult]=useState('');
+ const [hearts,setHearts]=useState(extraHeart?4:3);
+ const [room,setRoom]=useState(1),[enemyHp,setEnemyHp]=useState(3),[guard,setGuard]=useState(false),[dungeonMsg,setDungeonMsg]=useState('Um guardião bloqueia a passagem!'),[heroLane,setHeroLane]=useState(0),[mana,setMana]=useState(100),[dungeonPowerCd,setDungeonPowerCd]=useState(0);
+ const [lane,setLane]=useState(1),[obstacles,setObstacles]=useState([]),[move,setMove]=useState('run'),[distance,setDistance]=useState(0),[runnerBoost,setRunnerBoost]=useState(0),[runnerShield,setRunnerShield]=useState(0);
+ const [gems,setGems]=useState(randomBoard),[selected,setSelected]=useState(null),[combo,setCombo]=useState(0),[moves,setMoves]=useState(24),[matched,setMatched]=useState([]);
+ const [targets,setTargets]=useState([]);
+ const [tdTowers,setTdTowers]=useState([]),[tdEnemies,setTdEnemies]=useState([]),[tdShots,setTdShots]=useState([]),[tdCash,setTdCash]=useState(120),[tdBase,setTdBase]=useState(12),[tdWave,setTdWave]=useState(1),[tdKills,setTdKills]=useState(0),[tdSelected,setTdSelected]=useState(null);
+ const tdSpawn=useRef(0),tdId=useRef(1);
+ const [tdAbilityCd,setTdAbilityCd]=useState(0),[tdFreeze,setTdFreeze]=useState(0),[tdTowerType,setTdTowerType]=useState('bolt'),[tdAbility,setTdAbility]=useState('');
+ const tdPath=[[8,12],[8,34],[31,34],[31,76],[57,76],[57,22],[81,22],[81,86]];
+ const tdSlots=[[18,17],[18,48],[42,20],[43,57],[69,44],[68,88],[91,52],[43,91],[8,62]];
+ const tdPoint=p=>{const seg=Math.min(tdPath.length-2,Math.floor(p)),t=p-seg,a=tdPath[seg],b=tdPath[seg+1];return {x:a[0]+(b[0]-a[0])*t,y:a[1]+(b[1]-a[1])*t}};
+ const touchStart=useRef(null),lastSpawn=useRef(0),gameRef=useRef(null),scoreRef=useRef(score),elapsedRef=useRef(elapsed),lastDungeonAttack=useRef(0);
+ useEffect(()=>{scoreRef.current=score},[score]);
+ useEffect(()=>{elapsedRef.current=elapsed},[elapsed]);
+ const finish=useCallback((finalScore,won,mode)=>{
+  if(gameRef.current?.done)return; if(gameRef.current)gameRef.current.done=true;
+  setFinished(true);setStarted(false);setScore(finalScore);setResult(won?'MISSÃO CONCLUÍDA':'FIM DE JOGO');
+  const xp=Math.min(100,Math.max(0,Math.floor(finalScore*.25)));
+  onReward(finalScore,gameKey);onMatch({gameKey,score:finalScore,xpEarned:xp,mode,won:!!won&&finalScore>=10,durationSeconds:elapsedRef.current});
+  if(finalScore>=25)void onLoot(gameKey,'coin_pickup');
+ },[gameKey,onMatch,onReward,onLoot]);
+ const start=()=>{
+  gameRef.current={done:false};setStarted(true);setFinished(false);setScore(0);setElapsed(0);setHearts(extraHeart?4:3);setResult('');
+  lastDungeonAttack.current=0;setRoom(1);setEnemyHp(3);setGuard(false);setDungeonMsg('Um guardião bloqueia a passagem!');setHeroLane(0);setMana(100);setDungeonPowerCd(0);
+  setLane(1);setObstacles([]);setMove('run');setDistance(0);setRunnerBoost(0);setRunnerShield(0);lastSpawn.current=0;
+  setGems(randomBoard());setSelected(null);setCombo(0);setMoves(24);setMatched([]);setTargets([]);setTdTowers([]);setTdEnemies([]);setTdShots([]);setTdCash(120);setTdBase(12);setTdWave(1);setTdKills(0);setTdSelected(null);setTdAbilityCd(0);setTdFreeze(0);setTdTowerType('bolt');setTdAbility('');tdSpawn.current=0;tdId.current=1;
+ };
+ const loseLife=()=>{
+  setHearts(v=>{if(v<=1){finish(scoreRef.current,false,cfg.mode);return 0}return v-1});
+ };
+ useEffect(()=>{
+  if(!started||!['race','dungeon','defense'].includes(cfg.mode))return;
+  const timer=window.setInterval(()=>{
+   if(cfg.mode==='defense')tdSpawn.current++;
+   setElapsed(v=>v+(cfg.mode==='race'?(lastSpawn.current%4===0?1:0):cfg.mode==='defense'?(tdSpawn.current%10===9?1:0):1));
+   if(cfg.mode==='race'){
+    setDistance(v=>v+1);
+    setObstacles(old=>{
+     const next=old.map(o=>({...o,y:o.y+4.1})).filter(o=>o.y<112);
+     if(lastSpawn.current%7===0)next.push({id:Math.random(),lane:Math.floor(Math.random()*3),y:-12,type:Math.random()<.22?'coin':Math.random()<.18?'boost':Math.random()<.14?'shield':Math.random()<.56?'barrier':'cart'});
+     return next;
+    });
+    lastSpawn.current++;
+    setScore(v=>v+0.35);
+   }
+   if(cfg.mode==='defense'){
+    setTdEnemies(old=>{
+     const firing=[];
+     let next=old.map(e=>{
+      const q=tdPoint(e.p);let damage=0;
+      tdTowers.forEach(t=>{
+       const dist=Math.hypot(q.x-t.x,q.y-t.y),range=t.type==='arc'?27:t.type==='frost'?20:17;
+       if(dist<=range){damage+=(t.type==='arc'?.46:t.type==='frost'?.12:.32)*t.level;if(tdSpawn.current%3===0)firing.push({id:t.id+'-'+e.id+'-'+tdSpawn.current,x1:t.x,y1:t.y,x2:q.x,y2:q.y,type:t.type});}
+      });
+      return {...e,p:e.p+(tdFreeze>0?0:.035+tdWave*.002),hp:e.hp-damage};
+     });
+     setTdShots(firing);
+     const escaped=next.filter(e=>e.p>=tdPath.length-1);if(escaped.length)setTdBase(v=>{const n=Math.max(0,v-escaped.length);if(n===0)finish(scoreRef.current,false,'tower-defense-base');return n});
+     const killed=old.length-next.length-escaped.length;if(killed>0){setTdKills(v=>{const n=v+killed;if(n>=50)finish(scoreRef.current+100,true,'tower-defense-50');return n});setTdCash(v=>v+killed*12);setScore(v=>v+killed*10)}
+     next=next.filter(e=>e.p<tdPath.length-1&&e.hp>0);if(tdSpawn.current%24===0&&tdKills<50)next.push({id:tdId.current++,p:0,hp:1.8+tdWave*.25,boss:tdWave>=5&&tdKills%10===9,type:tdWave>=4&&tdSpawn.current%8===0?'brute':'scout'});return next;
+    });if(tdSpawn.current%180===0)setTdWave(v=>Math.min(5,v+1));
+   }
+  },cfg.mode==='race'?250:cfg.mode==='defense'?100:1000);
+  return()=>window.clearInterval(timer); },[started,cfg.mode,tdTowers,tdWave,tdKills,tdFreeze]); useEffect(()=>{
+  if(!started||cfg.mode!=='dungeon'||elapsed===0||elapsed%4!==0||lastDungeonAttack.current===elapsed)return;
+  lastDungeonAttack.current=elapsed;if(guard){setGuard(false);setDungeonMsg('Bloqueio perfeito! Você anulou o golpe.')}else{setDungeonMsg('O guardião acertou você!');loseLife()}
+ },[elapsed,started,cfg.mode,guard]);
+ useEffect(()=>{
+  if(!started||cfg.mode!=='race')return;
+  const collision=obstacles.find(o=>o.lane===lane&&o.y>72&&o.y<105);
+  if(!collision)return;
+  setObstacles(old=>old.filter(o=>o.id!==collision.id));
+  if(collision.type==='coin'){setScore(v=>v+10*(coinBoost?2:1));void onLoot(gameKey,'coin_pickup')}
+  else if(collision.type==='boost'){setRunnerBoost(45);setScore(v=>v+15)}
+  else if(collision.type==='shield'){setRunnerShield(45);setScore(v=>v+15)}
+  else if(move==='jump'||move==='slide'){setScore(v=>v+5)}
+  else if(runnerShield>0){setRunnerShield(0);setScore(v=>v+8)}else loseLife();
+ },[obstacles,lane,started,cfg.mode,move,runnerShield]);
+ useEffect(()=>{if(started&&cfg.mode==='race'&&elapsed>=45)finish(score,true,'runner-45s')},[elapsed,started,cfg.mode,score,finish]);
+ useEffect(()=>{if(started&&cfg.mode==='defense'&&tdKills>=50)finish(score,true,'tower-defense-50')},[tdKills,started,cfg.mode,score,finish]);
+ useEffect(()=>{if(!started||cfg.mode!=='race')return;const t=window.setTimeout(()=>setMove('run'),650);return()=>window.clearTimeout(t)},[move,started,cfg.mode]);
+ const dungeonAction=action=>{
+  if(!started)return;
+  if(action==='guard'){setGuard(true);setDungeonMsg('GUARDA PERFEITA · bloqueio preparado');return}
+  if(action==='power'){if(mana<35||dungeonPowerCd>0)return;setMana(v=>v-35);setDungeonPowerCd(5);setEnemyHp(v=>Math.max(0,v-2));setScore(v=>v+18);setDungeonMsg('RAJADA ARCANA · impacto mágico!');window.setTimeout(()=>setDungeonPowerCd(0),5000);return}
+  if(action==='left'||action==='right'){setHeroLane(v=>Math.max(-1,Math.min(1,v+(action==='left'?-1:1))));setDungeonMsg('Você reposicionou o personagem.');return}
+  if(action==='attack'){
+   if(enemyHp<=0)return;
+   if(guard){setGuard(false);setDungeonMsg('O ataque foi bloqueado!');return}
+   const hp=enemyHp-1;setEnemyHp(hp);setScore(v=>v+8);setMana(v=>Math.min(100,v+5));
+   if(hp<=0){setDungeonMsg('Guardião derrotado! Corredor liberado.');setTimeout(()=>{
+    setRoom(v=>{if(v>=7){finish(score+56,true,'dungeon-7-salas');return v}setEnemyHp(2+Math.floor(Math.random()*3)+Math.floor(room/3));setDungeonMsg('Uma nova criatura apareceu!');return v+1});
+   },450)}else setDungeonMsg('Acertou! Mais '+hp+' golpes para vencer.');
+  }
+  if(action==='dodge'){setGuard(false);setHeroLane(v=>v===0?1:-v);setDungeonMsg('ESQUIVA · reposicionamento rápido!');setScore(v=>v+5);setMana(v=>Math.min(100,v+8))}
+ };
+ const swapGem=index=>{
+  if(!started||moves<=0||matched.length)return;
+  if(selected===null){setSelected(index);return}
+  if(selected===index){setSelected(null);return}
+  if(!adjacency(selected,index)){setSelected(index);return}
+  const next=[...gems];[next[selected],next[index]]=[next[index],next[selected]];
+  const hits=findMatches(next);setSelected(null);
+  if(!hits.size){setGems(gems);return}
+  setMoves(v=>v-1);setMatched([...hits]);setCombo(v=>v+1);
+  const points=hits.size*10*(coinBoost?2:1)+(hits.size>=5?60:hits.size===4?25:0),nextScore=score+points;setScore(nextScore);
+  if(nextScore>=600){window.setTimeout(()=>finish(nextScore,true,'gem-match-600'),360);return}
+  window.setTimeout(()=>{
+   const board=[...next];hits.forEach(i=>board[i]=null);
+   for(let c=0;c<8;c++){let write=7;for(let r=7;r>=0;r--){const val=board[r*8+c];if(val!==null){board[write*8+c]=val;if(write!==r)board[r*8+c]=null;write--}}for(let r=write;r>=0;r--)board[r*8+c]=Math.floor(Math.random()*5)}
+   setGems(board);setMatched([]);
+   if(moves<=1){finish(nextScore,false,'gem-match-moves');return}
+   const cascade=findMatches(board);
+   if(cascade.size){setMatched([...cascade]);setScore(v=>v+cascade.size*15);window.setTimeout(()=>{const b=[...board];cascade.forEach(i=>b[i]=Math.floor(Math.random()*5));setGems(b);setMatched([])},300)}
+  },320);
+ };
+ const raceKey=key=>{
+  if(!started||cfg.mode!=='race')return;
+  if(key==='left')setLane(v=>Math.max(0,v-1));
+  if(key==='right')setLane(v=>Math.min(2,v+1));
+  if(key==='jump'||key==='slide')setMove(key);
+ };
+ useEffect(()=>{
+  if(!started||cfg.mode!=='race')return;
+  const handler=e=>{if(['ArrowLeft','a','A'].includes(e.key)){e.preventDefault();raceKey('left')}if(['ArrowRight','d','D'].includes(e.key)){e.preventDefault();raceKey('right')}if(['ArrowUp',' ','w','W'].includes(e.key)){e.preventDefault();raceKey('jump')}if(['ArrowDown','s','S'].includes(e.key)){e.preventDefault();raceKey('slide')}};
+  window.addEventListener('keydown',handler);return()=>window.removeEventListener('keydown',handler);
+ },[started,cfg.mode]);
+ const tapTarget=id=>{setTargets(old=>old.filter(t=>t.id!==id));setScore(v=>v+10)};
+ const tdPlace=(x,y,type=tdTowerType)=>{if(!started)return;const old=tdTowers.find(t=>Math.hypot(t.x-x,t.y-y)<4);if(old){setTdSelected(old.id);return}const cost=type==='arc'?65:type==='frost'?55:40;if(tdCash<cost)return;setTdTowers(v=>[...v,{id:tdId.current++,x,y,level:1,type}]);setTdCash(v=>v-cost);setTdSelected(null)};
+ const tdCast=kind=>{if(!started||tdAbilityCd>0||!tdEnemies.length)return;if(kind==='nova'){setTdEnemies(v=>v.map(e=>({...e,hp:e.hp-2.4})));setScore(v=>v+25)}else{setTdFreeze(4);window.setTimeout(()=>setTdFreeze(0),4000)}setTdAbility(kind);setTdAbilityCd(12);window.setTimeout(()=>setTdAbilityCd(0),12000)};
+ const tdUpgrade=()=>{const t=tdTowers.find(x=>x.id===tdSelected);if(!t||t.level>=3||tdCash<45*t.level)return;setTdTowers(v=>v.map(x=>x.id===tdSelected?{...x,level:x.level+1}:x));setTdCash(v=>v-45*t.level)};
+ if(!cfg)return null;
+ return <section className="nax-game">
+  <style>{STYLE}</style>
+  <header className="nax-game-head"><div><span>{cfg.tag}</span><h3>{cfg.icon} {cfg.title}</h3><p>{cfg.desc}</p></div><div className="nax-score"><small>PONTUAÇÃO</small><b>{score.toLocaleString('pt-BR')}</b></div></header>
+  <div className="nax-hud"><span><Heart size={15}/> {hearts} vidas</span><span><Timer size={15}/> {cfg.mode==='race'?Math.max(0,45-elapsed)+'s':cfg.mode==='defense'?'Onda '+tdWave+'/5':cfg.mode==='dungeon'?'Sala '+room+'/7':moves+' jogadas'}</span><span><Coins size={15}/> {coinBoost?'Bônus de moedas ativo':'Recompensas por desempenho'}</span></div>
+  {!started&&!finished&&<div className="nax-start"><div className="nax-start-orb">{cfg.icon}</div><h4>Preparado para jogar?</h4><p>{cfg.mode==='dungeon'?'Explore sete salas. Ataque o guardião, defenda-se e desvie dos golpes para avançar.':cfg.mode==='gems'?'Troque gemas vizinhas. Faça combinações de 3 ou mais e provoque cascatas em 24 jogadas.':cfg.mode==='race'?'Desvie nas três pistas, pule barreiras e deslize por baixo dos obstáculos. Sobreviva por 45 segundos.':'Toque nos invasores antes que alcancem o cofrinho. Aguente 30 segundos.'}</p><button onClick={start}>COMEÇAR JOGO <Zap size={16}/></button></div>}
+  {started&&cfg.mode==='dungeon'&&<><div className="nax-arena"><div className="nax-dungeon-scene"><div className="nax-corridor-wall left"/><div className="nax-corridor-wall right"/><div className="nax-corridor-floor"/><div className="nax-floor-lines"/><span className="nax-torch l"/><span className="nax-torch r"/><div className="nax-dungeon-top">MASMORRA NEXUS · SALA {room}/7</div><div className="nax-dungeon-message">{dungeonMsg}</div><div className={'nax-dungeon-foe '+(enemyHp<=0?'hit':'')}><i/><b/><em/></div><div className={'nax-dungeon-hero '+(guard?'guard':'')} style={{left:'calc(50% + '+(heroLane*23)+'px)'}}><i/><b/><em/></div><div style={{position:'absolute',top:'55%',left:'50%',transform:'translateX(-50%)',width:'110px',height:'5px',borderRadius:'9px',background:'#1a142b',border:'1px solid #ffffff33'}}><i style={{display:'block',width:Math.max(0,enemyHp/4*100)+'%',height:'100%',background:'linear-gradient(90deg,#ff4f78,#ffc36a)',borderRadius:'9px'}}/></div></div></div><div className="nax-dungeon-actions"><button onClick={()=>dungeonAction('left')}><ArrowLeft size={16}/> ESQ.</button><button onClick={()=>dungeonAction('attack')}><Swords size={16}/> GOLPE</button><button onClick={()=>dungeonAction('power')} disabled={mana<35||dungeonPowerCd>0}><Zap size={16}/> ARCANO <small>{dungeonPowerCd?dungeonPowerCd+'s':mana+' MP'}</small></button><button onClick={()=>dungeonAction('guard')}><Shield size={16}/> DEFESA</button><button onClick={()=>dungeonAction('dodge')}><Footprints size={16}/> ESQUIVA</button><button onClick={()=>dungeonAction('right')}><ArrowRight size={16}/> DIR.</button></div><div className="nax-dungeon-mana"><span>ENERGIA ARCANA</span><i><b style={{width:mana+'%'}}/></i></div></>}
+  {started&&cfg.mode==='race'&&<><div className="nax-race-stage" onTouchStart={e=>{touchStart.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}} onTouchEnd={e=>{if(!touchStart.current)return;const dx=e.changedTouches[0].clientX-touchStart.current.x,dy=e.changedTouches[0].clientY-touchStart.current.y;if(Math.abs(dx)>25)raceKey(dx>0?'right':'left');else if(Math.abs(dy)>20)raceKey(dy<0?'jump':'slide');touchStart.current=null}}><div className="nax-sun"/><div className="nax-city"/><div className="nax-road"/><div className="nax-road-stripes"/>{obstacles.map(o=><span key={o.id} className={'nax-run-obstacle type-'+o.type} style={{left:(25+o.lane*25)+'%',top:o.y+'%'}}>{o.type==='coin'?'':o.type==='boost'?'':o.type==='shield'?'':''}</span>)}<span className={'nax-run-player '+move+(runnerBoost?' boosted':'')+(runnerShield?' shielded':'')} style={{left:(25+lane*25)+'%'}}><i/><b/><em/></span><div style={{position:'absolute',top:10,left:12,color:'#fff',fontSize:10,fontWeight:900,textShadow:'0 2px 8px #000'}}>DISTÂNCIA {distance*12} M</div></div><div className="nax-race-controls"><button onClick={()=>raceKey('left')}><ArrowLeft/> ESQ.</button><button className="action" onClick={()=>raceKey('jump')}>PULAR</button><button className="action" onClick={()=>raceKey('slide')}>DESLIZAR</button><button onClick={()=>raceKey('right')}>DIR. <ArrowRight/></button></div><div className="nax-runner-powerups"><span>IMPULSO {runnerBoost?'ATIVO':'—'}</span><span>ESCUDO {runnerShield?'ATIVO':'—'}</span><span>DISTÂNCIA {distance*12} M</span></div><div className="nax-gem-help">No celular: deslize para os lados, para cima (pular) ou para baixo (deslizar). No teclado: setas ou WASD.</div></>}
+  {started&&cfg.mode==='gems'&&<><div className="nax-combo">{combo>1?'COMBO x'+combo:'ENCONTRE COMBINAÇÕES DE 3+'}</div><div className="nax-gem-wrap"><div className="nax-gem-side"><div className="nax-gem-stat"><small>JOGADAS</small><b>{moves}</b></div><div className="nax-gem-stat"><small>COMBO</small><b>x{combo||1}</b></div><div className="nax-gem-stat"><small>META</small><b>600</b></div></div><div className="nax-gem-board">{gems.map((gem,i)=><button key={i} onClick={()=>swapGem(i)} className={(selected===i?'selected ':'')+(matched.includes(i)?'matched':'')} style={{'--gem':cleanPalette[gem]}} aria-label={'Gema '+(i+1)}/>)}</div><div className="nax-gem-side"><div className="nax-gem-stat"><small>PONTOS</small><b>{score}</b></div><div className="nax-gem-stat"><small>PEÇAS</small><b>64</b></div></div></div><div className="nax-gem-help">Toque em uma gema e depois em uma vizinha para trocar. Combinações maiores valem mais!</div></>}
+  {started&&cfg.mode==='defense'&&<><div className="nax-td-hud"><span>WAVE {tdWave}/5</span><span>◈ {tdCash} CRÉDITOS</span><span>BASE {tdBase}/12</span><span>ELIMINAÇÕES {tdKills}/50</span></div><div className="nax-td"><div className="td-atmosphere"/><svg className="nax-td-path" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline className="nax-td-pathline" points={tdPath.map(p=>p.join(',')).join(' ')}/><polyline className="nax-td-pathedge" points={tdPath.map(p=>p.join(',')).join(' ')}/>{tdTowers.map(t=><circle key={'range-'+t.id} cx={t.x} cy={t.y} r={t.type==='arc'?27:t.type==='frost'?20:17} fill={t.type==='arc'?'#c58cff':t.type==='frost'?'#71eaff':'#69dfff'} fillOpacity={tdSelected===t.id?'.22':'.09'} stroke={t.type==='arc'?'#d9a8ff':t.type==='frost'?'#8cf2ff':'#8ceaff'} strokeOpacity={tdSelected===t.id?'.9':'.42'} strokeWidth={tdSelected===t.id?'.8':'.35'} strokeDasharray={tdSelected===t.id?'2 1':'1 2'}/>)}{tdShots.map(s=><g key={s.id} className={'nax-td-shot '+s.type}><line x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}/><circle cx={s.x2} cy={s.y2} r="1.5"/></g>)}</svg>{tdSlots.map(([x,y],i)=><button key={i} className="nax-td-slot" style={{left:x+'%',top:y+'%'}} onClick={()=>tdPlace(x,y)} aria-label="Construir torre">+</button>)}{tdTowers.map(t=><button key={t.id} className={'nax-td-tower '+t.type+(tdSelected===t.id?' selected':'')} style={{left:t.x+'%',top:t.y+'%'}} onClick={()=>setTdSelected(t.id)} aria-label={'Torre nível '+t.level}><i/><b>{t.level}</b></button>)}{tdEnemies.map(e=>{const p=tdPoint(e.p);return <span key={e.id} className={'nax-td-enemy '+(e.boss?'boss ':'')+(e.type||'')} style={{left:p.x+'%',top:p.y+'%'}}><i/><b/></span>})}<div className="nax-td-base"><i/><strong>NEXUS CORE</strong></div>{tdFreeze>0&&<label className="td-freeze-label">CAMPO CRIOGÊNICO ATIVO</label>}</div><div className="nax-td-legend"><span><i/> Alcance das torres</span><span>Toque numa torre para destacar sua área</span></div><div className="td-abilities"><button disabled={tdAbilityCd>0||!tdEnemies.length} onClick={()=>tdCast('nova')}>PULSO NOVA <small>{tdAbilityCd?tdAbilityCd+'s':'DANO EM ÁREA'}</small></button><button disabled={tdAbilityCd>0||!tdEnemies.length} onClick={()=>tdCast('freeze')}>CAMPO CRIO <small>{tdAbilityCd?tdAbilityCd+'s':'CONGELA INIMIGOS'}</small></button></div><div className="nax-td-shop"><button className={tdTowerType==='bolt'?'active':''} onClick={()=>setTdTowerType('bolt')}><i/>CANHÃO<small>40 · equilibrado</small></button><button className={tdTowerType==='arc'?'active':''} onClick={()=>setTdTowerType('arc')}><i/>ARCANO<small>65 · alto dano</small></button><button className={tdTowerType==='frost'?'active':''} onClick={()=>setTdTowerType('frost')}><i/>CRIO<small>55 · controle</small></button><button onClick={tdUpgrade} disabled={!tdSelected||tdCash<45||tdTowers.find(t=>t.id===tdSelected)?.level>=3}>EVOLUIR<small>{tdSelected?'45+ créditos':'selecione torre'}</small></button></div></>}
+  {finished&&<div className="nax-result"><Trophy size={30}/><span>{result}</span><b>{score.toLocaleString('pt-BR')} PTS</b><p>{result==='MISSÃO CONCLUÍDA'?'Boa! Sua evolução foi registrada.':'Cada tentativa ensina um caminho novo. Tente novamente!'}</p><button onClick={start}><RefreshCw size={15}/> JOGAR NOVAMENTE</button></div>}
+  <footer className="nax-game-foot"><Shield size={14}/> {extraHeart?'Proteção extra equipada · ':''}Desafios justos, sem compras obrigatórias. XP sujeito às regras do Arcade.</footer>
+ </section>;
+}
