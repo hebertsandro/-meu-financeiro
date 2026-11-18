@@ -107,6 +107,21 @@ const STYLE=`
 .nax-td-base{display:grid;justify-items:center}
 @keyframes arcade-idle{to{translate:0 -5px}}@keyframes arcade-road{to{background-position:0 76px}}@keyframes arcade-run{to{translate:0 -3px}}@keyframes arcade-gem-pop{to{transform:scale(.15) rotate(160deg);opacity:0}}@keyframes arcade-gem-selected{to{filter:brightness(1.5);transform:scale(1.07)}}@keyframes arcade-enemy{to{translate:-50% -3px}}
 @media(max-width:560px){.nax-dungeon-actions{grid-template-columns:repeat(2,1fr)}.nax-runner-powerups{font-size:7px}.nax-gem-board{gap:4px;padding:7px}}
+
+/* Final interaction feedback */
+.nax-dungeon-message{z-index:5;top:24%;padding:8px 14px;border:1px solid #9b8bdb88;border-radius:20px;background:#080d1ddd;color:#f1edff;font-weight:800;box-shadow:0 5px 20px #0008}
+.nax-corridor-floor{animation:arcade-floor-flow .9s linear infinite}
+.nax-floor-lines{animation:arcade-floor-flow .7s linear infinite}
+.nax-torch{font-size:0;width:10px;height:27px;border-radius:5px;background:linear-gradient(#ffd99a,#a34c28);box-shadow:0 0 20px 7px #ff9c4388;animation:arcade-flame .3s infinite alternate}
+.nax-torch:after{content:'';position:absolute;left:1px;top:-13px;width:8px;height:15px;border-radius:70% 20% 70% 30%;background:linear-gradient(#fff4bd,#ff9b38 65%,transparent)}
+.nax-gem-board button.matched{animation:arcade-gem-pop .34s ease-in forwards}
+.nax-gem-board button i{transition:transform .2s}
+.nax-td-pathline{stroke-linecap:round;stroke-linejoin:round}
+.nax-td-enemy{transition:left .15s linear,top .15s linear}
+.nax-td-tower{transition:filter .2s,transform .2s}
+.nax-td-tower.selected{filter:brightness(1.4);transform:translate(-50%,-50%) scale(1.12)}
+.nax-td-slot:active{transform:translate(-50%,-50%) scale(.88)}
+@keyframes arcade-floor-flow{to{background-position:0 38px}}@keyframes arcade-flame{to{filter:brightness(1.5);box-shadow:0 0 27px 11px #ff9c4388}}
 `;
 export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{},onLoot=()=>{},skills=[]}){
  const cfg=CONFIG[gameKey],extraHeart=skills.includes('extra-heart'),coinBoost=skills.includes('coin-boost');
@@ -144,11 +159,11 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
  useEffect(()=>{
   if(!started||!['race','dungeon','defense'].includes(cfg.mode))return;
   const timer=window.setInterval(()=>{
-   setElapsed(v=>v+1);
+   setElapsed(v=>{const n=v+1;if(cfg.mode==='dungeon'&&n%4===0){if(guard){setGuard(false);setDungeonMsg('Bloqueio perfeito! Você anulou o golpe.')}else{setDungeonMsg('O guardião acertou você!');loseLife()}}return n});
    if(cfg.mode==='race'){
     setDistance(v=>v+1);
     setObstacles(old=>{
-     const next=old.map(o=>({...o,y:o.y+2.9})).filter(o=>o.y<112);
+     const next=old.map(o=>({...o,y:o.y+4.1})).filter(o=>o.y<112);
      if(lastSpawn.current%7===0)next.push({id:Math.random(),lane:Math.floor(Math.random()*3),y:-12,type:Math.random()<.22?'coin':Math.random()<.18?'boost':Math.random()<.14?'shield':Math.random()<.56?'barrier':'cart'});
      return next;
     });
@@ -158,15 +173,15 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
    if(cfg.mode==='defense'){
     tdSpawn.current++;
     setTdEnemies(old=>{
-     let next=old.map(e=>({...e,p:e.p+(tdFreeze>0?0:.026+tdWave*.002),hp:e.hp-tdTowers.reduce((d,t)=>{const q=tdPoint(e.p),dist=Math.hypot(q.x-t.x,q.y-t.y),range=t.type==='arc'?27:t.type==='frost'?20:17;return d+(dist<range?(t.type==='arc'?.34:t.type==='frost'?.13:.24)*t.level:0)},0)}));
+     let next=old.map(e=>({...e,p:e.p+(tdFreeze>0?0:.105+tdWave*.003),hp:e.hp-tdTowers.reduce((d,t)=>{const q=tdPoint(e.p),dist=Math.hypot(q.x-t.x,q.y-t.y),range=t.type==='arc'?27:t.type==='frost'?20:17;return d+(dist<range?(t.type==='arc'?.34:t.type==='frost'?.13:.24)*t.level:0)},0)}));
      const escaped=next.filter(e=>e.p>=tdPath.length-1);if(escaped.length)setTdBase(v=>{const n=Math.max(0,v-escaped.length);if(n===0)finish(scoreRef.current,false,'tower-defense-base');return n});
      const killed=old.length-next.length-escaped.length;if(killed>0){setTdKills(v=>{const n=v+killed;if(n>=50)finish(scoreRef.current+100,true,'tower-defense-50');return n});setTdCash(v=>v+killed*12);setScore(v=>v+killed*10)}
-     next=next.filter(e=>e.p<tdPath.length-1&&e.hp>0);if(tdSpawn.current%4===0&&tdKills<50)next.push({id:tdId.current++,p:0,hp:1.8+tdWave*.25,boss:tdWave>=5&&tdKills%10===9,type:tdWave>=4&&tdSpawn.current%8===0?'brute':'scout'});return next;
-    });if(tdSpawn.current%40===0)setTdWave(v=>Math.min(5,v+1));
+     next=next.filter(e=>e.p<tdPath.length-1&&e.hp>0);if(tdSpawn.current%3===0&&tdKills<50)next.push({id:tdId.current++,p:0,hp:1.8+tdWave*.25,boss:tdWave>=5&&tdKills%10===9,type:tdWave>=4&&tdSpawn.current%8===0?'brute':'scout'});return next;
+    });if(tdSpawn.current%18===0)setTdWave(v=>Math.min(5,v+1));
    }
-  },cfg.mode==='race'?120:1000);
+  },cfg.mode==='race'?250:1000);
   return()=>window.clearInterval(timer);
- },[started,cfg.mode,tdTowers,tdWave,tdKills,tdFreeze]);
+ },[started,cfg.mode,tdTowers,tdWave,tdKills,tdFreeze,guard]);
  useEffect(()=>{
   if(!started||cfg.mode!=='race')return;
   const collision=obstacles.find(o=>o.lane===lane&&o.y>72&&o.y<105);
@@ -191,7 +206,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
    if(guard){setGuard(false);setDungeonMsg('O ataque foi bloqueado!');return}
    const hp=enemyHp-1;setEnemyHp(hp);setScore(v=>v+8);setMana(v=>Math.min(100,v+5));
    if(hp<=0){setDungeonMsg('Guardião derrotado! Corredor liberado.');setTimeout(()=>{
-    setRoom(v=>{if(v>=6){finish(score+48,true,'dungeon-7-salas');return v}setEnemyHp(2+Math.floor(Math.random()*3));setDungeonMsg('Uma nova criatura apareceu!');return v+1});
+    setRoom(v=>{if(v>=7){finish(score+56,true,'dungeon-7-salas');return v}setEnemyHp(2+Math.floor(Math.random()*3)+Math.floor(room/3));setDungeonMsg('Uma nova criatura apareceu!');return v+1});
    },450)}else setDungeonMsg('Acertou! Mais '+hp+' golpes para vencer.');
   }
   if(action==='dodge'){setGuard(false);setHeroLane(v=>v===0?1:-v);setDungeonMsg('ESQUIVA · reposicionamento rápido!');setScore(v=>v+5);setMana(v=>Math.min(100,v+8))}
