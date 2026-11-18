@@ -64,3 +64,6 @@
 .nc-secret-card>div{display:grid;gap:4px;flex:1;min-width:0}.nc-secret-card b{font-size:10px}.nc-secret-card small{color:var(--muted,#a9b2c9);font-size:9px;line-height:1.4}.nc-secret-card>strong{font-size:9px;color:#b8a9ff;white-space:nowrap}
 .nc-secret-track{height:4px;border-radius:9px;background:#29344b;overflow:hidden;margin-top:3px}.nc-secret-track i{display:block;height:100%;background:linear-gradient(90deg,#8167f1,#4bc4d2)}
 @media(max-width:650px){.nc-secret-grid{grid-template-columns:1fr}.nc-secret-head{align-items:flex-start;flex-direction:column}.nc-secret-head>small{text-align:left}}
+
+.nc-challenge-form input:focus,.nc-challenge-form select:focus{outline:none;border-color:rgba(159,139,255,.8);box-shadow:0 0 0 3px rgba(126,102,255,.13)}
+.nc-challenge-form .nc-primary:hover:not(:disabled){filter:brightness(1.12);transform:translateY(-1px)}
