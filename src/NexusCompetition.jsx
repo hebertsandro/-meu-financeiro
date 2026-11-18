@@ -125,7 +125,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
    <div className="nc-board-caption">DUELOS ENTRE AMIGOS · PRAZO DE 7 DIAS</div>
    <div className="nc-challenge-form">
     <label>Escolha um amigo<select value={challengeFriend} onChange={e=>setChallengeFriend(e.target.value)}><option value="">Selecione...</option>{friends.map(p=><option key={p.user_id} value={p.user_id}>{display(p)} {p.username?'(@'+p.username+')':''}</option>)}</select></label>
-    <label>Jogo<select value={challengeGame} onChange={e=>setChallengeGame(e.target.value)}>{games.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
+    <label>Jogo<select value={challengeGame} onChange={e=>{const key=e.target.value;setChallengeGame(key);setChallengeTarget(key==='extra-race'?'40':key==='extra-gems'?'100':key==='extra-dungeon'?'100':key==='extra-defense'?'100':'500')}}>{games.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
     <label>Meta de pontuação<input type="number" min="1" max="1000000" value={challengeTarget} onChange={e=>setChallengeTarget(e.target.value)}/></label>
     <label>Nome do desafio<input maxLength="60" value={challengeTitle} onChange={e=>setChallengeTitle(e.target.value)}/></label>
     <button className="nc-primary" type="button" disabled={!challengeFriend||!challengeTitle.trim()||Number(challengeTarget)<1||challengeBusy} onClick={createChallenge}><Swords size={16}/>{challengeBusy?'Enviando...':'Desafiar amigo'}</button>
