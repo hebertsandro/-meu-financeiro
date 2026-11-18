@@ -44,14 +44,16 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
  const [lane,setLane]=useState(1),[obstacles,setObstacles]=useState([]),[move,setMove]=useState('run'),[distance,setDistance]=useState(0);
  const [gems,setGems]=useState(randomBoard),[selected,setSelected]=useState(null),[combo,setCombo]=useState(0),[moves,setMoves]=useState(24),[matched,setMatched]=useState([]);
  const [targets,setTargets]=useState([]);
- const touchStart=useRef(null),lastSpawn=useRef(0),gameRef=useRef(null);
+ const touchStart=useRef(null),lastSpawn=useRef(0),gameRef=useRef(null),scoreRef=useRef(score),elapsedRef=useRef(elapsed);
+ useEffect(()=>{scoreRef.current=score},[score]);
+ useEffect(()=>{elapsedRef.current=elapsed},[elapsed]);
  const finish=useCallback((finalScore,won,mode)=>{
   if(gameRef.current?.done)return; if(gameRef.current)gameRef.current.done=true;
   setFinished(true);setStarted(false);setScore(finalScore);setResult(won?'MISSÃO CONCLUÍDA':'FIM DE JOGO');
   const xp=Math.min(100,Math.max(0,Math.floor(finalScore*.25)));
-  onReward(finalScore,gameKey);onMatch({gameKey,score:finalScore,xpEarned:xp,mode,won:!!won&&finalScore>=10,durationSeconds:elapsed});
+  onReward(finalScore,gameKey);onMatch({gameKey,score:finalScore,xpEarned:xp,mode,won:!!won&&finalScore>=10,durationSeconds:elapsedRef.current});
   if(finalScore>=25)void onLoot(gameKey,'coin_pickup');
- },[gameKey,onMatch,onReward,onLoot,elapsed]);
+ },[gameKey,onMatch,onReward,onLoot]);
  const start=()=>{
   gameRef.current={done:false};setStarted(true);setFinished(false);setScore(0);setElapsed(0);setHearts(extraHeart?4:3);setResult('');
   setRoom(1);setEnemyHp(3);setGuard(false);setDungeonMsg('Um guardião bloqueia a passagem!');
@@ -59,7 +61,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
   setGems(randomBoard());setSelected(null);setCombo(0);setMoves(24);setMatched([]);setTargets([]);
  };
  const loseLife=()=>{
-  setHearts(v=>{if(v<=1){finish(score,false,cfg.mode);return 0}return v-1});
+  setHearts(v=>{if(v<=1){finish(scoreRef.current,false,cfg.mode);return 0}return v-1});
  };
  useEffect(()=>{
   if(!started||!['race','dungeon','defense'].includes(cfg.mode))return;
