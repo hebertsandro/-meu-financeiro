@@ -4453,3 +4453,11 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
   .space-nexus-card{box-shadow:0 14px 36px #02061777,0 0 20px #5979ff16}
   .space-nexus-arena{box-shadow:inset 0 0 38px #050a1c99}
 }
+
+/* Arcade expansion cards */
+.arcade-extra-card{appearance:none;text-align:left;color:inherit;cursor:pointer}
+.arcade-extra-card .arcade-library-art{background:radial-gradient(circle at 50% 45%,rgba(142,111,255,.34),transparent 45%),linear-gradient(145deg,#17223d,#10172a)}
+.arcade-extra-card .arcade-library-art>span{filter:drop-shadow(0 0 15px rgba(150,128,255,.55))}
+.arcade-extra-card:hover{transform:translateY(-5px);border-color:rgba(153,132,255,.65);box-shadow:0 16px 38px rgba(71,66,174,.22)}
+.cover-extra{background:radial-gradient(ellipse at 80% 10%,rgba(113,92,237,.35),transparent 40%),linear-gradient(120deg,#111b32,#172d48 55%,#17213d)}
+.cover-extra .arcade-detail-emoji{filter:drop-shadow(0 0 24px rgba(159,133,255,.65))}
