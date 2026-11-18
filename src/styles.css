@@ -4461,3 +4461,5 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .arcade-extra-card:hover{transform:translateY(-5px);border-color:rgba(153,132,255,.65);box-shadow:0 16px 38px rgba(71,66,174,.22)}
 .cover-extra{background:radial-gradient(ellipse at 80% 10%,rgba(113,92,237,.35),transparent 40%),linear-gradient(120deg,#111b32,#172d48 55%,#17213d)}
 .cover-extra .arcade-detail-emoji{filter:drop-shadow(0 0 24px rgba(159,133,255,.65))}
+
+.player-title-chip{display:inline-flex;align-items:center;gap:5px;width:max-content;max-width:100%;margin-top:7px;padding:5px 9px;border:1px solid rgba(166,137,255,.38);border-radius:999px;background:linear-gradient(100deg,rgba(112,82,220,.22),rgba(35,157,184,.12));color:#d8ccff;font-size:9px;font-weight:900;letter-spacing:.45px;box-shadow:0 0 18px rgba(124,91,255,.12)}
