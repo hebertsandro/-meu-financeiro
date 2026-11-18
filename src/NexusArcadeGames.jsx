@@ -109,7 +109,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
    }
   },cfg.mode==='race'?480:1000);
   return()=>window.clearInterval(timer);
- },[started,cfg.mode]);
+ },[started,cfg.mode,tdTowers,tdWave,tdKills]);
  useEffect(()=>{
   if(!started||cfg.mode!=='race')return;
   const collision=obstacles.find(o=>o.lane===lane&&o.y>72&&o.y<105);
