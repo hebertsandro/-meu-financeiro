@@ -137,7 +137,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
  const tdPath=[[8,12],[8,34],[31,34],[31,76],[57,76],[57,22],[81,22],[81,86]];
  const tdSlots=[[18,17],[18,48],[42,20],[43,57],[69,44],[68,88],[91,52],[43,91],[8,62]];
  const tdPoint=p=>{const seg=Math.min(tdPath.length-2,Math.floor(p)),t=p-seg,a=tdPath[seg],b=tdPath[seg+1];return {x:a[0]+(b[0]-a[0])*t,y:a[1]+(b[1]-a[1])*t}};
- const touchStart=useRef(null),lastSpawn=useRef(0),gameRef=useRef(null),scoreRef=useRef(score),elapsedRef=useRef(elapsed);
+ const touchStart=useRef(null),lastSpawn=useRef(0),gameRef=useRef(null),scoreRef=useRef(score),elapsedRef=useRef(elapsed),lastDungeonAttack=useRef(0);
  useEffect(()=>{scoreRef.current=score},[score]);
  useEffect(()=>{elapsedRef.current=elapsed},[elapsed]);
  const finish=useCallback((finalScore,won,mode)=>{
@@ -149,7 +149,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
  },[gameKey,onMatch,onReward,onLoot]);
  const start=()=>{
   gameRef.current={done:false};setStarted(true);setFinished(false);setScore(0);setElapsed(0);setHearts(extraHeart?4:3);setResult('');
-  setRoom(1);setEnemyHp(3);setGuard(false);setDungeonMsg('Um guardião bloqueia a passagem!');setHeroLane(0);setMana(100);setDungeonPowerCd(0);
+  lastDungeonAttack.current=0;setRoom(1);setEnemyHp(3);setGuard(false);setDungeonMsg('Um guardião bloqueia a passagem!');setHeroLane(0);setMana(100);setDungeonPowerCd(0);
   setLane(1);setObstacles([]);setMove('run');setDistance(0);setRunnerBoost(0);setRunnerShield(0);lastSpawn.current=0;
   setGems(randomBoard());setSelected(null);setCombo(0);setMoves(24);setMatched([]);setTargets([]);setTdTowers([]);setTdEnemies([]);setTdCash(120);setTdBase(12);setTdWave(1);setTdKills(0);setTdSelected(null);setTdAbilityCd(0);setTdFreeze(0);setTdTowerType('bolt');setTdAbility('');tdSpawn.current=0;tdId.current=1;
  };
@@ -159,7 +159,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
  useEffect(()=>{
   if(!started||!['race','dungeon','defense'].includes(cfg.mode))return;
   const timer=window.setInterval(()=>{
-   setElapsed(v=>{const n=v+1;if(cfg.mode==='dungeon'&&n%4===0){if(guard){setGuard(false);setDungeonMsg('Bloqueio perfeito! Você anulou o golpe.')}else{setDungeonMsg('O guardião acertou você!');loseLife()}}return n});
+   setElapsed(v=>v+1);
    if(cfg.mode==='race'){
     setDistance(v=>v+1);
     setObstacles(old=>{
@@ -181,7 +181,11 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
    }
   },cfg.mode==='race'?250:1000);
   return()=>window.clearInterval(timer);
- },[started,cfg.mode,tdTowers,tdWave,tdKills,tdFreeze,guard]);
+ },[started,cfg.mode,tdTowers,tdWave,tdKills,tdFreeze]);
+ useEffect(()=>{
+  if(!started||cfg.mode!=='dungeon'||elapsed===0||elapsed%4!==0||lastDungeonAttack.current===elapsed)return;
+  lastDungeonAttack.current=elapsed;if(guard){setGuard(false);setDungeonMsg('Bloqueio perfeito! Você anulou o golpe.')}else{setDungeonMsg('O guardião acertou você!');loseLife()}
+ },[elapsed,started,cfg.mode,guard]);
  useEffect(()=>{
   if(!started||cfg.mode!=='race')return;
   const collision=obstacles.find(o=>o.lane===lane&&o.y>72&&o.y<105);
