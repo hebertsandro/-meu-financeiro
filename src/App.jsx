@@ -1,5 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
 import { supabase, isConfigured } from './supabase';
+import './nexus-arcade-expansions.css';
 const NexusSocial = React.lazy(() => import('./NexusSocial'));
 const PlayerPostGrid = React.lazy(() => import('./NexusSocial').then(module => ({ default: module.PlayerPostGrid })));
 const NexusCompetition = React.lazy(() => import('./NexusCompetition'));
