@@ -4463,3 +4463,8 @@ button:focus-visible,a:focus-visible,input:focus-visible,textarea:focus-visible,
 .cover-extra .arcade-detail-emoji{filter:drop-shadow(0 0 24px rgba(159,133,255,.65))}
 
 .player-title-chip{display:inline-flex;align-items:center;gap:5px;width:max-content;max-width:100%;margin-top:7px;padding:5px 9px;border:1px solid rgba(166,137,255,.38);border-radius:999px;background:linear-gradient(100deg,rgba(112,82,220,.22),rgba(35,157,184,.12));color:#d8ccff;font-size:9px;font-weight:900;letter-spacing:.45px;box-shadow:0 0 18px rgba(124,91,255,.12)}
+
+/* Molduras cosméticas conquistadas na Loja NEXUS */
+.player-avatar.frame-neon,.frame-neon .player-avatar{border:2px solid #5ce4ff!important;box-shadow:0 0 0 4px rgba(65,210,255,.13),0 0 24px rgba(65,210,255,.55)!important}
+.player-card-frame.frame-prism{border:1px solid transparent!important;background:linear-gradient(#101827,#101827) padding-box,conic-gradient(from 20deg,#62e8ff,#a78bfa,#ff86c8,#f8d77a,#62e8ff) border-box!important;box-shadow:0 0 0 1px rgba(174,139,255,.24),0 0 35px rgba(133,100,255,.18)!important}
+.player-card-frame.frame-prism:before{background:linear-gradient(90deg,#62e8ff,#a78bfa,#ff86c8,#f8d77a)!important}
