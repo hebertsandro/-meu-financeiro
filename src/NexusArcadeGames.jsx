@@ -100,6 +100,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
   if(!started)return;
   if(action==='guard'){setGuard(true);setDungeonMsg('Você ergueu o escudo!');return}
   if(action==='attack'){
+   if(enemyHp<=0)return;
    if(guard){setGuard(false);setDungeonMsg('O ataque foi bloqueado!');return}
    const hp=enemyHp-1;setEnemyHp(hp);setScore(v=>v+8);
    if(hp<=0){setDungeonMsg('Guardião derrotado! Corredor liberado.');setTimeout(()=>{
@@ -114,14 +115,16 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
   if(selected===index){setSelected(null);return}
   if(!adjacency(selected,index)){setSelected(index);return}
   const next=[...gems];[next[selected],next[index]]=[next[index],next[selected]];
-  const hits=findMatches(next);setSelected(null);setMoves(v=>v-1);
+  const hits=findMatches(next);setSelected(null);
   if(!hits.size){setGems(gems);return}
-  setMatched([...hits]);setCombo(v=>v+1);
-  const points=hits.size*10*(coinBoost?2:1);setScore(v=>v+points);
+  setMoves(v=>v-1);setMatched([...hits]);setCombo(v=>v+1);
+  const points=hits.size*10*(coinBoost?2:1),nextScore=score+points;setScore(nextScore);
+  if(nextScore>=600){window.setTimeout(()=>finish(nextScore,true,'gem-match-600'),360);return}
   window.setTimeout(()=>{
    const board=[...next];hits.forEach(i=>board[i]=null);
    for(let c=0;c<8;c++){let write=7;for(let r=7;r>=0;r--){const val=board[r*8+c];if(val!==null){board[write*8+c]=val;if(write!==r)board[r*8+c]=null;write--}}for(let r=write;r>=0;r--)board[r*8+c]=Math.floor(Math.random()*5)}
    setGems(board);setMatched([]);
+   if(moves<=1){finish(nextScore,false,'gem-match-moves');return}
    const cascade=findMatches(board);
    if(cascade.size){setMatched([...cascade]);setScore(v=>v+cascade.size*15);window.setTimeout(()=>{const b=[...board];cascade.forEach(i=>b[i]=Math.floor(Math.random()*5));setGems(b);setMatched([])},300)}
   },320);
