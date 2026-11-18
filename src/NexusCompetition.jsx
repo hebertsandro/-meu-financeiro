@@ -5,7 +5,7 @@ import './nexus-competition.css';
 import NexusLoot from './NexusLoot';
 import NexusMultiplayer from './NexusMultiplayer';
 
-const games=[{id:'space-nexus',name:'Space Nexus',icon:'🚀'},{id:'piggy-run',name:'Asas da Fortuna',icon:'🐷'},{id:'quiz',name:'Quiz Financeiro',icon:'🧠'}];
+const games=[{id:'space-nexus',name:'Space Nexus',icon:'🚀'},{id:'piggy-run',name:'Asas da Fortuna',icon:'🐷'},{id:'quiz',name:'Quiz Financeiro',icon:'🧠'},{id:'extra-dungeon',name:'Dungeon Rush',icon:'⚔️'},{id:'extra-gems',name:'Gem Match',icon:'💎'},{id:'extra-race',name:'Corrida do Dinheiro',icon:'🏎️'},{id:'extra-defense',name:'Defesa do Cofrinho',icon:'🏰'}];
 const gameName=id=>games.find(g=>g.id===id)?.name||id;
 const fmtDate=value=>value?new Date(value).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'}):'—';
 const fmtDateTime=value=>value?new Date(value).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'—';
