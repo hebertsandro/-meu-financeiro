@@ -1,0 +1,69 @@
+/* Biblioteca de jogos, boas-vindas e menu do Space Nexus — visual futurista refinado. */
+
+/* Boas-vindas */
+.games-welcome{position:relative;overflow:hidden}
+.games-welcome:after{
+  content:"";position:absolute;right:-40px;top:-60px;width:230px;height:230px;border-radius:50%;pointer-events:none;
+  background:radial-gradient(circle,rgba(63,224,245,.2),transparent 65%);
+}
+.games-welcome h2{background:linear-gradient(95deg,#fff 15%,#d6c8ff 60%,#8ff0fb 100%);-webkit-background-clip:text;background-clip:text;color:transparent}
+.games-welcome-xp{border-color:rgba(255,216,120,.45);background:linear-gradient(160deg,#241a4d,#150f33);box-shadow:0 0 24px rgba(255,200,90,.14)}
+.games-welcome-xp svg{color:#ffd86b;filter:drop-shadow(0 0 8px rgba(255,216,74,.7))}
+
+/* Cartões da biblioteca: cada jogo com a sua cor */
+.arcade-library-art>span{filter:drop-shadow(0 6px 14px rgba(0,0,0,.45));animation:nxLibFloat 3s ease-in-out infinite}
+.arcade-library-card:hover .arcade-library-art>span{animation-duration:1.4s}
+.arcade-library-art>i{animation:nxLibTwinkle 2.2s ease-in-out infinite}
+.space-library-card .arcade-library-art{background:radial-gradient(circle at 50% 45%,#5468ff,#1b2a78 62%,#0a1030)}
+.quiz-library-card .arcade-library-art{background:radial-gradient(circle at 50% 45%,#a56bff,#552ba5 62%,#190d40)}
+.flap-library-card .arcade-library-art{background:radial-gradient(circle at 50% 45%,#ff8fc2,#b83b86 62%,#431038)}
+.arcade-extra-card .arcade-library-art{background:radial-gradient(circle at 50% 45%,#3fd7c0,#1a8590 62%,#08303a)}
+.arcade-library-art:after{
+  content:"";position:absolute;inset:0;pointer-events:none;
+  background:linear-gradient(115deg,transparent 35%,rgba(255,255,255,.12) 50%,transparent 65%);
+  transform:translateX(-120%);transition:transform .7s ease;
+}
+.arcade-library-card:hover .arcade-library-art:after{transform:translateX(120%)}
+
+.arcade-library-tag{
+  position:absolute;top:10px;left:10px;z-index:2;
+  padding:3px 10px;border-radius:999px;
+  border:1px solid rgba(255,230,150,.7);
+  background:linear-gradient(100deg,rgba(255,196,70,.85),rgba(255,130,60,.85));
+  color:#2a1500;font-size:9px;font-style:normal;font-weight:900;letter-spacing:.1em;
+  box-shadow:0 0 16px rgba(255,170,60,.5);
+}
+.arcade-library-play{box-shadow:0 8px 22px rgba(90,110,255,.4),inset 0 1px 0 rgba(255,255,255,.28)}
+
+@keyframes nxLibFloat{0%,100%{transform:translateY(0)}50%{transform:translateY(-6px)}}
+@keyframes nxLibTwinkle{0%,100%{opacity:.4;transform:scale(.85)}50%{opacity:1;transform:scale(1.2)}}
+
+/* Seletor de modo do Space Nexus */
+.space-mode-picker>b{color:#c9bcff;letter-spacing:.16em}
+.space-mode-picker button{border-radius:14px;transition:transform .18s,border-color .2s,background .2s,box-shadow .2s}
+.space-mode-picker button:hover{transform:translateY(-2px);border-color:rgba(155,123,255,.6)}
+.space-mode-picker button.active{
+  border-color:rgba(160,140,255,.9);
+  background:linear-gradient(160deg,rgba(143,107,255,.3),rgba(63,224,245,.16));
+  box-shadow:0 0 0 1px rgba(155,123,255,.4),0 0 26px rgba(120,90,255,.35);
+}
+
+/* Painel superior do jogo */
+.space-nexus-hud{border-radius:16px;box-shadow:inset 0 1px 0 rgba(255,255,255,.05)}
+.space-wave-pill{box-shadow:0 0 16px rgba(80,200,240,.25)}
+
+/* Tela inicial / fim de jogo */
+.space-overlay h3{
+  background:linear-gradient(95deg,#fff 20%,#cdbfff 60%,#8ff0fb 100%);
+  -webkit-background-clip:text;background-clip:text;color:transparent;
+  filter:drop-shadow(0 0 18px rgba(130,110,255,.55));
+  animation:nxTitleIn .6s cubic-bezier(.2,.8,.2,1) both;
+}
+.space-overlay .primary{box-shadow:0 10px 30px rgba(100,100,255,.5),inset 0 1px 0 rgba(255,255,255,.3)}
+.space-result-medal{color:#ffe08a;font-weight:800;text-shadow:0 0 14px rgba(255,200,90,.5)}
+@keyframes nxTitleIn{from{opacity:0;transform:translateY(10px) scale(.96)}to{opacity:1;transform:none}}
+
+@media(prefers-reduced-motion:reduce){
+  .arcade-library-art>span,.arcade-library-art>i,.space-overlay h3{animation:none!important}
+  .arcade-library-art:after{transition:none}
+}

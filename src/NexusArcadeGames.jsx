@@ -2,14 +2,22 @@ import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {Shield,Heart,Timer,Coins,ArrowLeft,ArrowRight,Zap,RefreshCw,Trophy,Swords,Footprints} from 'lucide-react';
 
 const CONFIG={
- 'extra-dungeon':{title:'Dungeon Rush',icon:'DR',tag:'AVENTURA · MASMORRA',desc:'Explore corredores, enfrente criaturas e encontre a saída.',mode:'dungeon'},
- 'extra-gems':{title:'Gem Match',icon:'GM',tag:'PUZZLE · COMBINAÇÃO',desc:'Faça combinações, provoque cascatas e aumente seus combos.',mode:'gems'},
- 'extra-race':{title:'Corrida do Dinheiro',icon:'CR',tag:'ENDLESS RUNNER · CORRIDA',desc:'Corra pela cidade, pule, deslize e troque de pista para sobreviver.',mode:'race'},
- 'extra-defense':{title:'Defesa do Cofrinho',icon:'DC',tag:'DEFESA · PRECISÃO',desc:'Proteja seu cofrinho tocando nos invasores antes que cheguem.',mode:'defense'}
+ 'extra-dungeon':{title:'Dungeon Rush',icon:'🗡️',tag:'AVENTURA · MASMORRA',desc:'Explore corredores, enfrente criaturas e encontre a saída.',mode:'dungeon'},
+ 'extra-gems':{title:'Gem Match',icon:'💎',tag:'PUZZLE · COMBINAÇÃO',desc:'Faça combinações, provoque cascatas e aumente seus combos.',mode:'gems'},
+ 'extra-race':{title:'Corrida do Dinheiro',icon:'🏃',tag:'ENDLESS RUNNER · CORRIDA',desc:'Corra pela cidade, pule, deslize e troque de pista para sobreviver.',mode:'race'},
+ 'extra-defense':{title:'Defesa do Cofrinho',icon:'🛡️',tag:'DEFESA · PRECISÃO',desc:'Construa torres, evolua suas defesas e proteja o núcleo contra 50 invasores.',mode:'defense'}
 };
 const PALETTE=['#48d9ff','#a78bfa','#ff6fae','#ffd166','#65e6a7',' #ff875d'];
 const cleanPalette=PALETTE.map(x=>x.trim());
-const randomBoard=()=>Array.from({length:64},()=>Math.floor(Math.random()*5));
+const TIPS={
+ dungeon:['⚔️ Golpe: ataque o guardião e ganhe energia','🛡️ Defesa antes do golpe dele (a cada 4s) anula o dano','✨ Arcano gasta 35 MP e causa 2 de dano','⌨️ A/D mover · Espaço golpe · K defesa · L arcano · Shift esquiva'],
+ gems:['💎 Troque duas gemas vizinhas para formar 3 ou mais iguais','🔥 Cascatas e combos multiplicam os pontos','🎯 Faça 600 pontos em até 24 jogadas'],
+ race:['🟨 Barreiras amarelas: PULE (↑ ou Espaço)','🟪 Carrinhos roxos: DESLIZE (↓ ou S)','🪙 Moedas dão pontos · ⚡ impulso dobra pontos e ignora obstáculos · 🛡️ escudo protege um impacto'],
+ defense:['➕ Toque nos pontos + para construir torres','🔧 Toque numa torre e use EVOLUIR para fortalecê-la','❄️ Use Pulso Nova e Campo Crio nos momentos críticos']
+};
+const readBest=k=>{try{return Number(window.localStorage.getItem('mf_best_'+k)||0)}catch{return 0}};
+const saveBest=(k,v)=>{try{window.localStorage.setItem('mf_best_'+k,String(v))}catch{}};
+const randomBoard=()=>makeBoard();
 const findMatches=board=>{
  const found=new Set();
  for(let r=0;r<8;r++)for(let c=0;c<8;c++){
@@ -20,6 +28,8 @@ const findMatches=board=>{
  return found;
 };
 const adjacency=(a,b)=>Math.abs(a-b)===8||(Math.abs(a-b)===1&&Math.floor(a/8)===Math.floor(b/8));
+function hasMove(board){for(let i=0;i<64;i++){for(const j of [i+1,i+8]){if(j>63||(j===i+1&&Math.floor(i/8)!==Math.floor(j/8)))continue;const b=[...board];[b[i],b[j]]=[b[j],b[i]];if(findMatches(b).size)return true}}return false}
+function makeBoard(){for(let t=0;t<60;t++){const b=[];for(let i=0;i<64;i++){const r=Math.floor(i/8),c=i%8;let v,guard=0;do{v=Math.floor(Math.random()*5);guard++}while(guard<20&&((c>=2&&b[i-1]===v&&b[i-2]===v)||(r>=2&&b[i-8]===v&&b[i-16]===v)));b.push(v)}if(!findMatches(b).size&&hasMove(b))return b}return Array.from({length:64},(_,i)=>(i+Math.floor(i/8))%5)}
 const STYLE=`
 .nax-td{height:clamp(390px,62vw,550px);border-radius:22px;background:radial-gradient(ellipse at 50% 45%,#214657,#0b1929 72%);box-shadow:inset 0 0 80px #020a14,0 18px 50px #0008}
 .nax-td:before{background-image:linear-gradient(#a2e9ff0a 1px,transparent 1px),linear-gradient(90deg,#a2e9ff0a 1px,transparent 1px);background-size:28px 28px}
@@ -132,12 +142,20 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
  const cfg=CONFIG[gameKey],extraHeart=skills.includes('extra-heart'),coinBoost=skills.includes('coin-boost');
  const [started,setStarted]=useState(false),[finished,setFinished]=useState(false),[score,setScore]=useState(0),[elapsed,setElapsed]=useState(0),[result,setResult]=useState('');
  const [hearts,setHearts]=useState(extraHeart?4:3);
- const [room,setRoom]=useState(1),[enemyHp,setEnemyHp]=useState(3),[guard,setGuard]=useState(false),[dungeonMsg,setDungeonMsg]=useState('Um guardião bloqueia a passagem!'),[heroLane,setHeroLane]=useState(0),[mana,setMana]=useState(100),[dungeonPowerCd,setDungeonPowerCd]=useState(0);
+ const [room,setRoom]=useState(1),[enemyHp,setEnemyHp]=useState(3),[enemyMax,setEnemyMax]=useState(3),[guard,setGuard]=useState(false),[dungeonMsg,setDungeonMsg]=useState('Um guardião bloqueia a passagem!'),[heroLane,setHeroLane]=useState(0),[mana,setMana]=useState(100),[dungeonPowerCd,setDungeonPowerCd]=useState(0);
  const [lane,setLane]=useState(1),[obstacles,setObstacles]=useState([]),[move,setMove]=useState('run'),[distance,setDistance]=useState(0),[runnerBoost,setRunnerBoost]=useState(0),[runnerShield,setRunnerShield]=useState(0);
  const [gems,setGems]=useState(randomBoard),[selected,setSelected]=useState(null),[combo,setCombo]=useState(0),[moves,setMoves]=useState(24),[matched,setMatched]=useState([]);
  const [targets,setTargets]=useState([]);
  const [tdTowers,setTdTowers]=useState([]),[tdEnemies,setTdEnemies]=useState([]),[tdShots,setTdShots]=useState([]),[tdCash,setTdCash]=useState(120),[tdBase,setTdBase]=useState(12),[tdWave,setTdWave]=useState(1),[tdKills,setTdKills]=useState(0),[tdSelected,setTdSelected]=useState(null);
  const tdSpawn=useRef(0),tdId=useRef(1);
+ const [best,setBest]=useState(()=>readBest(gameKey)),[record,setRecord]=useState(false);
+ const bestRef=useRef(best),busyRef=useRef(false),timers=useRef([]),boostRef=useRef(0),actionRef=useRef(null),roomRef=useRef(1);
+ const later=(fn,ms)=>{const id=window.setTimeout(fn,ms);timers.current.push(id)};
+ useEffect(()=>{bestRef.current=best},[best]);
+ useEffect(()=>{const b=readBest(gameKey);setBest(b);bestRef.current=b},[gameKey]);
+ useEffect(()=>()=>timers.current.forEach(window.clearTimeout),[]);
+ useEffect(()=>{roomRef.current=room},[room]);
+ useEffect(()=>{boostRef.current=runnerBoost},[runnerBoost]);
  const [tdAbilityCd,setTdAbilityCd]=useState(0),[tdFreeze,setTdFreeze]=useState(0),[tdTowerType,setTdTowerType]=useState('bolt'),[tdAbility,setTdAbility]=useState('');
  const tdPath=[[8,12],[8,34],[31,34],[31,76],[57,76],[57,22],[81,22],[81,86]];
  const tdSlots=[[18,17],[18,48],[42,20],[43,57],[69,44],[68,88],[91,52],[43,91],[8,62]];
@@ -145,16 +163,16 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
  const touchStart=useRef(null),lastSpawn=useRef(0),gameRef=useRef(null),scoreRef=useRef(score),elapsedRef=useRef(elapsed),lastDungeonAttack=useRef(0);
  useEffect(()=>{scoreRef.current=score},[score]);
  useEffect(()=>{elapsedRef.current=elapsed},[elapsed]);
- const finish=useCallback((finalScore,won,mode)=>{
+ const finish=useCallback((rawScore,won,mode)=>{
   if(gameRef.current?.done)return; if(gameRef.current)gameRef.current.done=true;
-  setFinished(true);setStarted(false);setScore(finalScore);setResult(won?'MISSÃO CONCLUÍDA':'FIM DE JOGO');
+  const finalScore=Math.max(0,Math.round(Number(rawScore)||0));const isRecord=finalScore>bestRef.current&&finalScore>0;if(isRecord){bestRef.current=finalScore;saveBest(gameKey,finalScore);setBest(finalScore)}setRecord(isRecord);setFinished(true);setStarted(false);setScore(finalScore);setResult(won?'MISSÃO CONCLUÍDA':'FIM DE JOGO');
   const xp=Math.min(100,Math.max(0,Math.floor(finalScore*.25)));
   onReward(finalScore,gameKey);onMatch({gameKey,score:finalScore,xpEarned:xp,mode,won:!!won&&finalScore>=10,durationSeconds:elapsedRef.current});
   if(finalScore>=25)void onLoot(gameKey,'coin_pickup');
  },[gameKey,onMatch,onReward,onLoot]);
  const start=()=>{
-  gameRef.current={done:false};setStarted(true);setFinished(false);setScore(0);setElapsed(0);setHearts(extraHeart?4:3);setResult('');
-  lastDungeonAttack.current=0;setRoom(1);setEnemyHp(3);setGuard(false);setDungeonMsg('Um guardião bloqueia a passagem!');setHeroLane(0);setMana(100);setDungeonPowerCd(0);
+  timers.current.forEach(window.clearTimeout);timers.current=[];busyRef.current=false;boostRef.current=0;setRecord(false);gameRef.current={done:false};setStarted(true);setFinished(false);setScore(0);setElapsed(0);setHearts(extraHeart?4:3);setResult('');
+  lastDungeonAttack.current=0;setRoom(1);roomRef.current=1;setEnemyHp(3);setEnemyMax(3);setGuard(false);setDungeonMsg('Um guardião bloqueia a passagem!');setHeroLane(0);setMana(100);setDungeonPowerCd(0);
   setLane(1);setObstacles([]);setMove('run');setDistance(0);setRunnerBoost(0);setRunnerShield(0);lastSpawn.current=0;
   setGems(randomBoard());setSelected(null);setCombo(0);setMoves(24);setMatched([]);setTargets([]);setTdTowers([]);setTdEnemies([]);setTdShots([]);setTdCash(120);setTdBase(12);setTdWave(1);setTdKills(0);setTdSelected(null);setTdAbilityCd(0);setTdFreeze(0);setTdTowerType('bolt');setTdAbility('');tdSpawn.current=0;tdId.current=1;
  };
@@ -166,6 +184,8 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
   const timer=window.setInterval(()=>{
    if(cfg.mode==='defense')tdSpawn.current++;
    setElapsed(v=>v+(cfg.mode==='race'?(lastSpawn.current%4===0?1:0):cfg.mode==='defense'?(tdSpawn.current%10===9?1:0):1));
+   if(cfg.mode==='dungeon'){setDungeonPowerCd(v=>Math.max(0,v-1));setMana(v=>Math.min(100,v+3))}
+   if(cfg.mode==='defense'&&tdSpawn.current%10===0){setTdAbilityCd(v=>Math.max(0,v-1));setTdFreeze(v=>Math.max(0,v-1))}
    if(cfg.mode==='race'){
     setDistance(v=>v+1);
     setObstacles(old=>{
@@ -174,7 +194,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
      return next;
     });
     lastSpawn.current++;
-    setScore(v=>v+0.35);
+    setScore(v=>v+(boostRef.current>0?0.8:0.35));setRunnerBoost(b=>Math.max(0,b-1));
    }
    if(cfg.mode==='defense'){
     setTdEnemies(old=>{
@@ -204,48 +224,65 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
   if(!collision)return;
   setObstacles(old=>old.filter(o=>o.id!==collision.id));
   if(collision.type==='coin'){setScore(v=>v+10*(coinBoost?2:1));void onLoot(gameKey,'coin_pickup')}
-  else if(collision.type==='boost'){setRunnerBoost(45);setScore(v=>v+15)}
-  else if(collision.type==='shield'){setRunnerShield(45);setScore(v=>v+15)}
-  else if(move==='jump'||move==='slide'){setScore(v=>v+5)}
+  else if(collision.type==='boost'){setRunnerBoost(24);setScore(v=>v+15)}
+  else if(collision.type==='shield'){setRunnerShield(1);setScore(v=>v+15)}
+  else if((collision.type==='barrier'&&move==='jump')||(collision.type==='cart'&&move==='slide')){setScore(v=>v+5)}
+  else if(runnerBoost>0){setScore(v=>v+5)}
   else if(runnerShield>0){setRunnerShield(0);setScore(v=>v+8)}else loseLife();
- },[obstacles,lane,started,cfg.mode,move,runnerShield]);
+ },[obstacles,lane,started,cfg.mode,move,runnerShield,runnerBoost]);
  useEffect(()=>{if(started&&cfg.mode==='race'&&elapsed>=45)finish(score,true,'runner-45s')},[elapsed,started,cfg.mode,score,finish]);
  useEffect(()=>{if(started&&cfg.mode==='defense'&&tdKills>=50)finish(score,true,'tower-defense-50')},[tdKills,started,cfg.mode,score,finish]);
  useEffect(()=>{if(!started||cfg.mode!=='race')return;const t=window.setTimeout(()=>setMove('run'),650);return()=>window.clearTimeout(t)},[move,started,cfg.mode]);
+ const clearRoom=()=>{
+  setDungeonMsg('Guardião derrotado! Corredor liberado.');
+  later(()=>{
+   if(roomRef.current>=7){finish(scoreRef.current+56,true,'dungeon-7-salas');return}
+   const hp=2+Math.floor(Math.random()*3)+Math.floor(roomRef.current/3);
+   setEnemyHp(hp);setEnemyMax(hp);setMana(v=>Math.min(100,v+20));setDungeonMsg('Uma nova criatura apareceu!');setRoom(roomRef.current+1);
+  },450);
+ };
  const dungeonAction=action=>{
   if(!started)return;
   if(action==='guard'){setGuard(true);setDungeonMsg('GUARDA PERFEITA · bloqueio preparado');return}
-  if(action==='power'){if(mana<35||dungeonPowerCd>0)return;setMana(v=>v-35);setDungeonPowerCd(5);setEnemyHp(v=>Math.max(0,v-2));setScore(v=>v+18);setDungeonMsg('RAJADA ARCANA · impacto mágico!');window.setTimeout(()=>setDungeonPowerCd(0),5000);return}
+  if(action==='power'){if(mana<35||dungeonPowerCd>0||enemyHp<=0)return;{const hp=Math.max(0,enemyHp-2);setMana(v=>v-35);setDungeonPowerCd(5);setEnemyHp(hp);setScore(v=>v+18);if(hp<=0)clearRoom();else setDungeonMsg('RAJADA ARCANA · impacto mágico!');return}}
   if(action==='left'||action==='right'){setHeroLane(v=>Math.max(-1,Math.min(1,v+(action==='left'?-1:1))));setDungeonMsg('Você reposicionou o personagem.');return}
   if(action==='attack'){
    if(enemyHp<=0)return;
    if(guard){setGuard(false);setDungeonMsg('O ataque foi bloqueado!');return}
    const hp=enemyHp-1;setEnemyHp(hp);setScore(v=>v+8);setMana(v=>Math.min(100,v+5));
-   if(hp<=0){setDungeonMsg('Guardião derrotado! Corredor liberado.');setTimeout(()=>{
-    setRoom(v=>{if(v>=7){finish(score+56,true,'dungeon-7-salas');return v}setEnemyHp(2+Math.floor(Math.random()*3)+Math.floor(room/3));setDungeonMsg('Uma nova criatura apareceu!');return v+1});
-   },450)}else setDungeonMsg('Acertou! Mais '+hp+' golpes para vencer.');
+   if(hp<=0)clearRoom();else setDungeonMsg('Acertou! Mais '+hp+' golpes para vencer.');
   }
   if(action==='dodge'){setGuard(false);setHeroLane(v=>v===0?1:-v);setDungeonMsg('ESQUIVA · reposicionamento rápido!');setScore(v=>v+5);setMana(v=>Math.min(100,v+8))}
  };
+ actionRef.current=dungeonAction;
+ const runChain=(board,chain,total,movesLeft)=>{
+  const hits=findMatches(board);
+  if(!hits.size){
+   const settled=hasMove(board)?board:makeBoard();
+   setGems(settled);setMatched([]);busyRef.current=false;
+   if(total>=600)finish(total,true,'gem-match-600');else if(movesLeft<=0)finish(total,false,'gem-match-moves');
+   return;
+  }
+  setMatched([...hits]);setCombo(chain);
+  const pts=Math.round((hits.size*10+(hits.size>=5?60:hits.size===4?25:0))*(coinBoost?2:1)*(1+(chain-1)*.5));
+  const t=total+pts;setScore(t);
+  later(()=>{
+   const b=[...board];hits.forEach(i=>b[i]=null);
+   for(let c=0;c<8;c++){let write=7;for(let r=7;r>=0;r--){const val=b[r*8+c];if(val!==null){b[write*8+c]=val;if(write!==r)b[r*8+c]=null;write--}}for(let r=write;r>=0;r--)b[r*8+c]=Math.floor(Math.random()*5)}
+   setGems(b);setMatched([]);
+   later(()=>runChain(b,chain+1,t,movesLeft),240);
+  },330);
+ };
  const swapGem=index=>{
-  if(!started||moves<=0||matched.length)return;
+  if(!started||moves<=0||busyRef.current)return;
   if(selected===null){setSelected(index);return}
   if(selected===index){setSelected(null);return}
   if(!adjacency(selected,index)){setSelected(index);return}
   const next=[...gems];[next[selected],next[index]]=[next[index],next[selected]];
-  const hits=findMatches(next);setSelected(null);
-  if(!hits.size){setGems(gems);return}
-  setMoves(v=>v-1);setMatched([...hits]);setCombo(v=>v+1);
-  const points=hits.size*10*(coinBoost?2:1)+(hits.size>=5?60:hits.size===4?25:0),nextScore=score+points;setScore(nextScore);
-  if(nextScore>=600){window.setTimeout(()=>finish(nextScore,true,'gem-match-600'),360);return}
-  window.setTimeout(()=>{
-   const board=[...next];hits.forEach(i=>board[i]=null);
-   for(let c=0;c<8;c++){let write=7;for(let r=7;r>=0;r--){const val=board[r*8+c];if(val!==null){board[write*8+c]=val;if(write!==r)board[r*8+c]=null;write--}}for(let r=write;r>=0;r--)board[r*8+c]=Math.floor(Math.random()*5)}
-   setGems(board);setMatched([]);
-   if(moves<=1){finish(nextScore,false,'gem-match-moves');return}
-   const cascade=findMatches(board);
-   if(cascade.size){setMatched([...cascade]);setScore(v=>v+cascade.size*15);window.setTimeout(()=>{const b=[...board];cascade.forEach(i=>b[i]=Math.floor(Math.random()*5));setGems(b);setMatched([])},300)}
-  },320);
+  setSelected(null);
+  if(!findMatches(next).size)return;
+  busyRef.current=true;setMoves(v=>v-1);setGems(next);setCombo(0);
+  runChain(next,1,scoreRef.current,moves-1);
  };
  const raceKey=key=>{
   if(!started||cfg.mode!=='race')return;
@@ -258,21 +295,28 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
   const handler=e=>{if(['ArrowLeft','a','A'].includes(e.key)){e.preventDefault();raceKey('left')}if(['ArrowRight','d','D'].includes(e.key)){e.preventDefault();raceKey('right')}if(['ArrowUp',' ','w','W'].includes(e.key)){e.preventDefault();raceKey('jump')}if(['ArrowDown','s','S'].includes(e.key)){e.preventDefault();raceKey('slide')}};
   window.addEventListener('keydown',handler);return()=>window.removeEventListener('keydown',handler);
  },[started,cfg.mode]);
+ useEffect(()=>{
+  if(!started||cfg.mode!=='dungeon')return;
+  const handler=e=>{if(/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName||''))return;const k=e.key;let a=null;
+   if(['ArrowLeft','a','A'].includes(k))a='left';else if(['ArrowRight','d','D'].includes(k))a='right';else if([' ','j','J','Enter'].includes(k))a='attack';else if(['k','K','ArrowUp','w','W'].includes(k))a='guard';else if(['l','L'].includes(k))a='power';else if(['Shift','ArrowDown','s','S'].includes(k))a='dodge';
+   if(a){e.preventDefault();actionRef.current?.(a)}};
+  window.addEventListener('keydown',handler);return()=>window.removeEventListener('keydown',handler);
+ },[started,cfg.mode]);
  const tapTarget=id=>{setTargets(old=>old.filter(t=>t.id!==id));setScore(v=>v+10)};
  const tdPlace=(x,y,type=tdTowerType)=>{if(!started)return;const old=tdTowers.find(t=>Math.hypot(t.x-x,t.y-y)<4);if(old){setTdSelected(old.id);return}const cost=type==='arc'?65:type==='frost'?55:40;if(tdCash<cost)return;setTdTowers(v=>[...v,{id:tdId.current++,x,y,level:1,type}]);setTdCash(v=>v-cost);setTdSelected(null)};
- const tdCast=kind=>{if(!started||tdAbilityCd>0||!tdEnemies.length)return;if(kind==='nova'){setTdEnemies(v=>v.map(e=>({...e,hp:e.hp-2.4})));setScore(v=>v+25)}else{setTdFreeze(4);window.setTimeout(()=>setTdFreeze(0),4000)}setTdAbility(kind);setTdAbilityCd(12);window.setTimeout(()=>setTdAbilityCd(0),12000)};
+ const tdCast=kind=>{if(!started||tdAbilityCd>0||!tdEnemies.length)return;if(kind==='nova'){setTdEnemies(v=>v.map(e=>({...e,hp:e.hp-2.4})));setScore(v=>v+25)}else{setTdFreeze(4)}setTdAbility(kind);setTdAbilityCd(12)};
  const tdUpgrade=()=>{const t=tdTowers.find(x=>x.id===tdSelected);if(!t||t.level>=3||tdCash<45*t.level)return;setTdTowers(v=>v.map(x=>x.id===tdSelected?{...x,level:x.level+1}:x));setTdCash(v=>v-45*t.level)};
  if(!cfg)return null;
  return <section className="nax-game">
   <style>{STYLE}</style>
-  <header className="nax-game-head"><div><span>{cfg.tag}</span><h3>{cfg.icon} {cfg.title}</h3><p>{cfg.desc}</p></div><div className="nax-score"><small>PONTUAÇÃO</small><b>{score.toLocaleString('pt-BR')}</b></div></header>
-  <div className="nax-hud"><span><Heart size={15}/> {hearts} vidas</span><span><Timer size={15}/> {cfg.mode==='race'?Math.max(0,45-elapsed)+'s':cfg.mode==='defense'?'Onda '+tdWave+'/5':cfg.mode==='dungeon'?'Sala '+room+'/7':moves+' jogadas'}</span><span><Coins size={15}/> {coinBoost?'Bônus de moedas ativo':'Recompensas por desempenho'}</span></div>
-  {!started&&!finished&&<div className="nax-start"><div className="nax-start-orb">{cfg.icon}</div><h4>Preparado para jogar?</h4><p>{cfg.mode==='dungeon'?'Explore sete salas. Ataque o guardião, defenda-se e desvie dos golpes para avançar.':cfg.mode==='gems'?'Troque gemas vizinhas. Faça combinações de 3 ou mais e provoque cascatas em 24 jogadas.':cfg.mode==='race'?'Desvie nas três pistas, pule barreiras e deslize por baixo dos obstáculos. Sobreviva por 45 segundos.':'Toque nos invasores antes que alcancem o cofrinho. Aguente 30 segundos.'}</p><button onClick={start}>COMEÇAR JOGO <Zap size={16}/></button></div>}
-  {started&&cfg.mode==='dungeon'&&<><div className="nax-arena"><div className="nax-dungeon-scene"><div className="nax-corridor-wall left"/><div className="nax-corridor-wall right"/><div className="nax-corridor-floor"/><div className="nax-floor-lines"/><span className="nax-torch l"/><span className="nax-torch r"/><div className="nax-dungeon-top">MASMORRA NEXUS · SALA {room}/7</div><div className="nax-dungeon-message">{dungeonMsg}</div><div className={'nax-dungeon-foe '+(enemyHp<=0?'hit':'')}><i/><b/><em/></div><div className={'nax-dungeon-hero '+(guard?'guard':'')} style={{left:'calc(50% + '+(heroLane*23)+'px)'}}><i/><b/><em/></div><div style={{position:'absolute',top:'55%',left:'50%',transform:'translateX(-50%)',width:'110px',height:'5px',borderRadius:'9px',background:'#1a142b',border:'1px solid #ffffff33'}}><i style={{display:'block',width:Math.max(0,enemyHp/4*100)+'%',height:'100%',background:'linear-gradient(90deg,#ff4f78,#ffc36a)',borderRadius:'9px'}}/></div></div></div><div className="nax-dungeon-actions"><button onClick={()=>dungeonAction('left')}><ArrowLeft size={16}/> ESQ.</button><button onClick={()=>dungeonAction('attack')}><Swords size={16}/> GOLPE</button><button onClick={()=>dungeonAction('power')} disabled={mana<35||dungeonPowerCd>0}><Zap size={16}/> ARCANO <small>{dungeonPowerCd?dungeonPowerCd+'s':mana+' MP'}</small></button><button onClick={()=>dungeonAction('guard')}><Shield size={16}/> DEFESA</button><button onClick={()=>dungeonAction('dodge')}><Footprints size={16}/> ESQUIVA</button><button onClick={()=>dungeonAction('right')}><ArrowRight size={16}/> DIR.</button></div><div className="nax-dungeon-mana"><span>ENERGIA ARCANA</span><i><b style={{width:mana+'%'}}/></i></div></>}
-  {started&&cfg.mode==='race'&&<><div className="nax-race-stage" onTouchStart={e=>{touchStart.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}} onTouchEnd={e=>{if(!touchStart.current)return;const dx=e.changedTouches[0].clientX-touchStart.current.x,dy=e.changedTouches[0].clientY-touchStart.current.y;if(Math.abs(dx)>25)raceKey(dx>0?'right':'left');else if(Math.abs(dy)>20)raceKey(dy<0?'jump':'slide');touchStart.current=null}}><div className="nax-sun"/><div className="nax-city"/><div className="nax-road"/><div className="nax-road-stripes"/>{obstacles.map(o=><span key={o.id} className={'nax-run-obstacle type-'+o.type} style={{left:(25+o.lane*25)+'%',top:o.y+'%'}}>{o.type==='coin'?'':o.type==='boost'?'':o.type==='shield'?'':''}</span>)}<span className={'nax-run-player '+move+(runnerBoost?' boosted':'')+(runnerShield?' shielded':'')} style={{left:(25+lane*25)+'%'}}><i/><b/><em/></span><div style={{position:'absolute',top:10,left:12,color:'#fff',fontSize:10,fontWeight:900,textShadow:'0 2px 8px #000'}}>DISTÂNCIA {distance*12} M</div></div><div className="nax-race-controls"><button onClick={()=>raceKey('left')}><ArrowLeft/> ESQ.</button><button className="action" onClick={()=>raceKey('jump')}>PULAR</button><button className="action" onClick={()=>raceKey('slide')}>DESLIZAR</button><button onClick={()=>raceKey('right')}>DIR. <ArrowRight/></button></div><div className="nax-runner-powerups"><span>IMPULSO {runnerBoost?'ATIVO':'—'}</span><span>ESCUDO {runnerShield?'ATIVO':'—'}</span><span>DISTÂNCIA {distance*12} M</span></div><div className="nax-gem-help">No celular: deslize para os lados, para cima (pular) ou para baixo (deslizar). No teclado: setas ou WASD.</div></>}
-  {started&&cfg.mode==='gems'&&<><div className="nax-combo">{combo>1?'COMBO x'+combo:'ENCONTRE COMBINAÇÕES DE 3+'}</div><div className="nax-gem-wrap"><div className="nax-gem-side"><div className="nax-gem-stat"><small>JOGADAS</small><b>{moves}</b></div><div className="nax-gem-stat"><small>COMBO</small><b>x{combo||1}</b></div><div className="nax-gem-stat"><small>META</small><b>600</b></div></div><div className="nax-gem-board">{gems.map((gem,i)=><button key={i} onClick={()=>swapGem(i)} className={(selected===i?'selected ':'')+(matched.includes(i)?'matched':'')} style={{'--gem':cleanPalette[gem]}} aria-label={'Gema '+(i+1)}/>)}</div><div className="nax-gem-side"><div className="nax-gem-stat"><small>PONTOS</small><b>{score}</b></div><div className="nax-gem-stat"><small>PEÇAS</small><b>64</b></div></div></div><div className="nax-gem-help">Toque em uma gema e depois em uma vizinha para trocar. Combinações maiores valem mais!</div></>}
+  <header className="nax-game-head"><div><span>{cfg.tag}</span><h3>{cfg.icon} {cfg.title}</h3><p>{cfg.desc}</p></div><div className="nax-score"><small>PONTUAÇÃO</small><b>{Math.floor(score).toLocaleString('pt-BR')}</b></div></header>
+  <div className="nax-hud"><span><Heart size={15}/> {cfg.mode==='defense'?'Núcleo '+tdBase+'/12':cfg.mode==='gems'?'Meta: 600 pontos':hearts+' vidas'}</span><span><Timer size={15}/> {cfg.mode==='race'?Math.max(0,45-elapsed)+'s':cfg.mode==='defense'?'Onda '+tdWave+'/5':cfg.mode==='dungeon'?'Sala '+room+'/7':moves+' jogadas'}</span><span><Coins size={15}/> {coinBoost?'Bônus de moedas ativo':'Recompensas por desempenho'}</span><span><Trophy size={15}/> Recorde {best.toLocaleString('pt-BR')}</span></div>
+  {!started&&!finished&&<div className="nax-start"><div className="nax-start-orb">{cfg.icon}</div><h4>Preparado para jogar?</h4><p>{cfg.mode==='dungeon'?'Explore sete salas. Ataque o guardião, defenda-se e desvie dos golpes para avançar.':cfg.mode==='gems'?'Troque gemas vizinhas. Faça combinações de 3 ou mais e provoque cascatas em 24 jogadas.':cfg.mode==='race'?'Desvie nas três pistas, pule barreiras e deslize por baixo dos obstáculos. Sobreviva por 45 segundos.':'Construa torres nos pontos +, evolua as defesas e use habilidades. Elimine 50 invasores antes que o núcleo caia.'}</p><ul className="nax-tips">{(TIPS[cfg.mode]||[]).map(t=><li key={t}>{t}</li>)}</ul><button onClick={start}>COMEÇAR JOGO <Zap size={16}/></button></div>}
+  {started&&cfg.mode==='dungeon'&&<><div className="nax-arena"><div className="nax-dungeon-scene"><div className="nax-corridor-wall left"/><div className="nax-corridor-wall right"/><div className="nax-corridor-floor"/><div className="nax-floor-lines"/><span className="nax-torch l"/><span className="nax-torch r"/><div className="nax-dungeon-top">MASMORRA NEXUS · SALA {room}/7</div><div className="nax-dungeon-message">{dungeonMsg}</div><div className={'nax-dungeon-foe '+(enemyHp<=0?'hit':'')}><i/><b/><em/></div><div className={'nax-dungeon-hero '+(guard?'guard':'')} style={{left:'calc(50% + '+(heroLane*23)+'px)'}}><i/><b/><em/></div><div style={{position:'absolute',top:'55%',left:'50%',transform:'translateX(-50%)',width:'110px',height:'5px',borderRadius:'9px',background:'#1a142b',border:'1px solid #ffffff33'}}><i style={{display:'block',width:Math.min(100,Math.max(0,enemyHp/enemyMax*100))+'%',height:'100%',background:'linear-gradient(90deg,#ff4f78,#ffc36a)',borderRadius:'9px'}}/></div></div></div><div className="nax-dungeon-actions"><button onClick={()=>dungeonAction('left')}><ArrowLeft size={16}/> ESQ.</button><button onClick={()=>dungeonAction('attack')}><Swords size={16}/> GOLPE</button><button onClick={()=>dungeonAction('power')} disabled={mana<35||dungeonPowerCd>0}><Zap size={16}/> ARCANO <small>{dungeonPowerCd?dungeonPowerCd+'s':mana+' MP'}</small></button><button onClick={()=>dungeonAction('guard')}><Shield size={16}/> DEFESA</button><button onClick={()=>dungeonAction('dodge')}><Footprints size={16}/> ESQUIVA</button><button onClick={()=>dungeonAction('right')}><ArrowRight size={16}/> DIR.</button></div><div className="nax-dungeon-mana"><span>ENERGIA ARCANA</span><i><b style={{width:mana+'%'}}/></i></div></>}
+  {started&&cfg.mode==='race'&&<><div className="nax-race-stage" onTouchStart={e=>{touchStart.current={x:e.touches[0].clientX,y:e.touches[0].clientY}}} onTouchEnd={e=>{if(!touchStart.current)return;const dx=e.changedTouches[0].clientX-touchStart.current.x,dy=e.changedTouches[0].clientY-touchStart.current.y;if(Math.abs(dx)>25)raceKey(dx>0?'right':'left');else if(Math.abs(dy)>20)raceKey(dy<0?'jump':'slide');touchStart.current=null}}><div className="nax-sun"/><div className="nax-city"/><div className="nax-road"/><div className="nax-road-stripes"/>{obstacles.map(o=><span key={o.id} className={'nax-run-obstacle type-'+o.type} style={{left:(25+o.lane*25)+'%',top:o.y+'%'}}>{o.type==='coin'?'':o.type==='boost'?'':o.type==='shield'?'':''}</span>)}<span className={'nax-run-player '+move+(runnerBoost?' boosted':'')+(runnerShield?' shielded':'')} style={{left:(25+lane*25)+'%'}}><i/><b/><em/></span><div style={{position:'absolute',top:10,left:12,color:'#fff',fontSize:10,fontWeight:900,textShadow:'0 2px 8px #000'}}>DISTÂNCIA {distance*12} M</div></div><div className="nax-race-controls"><button onClick={()=>raceKey('left')}><ArrowLeft/> ESQ.</button><button className="action" onClick={()=>raceKey('jump')}>PULAR</button><button className="action" onClick={()=>raceKey('slide')}>DESLIZAR</button><button onClick={()=>raceKey('right')}>DIR. <ArrowRight/></button></div><div className="nax-runner-powerups"><span>IMPULSO {runnerBoost?'ATIVO':'—'}</span><span>ESCUDO {runnerShield?'ATIVO':'—'}</span><span>DISTÂNCIA {distance*12} M</span></div><div className="nax-gem-help">Barreiras amarelas: PULE · Carrinhos roxos: DESLIZE. No celular, deslize pela tela; no teclado, use setas ou WASD.</div></>}
+  {started&&cfg.mode==='gems'&&<><div className="nax-combo">{combo>1?'COMBO x'+combo:'ENCONTRE COMBINAÇÕES DE 3+'}</div><div className="nax-gem-wrap"><div className="nax-gem-side"><div className="nax-gem-stat"><small>JOGADAS</small><b>{moves}</b></div><div className="nax-gem-stat"><small>COMBO</small><b>x{combo||1}</b></div><div className="nax-gem-stat"><small>META</small><b>600</b></div></div><div className="nax-gem-board">{gems.map((gem,i)=><button key={i} onClick={()=>swapGem(i)} className={(selected===i?'selected ':'')+(matched.includes(i)?'matched':'')} style={{'--gem':cleanPalette[gem]}} aria-label={'Gema '+(i+1)}/>)}</div><div className="nax-gem-side"><div className="nax-gem-stat"><small>PONTOS</small><b>{Math.floor(score)}</b></div><div className="nax-gem-stat"><small>PEÇAS</small><b>64</b></div></div></div><div className="nax-gem-help">Toque em uma gema e depois em uma vizinha para trocar. Combinações maiores valem mais!</div></>}
   {started&&cfg.mode==='defense'&&<><div className="nax-td-hud"><span>WAVE {tdWave}/5</span><span>◈ {tdCash} CRÉDITOS</span><span>BASE {tdBase}/12</span><span>ELIMINAÇÕES {tdKills}/50</span></div><div className="nax-td"><div className="td-atmosphere"/><svg className="nax-td-path" viewBox="0 0 100 100" preserveAspectRatio="none"><polyline className="nax-td-pathline" points={tdPath.map(p=>p.join(',')).join(' ')}/><polyline className="nax-td-pathedge" points={tdPath.map(p=>p.join(',')).join(' ')}/>{tdTowers.map(t=><circle key={'range-'+t.id} cx={t.x} cy={t.y} r={t.type==='arc'?27:t.type==='frost'?20:17} fill={t.type==='arc'?'#c58cff':t.type==='frost'?'#71eaff':'#69dfff'} fillOpacity={tdSelected===t.id?'.22':'.09'} stroke={t.type==='arc'?'#d9a8ff':t.type==='frost'?'#8cf2ff':'#8ceaff'} strokeOpacity={tdSelected===t.id?'.9':'.42'} strokeWidth={tdSelected===t.id?'.8':'.35'} strokeDasharray={tdSelected===t.id?'2 1':'1 2'}/>)}{tdShots.map(s=><g key={s.id} className={'nax-td-shot '+s.type}><line x1={s.x1} y1={s.y1} x2={s.x2} y2={s.y2}/><circle cx={s.x2} cy={s.y2} r="1.5"/></g>)}</svg>{tdSlots.map(([x,y],i)=><button key={i} className="nax-td-slot" style={{left:x+'%',top:y+'%'}} onClick={()=>tdPlace(x,y)} aria-label="Construir torre">+</button>)}{tdTowers.map(t=><button key={t.id} className={'nax-td-tower '+t.type+(tdSelected===t.id?' selected':'')} style={{left:t.x+'%',top:t.y+'%'}} onClick={()=>setTdSelected(t.id)} aria-label={'Torre nível '+t.level}><i/><b>{t.level}</b></button>)}{tdEnemies.map(e=>{const p=tdPoint(e.p);return <span key={e.id} className={'nax-td-enemy '+(e.boss?'boss ':'')+(e.type||'')} style={{left:p.x+'%',top:p.y+'%'}}><i/><b><em style={{width:Math.max(0,Math.min(100,e.hp/(1.8+tdWave*.25)*100))+'%'}}/></b></span>})}<div className="nax-td-base"><i/><strong>NEXUS CORE</strong></div>{tdFreeze>0&&<label className="td-freeze-label">CAMPO CRIOGÊNICO ATIVO</label>}</div><div className="nax-td-legend"><span><i/> Alcance das torres</span><span>Toque numa torre para destacar sua área</span></div><div className="td-abilities"><button disabled={tdAbilityCd>0||!tdEnemies.length} onClick={()=>tdCast('nova')}>PULSO NOVA <small>{tdAbilityCd?tdAbilityCd+'s':'DANO EM ÁREA'}</small></button><button disabled={tdAbilityCd>0||!tdEnemies.length} onClick={()=>tdCast('freeze')}>CAMPO CRIO <small>{tdAbilityCd?tdAbilityCd+'s':'CONGELA INIMIGOS'}</small></button></div><div className="nax-td-shop"><button className={tdTowerType==='bolt'?'active':''} onClick={()=>setTdTowerType('bolt')}><i/>CANHÃO<small>40 · equilibrado</small></button><button className={tdTowerType==='arc'?'active':''} onClick={()=>setTdTowerType('arc')}><i/>ARCANO<small>65 · alto dano</small></button><button className={tdTowerType==='frost'?'active':''} onClick={()=>setTdTowerType('frost')}><i/>CRIO<small>55 · controle</small></button><button onClick={tdUpgrade} disabled={!tdSelected||tdCash<45||tdTowers.find(t=>t.id===tdSelected)?.level>=3}>EVOLUIR<small>{tdSelected?'45+ créditos':'selecione torre'}</small></button></div></>}
-  {finished&&<div className="nax-result"><Trophy size={30}/><span>{result}</span><b>{score.toLocaleString('pt-BR')} PTS</b><p>{result==='MISSÃO CONCLUÍDA'?'Boa! Sua evolução foi registrada.':'Cada tentativa ensina um caminho novo. Tente novamente!'}</p><button onClick={start}><RefreshCw size={15}/> JOGAR NOVAMENTE</button></div>}
+  {finished&&<div className="nax-result"><Trophy size={30}/><span>{result}</span><b>{score.toLocaleString('pt-BR')} PTS</b>{record&&<em className="nax-record">NOVO RECORDE!</em>}<p>{result==='MISSÃO CONCLUÍDA'?'Boa! Sua evolução foi registrada.':'Cada tentativa ensina um caminho novo. Tente novamente!'}</p><button onClick={start}><RefreshCw size={15}/> JOGAR NOVAMENTE</button></div>}
   <footer className="nax-game-foot"><Shield size={14}/> {extraHeart?'Proteção extra equipada · ':''}Desafios justos, sem compras obrigatórias. XP sujeito às regras do Arcade.</footer>
  </section>;
 }
