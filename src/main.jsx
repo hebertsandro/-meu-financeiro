@@ -7,6 +7,7 @@ import './phase1-visual-refinement.css';
 import './nexus-player-profile.css';
 import './nexus-motion.css';
 import './nexus-brand.css';
+import './nexus-futuristic.css';
 
 class AppStartupBoundary extends React.Component {
   constructor(props) {
