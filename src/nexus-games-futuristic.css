@@ -1,0 +1,73 @@
+/* NEXUS FUTURISTA — jogos, competição e progressão.
+   Só altera brilho, borda, sombra e transições. Não muda layout nem regras dos jogos. */
+
+/* Destaques do topo das telas de jogos e competição */
+.games-welcome,.game-world-hero,.nc-hero,.nc-season-banner,.quiz-hero{
+  box-shadow:0 0 0 1px rgba(155,123,255,.3),0 20px 60px rgba(100,70,240,.26),inset 0 1px 0 rgba(255,255,255,.07);
+}
+.games-welcome-xp,.nc-hero-xp,.xp-header-chip{
+  text-shadow:0 0 16px rgba(63,224,245,.55);
+  font-variant-numeric:tabular-nums;
+}
+.nc-eyebrow,.gamer-section-heading small{color:#5eeaf8;text-shadow:0 0 14px rgba(63,224,245,.45)}
+
+/* Biblioteca de jogos */
+.arcade-library-card{
+  transition:transform .28s cubic-bezier(.2,.8,.2,1),box-shadow .28s cubic-bezier(.2,.8,.2,1),border-color .28s;
+}
+.arcade-library-card:hover{
+  transform:translateY(-4px);
+  border-color:rgba(155,123,255,.55);
+  box-shadow:0 0 0 1px rgba(155,123,255,.35),0 18px 44px rgba(100,70,240,.3);
+}
+.arcade-library-play{
+  background:linear-gradient(100deg,#8f6bff,#4fa8ff 55%,#3fe0f5);
+  box-shadow:0 8px 24px rgba(90,110,255,.4),inset 0 1px 0 rgba(255,255,255,.3);
+  transition:transform .2s,box-shadow .25s,filter .2s;
+}
+.arcade-library-play:hover{transform:translateY(-2px);filter:brightness(1.08);box-shadow:0 12px 32px rgba(90,110,255,.55),inset 0 1px 0 rgba(255,255,255,.35)}
+.arcade-library-play:active{transform:scale(.97)}
+
+/* Palcos dos jogos */
+.space-nexus-arena,.flap-game-stage,.nax-game{
+  box-shadow:0 0 0 1px rgba(110,140,230,.28),0 24px 64px rgba(2,6,20,.55),0 0 80px rgba(100,70,240,.12);
+}
+.space-score-block,.space-lives-block,.nax-score{text-shadow:0 0 14px rgba(63,224,245,.5);font-variant-numeric:tabular-nums}
+.space-overlay{backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+
+/* Respostas e opções do quiz */
+.game-option{transition:border-color .18s,background .18s,box-shadow .2s,transform .18s}
+.game-option:hover:not(:disabled){box-shadow:0 0 0 2px rgba(155,123,255,.16),0 10px 24px rgba(0,0,0,.28);transform:translateX(3px)}
+.game-option.correct{box-shadow:0 0 22px rgba(72,201,154,.28)}
+.game-option.wrong{box-shadow:0 0 22px rgba(237,119,136,.24)}
+
+/* Abas da competição e da progressão */
+.nc-tabs button,.npx-tabs button{transition:background .2s,border-color .2s,color .2s,box-shadow .2s,transform .15s}
+.nc-tabs button:hover,.npx-tabs button:hover{transform:translateY(-1px);border-color:rgba(155,123,255,.5)}
+.nc-tabs button.active,.npx-tabs button.active{box-shadow:0 0 20px rgba(120,90,255,.35)}
+
+/* Cartões de competição, medalhas, loja e habilidades */
+.nc-medal-grid>*,.nc-secret-card,.nc-mastery-card,.nc-challenge-card,.nc-coach-card,
+.npx-shop-grid>*,.npx-skill-grid>*,.level-reward,.reward-hub{
+  transition:transform .26s cubic-bezier(.2,.8,.2,1),box-shadow .26s cubic-bezier(.2,.8,.2,1),border-color .26s;
+}
+.nc-medal-grid>*:hover,.nc-secret-card:hover,.nc-mastery-card:hover,.nc-challenge-card:hover,.nc-coach-card:hover,
+.npx-shop-grid>*:hover,.npx-skill-grid>*:hover,.level-reward:hover,.reward-hub:hover{
+  transform:translateY(-3px);
+  border-color:rgba(155,123,255,.5);
+  box-shadow:0 0 0 1px rgba(155,123,255,.3),0 16px 40px rgba(100,70,240,.24);
+}
+
+/* Ranking */
+.nc-rank-row{transition:background .2s,transform .2s}
+.nc-rank-row:hover{background:rgba(155,123,255,.09);transform:translateX(3px)}
+.nc-rank-position{font-variant-numeric:tabular-nums;text-shadow:0 0 14px rgba(255,210,100,.35)}
+.nc-match-row{transition:background .2s}
+.nc-match-row:hover{background:rgba(63,224,245,.06)}
+
+@media(prefers-reduced-motion:reduce){
+  .arcade-library-card:hover,.arcade-library-play:hover,.game-option:hover,
+  .nc-tabs button:hover,.npx-tabs button:hover,.nc-rank-row:hover,
+  .nc-medal-grid>*:hover,.nc-secret-card:hover,.nc-mastery-card:hover,.nc-challenge-card:hover,.nc-coach-card:hover,
+  .npx-shop-grid>*:hover,.npx-skill-grid>*:hover,.level-reward:hover,.reward-hub:hover{transform:none!important}
+}
