@@ -1,0 +1,100 @@
+/* Space Nexus — estilo cartoon: contorno grosso, cores alegres, movimento "elástico". */
+
+/* Troca o brilho neon dos inimigos por uma sombra suave de desenho animado */
+.space-enemy{filter:drop-shadow(0 3px 0 rgba(10,6,40,.55))!important}
+.space-enemy.brute,.space-enemy.tank,.space-enemy.phantom,.space-enemy.scout,.space-enemy.ufo{filter:drop-shadow(0 3px 0 rgba(10,6,40,.55))!important}
+.space-enemy.phantom{opacity:.95}
+.space-art-enemy.tank-art,.space-art-enemy.phantom-art{filter:none!important}
+.space-art-ship{filter:drop-shadow(0 3px 0 rgba(10,6,40,.6)) drop-shadow(0 0 10px rgba(79,182,255,.5))!important}
+
+/* Tamanhos: o UFO é um pouco mais largo */
+.space-enemy.ufo{width:44px;height:34px}
+
+/* Movimento elástico dos inimigos (cada tipo com um ritmo) */
+.space-enemy .space-art-enemy{transform-origin:50% 60%;animation:nxCartoonBob 1.1s ease-in-out infinite}
+.space-enemy.scout .space-art-enemy{animation-duration:.55s}
+.space-enemy.brute .space-art-enemy{animation:nxCartoonStomp 1.4s ease-in-out infinite}
+.space-enemy.tank .space-art-enemy{animation:nxCartoonStomp 1.7s ease-in-out infinite}
+.space-enemy.phantom .space-art-enemy{animation:nxCartoonFloat 2s ease-in-out infinite}
+.space-enemy.ufo .space-art-enemy{animation:nxCartoonSpin 1.6s ease-in-out infinite}
+.space-enemy.scout{animation:none!important}
+
+@keyframes nxCartoonBob{0%,100%{transform:scale(1,1) translateY(0)}50%{transform:scale(1.07,.93) translateY(2px)}}
+@keyframes nxCartoonStomp{0%,100%{transform:scale(1,1)}40%{transform:scale(.94,1.07)}70%{transform:scale(1.06,.95)}}
+@keyframes nxCartoonFloat{0%,100%{transform:translateY(0) rotate(-3deg)}50%{transform:translateY(-4px) rotate(3deg)}}
+@keyframes nxCartoonSpin{0%,100%{transform:rotate(-6deg)}50%{transform:rotate(6deg) translateY(-2px)}}
+
+/* Barra de vida dos inimigos mais "gordinha" */
+.space-enemy-hp{height:5px!important;border:1.5px solid #1b1140;border-radius:6px!important;max-width:36px!important;bottom:-9px!important;box-shadow:none!important}
+
+/* Chefões */
+.space-boss>.space-art-boss{filter:drop-shadow(0 5px 0 rgba(10,6,40,.55))!important;animation:nxBossBounce 1.8s ease-in-out infinite!important}
+.space-boss.phase-two>.space-art-boss{filter:drop-shadow(0 5px 0 rgba(10,6,40,.55)) saturate(1.5) hue-rotate(-14deg)!important;animation:nxBossRage .28s ease-in-out infinite alternate!important}
+.space-boss b{color:#fff;text-shadow:0 2px 0 #1b1140,0 0 8px rgba(255,255,255,.4);letter-spacing:.06em}
+.space-boss>i{height:11px!important;border:2px solid #1b1140!important;border-radius:12px!important;background:#3a1a5c!important}
+.space-boss>i em{background:linear-gradient(90deg,#ff5c7a,#ffc447)!important}
+@keyframes nxBossBounce{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(5px) scale(1.03,.97)}}
+@keyframes nxBossRage{from{transform:translateX(-2px) rotate(-1.5deg) scale(1.04)}to{transform:translateX(2px) rotate(1.5deg) scale(1.04)}}
+
+/* Tiros com cara de desenho */
+.space-player-shot{width:7px!important;height:20px!important;border:2px solid #1b1140;background:linear-gradient(#fff6a8,#ffd84a)!important;box-shadow:0 0 8px 2px rgba(255,216,74,.7)!important}
+.space-enemy-shot{width:11px!important;height:11px!important;border:2px solid #1b1140;border-radius:50%!important;background:#ff7aa8!important;box-shadow:0 0 8px 2px rgba(255,122,168,.6)!important}
+.space-enemy-shot.boss-shot{width:15px!important;height:15px!important;background:#ffb04d!important;box-shadow:0 0 10px 3px rgba(255,176,77,.7)!important}
+
+/* Power-ups */
+.space-drop{border:2.5px solid #1b1140!important;border-radius:50%!important;width:30px!important;height:30px!important;animation:nxDropBob 1s ease-in-out infinite}
+.space-drop span{font-size:14px!important;color:#1b1140!important;text-shadow:none!important}
+.space-drop-bomb{background:linear-gradient(145deg,#ffd0d0,#ff5c5c 55%,#b3202c)!important;box-shadow:0 0 14px #ff6a6a,0 0 26px #ff3a3a88}
+@keyframes nxDropBob{0%,100%{transform:translate(-50%,-50%) scale(1)}50%{transform:translate(-50%,-56%) scale(1.1)}}
+
+/* Onda de choque da bomba */
+.space-fx.shockwave{
+  width:30px;height:30px;
+  border:6px solid #ffd84a;
+  box-shadow:0 0 30px rgba(255,216,74,.8),inset 0 0 30px rgba(255,216,74,.5);
+  background:transparent;
+  animation:nxShock .7s ease-out forwards;
+}
+@keyframes nxShock{from{transform:translate(-50%,-50%) scale(.3);opacity:1}to{transform:translate(-50%,-50%) scale(26);opacity:0}}
+
+/* Explosões em tons de desenho */
+.space-fx.boom{border:4px solid #1b1140}
+
+/* Banner de onda */
+.space-wave-banner{
+  position:absolute;
+  left:50%;top:38%;
+  z-index:9;
+  padding:8px 22px;
+  border:4px solid #1b1140;
+  border-radius:18px;
+  pointer-events:none;
+  background:linear-gradient(180deg,#ffe27a,#ffb42e);
+  color:#1b1140;
+  font:900 clamp(17px,4vw,24px)/1 inherit;
+  letter-spacing:.06em;
+  white-space:nowrap;
+  box-shadow:0 5px 0 #1b1140;
+  transform:translate(-50%,-50%);
+  animation:nxBanner 1.9s cubic-bezier(.2,.9,.3,1.2) both;
+}
+@keyframes nxBanner{
+  0%{opacity:0;transform:translate(-50%,-50%) scale(.3) rotate(-8deg)}
+  18%{opacity:1;transform:translate(-50%,-50%) scale(1.12) rotate(2deg)}
+  30%{transform:translate(-50%,-50%) scale(1) rotate(0)}
+  80%{opacity:1}
+  100%{opacity:0;transform:translate(-50%,-90%) scale(.95)}
+}
+
+/* Indicadores de power-up ativo */
+.space-buffs{position:absolute;left:10px;bottom:10px;z-index:7;display:flex;flex-direction:column;gap:5px;pointer-events:none}
+.space-buffs span{padding:4px 10px;border:2.5px solid #1b1140;border-radius:12px;background:linear-gradient(180deg,#fff6a8,#ffd84a);color:#1b1140;font-size:10px;font-weight:900;letter-spacing:.05em;box-shadow:0 3px 0 #1b1140;animation:nxBuffPop .3s ease both}
+@keyframes nxBuffPop{from{opacity:0;transform:translateX(-12px) scale(.8)}to{opacity:1;transform:none}}
+
+/* Combo no estilo cartoon */
+.space-combo{border:3px solid #1b1140;box-shadow:0 4px 0 #1b1140!important}
+
+@media(prefers-reduced-motion:reduce){
+  .space-enemy .space-art-enemy,.space-boss>.space-art-boss,.space-drop,.space-buffs span{animation:none!important}
+  .space-wave-banner{animation-duration:.01s!important;animation-delay:1.2s!important}
+}
