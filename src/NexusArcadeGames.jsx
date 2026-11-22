@@ -318,7 +318,7 @@ export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{}
  const tdPlace=(x,y,type=tdTowerType)=>{if(!started)return;const old=tdTowers.find(t=>Math.hypot(t.x-x,t.y-y)<4);if(old){setTdSelected(old.id);return}const cost=type==='arc'?65:type==='frost'?55:40;if(tdCash<cost)return;setTdTowers(v=>[...v,{id:tdId.current++,x,y,level:1,type}]);setTdCash(v=>v-cost);setTdSelected(null)};
  const tdCast=kind=>{if(!started||tdAbilityCd>0||!tdEnemies.length)return;if(kind==='nova'){setTdEnemies(v=>v.map(e=>({...e,hp:e.hp-2.4})));setScore(v=>v+25)}else{setTdFreeze(4)}setTdAbility(kind);setTdAbilityCd(12)};
  const tdAim=t=>{const range=t.type==='arc'?27:t.type==='frost'?20:17;let best=null,bd=1e9;tdEnemies.forEach(e=>{const q=tdPoint(e.p),d=Math.hypot(q.x-t.x,q.y-t.y);if(d<=range&&d<bd){bd=d;best=q}});return best?Math.atan2(best.y-t.y,best.x-t.x)*180/Math.PI:-90};
- const tdHeading=e=>{const a=tdPoint(e.p),b=tdPoint(Math.min(tdPath.length-1,e.p+.05));return Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI-90};
+ const tdHeading=e=>{const a=tdPoint(e.p),b=tdPoint(Math.min(tdPath.length-1,e.p+.05));return Math.atan2(b.y-a.y,b.x-a.x)*180/Math.PI+90};
  const tdSell=()=>{const t=tdTowers.find(x=>x.id===tdSelected);if(!t)return;const base=t.type==='arc'?65:t.type==='frost'?55:40,spent=base+(t.level===2?45:t.level===3?135:0);setTdTowers(v=>v.filter(x=>x.id!==t.id));setTdCash(v=>v+Math.round(spent*.6));setTdSelected(null)};
  const tdUpgrade=()=>{const t=tdTowers.find(x=>x.id===tdSelected);if(!t||t.level>=3||tdCash<45*t.level)return;setTdTowers(v=>v.map(x=>x.id===tdSelected?{...x,level:x.level+1}:x));setTdCash(v=>v-45*t.level)};
  if(!cfg)return null;
