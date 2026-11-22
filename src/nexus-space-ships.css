@@ -36,3 +36,18 @@
 .space-nova-btn:disabled{cursor:default}
 @keyframes nxNovaReady{to{transform:scale(1.06)}}
 @media(prefers-reduced-motion:reduce){.eng,.space-enemy.kamikaze,.space-nova-btn.ready,.space-hp.low i{animation:none!important}}
+
+/* Defesa do Cofrinho — torres e naves em SVG */
+.nax-game .nax-td-tower{background:radial-gradient(circle,#10243b,#08121f);border:1px solid #8ceaff88;padding:0;overflow:visible}
+.nax-game .nax-td-tower .td-tower-art{width:100%;height:100%;display:block;filter:drop-shadow(0 0 6px #5fe6ff88)}
+.nax-game .nax-td-tower.arc .td-tower-art{filter:drop-shadow(0 0 7px #c58cff)}
+.nax-game .nax-td-tower.frost .td-tower-art{filter:drop-shadow(0 0 7px #7defff)}
+.nax-game .nax-td-enemy{background:none;border:0;box-shadow:none;width:30px;height:30px;font-size:0}
+.nax-game .nax-td-enemy.brute{width:36px;height:36px}.nax-game .nax-td-enemy.boss{width:50px;height:50px;background:none;box-shadow:none}
+.nax-game .nax-td-enemy .td-ship-art{width:100%;height:100%;display:block;filter:drop-shadow(0 0 7px #ff5577aa)}
+.nax-game .nax-td-enemy>b{left:50%;transform:translateX(-50%)}
+.nax-game .nax-td-shop button .td-tower-art{width:34px;height:34px}
+.td-core-hp{display:block;width:60px;height:5px;margin-top:3px;border-radius:5px;overflow:hidden;background:#07121f;border:1px solid #6fe3ff88}
+.td-core-hp em{display:block;height:100%;background:linear-gradient(90deg,#ff5a6a,#5ff0ff);transition:width .3s}
+.nax-td-shop{grid-template-columns:repeat(5,1fr)}
+@media(max-width:560px){.nax-td-shop{grid-template-columns:repeat(2,1fr)}}
