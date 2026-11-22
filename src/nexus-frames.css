@@ -1,0 +1,51 @@
+/* Molduras estilo cartoon: contorno grosso, anel colorido com degradê, brilho e um enfeite em cada uma.
+   Carregado por último para sobrepor as camadas antigas. */
+.frame-violet{--f1:#ecd9ff;--f2:#a463ff;--f3:#4b1d9a;--orn:"✨";--r:34%}
+.frame-cyan{--f1:#dcfdff;--f2:#35d6ee;--f3:#0b5f86;--orn:"💎";--r:50%}
+.frame-gold{--f1:#fff6c9;--f2:#ffc233;--f3:#a85f0c;--orn:"👑";--r:50%}
+.frame-ruby{--f1:#ffd9e4;--f2:#ff4d78;--f3:#8c0f36;--orn:"🔥";--r:46% 46% 50% 50% / 56% 56% 44% 44%}
+.frame-chrome{--f1:#ffffff;--f2:#9fb4d8;--f3:#4a5b82;--orn:"⭐";--r:50%}
+.frame-neon{--f1:#e2fff2;--f2:#2bf2b0;--f3:#0a6d78;--orn:"⚡";--r:30%}
+.frame-prism{--f1:#fff;--f2:#c9a6ff;--f3:#5b3fd0;--orn:"🌈";--r:50%}
+
+/* Avatares */
+:is(.player-avatar,.profile-avatar-button).frame-violet,:is(.player-avatar,.profile-avatar-button).frame-cyan,:is(.player-avatar,.profile-avatar-button).frame-gold,
+:is(.player-avatar,.profile-avatar-button).frame-ruby,:is(.player-avatar,.profile-avatar-button).frame-chrome,:is(.player-avatar,.profile-avatar-button).frame-neon,:is(.player-avatar,.profile-avatar-button).frame-prism{
+ position:relative;overflow:visible!important;
+ border:max(4px,.12em) solid transparent!important;border-radius:var(--r)!important;
+ background:linear-gradient(145deg,#2a3560,#141a38) padding-box,linear-gradient(150deg,var(--f1),var(--f2) 45%,var(--f3)) border-box!important;
+ background-origin:border-box!important;background-clip:padding-box,border-box!important;
+ outline:3px solid #0a0e1f;
+ box-shadow:0 5px 0 #0a0e1f,0 0 20px color-mix(in srgb,var(--f2) 50%,transparent)!important;
+ animation:none!important;
+}
+:is(.player-avatar,.profile-avatar-button).frame-prism{background:linear-gradient(145deg,#2a3560,#141a38) padding-box,conic-gradient(#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a) border-box!important}
+:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism):before{
+ content:""!important;position:absolute!important;inset:0!important;width:auto!important;height:auto!important;border:0!important;border-radius:inherit!important;pointer-events:none;
+ background:radial-gradient(ellipse 62% 26% at 30% 10%,rgba(255,255,255,.5),transparent 72%)!important;box-shadow:none!important;transform:none!important;animation:none!important;opacity:1!important}
+:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism):after{
+ content:var(--orn)!important;display:block!important;position:absolute!important;top:-14%!important;right:-12%!important;left:auto!important;bottom:auto!important;
+ width:auto!important;height:auto!important;border:0!important;background:none!important;box-shadow:none!important;
+ font-size:.8em;line-height:1;transform:rotate(14deg)!important;filter:drop-shadow(0 2px 0 #0a0e1f) drop-shadow(0 0 6px #0006);animation:nxFrameBob 2.6s ease-in-out infinite!important}
+:is(.player-avatar,.profile-avatar-button).frame-gold:after{top:-30%!important;right:auto!important;left:50%!important;transform:translateX(-50%) rotate(-6deg)!important}
+:is(.player-avatar,.profile-avatar-button).frame-ruby:after{top:auto!important;right:-12%!important;bottom:-12%!important}
+:is(.player-avatar,.profile-avatar-button).frame-chrome:after{top:-16%!important;right:auto!important;left:-12%!important}
+@keyframes nxFrameBob{0%,100%{translate:0 0}50%{translate:0 -3px}}
+
+/* Avatares pequenos do feed */
+.nxf-avatar:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism),
+.nxf-compose-avatar:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism){
+ border:3px solid var(--f2)!important;outline:2px solid #0a0e1f;box-shadow:0 3px 0 #0a0e1f,0 0 10px color-mix(in srgb,var(--f2) 50%,transparent)!important}
+
+/* Cartão do jogador: anéis empilhados */
+.player-card-frame:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism){
+ box-shadow:0 0 0 3px #0a0e1f,0 0 0 7px var(--f2),0 0 0 10px #0a0e1f,0 0 34px 10px color-mix(in srgb,var(--f2) 38%,transparent),0 20px 40px #0008!important}
+.player-card-frame.frame-prism{box-shadow:0 0 0 3px #0a0e1f,0 0 0 7px #b48cff,0 0 0 10px #0a0e1f,0 0 34px 10px #b48cff55!important}
+
+/* Prévias no seletor de molduras */
+.card-frame-previews .profile-frame-option:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism) i{
+ border:3px solid var(--f2)!important;box-shadow:0 0 0 2px #0a0e1f,0 0 0 5px var(--f2),0 0 0 7px #0a0e1f,0 0 16px color-mix(in srgb,var(--f2) 55%,transparent)!important}
+.profile-frame-option .frame-thumbnail-avatar{margin:8px auto 2px}
+.profile-frame-option.selected{border-color:#fff!important;box-shadow:0 0 0 3px #0a0e1f,0 0 0 5px #fff!important}
+
+@media(prefers-reduced-motion:reduce){:is(.player-avatar,.profile-avatar-button):after{animation:none!important}}
