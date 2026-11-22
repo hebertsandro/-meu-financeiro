@@ -2,6 +2,8 @@ import React,{useEffect,useState} from 'react';
 import {ChevronRight} from 'lucide-react';
 import {ShipArt,EnemyArt,BossArt} from './SpaceNexusArt.jsx';
 
+const Foe=React.memo(function Foe({type,x,y,hp,maxHp}){return <div className={'space-enemy '+type} style={{left:x+'%',top:y+'%'}}><EnemyArt type={type}/><i className="space-enemy-hp" style={{width:(hp/maxHp*100)+'%'}}/></div>});
+const Bolt=React.memo(function Bolt({x,y,cls}){return <i className={cls} style={{left:x+'%',top:y+'%'}}/>});
 export default function SpaceNexusGame({onReward,onMatch,onLoot}){
  const modes={
   easy:{label:'Fácil',waves:10,hp:140,spawn:86,speed:.72,bossHp:1,fire:1.25},
@@ -143,7 +145,7 @@ export default function SpaceNexusGame({onReward,onMatch,onLoot}){
     setWave(g.wave);setMessage('ONDA '+g.wave+' — a ameaça está evoluindo!');
    }
    g.fx=g.fx.filter(f=>n<f.ttl);
-   if(n%2===0){setCombo(g.combo||0);setNova(Math.floor(g.nova||0));setFx([...g.fx]);setBuffs(b=>{const r=n<g.rapidUntil,dd=n<g.doubleUntil;return b.rapid===r&&b.double===dd?b:{rapid:r,double:dd}});setShip(s=>s.x===g.ship.x&&s.y===g.ship.y?s:{...g.ship});setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
+   {setCombo(g.combo||0);setNova(Math.floor(g.nova||0));setFx([...g.fx]);setBuffs(b=>{const r=n<g.rapidUntil,dd=n<g.doubleUntil;return b.rapid===r&&b.double===dd?b:{rapid:r,double:dd}});setShip(s=>s.x===g.ship.x&&s.y===g.ship.y?s:{...g.ship});setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
   }
   };
   raf=requestAnimationFrame(frame);
@@ -154,10 +156,10 @@ export default function SpaceNexusGame({onReward,onMatch,onLoot}){
   <div className="space-nexus-hud"><div className="space-hud-block"><small>SETOR ATUAL</small><span className="space-wave-pill"><i/> ONDA {wave}/{mode==='infinite'?'∞':modes[mode].waves}</span></div><div className="space-score-block"><small>PONTUAÇÃO</small><b>{score.toLocaleString('pt-BR')}</b></div><div className="space-lives-block"><small>INTEGRIDADE</small><span><em className={'space-hp'+(lives<=modes[mode].hp*.3?' low':'')}><i style={{width:Math.max(0,lives/modes[mode].hp*100)+'%'}}/><b>{Math.round(lives)}</b></em></span></div></div>
   <div className="space-nexus-arena" onPointerDown={e=>{if(!running)return;e.currentTarget.setPointerCapture?.(e.pointerId);moveTo(e.clientX,e.clientY,e.currentTarget)}} onPointerMove={e=>{if(!running)return;if(e.pointerType==='touch'||(e.buttons&1))moveTo(e.clientX,e.clientY,e.currentTarget)}}>
    <div className="space-stars"/><div className="space-nebula"/>
-   {foes.map(f=><div key={f.id} className={'space-enemy '+f.type} style={{left:f.x+'%',top:f.y+'%'}}><EnemyArt type={f.type}/><i className="space-enemy-hp" style={{width:(f.hp/f.maxHp*100)+'%'}}/></div>)}
-   {enemyShots.map(b=><i key={b.id} className={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')} style={{left:b.x+'%',top:b.y+'%'}}/>)}
+   {foes.map(f=><Foe key={f.id} type={f.type} x={f.x} y={f.y} hp={f.hp} maxHp={f.maxHp}/>)}
+   {enemyShots.map(b=><Bolt key={b.id} x={b.x} y={b.y} cls={'space-enemy-shot '+(b.kind==='boss'?'boss-shot':'')}/>)}
    {drops.map(d=><div key={d.id} className={'space-drop space-drop-'+d.type} style={{left:d.x+'%',top:d.y+'%'}}><span>{d.type==='loot'?(d.icon||'💎'):d.type==='coin'?'🪙':d.type==='shield'?'S':d.type==='rapid'?'R':d.type==='double'?'×2':d.type==='bomb'?'B':'+'}</span></div>)}
-   {shots.map(b=><i key={b.id} className="space-player-shot" style={{left:b.x+'%',top:b.y+'%'}}/>)}
+   {shots.map(b=><Bolt key={b.id} x={b.x} y={b.y} cls="space-player-shot"/>)}
    {boss&&<div className={'space-boss boss-'+boss.id+' '+(boss.hp<=boss.max*.5?'phase-two':'')} style={{left:boss.x+'%',top:boss.y+'%'}}><BossArt id={boss.id}/><b>{boss.name}</b><small>{boss.hp<=boss.max*.5?'FASE 2 · FÚRIA MÁXIMA':boss.description}</small><i><em style={{width:(boss.hp/boss.max*100)+'%'}}/></i></div>}
    {fx.map(f=><i key={f.id} className={'space-fx '+f.type} style={{left:f.x+'%',top:f.y+'%'}}/>)}
    <div className={'space-player-ship '+(shieldActive?'shielded':'')} style={{left:ship.x+'%',top:ship.y+'%'}}><ShipArt/></div>

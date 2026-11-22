@@ -73,3 +73,13 @@
 /* Botões do painel de controle do Space Nexus */
 .space-nexus-controls .space-pause-btn{display:inline-flex;flex-direction:row;align-items:center;justify-content:center;gap:6px;width:auto;height:auto;min-height:0;padding:7px 13px;font-size:10px;line-height:1.2;white-space:nowrap}
 .space-nexus-controls>span{flex:1 1 180px;font-size:9px;letter-spacing:.08em}
+
+/* Gemas: pedras e bombas */
+.nax-gem-board button.stone{background:radial-gradient(circle at 35% 30%,#b4bdc9,#5d6878 60%,#2a313d)!important;border:2px solid #aab4c4;box-shadow:inset 0 -4px 6px #0007}
+.nax-gem-board button.stone.cracked::before{content:"";position:absolute;inset:18% 28%;background:linear-gradient(115deg,transparent 44%,#111a 46% 54%,transparent 56%);transform:rotate(18deg)}
+.nax-gem-board button.stone::after{content:"🪨";position:absolute;inset:0;display:grid;place-items:center;font-size:15px;opacity:.55}
+.nax-gem-board button.bomb::after{content:"💣";position:absolute;inset:0;display:grid;place-items:center;font-size:16px;animation:nxBombPulse .7s ease-in-out infinite alternate}
+.nax-gem-board button.bomb{box-shadow:0 0 0 2px #fff8,0 0 14px var(--gem)}
+@keyframes nxBombPulse{to{transform:scale(1.25)}}
+.td-stage-banner{top:42%!important;font-size:13px!important;padding:11px 20px!important;letter-spacing:.2em!important;background:linear-gradient(100deg,#4a2fb8cc,#1d7fb0cc)!important}
+.nax-game .nax-td-tower{width:54px!important;height:54px!important}

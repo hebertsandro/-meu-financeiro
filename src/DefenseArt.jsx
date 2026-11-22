@@ -1,20 +1,21 @@
 import React from 'react';
 // Arte SVG da Defesa do Cofrinho: torres e naves inimigas.
-const PAL={bolt:['#9beaff','#287aa0','#e6fbff'],arc:['#f3b4ff','#8844d6','#fff0ff'],frost:['#c8ffff','#2f8fc8','#f2ffff']};
+const PAL={bolt:['#7fe3ff','#1f6f96','#e6fbff','#0a2a40'],arc:['#d79bff','#6a2fc0','#fff0ff','#2a0f4a'],frost:['#a6f4ff','#2b86c4','#f2ffff','#0a2e4a']};
 export function TowerArt({type='bolt',level=1,angle=-90}){
- const [a,b,c]=PAL[type]||PAL.bolt;const id='tw'+type;
+ const [a,b,c,d]=PAL[type]||PAL.bolt;const id='tw'+type;
+ const hex='M24 2 L43 13 L43 35 L24 46 L5 35 L5 13Z';
  return <svg className="td-tower-art" viewBox="0 0 48 48" aria-hidden="true">
-  <defs><radialGradient id={id} cx=".35" cy=".3"><stop stopColor={c}/><stop offset=".45" stopColor={a}/><stop offset="1" stopColor={b}/></radialGradient></defs>
-  <circle cx="24" cy="24" r="21" fill="#0d1f33" stroke={a} strokeWidth="1.6" opacity=".95"/>
-  <circle cx="24" cy="24" r="17" fill="none" stroke={a} strokeWidth=".8" strokeDasharray="3 3" opacity=".6"/>
-  {[0,90,180,270].map(r=><rect key={r} x="21" y="1.5" width="6" height="5" rx="1.5" fill={b} stroke={a} strokeWidth="1" transform={'rotate('+r+' 24 24)'}/>)}
+  <defs><radialGradient id={id} cx=".35" cy=".3"><stop stopColor={c}/><stop offset=".4" stopColor={a}/><stop offset="1" stopColor={b}/></radialGradient><linearGradient id={id+'p'} x1="0" y1="0" x2="1" y2="1"><stop stopColor="#3a5670"/><stop offset="1" stopColor={d}/></linearGradient></defs>
+  <path d={hex} fill={'url(#'+id+'p)'} stroke={a} strokeWidth="2"/>
+  <path d={hex} fill="none" stroke={c} strokeWidth=".8" opacity=".5" transform="translate(24 24) scale(.78) translate(-24 -24)"/>
+  {[[24,5],[41,15],[41,33],[24,43],[7,33],[7,15]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="1.7" fill={a}/>)}
+  {level>=2&&<path d={hex} fill="none" stroke="#ffd86b" strokeWidth="1.6" strokeDasharray="4 3" transform="translate(24 24) scale(1.05) translate(-24 -24)"/>}
   <g transform={'rotate('+(angle+90)+' 24 24)'}>
-   {type==='bolt'&&<><rect x="21.5" y="3" width="5" height="19" rx="2" fill={b} stroke={c} strokeWidth="1.2"/><rect x="19" y="3" width="10" height="5" rx="2" fill={a} stroke={c} strokeWidth="1"/>{level>=2&&<><rect x="15" y="9" width="4" height="12" rx="1.5" fill={b} stroke={c}/><rect x="29" y="9" width="4" height="12" rx="1.5" fill={b} stroke={c}/></>}</>}
-   {type==='arc'&&<><path d="M24 2 L30 20 L24 16 L18 20Z" fill={b} stroke={c} strokeWidth="1.2" strokeLinejoin="round"/><circle cx="24" cy="4" r="3" fill={c}/>{level>=2&&<><path d="M14 8 L18 20 M34 8 L30 20" stroke={a} strokeWidth="2.4" strokeLinecap="round"/><circle cx="14" cy="8" r="2" fill={c}/><circle cx="34" cy="8" r="2" fill={c}/></>}</>}
-   {type==='frost'&&<><path d="M24 2 L28 14 L24 22 L20 14Z" fill={b} stroke={c} strokeWidth="1.2" strokeLinejoin="round"/>{level>=2&&<path d="M12 8 L20 17 M36 8 L28 17" stroke={a} strokeWidth="2.6" strokeLinecap="round"/>}</>}
+   {type==='bolt'&&<><rect x="16" y="9" width="6" height="19" rx="2.4" fill={b} stroke={c} strokeWidth="1.2"/><rect x="26" y="9" width="6" height="19" rx="2.4" fill={b} stroke={c} strokeWidth="1.2"/><rect x="15" y="6" width="8" height="5" rx="2" fill={a} stroke={c}/><rect x="25" y="6" width="8" height="5" rx="2" fill={a} stroke={c}/><circle cx="19" cy="5" r="2" fill="#fff"/><circle cx="29" cy="5" r="2" fill="#fff"/>{level>=3&&<rect x="21" y="3" width="6" height="22" rx="2.4" fill={a} stroke={c}/>}</>}
+   {type==='arc'&&<><path d="M24 4 L33 25 L24 29 L15 25Z" fill={b} stroke={c} strokeWidth="1.3" strokeLinejoin="round"/><path d="M11 14 L16 25 M37 14 L32 25" stroke={a} strokeWidth="3" strokeLinecap="round"/><circle cx="11" cy="13" r="3" fill={c} stroke={a}/><circle cx="37" cy="13" r="3" fill={c} stroke={a}/><circle cx="24" cy="6" r="4" fill={c} stroke={a} strokeWidth="1.4"/>{level>=3&&<path d="M24 6 L20 -1 M24 6 L28 -1" stroke="#ffd86b" strokeWidth="2" strokeLinecap="round"/>}</>}
+   {type==='frost'&&<><path d="M24 3 L31 20 L28 30 L20 30 L17 20Z" fill={b} stroke={c} strokeWidth="1.3" strokeLinejoin="round"/><path d="M24 7 L27 19 L24 26 L21 19Z" fill={c} opacity=".85"/><path d="M12 12 L19 22 M36 12 L29 22" stroke={a} strokeWidth="3.4" strokeLinecap="round"/><path d="M12 8 L12 16 M8 12 L16 12" stroke={c} strokeWidth="1.2"/></>}
   </g>
-  <circle cx="24" cy="24" r="8" fill={'url(#'+id+')'} stroke={c} strokeWidth="1.6"/><circle cx="24" cy="24" r="3" fill="#fff" opacity=".9"/>
-  {level>=3&&<circle cx="24" cy="24" r="13" fill="none" stroke="#ffd86b" strokeWidth="1.6" strokeDasharray="5 3"/>}
+  <circle cx="24" cy="25" r="9" fill={d} stroke={a} strokeWidth="1.8"/><circle cx="24" cy="25" r="6" fill={'url(#'+id+')'}/><circle cx="22" cy="23" r="2" fill="#fff" opacity=".9"/>
  </svg>;
 }
 export function EnemyShip({type='scout',boss=false,angle=0}){

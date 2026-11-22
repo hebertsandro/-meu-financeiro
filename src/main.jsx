@@ -14,6 +14,7 @@ import './nexus-space-neon.css';
 import './nexus-space-ships.css';
 import './nexus-library-polish.css';
 import './nexus-arcade-polish.css';
+import './nexus-perf.css';
 
 class AppStartupBoundary extends React.Component {
   constructor(props) {
