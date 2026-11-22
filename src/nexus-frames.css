@@ -33,9 +33,9 @@
  clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%)!important;
  background:linear-gradient(135deg,#fff 0,var(--f1) 22%,var(--f2) 55%,var(--f3) 100%)!important;
  box-shadow:none!important;filter:drop-shadow(0 0 3px var(--f2));transform:none!important;-webkit-mask:none!important;mask:none!important;animation:none!important}
-:is(.player-avatar,.profile-avatar-button).frame-gold:after{top:-.2em!important;right:auto!important;left:calc(50% - .1em)!important}
+:is(.player-avatar,.profile-avatar-button).frame-gold:after,:is(.player-avatar,.profile-avatar-button).frame-chrome:after{top:-.2em!important;right:auto!important;left:50%!important;translate:-50% 0}
 :is(.player-avatar,.profile-avatar-button).frame-ruby:after{top:auto!important;right:-.04em!important;bottom:-.1em!important;transform:rotate(180deg)!important}
-:is(.player-avatar,.profile-avatar-button).frame-chrome:after{top:-.2em!important;right:calc(50% - .1em)!important}
+
 :is(.player-avatar,.profile-avatar-button).frame-prism:after{background:conic-gradient(#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a)!important}
 @keyframes nxFrameSpin{to{--nx-a:360deg}}
 
@@ -55,3 +55,7 @@
 .profile-frame-option .frame-thumbnail-avatar{margin:10px auto 4px}
 
 @media(prefers-reduced-motion:reduce){:is(.player-avatar,.profile-avatar-button):before{animation:none!important}}
+
+/* Prévias do cartão: formas retas, sem inclinação */
+.card-frame-previews .profile-frame-option i{transform:none!important}
+.card-frame-previews .profile-frame-option i:before,.card-frame-previews .profile-frame-option i:after{left:50%!important;translate:none}
