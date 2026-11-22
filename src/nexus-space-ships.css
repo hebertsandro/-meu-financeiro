@@ -51,3 +51,21 @@
 .td-core-hp em{display:block;height:100%;background:linear-gradient(90deg,#ff5a6a,#5ff0ff);transition:width .3s}
 .nax-td-shop{grid-template-columns:repeat(5,1fr)}
 @media(max-width:560px){.nax-td-shop{grid-template-columns:repeat(2,1fr)}}
+
+/* Gemas — arrastar, troca animada, explosão */
+.nax-gem-board button{position:relative;touch-action:none;user-select:none;-webkit-user-select:none}
+.nax-gem-board button.swap{z-index:3;animation:nxGemSwap .19s ease-in-out forwards}
+.nax-gem-board button.bad{z-index:3;animation:nxGemBad .38s ease-in-out}
+@keyframes nxGemSwap{to{transform:translate(calc(var(--sx)*(100% + 9px)),calc(var(--sy)*(100% + 9px)))}}
+@keyframes nxGemBad{40%{transform:translate(calc(var(--sx)*(100% + 9px)),calc(var(--sy)*(100% + 9px)))}100%{transform:none}}
+.nax-gem-board button.matched{z-index:2;animation:nxGemBoomPop .34s ease-in forwards!important;filter:brightness(2)}
+.nax-gem-board button.matched::after{content:"";position:absolute;inset:-40%;border-radius:50%;pointer-events:none;
+ background:radial-gradient(circle,#fff 0,var(--gem) 32%,transparent 68%);animation:nxGemFlash .34s ease-out forwards}
+@keyframes nxGemBoomPop{40%{transform:scale(1.25)}to{transform:scale(.1) rotate(160deg);opacity:0}}
+@keyframes nxGemFlash{from{transform:scale(.3);opacity:1}to{transform:scale(1.7);opacity:0}}
+.nax-gem-board.shake{animation:nxBoardShake .4s linear}
+@keyframes nxBoardShake{20%{transform:translate(-4px,2px)}40%{transform:translate(4px,-2px)}60%{transform:translate(-3px,-2px)}80%{transform:translate(3px,2px)}}
+.gem-pop{position:absolute;left:50%;top:0;z-index:6;transform:translateX(-50%);font-style:normal;font-weight:900;font-size:13px;color:#fff;white-space:nowrap;
+ text-shadow:0 0 8px #ffd25a,0 1px 3px #000;pointer-events:none;animation:nxGemPop .7s ease-out forwards}
+@keyframes nxGemPop{to{transform:translate(-50%,-34px);opacity:0}}
+@media(prefers-reduced-motion:reduce){.nax-gem-board.shake{animation:none}}
