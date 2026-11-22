@@ -94,7 +94,7 @@
 .npx-shop-copy .npx-equip{background:#1c2c48;border:1px solid #3a5280}
 .npx-prev-title{display:grid;justify-items:center;gap:6px}.npx-prev-title span{font-size:34px}
 .npx-prev-title em{font-style:normal;font-size:11px;font-weight:900;padding:4px 12px;border-radius:999px;border:1px solid var(--rc);color:var(--rc);background:#0b1223}
-.npx-prev-ring{display:grid;place-items:center;width:66px;height:66px;border-radius:50%;border:6px solid var(--ring);outline:3px solid #0a0e1f;box-shadow:0 5px 0 #0a0e1f,0 0 22px var(--ring),inset 0 6px 0 #ffffff30;background:#16213a}
+.npx-prev-ring{display:grid;place-items:center;width:66px;height:66px;border-radius:50%;border:3px solid var(--ring);outline:1px solid var(--ring);outline-offset:4px;box-shadow:0 0 22px var(--ring),inset 0 0 14px color-mix(in srgb,var(--ring) 45%,transparent);background:#0b1223}
 .npx-prev-ring i{font-style:normal;font-size:28px}
 @media(max-width:600px){.npx-hub{padding:12px}.npx-head h3{font-size:18px}.npx-featured{grid-template-columns:84px 1fr}.npx-node{width:84px}.npx-node b{font-size:9px}}
 @media(prefers-reduced-motion:reduce){.npx-cell .npx-node.available .npx-node-ico{animation:none}}

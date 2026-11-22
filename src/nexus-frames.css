@@ -1,51 +1,56 @@
-/* Molduras estilo cartoon: contorno grosso, anel colorido com degradê, brilho e um enfeite em cada uma.
+/* Molduras futuristas: anel neon com degradê, arco de luz giratório, contorno duplo e gema em losango.
    Carregado por último para sobrepor as camadas antigas. */
-.frame-violet{--f1:#ecd9ff;--f2:#a463ff;--f3:#4b1d9a;--orn:"✨";--r:34%}
-.frame-cyan{--f1:#dcfdff;--f2:#35d6ee;--f3:#0b5f86;--orn:"💎";--r:50%}
-.frame-gold{--f1:#fff6c9;--f2:#ffc233;--f3:#a85f0c;--orn:"👑";--r:50%}
-.frame-ruby{--f1:#ffd9e4;--f2:#ff4d78;--f3:#8c0f36;--orn:"🔥";--r:46% 46% 50% 50% / 56% 56% 44% 44%}
-.frame-chrome{--f1:#ffffff;--f2:#9fb4d8;--f3:#4a5b82;--orn:"⭐";--r:50%}
-.frame-neon{--f1:#e2fff2;--f2:#2bf2b0;--f3:#0a6d78;--orn:"⚡";--r:30%}
-.frame-prism{--f1:#fff;--f2:#c9a6ff;--f3:#5b3fd0;--orn:"🌈";--r:50%}
+@property --nx-a{syntax:"<angle>";inherits:false;initial-value:0deg}
+.frame-violet{--f1:#e4ccff;--f2:#a463ff;--f3:#3a1a85;--r:30% 10% 30% 10%}
+.frame-cyan{--f1:#d9ffff;--f2:#35d6ee;--f3:#0a4f80;--r:50%}
+.frame-gold{--f1:#fff3c2;--f2:#f5b82e;--f3:#8a5208;--r:32% 32% 50% 50%}
+.frame-ruby{--f1:#ffd4e0;--f2:#ff4d78;--f3:#7a0b30;--r:12% 36% 12% 36%}
+.frame-chrome{--f1:#ffffff;--f2:#9fb4d8;--f3:#3f5078;--r:50% 50% 22% 22%}
+.frame-neon{--f1:#d9fff0;--f2:#2bf2b0;--f3:#0a5f6a;--r:26%}
+.frame-prism{--f1:#fff;--f2:#c9a6ff;--f3:#5b3fd0;--r:50%}
 
 /* Avatares */
-:is(.player-avatar,.profile-avatar-button).frame-violet,:is(.player-avatar,.profile-avatar-button).frame-cyan,:is(.player-avatar,.profile-avatar-button).frame-gold,
-:is(.player-avatar,.profile-avatar-button).frame-ruby,:is(.player-avatar,.profile-avatar-button).frame-chrome,:is(.player-avatar,.profile-avatar-button).frame-neon,:is(.player-avatar,.profile-avatar-button).frame-prism{
+:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism){
  position:relative;overflow:visible!important;
- border:max(4px,.12em) solid transparent!important;border-radius:var(--r)!important;
- background:linear-gradient(145deg,#2a3560,#141a38) padding-box,linear-gradient(150deg,var(--f1),var(--f2) 45%,var(--f3)) border-box!important;
+ border:max(3px,.07em) solid transparent!important;border-radius:var(--r)!important;
+ background:linear-gradient(150deg,#1d2850,#0c1128) padding-box,linear-gradient(150deg,var(--f1),var(--f2) 40%,var(--f3)) border-box!important;
  background-origin:border-box!important;background-clip:padding-box,border-box!important;
- outline:3px solid #0a0e1f;
- box-shadow:0 5px 0 #0a0e1f,0 0 20px color-mix(in srgb,var(--f2) 50%,transparent)!important;
- animation:none!important;
+ outline:1px solid color-mix(in srgb,var(--f2) 70%,transparent);outline-offset:4px;
+ box-shadow:0 0 0 2px #070b1c,0 0 18px color-mix(in srgb,var(--f2) 55%,transparent),inset 0 0 12px color-mix(in srgb,var(--f2) 25%,transparent)!important;
+ transform:none!important;animation:none!important;
 }
-:is(.player-avatar,.profile-avatar-button).frame-prism{background:linear-gradient(145deg,#2a3560,#141a38) padding-box,conic-gradient(#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a) border-box!important}
+:is(.player-avatar,.profile-avatar-button).frame-prism{background:linear-gradient(150deg,#1d2850,#0c1128) padding-box,conic-gradient(#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a) border-box!important}
+/* arco de luz que gira em volta do anel */
 :is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism):before{
- content:""!important;position:absolute!important;inset:0!important;width:auto!important;height:auto!important;border:0!important;border-radius:inherit!important;pointer-events:none;
- background:radial-gradient(ellipse 62% 26% at 30% 10%,rgba(255,255,255,.5),transparent 72%)!important;box-shadow:none!important;transform:none!important;animation:none!important;opacity:1!important}
+ content:""!important;position:absolute!important;inset:-6px!important;width:auto!important;height:auto!important;border:0!important;border-radius:inherit!important;pointer-events:none;
+ padding:2px;background:conic-gradient(from var(--nx-a),transparent 0 68%,var(--f1) 86%,transparent 100%)!important;
+ -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask-composite:exclude;
+ box-shadow:none!important;transform:none!important;opacity:1!important;animation:nxFrameSpin 3.6s linear infinite!important}
+/* gema em losango */
 :is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism):after{
- content:var(--orn)!important;display:block!important;position:absolute!important;top:-14%!important;right:-12%!important;left:auto!important;bottom:auto!important;
- width:auto!important;height:auto!important;border:0!important;background:none!important;box-shadow:none!important;
- font-size:.8em;line-height:1;transform:rotate(14deg)!important;filter:drop-shadow(0 2px 0 #0a0e1f) drop-shadow(0 0 6px #0006);animation:nxFrameBob 2.6s ease-in-out infinite!important}
-:is(.player-avatar,.profile-avatar-button).frame-gold:after{top:-30%!important;right:auto!important;left:50%!important;transform:translateX(-50%) rotate(-6deg)!important}
-:is(.player-avatar,.profile-avatar-button).frame-ruby:after{top:auto!important;right:-12%!important;bottom:-12%!important}
-:is(.player-avatar,.profile-avatar-button).frame-chrome:after{top:-16%!important;right:auto!important;left:-12%!important}
-@keyframes nxFrameBob{0%,100%{translate:0 0}50%{translate:0 -3px}}
+ content:""!important;display:block!important;position:absolute!important;top:-.2em!important;right:-.12em!important;left:auto!important;bottom:auto!important;
+ width:.34em!important;height:.34em!important;border:1px solid #fff9!important;border-radius:3px!important;
+ background:linear-gradient(145deg,var(--f1),var(--f2) 50%,var(--f3))!important;
+ box-shadow:0 0 10px var(--f2),0 0 0 2px #070b1c!important;transform:rotate(45deg)!important;clip-path:none!important;-webkit-mask:none!important;mask:none!important;animation:none!important}
+:is(.player-avatar,.profile-avatar-button).frame-gold:after{top:-.28em!important;right:auto!important;left:calc(50% - .17em)!important}
+:is(.player-avatar,.profile-avatar-button).frame-ruby:after{top:auto!important;right:-.12em!important;bottom:-.12em!important}
+:is(.player-avatar,.profile-avatar-button).frame-chrome:after{top:-.26em!important;right:calc(50% - .17em)!important}
+:is(.player-avatar,.profile-avatar-button).frame-prism:after{background:conic-gradient(#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a)!important}
+@keyframes nxFrameSpin{to{--nx-a:360deg}}
 
 /* Avatares pequenos do feed */
 .nxf-avatar:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism),
 .nxf-compose-avatar:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism){
- border:3px solid var(--f2)!important;outline:2px solid #0a0e1f;box-shadow:0 3px 0 #0a0e1f,0 0 10px color-mix(in srgb,var(--f2) 50%,transparent)!important}
+ border:2px solid var(--f2)!important;outline:none;box-shadow:0 0 0 2px #070b1c,0 0 12px color-mix(in srgb,var(--f2) 60%,transparent)!important}
 
-/* Cartão do jogador: anéis empilhados */
+/* Cartão do jogador: contorno duplo neon */
 .player-card-frame:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism){
- box-shadow:0 0 0 3px #0a0e1f,0 0 0 7px var(--f2),0 0 0 10px #0a0e1f,0 0 34px 10px color-mix(in srgb,var(--f2) 38%,transparent),0 20px 40px #0008!important}
-.player-card-frame.frame-prism{box-shadow:0 0 0 3px #0a0e1f,0 0 0 7px #b48cff,0 0 0 10px #0a0e1f,0 0 34px 10px #b48cff55!important}
+ box-shadow:0 0 0 1px var(--f2),0 0 0 5px #070b1c,0 0 0 6px color-mix(in srgb,var(--f2) 55%,transparent),0 0 36px 6px color-mix(in srgb,var(--f2) 32%,transparent),0 18px 44px #0008!important}
+.player-card-frame.frame-prism{box-shadow:0 0 0 1px #c9a6ff,0 0 0 5px #070b1c,0 0 0 6px #7ee0ff88,0 0 36px 6px #b48cff44!important}
 
-/* Prévias no seletor de molduras */
+/* Prévias no seletor */
 .card-frame-previews .profile-frame-option:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism) i{
- border:3px solid var(--f2)!important;box-shadow:0 0 0 2px #0a0e1f,0 0 0 5px var(--f2),0 0 0 7px #0a0e1f,0 0 16px color-mix(in srgb,var(--f2) 55%,transparent)!important}
-.profile-frame-option .frame-thumbnail-avatar{margin:8px auto 2px}
-.profile-frame-option.selected{border-color:#fff!important;box-shadow:0 0 0 3px #0a0e1f,0 0 0 5px #fff!important}
+ border:2px solid var(--f2)!important;box-shadow:0 0 0 2px #070b1c,0 0 0 3px color-mix(in srgb,var(--f2) 55%,transparent),0 0 16px color-mix(in srgb,var(--f2) 55%,transparent)!important}
+.profile-frame-option .frame-thumbnail-avatar{margin:10px auto 4px}
 
-@media(prefers-reduced-motion:reduce){:is(.player-avatar,.profile-avatar-button):after{animation:none!important}}
+@media(prefers-reduced-motion:reduce){:is(.player-avatar,.profile-avatar-button):before{animation:none!important}}
