@@ -17,6 +17,13 @@ import './nexus-arcade-polish.css';
 import './nexus-perf.css';
 import './nexus-frames.css';
 
+window.addEventListener('vite:preloadError', (event) => {
+  event.preventDefault();
+  try {
+    if (sessionStorage.getItem('mf_chunk_reload') !== '1') { sessionStorage.setItem('mf_chunk_reload', '1'); window.location.reload(); }
+  } catch { window.location.reload(); }
+});
+
 class AppStartupBoundary extends React.Component {
   constructor(props) {
     super(props);

@@ -3,15 +3,23 @@ import { supabase, isConfigured } from './supabase';
 import './nexus-arcade-expansions.css';
 import SpaceNexusGame from './SpaceNexus.jsx';
 import FinanceFlapGame from './FinanceFlap.jsx';
-const NexusSocial = React.lazy(() => import('./NexusSocial'));
-const PlayerPostGrid = React.lazy(() => import('./NexusSocial').then(module => ({ default: module.PlayerPostGrid })));
-const NexusCompetition = React.lazy(() => import('./NexusCompetition'));
-const NexusArcadeGames = React.lazy(() => import('./NexusArcadeGames'));
-const NexusProgression = React.lazy(() => import('./NexusProgression'));
-const PushNotifications = React.lazy(() => import('./PushNotifications'));
-const ReportsChart = React.lazy(() => import('./ReportsChart.jsx'));
-const SalaryCenter = React.lazy(() => import('./SalaryAndReports.jsx').then(module => ({ default: module.SalaryCenter })));
-const ReportsDashboard = React.lazy(() => import('./SalaryAndReports.jsx').then(module => ({ default: module.ReportsDashboard })));
+// Após uma atualização do site, o celular pode ter a versão antiga na memória e pedir um arquivo que mudou.
+// Nesse caso recarregamos uma única vez para pegar a versão nova.
+const lazyRetry = (load) => React.lazy(() => load().then(m => { try { sessionStorage.removeItem('mf_chunk_reload'); } catch {} return m; }).catch(err => {
+  let already = false;
+  try { already = sessionStorage.getItem('mf_chunk_reload') === '1'; sessionStorage.setItem('mf_chunk_reload', '1'); } catch {}
+  if (!already) { window.location.reload(); return new Promise(() => {}); }
+  throw err;
+}));
+const NexusSocial = lazyRetry(() => import('./NexusSocial'));
+const PlayerPostGrid = lazyRetry(() => import('./NexusSocial').then(module => ({ default: module.PlayerPostGrid })));
+const NexusCompetition = lazyRetry(() => import('./NexusCompetition'));
+const NexusArcadeGames = lazyRetry(() => import('./NexusArcadeGames'));
+const NexusProgression = lazyRetry(() => import('./NexusProgression'));
+const PushNotifications = lazyRetry(() => import('./PushNotifications'));
+const ReportsChart = lazyRetry(() => import('./ReportsChart.jsx'));
+const SalaryCenter = lazyRetry(() => import('./SalaryAndReports.jsx').then(module => ({ default: module.SalaryCenter })));
+const ReportsDashboard = lazyRetry(() => import('./SalaryAndReports.jsx').then(module => ({ default: module.ReportsDashboard })));
 import {
   Activity, ArrowLeft, ArrowDownLeft, ArrowUpRight, Bell, CalendarDays, ChartNoAxesCombined, Search, SlidersHorizontal, Power, Flag,
   Check, ChevronRight, CircleDollarSign, CreditCard, LayoutDashboard, LockKeyhole, Pencil, CalendarClock, Bot, Sparkles, Send,
