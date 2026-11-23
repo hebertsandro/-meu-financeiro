@@ -1,4 +1,5 @@
 import React,{useCallback,useEffect,useMemo,useState} from 'react';
+import './nexus-ux-2026.css';
 import './nexus-social-refined.css';
 import './nexus-social-next.css';
 import './nexus-social-premium.css';
