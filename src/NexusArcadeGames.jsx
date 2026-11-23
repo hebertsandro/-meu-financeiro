@@ -1,5 +1,6 @@
 import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {supabase} from './supabase';
+import './nexus-ux-2026.css';
 import {TowerArt,EnemyShip} from './DefenseArt.jsx';
 import {Shield,Heart,Timer,Coins,ArrowLeft,ArrowRight,Zap,RefreshCw,Trophy,Swords,Footprints} from 'lucide-react';
 
