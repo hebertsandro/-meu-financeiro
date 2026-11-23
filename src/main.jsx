@@ -19,6 +19,7 @@ import './nexus-perf.css';
 import './nexus-frames.css';
 import './nexus-games-v2.css';
 import './nexus-v2.css';
+import './nexus-v2b.css';
 
 window.addEventListener('vite:preloadError', (event) => {
   event.preventDefault();

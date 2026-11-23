@@ -1,0 +1,94 @@
+/* NEXUS 2 · camada 2: perfil/central do jogador, publicações, cartões, metas, telas de jogo, abertura */
+:root{--nx-bg:#070b16;--nx-surface:#0f1730;--nx-surface-2:#131d3a;--nx-border:rgba(150,170,255,.14);--nx-text:#eef2ff;--nx-muted:#93a3c8;--nx-accent-a:#8b6bff;--nx-accent-b:#3fd9f0;--nx-ok:#34d399;--nx-warn:#fbbf24;--nx-danger:#fb7185;--nx-radius:18px;--nx-radius-sm:12px}
+
+/* ---------- Abertura ---------- */
+.mf-splash.mf-launch-screen{background:radial-gradient(120% 80% at 50% 0%,#12193a 0%,#070b16 62%)!important}
+.mf-splash.mf-launch-screen:before,.mf-splash.mf-launch-screen:after{opacity:.35!important;border-color:rgba(139,107,255,.12)!important}
+.mf-splash-orbit{border-color:rgba(139,107,255,.16)!important;box-shadow:none!important}
+.mf-splash-orbit-two{border-color:rgba(63,217,240,.14)!important}
+.mf-splash-wordmark{letter-spacing:-.02em!important;animation:nx2Rise .8s .15s cubic-bezier(.2,.8,.2,1) both}
+.mf-splash-wordmark span{background:linear-gradient(95deg,#8b6bff,#3fd9f0)!important;-webkit-background-clip:text!important;background-clip:text!important;-webkit-text-fill-color:transparent!important}
+.mf-splash-progress{width:140px!important;height:2px!important;background:rgba(150,170,255,.14)!important}
+.mf-splash-progress i{background:linear-gradient(90deg,#8b6bff,#3fd9f0)!important;box-shadow:none!important}
+.mf-splash-center small{color:var(--nx-muted)!important;letter-spacing:.18em!important;animation:nx2Rise .8s .3s cubic-bezier(.2,.8,.2,1) both}
+@keyframes nx2Rise{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:none}}
+
+/* ---------- Perfil / Central do jogador ---------- */
+.player-profile-page{max-width:640px;margin:0 auto;display:grid;gap:14px}
+.player-profile-page .game-world-hero,.player-profile-page .player-card-frame{background:linear-gradient(160deg,var(--nx-surface-2),var(--nx-surface))!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;padding:18px!important;box-shadow:0 18px 40px -24px rgba(0,0,0,.7)!important}
+.player-profile-page .world-label{font-size:11px!important;letter-spacing:.16em!important;color:var(--nx-muted)!important;background:none!important;border:0!important}
+.player-profile-page .player-profile-edit-pencil{min-height:40px;border-radius:999px!important;background:rgba(139,107,255,.14)!important;border:1px solid rgba(139,107,255,.35)!important;color:var(--nx-text)!important;padding:0 14px!important;font-size:13px!important}
+.player-profile-page .player-identity{display:flex!important;align-items:center;gap:16px;margin-top:14px}
+.player-profile-page .player-profile-name-row h2{font-size:22px!important;letter-spacing:-.02em;margin:2px 0!important;color:var(--nx-text)!important}
+.player-profile-page .player-profile-rank{font-size:11px!important;font-weight:700;letter-spacing:.14em;color:var(--nx-accent-b)!important;background:none!important;border:0!important;padding:0!important}
+.player-profile-page .player-title-chip{display:inline-flex;margin-top:6px;padding:4px 10px;border-radius:999px;background:rgba(63,217,240,.1)!important;border:1px solid rgba(63,217,240,.28)!important;color:#bdf3fb!important;font-size:12px!important}
+.player-profile-page .player-social-identity b{color:var(--nx-muted)!important;font-weight:600;font-size:14px}
+.player-profile-page .player-profile-stats{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:8px!important;margin-top:16px}
+.player-profile-page .player-profile-stats>div{background:rgba(255,255,255,.035)!important;border:1px solid var(--nx-border)!important;border-radius:14px!important;padding:12px 8px!important;text-align:center;min-width:0}
+.player-profile-page .player-profile-stats b{display:block;font-size:20px!important;color:var(--nx-text)!important}
+.player-profile-page .player-profile-stats span{font-size:11px!important;color:var(--nx-muted)!important;line-height:1.25}
+.player-profile-page .player-xp-track,.player-profile-page .profile-xp-progress{height:6px!important;border-radius:99px!important;background:rgba(150,170,255,.14)!important;overflow:hidden}
+.player-profile-page .player-xp-track i,.player-profile-page .profile-xp-progress i{background:linear-gradient(90deg,var(--nx-accent-a),var(--nx-accent-b))!important;box-shadow:none!important}
+.player-profile-page .profile-career-grid,.player-profile-page .profile-career-stats{display:grid;gap:8px}
+.player-profile-page .profile-career-heading{font-size:13px;letter-spacing:.04em;color:var(--nx-muted)}
+.player-profile-page .profile-honor-chip{border-radius:999px!important;background:rgba(251,191,36,.1)!important;border:1px solid rgba(251,191,36,.3)!important;color:#fde7a6!important;font-size:12px!important}
+.player-profile-page .player-social-bio,.player-profile-page .profile-social-bio{color:var(--nx-muted)!important;font-size:14px;line-height:1.5}
+.profile-editor{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;padding:16px!important}
+.profile-editor input,.profile-editor textarea,.profile-editor select{background:var(--nx-bg)!important;border:1px solid var(--nx-border)!important;border-radius:12px!important;color:var(--nx-text)!important;min-height:44px;font-size:16px!important}
+.profile-edit-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
+
+/* ---------- Perfil público e publicações ---------- */
+.social-public-profile,.social-profile-posts,.player-central-posts{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;padding:16px!important;box-shadow:none!important}
+.social-public-section{border-top:1px solid var(--nx-border);padding-top:14px;margin-top:14px}
+.social-public-section-title,.social-profile-posts-heading{font-size:12px!important;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--nx-muted)!important}
+.social-profile-post-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:6px!important}
+.social-profile-post-tile,.social-profile-text-tile{aspect-ratio:1/1;border-radius:14px!important;overflow:hidden;border:1px solid var(--nx-border)!important;background:var(--nx-surface-2)!important;padding:0;position:relative}
+.social-profile-post-tile img{width:100%;height:100%;object-fit:cover;display:block}
+.social-profile-text-tile{display:grid;place-items:center;padding:8px!important;font-size:12px;line-height:1.35;color:var(--nx-text)!important;text-align:center}
+.social-profile-posts-empty,.social-public-honors-empty{border:1px dashed var(--nx-border)!important;border-radius:16px!important;background:transparent!important;color:var(--nx-muted)!important;padding:22px 14px;text-align:center;font-size:14px}
+.social-profile-post-viewer{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;max-width:min(94vw,520px);overflow:hidden}
+.social-profile-post-caption{color:var(--nx-text)!important;font-size:14px;line-height:1.5;padding:12px 14px}
+.social-profile-post-close{min-width:44px;min-height:44px;border-radius:999px!important;background:rgba(7,11,22,.7)!important;border:1px solid var(--nx-border)!important;color:var(--nx-text)!important}
+.social-profile-modal-backdrop{background:rgba(4,7,16,.78)!important;backdrop-filter:blur(8px)}
+.social-public-honors-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(130px,1fr));gap:8px}
+.social-public-honor{border-radius:14px!important;background:rgba(251,191,36,.08)!important;border:1px solid rgba(251,191,36,.25)!important}
+.social-person{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:16px!important;padding:12px!important;box-shadow:none!important}
+.social-tabs{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none}
+.social-tabs button{min-height:40px;border-radius:999px!important;border:1px solid var(--nx-border)!important;background:transparent!important;color:var(--nx-muted)!important;padding:0 14px;white-space:nowrap}
+.social-tabs button.active,.social-tabs button[aria-selected="true"]{background:linear-gradient(135deg,var(--nx-accent-a),var(--nx-accent-b))!important;color:#06101f!important;border-color:transparent!important;font-weight:700}
+
+/* ---------- Cartões e metas ---------- */
+.finance-item,.nexus-goal-card{background:linear-gradient(160deg,var(--nx-surface-2),var(--nx-surface))!important;border:1px solid var(--nx-border)!important;border-radius:var(--nx-radius)!important;box-shadow:none!important;padding:16px!important}
+.finance-item .item-top,.nexus-goal-card-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.finance-item .progress,.nexus-goal-track,.nexus-vault-progress{height:6px!important;border-radius:99px!important;background:rgba(150,170,255,.14)!important;overflow:hidden}
+.finance-item .progress i,.finance-item .progress span,.nexus-goal-track i,.nexus-vault-progress i{background:linear-gradient(90deg,var(--nx-accent-a),var(--nx-accent-b))!important;border-radius:inherit}
+.finance-item .item-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+.finance-item .item-meta,.nexus-goal-meta{color:var(--nx-muted)!important;font-size:12px}
+.finance-item .item-actions button,.nexus-goal-actions button{min-height:44px;border-radius:12px!important}
+.nexus-goals-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
+.nexus-vault-empty,.nexus-vault-balance{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:var(--nx-radius)!important}
+.simple-row,.history-row{border-bottom:1px solid var(--nx-border)!important}
+
+/* ---------- Dentro dos jogos (quiz, detalhe, recompensas) ---------- */
+.arcade-detail-copy{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:20px!important;padding:16px!important}
+.arcade-detail-glow{opacity:.35!important;filter:blur(40px)}
+.arcade-back-button{min-height:44px;border-radius:999px!important;background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;color:var(--nx-text)!important;padding:0 16px}
+.arcade-chip{border-radius:999px!important;background:rgba(139,107,255,.12)!important;border:1px solid rgba(139,107,255,.3)!important;color:var(--nx-text)!important;font-size:12px}
+.gamer-section-heading span{font-size:11px!important;letter-spacing:.16em!important;color:var(--nx-accent-b)!important}
+.gamer-section-heading h3{font-size:20px!important;letter-spacing:-.02em;color:var(--nx-text)!important}
+.quiz-game{display:grid;gap:12px;max-width:640px;margin:0 auto}
+.quiz-hero,.quiz-start-panel,.quiz-question-panel,.reward-hub{background:linear-gradient(160deg,var(--nx-surface-2),var(--nx-surface))!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;padding:18px!important;box-shadow:none!important}
+.quiz-kicker,.quiz-start-eyebrow{font-size:11px!important;letter-spacing:.16em!important;color:var(--nx-accent-b)!important}
+.quiz-stats-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.quiz-stat-card{background:rgba(255,255,255,.035)!important;border:1px solid var(--nx-border)!important;border-radius:14px!important;padding:12px 8px!important;text-align:center}
+.quiz-progress-line{height:4px!important;border-radius:99px;background:rgba(150,170,255,.14)!important;overflow:hidden}
+.quiz-progress-line i{background:linear-gradient(90deg,var(--nx-accent-a),var(--nx-accent-b))!important}
+.quiz-answer-list{display:grid;gap:8px}
+.quiz-answer-list button{min-height:52px;text-align:left;border-radius:14px!important;background:rgba(255,255,255,.035)!important;border:1px solid var(--nx-border)!important;color:var(--nx-text)!important;padding:12px 14px;font-size:15px;transition:border-color .15s,background .15s}
+.quiz-answer-list button:hover{border-color:rgba(139,107,255,.5)!important}
+.quiz-answer-list button.correct{border-color:var(--nx-ok)!important;background:rgba(52,211,153,.12)!important}
+.quiz-answer-list button.wrong{border-color:var(--nx-danger)!important;background:rgba(251,113,133,.12)!important}
+.quiz-start-button,.quiz-game .primary{min-height:48px;border-radius:14px!important;border:0!important;background:linear-gradient(135deg,var(--nx-accent-a),var(--nx-accent-b))!important;color:#06101f!important;font-weight:700;box-shadow:none!important}
+.quiz-reward-pill,.quiz-category{border-radius:999px!important;background:rgba(63,217,240,.1)!important;border:1px solid rgba(63,217,240,.28)!important;color:#bdf3fb!important;font-size:12px}
+.quiz-feedback{border-radius:14px!important;border:1px solid var(--nx-border)!important;background:rgba(255,255,255,.035)!important}
+@media(prefers-reduced-motion:reduce){.mf-splash-wordmark,.mf-splash-center small{animation:none!important}}
