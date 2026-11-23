@@ -4,6 +4,7 @@ import App from './App.jsx';
 import './styles.css';
 import './salary-reports.css';
 import './phase1-visual-refinement.css';
+import './redesign-2026.css';
 import './nexus-player-profile.css';
 import './nexus-motion.css';
 import './nexus-brand.css';
