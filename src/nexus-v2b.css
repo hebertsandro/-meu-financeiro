@@ -27,8 +27,8 @@
 .player-profile-page .player-profile-stats>div{background:rgba(255,255,255,.035)!important;border:1px solid var(--nx-border)!important;border-radius:14px!important;padding:12px 8px!important;text-align:center;min-width:0}
 .player-profile-page .player-profile-stats b{display:block;font-size:20px!important;color:var(--nx-text)!important}
 .player-profile-page .player-profile-stats span{font-size:11px!important;color:var(--nx-muted)!important;line-height:1.25}
-.player-profile-page .player-xp-track,.player-profile-page .profile-xp-progress{height:6px!important;border-radius:99px!important;background:rgba(150,170,255,.14)!important;overflow:hidden}
-.player-profile-page .player-xp-track i,.player-profile-page .profile-xp-progress i{background:linear-gradient(90deg,var(--nx-accent-a),var(--nx-accent-b))!important;box-shadow:none!important}
+.player-profile-page .player-xp-track{height:6px!important;border-radius:99px!important;background:rgba(150,170,255,.14)!important;overflow:hidden}
+.player-profile-page .player-xp-track i{background:linear-gradient(90deg,var(--nx-accent-a),var(--nx-accent-b))!important;box-shadow:none!important}
 .player-profile-page .profile-career-grid,.player-profile-page .profile-career-stats{display:grid;gap:8px}
 .player-profile-page .profile-career-heading{font-size:13px;letter-spacing:.04em;color:var(--nx-muted)}
 .player-profile-page .profile-honor-chip{border-radius:999px!important;background:rgba(251,191,36,.1)!important;border:1px solid rgba(251,191,36,.3)!important;color:#fde7a6!important;font-size:12px!important}
@@ -38,7 +38,7 @@
 .profile-edit-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px}
 
 /* ---------- Perfil público e publicações ---------- */
-.social-public-profile,.social-profile-posts,.player-central-posts{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;padding:16px!important;box-shadow:none!important}
+.social-public-profile{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;padding:16px!important;box-shadow:none!important}
 .social-public-section{border-top:1px solid var(--nx-border);padding-top:14px;margin-top:14px}
 .social-public-section-title,.social-profile-posts-heading{font-size:12px!important;font-weight:700;letter-spacing:.14em;text-transform:uppercase;color:var(--nx-muted)!important}
 .social-profile-post-grid{display:grid!important;grid-template-columns:repeat(3,1fr)!important;gap:6px!important}
@@ -46,7 +46,8 @@
 .social-profile-post-tile img{width:100%;height:100%;object-fit:cover;display:block}
 .social-profile-text-tile{display:grid;place-items:center;padding:8px!important;font-size:12px;line-height:1.35;color:var(--nx-text)!important;text-align:center}
 .social-profile-posts-empty,.social-public-honors-empty{border:1px dashed var(--nx-border)!important;border-radius:16px!important;background:transparent!important;color:var(--nx-muted)!important;padding:22px 14px;text-align:center;font-size:14px}
-.social-profile-post-viewer{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;max-width:min(94vw,520px);overflow:hidden}
+.social-profile-post-viewer{background:rgba(4,7,16,.82)!important;backdrop-filter:blur(8px)}
+.social-profile-post-viewer article{background:var(--nx-surface)!important;border:1px solid var(--nx-border)!important;border-radius:22px!important;width:min(100%,520px)!important;max-height:88dvh!important}
 .social-profile-post-caption{color:var(--nx-text)!important;font-size:14px;line-height:1.5;padding:12px 14px}
 .social-profile-post-close{min-width:44px;min-height:44px;border-radius:999px!important;background:rgba(7,11,22,.7)!important;border:1px solid var(--nx-border)!important;color:var(--nx-text)!important}
 .social-profile-modal-backdrop{background:rgba(4,7,16,.78)!important;backdrop-filter:blur(8px)}
@@ -92,3 +93,36 @@
 .quiz-reward-pill,.quiz-category{border-radius:999px!important;background:rgba(63,217,240,.1)!important;border:1px solid rgba(63,217,240,.28)!important;color:#bdf3fb!important;font-size:12px}
 .quiz-feedback{border-radius:14px!important;border:1px solid var(--nx-border)!important;background:rgba(255,255,255,.035)!important}
 @media(prefers-reduced-motion:reduce){.mf-splash-wordmark,.mf-splash-center small{animation:none!important}}
+
+/* ---------- Correções (rodada 2) ---------- */
+/* perfil: sem título solto nem espaços gigantes */
+.content:has(.player-profile-page) .page-heading{display:none!important}
+.player-profile-page,.player-profile-page>*{margin-top:0!important;min-height:0!important}
+.player-profile-page{padding-top:4px!important;gap:14px!important}
+.player-profile-page .game-world-hero{margin:0!important}
+.player-profile-page .player-profile-edit-pencil span{display:none}
+.player-profile-page .player-profile-edit-pencil{width:44px;padding:0!important;justify-content:center}
+.player-profile-page .profile-xp-progress{display:grid!important;gap:8px;border-radius:16px!important;padding:14px!important;background:rgba(255,255,255,.035)!important;border:1px solid var(--nx-border)!important;height:auto!important}
+.player-profile-page .profile-xp-progress>div:first-child{display:flex!important;align-items:baseline;justify-content:space-between;gap:10px;text-align:left!important}
+.player-profile-page .profile-xp-progress b{font-size:18px!important;color:var(--nx-text)!important}
+.player-profile-page .profile-xp-progress span{font-size:12px!important;color:var(--nx-muted)!important}
+.player-profile-page .profile-xp-gems{display:flex;gap:6px;justify-content:flex-start}
+.player-profile-page .profile-xp-gems>*{width:22px!important;height:22px!important;border-radius:7px!important}
+/* menu lateral: tudo na paleta violeta/ciano, nada verde */
+.sidebar .brand-accent,.brand .brand-accent,.auth-art .brand-accent{color:var(--nx-accent-b)!important;background:none!important;-webkit-text-fill-color:currentColor!important}
+.sidebar .nav-item svg,.sidebar nav button svg,.sidebar .nav-sub-item svg{color:var(--nx-muted)!important;stroke:currentColor!important;background:none!important;fill:none!important}
+.sidebar .nav-item.active svg,.sidebar nav button.active svg{color:var(--nx-accent-b)!important;background:none!important;fill:none!important}
+.sidebar .nav-item.active,.sidebar nav button.active{background:rgba(139,107,255,.14)!important;border-color:rgba(139,107,255,.32)!important;color:var(--nx-text)!important}
+/* números dos cartões e valores: legíveis e sem verde escuro */
+.finance-item .item-number,.item-number,.item-top strong,.transaction-amount{color:var(--nx-text)!important}
+.finance-item .item-number small,.item-number small{color:var(--nx-muted)!important}
+/* Quanto posso usar por dia */
+.cashflow-coach{display:grid!important;gap:14px!important;padding:18px!important;border-radius:22px!important;border:1px solid var(--nx-border)!important;background:linear-gradient(160deg,var(--nx-surface-2),var(--nx-surface))!important;box-shadow:none!important;font-size:14px!important}
+.cashflow-coach .coach-kicker{display:inline-flex;align-items:center;gap:6px;font-size:11px!important;font-weight:700;letter-spacing:.14em;color:var(--nx-accent-b)!important;text-transform:uppercase}
+.cashflow-coach h3{font-size:20px!important;line-height:1.2!important;letter-spacing:-.02em;color:var(--nx-text)!important;margin:6px 0!important}
+.cashflow-coach p{font-size:14px!important;line-height:1.5!important;color:var(--nx-muted)!important;margin:0!important}
+.cashflow-coach .coach-actions button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 16px;margin-top:12px;border-radius:999px!important;background:rgba(139,107,255,.14)!important;border:1px solid rgba(139,107,255,.35)!important;color:var(--nx-text)!important;font-size:14px!important}
+.cashflow-coach .coach-value{display:grid;gap:4px;padding:14px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid var(--nx-border)}
+.cashflow-coach .coach-value strong{font-size:30px!important;line-height:1;letter-spacing:-.03em;color:var(--nx-text)!important;display:block}
+.cashflow-coach .coach-value small{font-size:12px!important;color:var(--nx-muted)!important;display:block}
+.cashflow-coach .coach-value p{font-size:12px!important;margin-top:6px!important}
