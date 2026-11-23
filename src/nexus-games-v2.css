@@ -1,0 +1,149 @@
+/* NEXUS 2 · biblioteca de jogos, competição, coleção, clã e mundo (mobile-first) */
+.nx2-lib,.nexus-competition{--g-bg:var(--nx-bg,#070b16);--g-s1:var(--nx-surface,#0f1730);--g-s2:var(--nx-surface-2,#131d3a);--g-bd:var(--nx-border,rgba(150,170,255,.14));--g-tx:var(--nx-text,#eef2ff);--g-mu:var(--nx-muted,#93a3c8);--g-a:var(--nx-accent-a,#8b6bff);--g-b:var(--nx-accent-b,#3fd9f0);--g-ok:var(--nx-ok,#34d399);--g-warn:var(--nx-warn,#fbbf24);--g-r:var(--nx-radius,18px);--g-rs:var(--nx-radius-sm,12px)}
+
+/* ---------- Biblioteca ---------- */
+.nx2-lib{display:grid;gap:16px;color:var(--g-tx);padding:2px 0 8px}
+.nx2-lib-head{display:grid;gap:14px}
+.nx2-eyebrow{font-size:12px;letter-spacing:.14em;font-weight:700;color:var(--g-mu)}
+.nx2-lib-title h2{margin:4px 0 0;font-size:30px;line-height:1.1;font-weight:800;letter-spacing:-.02em;color:var(--g-tx)}
+.nx2-level{display:grid;gap:8px;padding:14px 16px;border:1px solid var(--g-bd);border-radius:var(--g-r);background:var(--g-s1)}
+.nx2-level-top{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.nx2-level-top b{font-size:15px;font-variant-numeric:tabular-nums}
+.nx2-level-badge{display:inline-flex;align-items:center;gap:6px;font-size:13px;font-weight:700;color:var(--g-b)}
+.nx2-bar{height:6px;border-radius:99px;background:rgba(150,170,255,.14);overflow:hidden}
+.nx2-bar i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--g-a),var(--g-b));transition:width .25s ease}
+.nx2-level small{font-size:12px;color:var(--g-mu)}
+.nx2-continue{display:flex;align-items:center;gap:14px;width:100%;min-height:76px;padding:14px 16px;text-align:left;color:var(--g-tx);cursor:pointer;border:1px solid rgba(139,107,255,.35);border-radius:var(--g-r);background:linear-gradient(135deg,rgba(139,107,255,.16),rgba(63,217,240,.08)),var(--g-s1);transition:transform .15s ease,border-color .15s ease}
+.nx2-continue:active{transform:scale(.985)}
+.nx2-continue-icon{display:grid;place-items:center;width:48px;height:48px;border-radius:14px;background:rgba(7,11,22,.55);color:var(--g-b);flex:none}
+.nx2-continue-copy{display:grid;gap:2px;min-width:0;flex:1}
+.nx2-continue-copy small{font-size:12px;letter-spacing:.1em;font-weight:700;color:var(--g-mu)}
+.nx2-continue-copy b{font-size:17px;font-weight:700}
+.nx2-continue-copy em{font-style:normal;font-size:13px;color:var(--g-mu);overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nx2-continue-go{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;background:linear-gradient(135deg,var(--g-a),var(--g-b));color:#06101f;flex:none}
+.nx2-cats{display:flex;gap:8px;overflow-x:auto;margin:0 -16px;padding:2px 16px;scrollbar-width:none}
+.nx2-cats::-webkit-scrollbar{display:none}
+.nx2-cats button{flex:none;min-height:44px;padding:0 16px;border-radius:99px;border:1px solid var(--g-bd);background:transparent;color:var(--g-mu);font:600 14px/1 inherit;font-family:inherit;cursor:pointer;transition:background .15s,color .15s,border-color .15s}
+.nx2-cats button.active{background:linear-gradient(135deg,var(--g-a),var(--g-b));border-color:transparent;color:#06101f}
+.nx2-grid{display:grid;gap:12px}
+.nx2-card{position:relative;display:flex;align-items:center;gap:14px;width:100%;min-height:92px;padding:14px;text-align:left;color:var(--g-tx);cursor:pointer;border:1px solid var(--g-bd);border-radius:var(--g-r);background:var(--g-s1);transition:transform .15s ease,border-color .15s ease,background .15s ease}
+.nx2-card:hover{border-color:rgba(139,107,255,.4);background:var(--g-s2)}
+.nx2-card:active{transform:scale(.985)}
+.nx2-card-art{position:relative;display:grid;place-items:center;width:64px;height:64px;border-radius:16px;flex:none;color:#fff;background:linear-gradient(145deg,var(--h1),var(--h2))}
+.nx2-card-art em{position:absolute;left:50%;bottom:-8px;transform:translateX(-50%);display:inline-flex;align-items:center;gap:3px;padding:3px 8px;border-radius:99px;font-style:normal;font-size:11px;font-weight:700;white-space:nowrap;background:var(--g-bg);color:var(--g-b);border:1px solid var(--g-bd)}
+.nx2-card-body{display:grid;gap:3px;min-width:0;flex:1}
+.nx2-card-body>b{font-size:16px;font-weight:700}
+.nx2-card-body>small{font-size:13px;line-height:1.35;color:var(--g-mu)}
+.nx2-card-meta{font-size:12px;color:var(--g-mu);margin-top:3px}
+.nx2-card-meta b{color:var(--g-tx);font-variant-numeric:tabular-nums}
+.nx2-card-go{color:var(--g-mu);flex:none}
+.hue-a{--h1:#5b3df5;--h2:#2aa7f0}.hue-b{--h1:#0f9d8a;--h2:#3fd9a0}.hue-c{--h1:#7a4df0;--h2:#c06bf0}.hue-d{--h1:#e0489a;--h2:#8b6bff}.hue-e{--h1:#2f6df0;--h2:#3fd9f0}
+.nx2-empty{display:flex;align-items:center;justify-content:center;gap:8px;margin:8px 0;padding:24px;border:1px dashed var(--g-bd);border-radius:var(--g-r);color:var(--g-mu);font-size:14px}
+@media(min-width:720px){.nx2-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.nx2-lib-head{grid-template-columns:1fr minmax(260px,340px);align-items:end}.nx2-cats{margin:0;padding:2px 0}}
+
+/* Tela de detalhe do jogo: mais calma */
+.gamer-world .arcade-back-button{min-height:44px!important;border-radius:99px!important;box-shadow:none!important}
+.gamer-world .arcade-detail-cover{min-height:0!important;padding:18px!important;border-radius:var(--nx-radius,18px)!important;box-shadow:none!important}
+.gamer-world .arcade-detail-glow{opacity:.35!important}
+.gamer-world .games-welcome{box-shadow:none!important}
+
+/* ---------- Competição ---------- */
+.nexus-competition{display:grid!important;gap:14px!important;color:var(--g-tx)}
+.nexus-competition .nc-hero{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:12px!important;padding:18px!important;border:1px solid var(--g-bd)!important;border-radius:var(--g-r)!important;background:linear-gradient(135deg,rgba(139,107,255,.14),rgba(63,217,240,.05)),var(--g-s1)!important;box-shadow:none!important}
+.nexus-competition .nc-eyebrow{font-size:12px!important;letter-spacing:.14em!important;color:var(--g-mu)!important;font-weight:700!important}
+.nexus-competition .nc-hero h2{margin:4px 0 4px!important;font-size:28px!important;letter-spacing:-.02em!important}
+.nexus-competition .nc-hero p{font-size:13px!important;color:var(--g-mu)!important;line-height:1.4!important;margin:0!important}
+.nexus-competition .nc-hero-xp{display:grid!important;justify-items:end!important;gap:2px!important;padding:0!important;border:0!important;background:none!important;box-shadow:none!important;color:var(--g-b)!important;flex:none}
+.nexus-competition .nc-hero-xp b{font-size:18px!important;color:var(--g-tx)!important;font-variant-numeric:tabular-nums}
+.nexus-competition .nc-hero-xp small{font-size:12px!important;color:var(--g-mu)!important}
+@media(max-width:520px){.nexus-competition .nc-hero{flex-direction:column!important;align-items:flex-start!important}.nexus-competition .nc-hero-xp{justify-items:start!important;grid-template-columns:auto auto!important;align-items:center!important;gap:2px 8px!important}.nexus-competition .nc-hero-xp small{grid-column:1/-1}}
+.nexus-competition .nc-summary-grid{display:grid!important;grid-template-columns:repeat(2,minmax(0,1fr))!important;gap:10px!important}
+.nexus-competition .nc-summary-grid article{display:grid!important;grid-template-columns:auto 1fr!important;align-items:center!important;gap:2px 10px!important;padding:14px!important;border:1px solid var(--g-bd)!important;border-radius:var(--g-r)!important;background:var(--g-s1)!important;box-shadow:none!important;min-width:0}
+.nexus-competition .nc-summary-grid article svg{grid-row:1/3;width:20px!important;height:20px!important;color:var(--g-b)!important}
+.nexus-competition .nc-summary-grid article span{font-size:12px!important;color:var(--g-mu)!important;letter-spacing:0!important;text-transform:none!important}
+.nexus-competition .nc-summary-grid article b{font-size:22px!important;line-height:1.1!important;font-variant-numeric:tabular-nums}
+.nexus-competition .nc-summary-grid article small{grid-column:1/-1;font-size:12px!important;color:var(--g-mu)!important}
+@media(min-width:760px){.nexus-competition .nc-summary-grid{grid-template-columns:repeat(4,minmax(0,1fr))!important}}
+.nexus-competition .nc-tabs,.nexus-competition .nc-subtabs{display:flex!important;flex-wrap:nowrap!important;gap:8px!important;overflow-x:auto!important;margin:0 -16px!important;padding:2px 16px!important;scrollbar-width:none}
+.nexus-competition .nc-tabs::-webkit-scrollbar,.nexus-competition .nc-subtabs::-webkit-scrollbar{display:none}
+.nexus-competition .nc-tabs button,.nexus-competition .nc-subtabs button{flex:none!important;display:inline-flex!important;align-items:center!important;gap:7px!important;min-height:44px!important;padding:0 16px!important;border-radius:99px!important;border:1px solid var(--g-bd)!important;background:transparent!important;color:var(--g-mu)!important;font-size:14px!important;font-weight:600!important;box-shadow:none!important}
+.nexus-competition .nc-tabs button.active,.nexus-competition .nc-subtabs button.active{background:linear-gradient(135deg,var(--g-a),var(--g-b))!important;border-color:transparent!important;color:#06101f!important}
+.nexus-competition .nc-content-head{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:10px}
+.nexus-competition .nc-content-head>div>span{font-size:12px!important;letter-spacing:.14em!important;color:var(--g-mu)!important}
+.nexus-competition .nc-content-head h3{margin:2px 0 0!important;font-size:20px!important}
+.nexus-competition .nc-content-head>button{display:inline-flex;align-items:center;gap:6px;min-height:44px;padding:0 14px;border-radius:99px;border:1px solid var(--g-bd);background:transparent;color:var(--g-mu);font-size:13px;font-weight:600}
+.nexus-competition .nc-board,.nexus-competition .nc-panel,.nexus-competition .nc-collection{border:1px solid var(--g-bd)!important;border-radius:var(--g-r)!important;background:var(--g-s1)!important;box-shadow:none!important;padding:14px!important}
+.nexus-competition .nc-collection{padding:0!important;border:0!important;background:none!important}
+.nexus-competition .nc-board-caption{font-size:12px!important;letter-spacing:.1em!important;font-weight:700!important;color:var(--g-mu)!important;margin-bottom:10px}
+.nexus-competition .nc-rank-row{display:grid!important;grid-template-columns:32px 40px minmax(0,1fr) auto!important;align-items:center!important;gap:10px!important;min-height:56px;padding:8px 10px!important;border:0!important;border-radius:14px!important;background:transparent!important;box-shadow:none!important}
+.nexus-competition .nc-rank-row+.nc-rank-row{margin-top:2px}
+.nexus-competition .nc-rank-row.is-me{background:rgba(139,107,255,.14)!important;outline:1px solid rgba(139,107,255,.35)}
+.nexus-competition .nc-rank-position{display:grid!important;place-items:center;width:28px;height:28px;border-radius:50%;font-size:13px!important;font-weight:700!important;color:var(--g-mu)!important;font-variant-numeric:tabular-nums}
+.nexus-competition .nc-rank-position.rank-1{background:rgba(251,191,36,.18);color:#fbbf24!important}
+.nexus-competition .nc-rank-position.rank-2{background:rgba(203,213,225,.16);color:#dbe4f3!important}
+.nexus-competition .nc-rank-position.rank-3{background:rgba(251,146,60,.16);color:#fdba74!important}
+.nexus-competition .nc-rank-avatar{display:grid!important;place-items:center;width:40px!important;height:40px!important;border-radius:50%!important;background:var(--g-s2)!important;font-size:18px;overflow:hidden}
+.nexus-competition .nc-rank-player{display:grid;min-width:0}
+.nexus-competition .nc-rank-player b{font-size:14px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nexus-competition .nc-rank-player small,.nexus-competition .nc-rank-score small{font-size:12px!important;color:var(--g-mu)!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nexus-competition .nc-rank-score{display:grid;justify-items:end;text-align:right}
+.nexus-competition .nc-rank-score b{font-size:15px!important;font-variant-numeric:tabular-nums}
+.nexus-competition .nc-my-global-rank{display:flex!important;flex-wrap:wrap;align-items:center;gap:16px!important;padding:14px!important;margin:0 0 10px!important;border:1px solid rgba(139,107,255,.3)!important;border-radius:14px!important;background:rgba(139,107,255,.1)!important;box-shadow:none!important}
+.nexus-competition .nc-my-global-rank small{font-size:12px!important;color:var(--g-mu)!important;letter-spacing:.06em}
+.nexus-competition .nc-my-global-rank b{display:block;font-size:22px!important}
+.nexus-competition .nc-my-global-rank>span{flex-basis:100%;font-size:12px;color:var(--g-mu)}
+.nexus-competition .nc-season-banner{display:flex!important;align-items:center;gap:12px;padding:14px!important;margin-bottom:10px;border:1px solid var(--g-bd)!important;border-radius:14px!important;background:var(--g-s2)!important;box-shadow:none!important}
+.nexus-competition .nc-season-banner>svg{color:var(--g-b);flex:none}
+.nexus-competition .nc-season-banner>div{display:grid;flex:1;min-width:0}
+.nexus-competition .nc-season-banner small{font-size:12px;color:var(--g-mu)}
+.nexus-competition .nc-season-banner>span{flex:none;font-size:12px;font-weight:700;padding:5px 10px;border-radius:99px;background:rgba(63,217,240,.12);color:var(--g-b)}
+.nexus-competition .nc-empty,.nexus-competition .nc-muted{margin:10px 0 0!important;padding:18px 14px;text-align:center;font-size:13px!important;line-height:1.5;color:var(--g-mu)!important;border:1px dashed var(--g-bd);border-radius:14px;background:none!important}
+.nexus-competition .nc-muted{border:0;padding:6px}
+.nexus-competition .nc-loading{display:flex;align-items:center;gap:10px;justify-content:center;padding:22px;color:var(--g-mu);font-size:14px}
+.nexus-competition .nc-error{padding:12px 14px;border-radius:14px;border:1px solid rgba(251,113,133,.35);background:rgba(251,113,133,.1);color:#fda4b4;font-size:13px}
+.nexus-competition .nc-match-row{display:grid!important;grid-template-columns:40px minmax(0,1fr) auto!important;gap:12px!important;align-items:center;padding:12px 4px!important;border:0!important;border-bottom:1px solid var(--g-bd)!important;background:none!important;box-shadow:none!important}
+.nexus-competition .nc-match-row>span{display:grid;place-items:center;width:40px;height:40px;border-radius:12px;background:var(--g-s2);font-size:20px}
+.nexus-competition .nc-match-row small{display:block;font-size:12px;color:var(--g-mu)}
+.nexus-competition .nc-match-score{text-align:right}
+.nexus-competition .nc-match-score b{font-variant-numeric:tabular-nums}
+.nexus-competition .nc-medal-grid,.nexus-competition .nc-mastery-grid,.nexus-competition .nc-secret-grid,.nexus-competition .nc-loot-grid{display:grid!important;grid-template-columns:1fr!important;gap:10px!important}
+@media(min-width:620px){.nexus-competition .nc-medal-grid,.nexus-competition .nc-mastery-grid,.nexus-competition .nc-secret-grid,.nexus-competition .nc-loot-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+.nexus-competition .nc-medal-card,.nexus-competition .nc-mastery-card,.nexus-competition .nc-secret-card,.nexus-competition .nc-loot-item,.nexus-competition .nc-challenge-card,.nexus-competition .nc-coach-card,.nexus-competition .nc-mastery-intro,.nexus-competition .nc-secret-achievements,.nexus-competition .nc-drop-row{border:1px solid var(--g-bd)!important;border-radius:var(--g-r)!important;background:var(--g-s1)!important;box-shadow:none!important}
+.nexus-competition .nc-secret-achievements{padding:14px!important}
+.nexus-competition .nc-secret-card{background:var(--g-s2)!important}
+.nexus-competition .nc-secret-card.unlocked{border-color:rgba(52,211,153,.4)!important}
+.nexus-competition .nc-secret-card>span{display:grid;place-items:center;width:36px;height:36px;color:var(--g-mu)}
+.nexus-competition .nc-mastery-track,.nexus-competition .nc-secret-track{height:6px!important;border-radius:99px!important;background:rgba(150,170,255,.14)!important;overflow:hidden}
+.nexus-competition .nc-mastery-track i,.nexus-competition .nc-secret-track i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,var(--g-a),var(--g-b))!important}
+.nexus-competition .nc-mastery-stats{font-size:12px!important}
+.nexus-competition .nc-mastery-intro{display:flex;gap:12px;align-items:center;padding:16px!important;flex-wrap:wrap}
+.nexus-competition .nc-coach-card>span,.nexus-competition .nc-challenge-status{font-size:12px!important;color:var(--g-b)!important;letter-spacing:.08em}
+.nexus-competition .nc-coach-card p,.nexus-competition .nc-mastery-intro p{font-size:14px!important;line-height:1.5}
+.nexus-competition .nc-coach-card small,.nexus-competition .nc-challenge-card small,.nexus-competition .nc-mastery-intro small,.nexus-competition .nc-medal-card small,.nexus-competition .nc-loot-item small,.nexus-competition .nc-drop-row small{font-size:12px!important;color:var(--g-mu)!important}
+.nexus-competition .nc-challenge-form{display:grid!important;grid-template-columns:1fr!important;gap:12px!important}
+@media(min-width:620px){.nexus-competition .nc-challenge-form{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
+.nexus-competition .nc-challenge-form label{font-size:13px!important}
+.nexus-competition .nc-challenge-form input,.nexus-competition .nc-challenge-form select{min-height:46px!important;border-radius:12px!important;border:1px solid var(--g-bd)!important;background:var(--g-s2)!important;color:var(--g-tx)!important;font-size:16px!important;padding:0 12px!important}
+.nexus-competition .nc-primary{min-height:48px!important;border-radius:14px!important;background:linear-gradient(135deg,var(--g-a),var(--g-b))!important;color:#06101f!important;font-weight:700!important;border:0!important;display:inline-flex;align-items:center;justify-content:center;gap:8px}
+.nexus-competition .nc-challenge-card{display:grid!important;grid-template-columns:1fr!important;gap:10px!important;padding:14px!important}
+.nexus-competition .nc-challenge-scores{justify-content:space-between!important;text-align:left!important}
+.nexus-competition .nc-challenge-winner{color:var(--g-warn)!important;font-size:13px!important}
+.nexus-competition .nc-loot-wallet{display:grid!important;grid-template-columns:1fr 1fr!important;gap:10px!important}
+.nexus-competition .nc-loot-wallet>div{padding:14px!important;border:1px solid var(--g-bd)!important;border-radius:var(--g-r)!important;background:var(--g-s1)!important;box-shadow:none!important}
+.nexus-competition .nc-loot-wallet small{font-size:12px!important;color:var(--g-mu)!important;letter-spacing:.04em}
+.nexus-competition .nc-loot-wallet b{display:flex!important;align-items:center;gap:7px;font-size:20px!important;margin-top:4px}
+.nexus-competition .nc-collection-head h4{display:flex;align-items:center;gap:8px;margin:0 0 4px;font-size:16px}
+.nexus-competition .nc-collection-head small{font-size:12px;color:var(--g-mu)}
+.nexus-competition .nc-footnote{display:flex;align-items:flex-start;gap:8px;padding:4px;font-size:12px;line-height:1.5;color:var(--g-mu)}
+.nexus-competition .nc-footnote svg{flex:none;margin-top:2px}
+.nexus-competition .nc-mp-room,.nexus-competition .nc-mp-landing>*{border-radius:var(--g-r)!important;box-shadow:none!important}
+.nexus-competition button:focus-visible,.nx2-lib button:focus-visible{outline:2px solid var(--g-b);outline-offset:2px}
+
+/* ---------- Clã e Mundo ---------- */
+.nexus-clan-board{--c-bd:var(--nx-border,rgba(150,170,255,.14))}
+.nexus-clan-board .ncb-head,.nexus-clan-board .ncb-composer,.nexus-clan-board .ncb-empty{border-radius:var(--nx-radius,18px)!important;box-shadow:none!important;border-color:var(--c-bd)!important}
+.nexus-clan-board .ncb-tabs button{min-height:44px!important}
+.nexus-clan-board .ncb-kicker{letter-spacing:.14em!important;font-size:12px!important}
+.nexus-world-island{box-shadow:none!important}
+
+@media(prefers-reduced-motion:reduce){.nx2-lib *,.nexus-competition *{transition:none!important;animation-duration:.01ms!important}}

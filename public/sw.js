@@ -6,8 +6,8 @@ self.addEventListener('push',event=>{
     body:data.body||'Você recebeu uma atualização.',
     tag:data.tag||'meu-financeiro',
     data:{url:data.url||'/'},
-    icon:'/favicon.ico',
-    badge:'/favicon.ico',
+    icon:'/apple-touch-icon.png',
+    badge:'/apple-touch-icon.png',
     renotify:true
   }));
 });
