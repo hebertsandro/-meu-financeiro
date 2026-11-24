@@ -126,3 +126,61 @@
 .cashflow-coach .coach-value strong{font-size:30px!important;line-height:1;letter-spacing:-.03em;color:var(--nx-text)!important;display:block}
 .cashflow-coach .coach-value small{font-size:12px!important;color:var(--nx-muted)!important;display:block}
 .cashflow-coach .coach-value p{font-size:12px!important;margin-top:6px!important}
+
+/* ---------- Banner de jogo (rodada 3) ---------- */
+.arcade-detail-cover.arcade-detail-cover{display:grid!important;grid-template-columns:72px 1fr!important;align-items:center!important;gap:16px!important;min-height:0!important;margin:0 0 16px!important;padding:16px!important;border-radius:22px!important;border:1px solid var(--nx-border)!important;box-shadow:none!important;color:var(--nx-text)!important;background:linear-gradient(135deg,#1a2350,#0f1730 70%)!important}
+.arcade-detail-cover.cover-flap{background:linear-gradient(135deg,#3a2a14,#0f1730 70%)!important}
+.arcade-detail-cover.cover-quiz{background:linear-gradient(135deg,#2a1d52,#0f1730 70%)!important}
+.arcade-detail-cover.cover-extra{background:linear-gradient(135deg,#12354a,#0f1730 70%)!important}
+.arcade-detail-cover:before,.arcade-detail-cover:after{display:none!important}
+.arcade-detail-cover .arcade-detail-glow{display:none!important}
+.arcade-detail-cover .arcade-detail-emoji{width:72px!important;height:72px!important;font-size:40px!important;line-height:1!important;display:grid!important;place-items:center;border-radius:20px!important;background:rgba(255,255,255,.07)!important;border:1px solid var(--nx-border)!important;box-shadow:none!important;filter:none!important;margin:0!important;position:static!important;transform:none!important;animation:none!important}
+.arcade-detail-cover .arcade-detail-copy{background:none!important;border:0!important;padding:0!important;max-width:none!important;min-width:0}
+.arcade-detail-cover .arcade-detail-copy>span{display:block;font-size:10px!important;letter-spacing:.14em!important;color:var(--nx-accent-b)!important}
+.arcade-detail-cover .arcade-detail-copy h2{font-size:22px!important;line-height:1.15!important;margin:4px 0!important;letter-spacing:-.02em;color:var(--nx-text)!important}
+.arcade-detail-cover .arcade-detail-copy p{font-size:13px!important;line-height:1.4!important;color:var(--nx-muted)!important;max-width:none!important}
+.arcade-back-button{width:auto!important;justify-content:flex-start;margin-bottom:12px!important;font-size:12px!important;letter-spacing:.08em}
+.gamer-section-heading{display:flex!important;flex-wrap:wrap;align-items:flex-start;justify-content:space-between;gap:10px}
+.gamer-section-heading .arcade-chip{flex:0 0 auto;white-space:nowrap}
+.gamer-section-heading span{white-space:normal!important}
+
+/* ---------- Perfil: título/identidade sem sobreposição ---------- */
+.player-profile-page .player-identity{height:auto!important;flex-wrap:nowrap;padding-bottom:14px!important;margin-bottom:0!important;border-bottom:1px solid var(--nx-border)!important;align-items:flex-start!important}
+.player-profile-page .player-info{min-width:0;display:grid;gap:4px;justify-items:start}
+.player-profile-page .player-title-chip{position:static!important;transform:none!important;margin:2px 0 0!important;width:auto;max-width:100%;letter-spacing:.02em!important;font-size:12px!important;white-space:normal;line-height:1.3}
+.player-profile-page .profile-xp-progress{min-height:0!important}
+.player-profile-page .profile-xp-progress .player-xp-track{margin:4px 0 0!important}
+.player-profile-page .profile-xp-gems{margin-top:2px}
+
+/* ---------- Joias (losangos) ---------- */
+.player-profile-page .profile-xp-gems .gemstone,.gemstone{display:block!important;position:static!important;width:20px!important;height:24px!important;border-radius:0!important;clip-path:polygon(50% 0,100% 36%,50% 100%,0 36%)!important;border:0!important;box-shadow:none!important;filter:drop-shadow(0 0 4px rgba(255,255,255,.25));background:linear-gradient(135deg,#fff 0,#9fb4d8 45%,#3f5078 100%)!important}
+.gemstone.gem-sapphire{background:linear-gradient(135deg,#e6f4ff,#4aa8ff 45%,#1b4fb8)!important}
+.gemstone.gem-amethyst{background:linear-gradient(135deg,#f3e8ff,#a77bff 45%,#5b2fb8)!important}
+.gemstone.gem-ruby{background:linear-gradient(135deg,#ffe6ec,#ff5d7d 45%,#a3153a)!important}
+.gemstone.gem-prism{background:conic-gradient(from 20deg,#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a)!important}
+.player-profile-page .profile-xp-gems{display:flex!important;gap:8px!important;align-items:center;margin-top:4px}
+
+/* ---------- Moldura cromática (4 joias): arco-íris giratório ---------- */
+:is(.player-avatar,.profile-avatar-button).frame-chromatic{
+ background:linear-gradient(150deg,#1d2850,#0c1128) padding-box,conic-gradient(from var(--nx-a,0deg),#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a) border-box!important;
+ box-shadow:0 0 0 1.5px #070b1c,0 0 16px rgba(180,140,255,.45),0 0 28px rgba(89,212,255,.25)!important;outline:1px solid rgba(255,255,255,.35)!important;animation:nxFrameSpin 6s linear infinite!important}
+:is(.player-avatar,.profile-avatar-button).frame-chromatic:before{background:conic-gradient(from var(--nx-a),transparent 0 60%,#fff 84%,transparent 100%)!important}
+:is(.player-avatar,.profile-avatar-button).frame-chromatic:after{background:conic-gradient(#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a)!important;filter:drop-shadow(0 0 4px #fff)!important}
+.player-card-frame.frame-chromatic{
+ border:2px solid transparent!important;
+ background:linear-gradient(160deg,#171f45,#0b1022 70%) padding-box,conic-gradient(from var(--nx-a,0deg),#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a) border-box!important;
+ box-shadow:0 0 0 4px #070b1c,0 0 30px 2px rgba(180,140,255,.28),0 0 50px 6px rgba(89,212,255,.14),0 18px 44px rgba(0,0,0,.55)!important;animation:nxFrameSpin 8s linear infinite!important}
+.player-card-frame.frame-chromatic:before{opacity:.5}
+.nxf-avatar.frame-chromatic,.nxf-compose-avatar.frame-chromatic{background:linear-gradient(150deg,#1d2850,#0c1128) padding-box,conic-gradient(from var(--nx-a,0deg),#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a) border-box!important}
+@media(prefers-reduced-motion:reduce){:is(.player-avatar,.profile-avatar-button).frame-chromatic,.player-card-frame.frame-chromatic{animation:none!important}}
+
+/* ---------- Coleção da loja (editor de perfil) ---------- */
+.nx2-col-list{display:grid;gap:8px;margin-top:8px}
+.nx2-col-item{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid var(--nx-border)}
+.nx2-col-item.on{border-color:rgba(63,217,240,.45);background:rgba(63,217,240,.07)}
+.nx2-col-item i{font-style:normal;font-size:22px;width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:rgba(255,255,255,.05)}
+.nx2-col-item b{display:block;font-size:14px;color:var(--nx-text)}.nx2-col-item small{color:var(--nx-muted);font-size:12px}
+.nx2-col-item button{min-height:40px;padding:0 14px;border-radius:999px;border:1px solid rgba(139,107,255,.4);background:rgba(139,107,255,.14);color:var(--nx-text);font-size:13px}
+.nx2-col-item.on button{border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.1)}
+.social-profile-post-tile img,.social-profile-post-tile video{width:100%;height:100%;object-fit:cover!important;background:none!important}
+.social-profile-post-viewer{z-index:2147483000!important}

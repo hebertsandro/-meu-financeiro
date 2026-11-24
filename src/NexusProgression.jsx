@@ -82,7 +82,7 @@ export default function NexusProgression({userId,gameXp=0,onToast=()=>{}}){
  useEffect(()=>{load()},[load]);
  const act=async(key,fn,label)=>{
   if(busy)return;setBusy(key);setError('');
-  const args=fn==='nexus_progression_unlock_skill'?{skill_key_input:key}:fn==='nexus_progression_claim_pass_reward'?{reward_key_input:key,season_id_input:season?.id}:fn==='nexus_progression_equip'?{item_key_input:key}:{cosmetic_key_input:key};
+  const args=fn==='nexus_progression_unlock_skill'?{skill_key_input:key}:fn==='nexus_progression_claim_pass_reward'?{reward_key_input:key,season_id_input:season?.id}:(fn==='nexus_progression_equip'||fn==='nexus_progression_unequip')?{item_key_input:key}:{cosmetic_key_input:key};
   const {error:e}=await supabase.rpc(fn,args);setBusy('');
   if(e){setError(e.message);return}
   onToast(label||'Progresso NEXUS atualizado!');await load();
@@ -147,7 +147,7 @@ export default function NexusProgression({userId,gameXp=0,onToast=()=>{}}){
     return <article key={p.id} className={'npx-tier '+(claimed?'claimed':ready?'ready':'locked')}>
      <div className="npx-tier-n"><span>{i+1}</span></div>
      <div className="npx-tier-card"><i>{p.icon}</i><small>{p.type.toUpperCase()}</small><b>{p.name}</b><em>{p.xp} XP</em>
-      {claimed?(canEquip?(equipped?<span className="npx-claimed"><Check size={13}/> EQUIPADO</span>:<button disabled={!!busy} onClick={()=>act(p.id,'nexus_progression_equip','Equipado!')}>Equipar</button>):<span className="npx-claimed"><Check size={13}/> RECEBIDO</span>)
+      {claimed?(canEquip?<button disabled={!!busy} onClick={()=>act(p.id,equipped?'nexus_progression_unequip':'nexus_progression_equip',equipped?'Item removido.':'Equipado!')}>{equipped?'Remover':'Equipar'}</button>:<span className="npx-claimed"><Check size={13}/> RECEBIDO</span>)
        :ready?<button className="go" disabled={!!busy} onClick={()=>act(p.id,'nexus_progression_claim_pass_reward','Recompensa resgatada!')}><Gift size={13}/> {busy===p.id?'...':'Resgatar'}</button>
        :<span className="npx-lock"><Lock size={12}/> {Math.max(0,p.xp-seasonXp)} XP</span>}
      </div></article>})}</div>
@@ -166,10 +166,27 @@ export default function NexusProgression({userId,gameXp=0,onToast=()=>{}}){
     return <article key={item.id} className={'npx-shop-item '+(has?'owned':'')} style={{'--rc':RARITY[item.rarity]}}>
      <div className="npx-shop-art"><Preview item={item}/><small>{item.rarity}</small></div>
      <div className="npx-shop-copy"><small>{item.kind}</small><b>{item.name}</b><p>{item.desc}</p>
-      {has?<button className="npx-equip" disabled={!!busy||equipped} onClick={()=>act(item.id,'nexus_progression_equip','Equipado!')}>{equipped?<><Check size={14}/> Equipado</>:'Equipar'}</button>
+      {has?<button className="npx-equip" disabled={!!busy} onClick={()=>act(item.id,equipped?'nexus_progression_unequip':'nexus_progression_equip',equipped?'Item removido.':'Equipado!')}>{equipped?<><Check size={14}/> Equipado · remover</>:'Equipar'}</button>
        :<button disabled={!!busy||coins<item.cost} onClick={()=>act(item.id,'nexus_progression_purchase_cosmetic','Item comprado!')}>{busy===item.id?'Comprando...':<><Coins size={14}/> {item.cost} · Comprar</>}</button>}
      </div></article>})}</div>
    <p className="npx-note"><Crown size={15}/> Itens ficam na sua conta e aparecem no seu perfil. A loja não usa dinheiro real.</p>
   </div>}
  </section>;
+}
+
+
+// ── Coleção (usada no editor de perfil) ──────────────────────────────────
+const FRAME_OF=key=>key==='cosmetic-gold-crown'?{frame:'gold',cardFrame:'gold'}:key==='cosmetic-ruby-aura'?{frame:'ruby',cardFrame:'ruby'}:(key==='cosmetic-prism-frame'||key==='pass-frame-prism')?{cardFrame:'chrome'}:{frame:'cyan'};
+export function NexusCollection({userId,onApplied=()=>{},onToast=()=>{}}){
+ const [progress,setProgress]=useState(EMPTY),[busy,setBusy]=useState(''),[error,setError]=useState('');
+ const load=useCallback(async()=>{if(!userId)return;const {data,error:e}=await supabase.from('nexus_player_progress').select('owned_cosmetics,equipped_title,equipped_cosmetic').eq('user_id',userId).maybeSingle();if(e){setError('Não foi possível carregar sua coleção.');return}setProgress({...EMPTY,...(data||{})})},[userId]);
+ useEffect(()=>{load()},[load]);
+ const info={};SHOP.forEach(i=>{info[i.id]={name:i.name,icon:i.icon,kind:i.kind}});PASS.forEach(i=>{if(i.type!=='Moedas')info[i.id]={name:i.name,icon:i.icon,kind:i.type}});
+ const owned=(progress.owned_cosmetics||[]).filter(k=>info[k]);
+ const act=async(key,on)=>{if(busy)return;setBusy(key);setError('');const {error:e}=await supabase.rpc(on?'nexus_progression_equip':'nexus_progression_unequip',{item_key_input:key});setBusy('');if(e){setError(e.message);return}
+  const isTitle=info[key].kind==='Título';
+  onApplied(isTitle?{title:on?(TITLES[key]||''):''}:on?FRAME_OF(key):{frame:'violet',cardFrame:'violet'});onToast(on?'Equipado!':'Item removido.');await load()};
+ if(!owned.length)return <div className="profile-choice-group nx2-collection"><b>Coleção da loja</b><p className="muted">Títulos e molduras que você conquistar ou comprar aparecem aqui para equipar e remover.</p></div>;
+ const row=(key)=>{const it=info[key],eq=progress.equipped_title===key||progress.equipped_cosmetic===key;return <div key={key} className={'nx2-col-item'+(eq?' on':'')}><i>{it.icon}</i><span><b>{it.name}</b><small>{it.kind}</small></span><button type="button" disabled={!!busy} onClick={()=>act(key,!eq)}>{eq?'Remover':'Equipar'}</button></div>};
+ return <div className="profile-choice-group nx2-collection"><b>Coleção da loja <small> · títulos e molduras conquistados</small></b>{error&&<p className="muted" role="alert">{error}</p>}<div className="nx2-col-list">{owned.map(row)}</div></div>;
 }
