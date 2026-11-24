@@ -17,3 +17,10 @@
 .nxb-go{min-height:48px;border-radius:14px;border:0;background:linear-gradient(135deg,#8b6bff,#3fd9f0);color:#06101f;font-weight:700;font-size:15px}.nxb-go:disabled{background:rgba(150,170,255,.12);color:#93a3c8}
 .nxb-hist{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.nxb-hist small{color:#93a3c8;font-size:11px}
 .nxb-hist span{padding:3px 8px;border-radius:999px;font-size:12px}.nxb-hist .won{background:rgba(52,211,153,.12);color:#34d399}.nxb-hist .lost{background:rgba(251,113,133,.12);color:#fb7185}
+
+.nxb-q{display:inline-flex;align-items:center;gap:6px;margin:0 14px 12px;min-height:40px;padding:0 12px;border-radius:999px;border:1px solid rgba(150,170,255,.2);background:rgba(255,255,255,.04);color:#c7d2ff;font-size:13px}
+.nxb-toggle{padding-bottom:6px}
+.nxb-help{margin:0 14px 14px;padding:12px;border-radius:16px;background:rgba(7,11,22,.6);border:1px solid rgba(150,170,255,.18);display:grid;gap:8px}
+.nxb-help-head{display:flex;align-items:center;justify-content:space-between}.nxb-help-head button{width:40px;height:40px;border-radius:999px;border:0;background:rgba(255,255,255,.06);color:#eef2ff;display:grid;place-items:center}
+.nxb-help table{width:100%;border-collapse:collapse;font-size:13px}.nxb-help th{text-align:left;color:#93a3c8;font-weight:600;font-size:11px;letter-spacing:.08em;padding:6px 4px}.nxb-help td{padding:8px 4px;border-top:1px solid rgba(150,170,255,.12)}.nxb-help td:last-child{color:#fbbf24;font-weight:700}
+.nxb-help ul{margin:0;padding-left:18px;font-size:12px;line-height:1.5;color:#93a3c8}
