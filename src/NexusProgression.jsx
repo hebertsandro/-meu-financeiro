@@ -176,7 +176,8 @@ export default function NexusProgression({userId,gameXp=0,onToast=()=>{}}){
 
 
 // ── Coleção (usada no editor de perfil) ──────────────────────────────────
-const FRAME_OF=key=>key==='cosmetic-gold-crown'?{frame:'gold',cardFrame:'gold'}:key==='cosmetic-ruby-aura'?{frame:'ruby',cardFrame:'ruby'}:(key==='cosmetic-prism-frame'||key==='pass-frame-prism')?{cardFrame:'chrome'}:{frame:'cyan'};
+const FRAME_ID={'cosmetic-ruby-aura':'ember','cosmetic-gold-crown':'royal','cosmetic-prism-frame':'prismatic','cosmetic-neon-trail':'neontrail','pass-trail-blue':'bluetrail','pass-frame-prism':'shard'};
+const FRAME_OF=key=>({frame:FRAME_ID[key]||'cyan',cardFrame:FRAME_ID[key]||'cyan'});
 export function NexusCollection({userId,onApplied=()=>{},onToast=()=>{}}){
  const [progress,setProgress]=useState(EMPTY),[busy,setBusy]=useState(''),[error,setError]=useState('');
  const load=useCallback(async()=>{if(!userId)return;const {data,error:e}=await supabase.from('nexus_player_progress').select('owned_cosmetics,equipped_title,equipped_cosmetic').eq('user_id',userId).maybeSingle();if(e){setError('Não foi possível carregar sua coleção.');return}setProgress({...EMPTY,...(data||{})})},[userId]);

@@ -748,6 +748,7 @@ function App(){
   },[]);
   const toastTimerRef=React.useRef(null);
   useEffect(()=>()=>{if(toastTimerRef.current)window.clearTimeout(toastTimerRef.current)},[]);
+  useEffect(()=>{const open=()=>setPage('social-feed');window.addEventListener('nx:open-post',open);return()=>window.removeEventListener('nx:open-post',open)},[]);
   const notify=(s)=>{setToast(s);if(toastTimerRef.current)window.clearTimeout(toastTimerRef.current);toastTimerRef.current=window.setTimeout(()=>{toastTimerRef.current=null;setToast('')},3200)};
   const unreadCount=data.notifications.filter(n=>!n.is_read).length;
   async function addNotification(title,message,category='geral'){if(!session?.user?.id)return;const {error}=await supabase.from('notifications').insert({user_id:session.user.id,title,message,category});if(!error){await loadData();supabase.functions.invoke('send-push',{body:{title,body:message,url:'/',tag:category||'meu-financeiro'}}).then(({error:pushError})=>{if(pushError)console.warn('Push notification:',pushError.message)}).catch(error=>console.warn('Push notification:',error))}}
@@ -1446,7 +1447,7 @@ function App(){
             <div><b>{(playerProfile.gems||[]).length}</b><span>Joias equipadas</span></div>
           </div>
           {playerProfile.bio&&<p className="player-social-bio profile-social-bio">{playerProfile.bio}</p>}
-          {playerProfile.clan&&<div className="player-clan-badge">{playerProfile.clan.clan_emblem} {playerProfile.clan.clan_name} [{playerProfile.clan.clan_tag}] · {playerProfile.clan.clan_role==='leader'?'ADM':playerProfile.clan.clan_role==='officer'?'OFICIAL':'MEMBRO'}</div>}
+          
           <div className="profile-honors-inline" aria-label="Medalhas e honrarias">
             {isAdmin&&<><span className="profile-honor-chip founder">👑 Fundador</span><span className="profile-honor-chip founder">⚡ Fundador NEXUS</span><span className="profile-honor-chip founder">🛡️ Admin oficial</span></>}
             {profileGameMedals.filter(m=>profileEquippedMedals.includes('game:'+m.game_key)).map(m=><span className="profile-honor-chip equipped-honor" key={'inline-g-'+m.game_key}>🏅 {({'space-nexus':'Space Nexus','piggy-run':'Asas da Fortuna',quiz:'Quiz'})[m.game_key]||m.game_key} ×{Number(m.medals_count||0)}</span>)}

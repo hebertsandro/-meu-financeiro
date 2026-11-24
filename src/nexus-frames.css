@@ -10,7 +10,7 @@
 .frame-prism{--f1:#fff;--f2:#c9a6ff;--f3:#5b3fd0;--r:50%}
 
 /* Avatares */
-:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism){
+:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism,.frame-ember,.frame-royal,.frame-prismatic,.frame-neontrail,.frame-bluetrail,.frame-shard){
  position:relative;overflow:visible!important;
  border:max(2px,.045em) solid transparent!important;border-radius:var(--r)!important;
  background:linear-gradient(150deg,#1d2850,#0c1128) padding-box,linear-gradient(150deg,var(--f1),var(--f2) 40%,var(--f3)) border-box!important;
@@ -21,13 +21,13 @@
 }
 :is(.player-avatar,.profile-avatar-button).frame-prism{background:linear-gradient(150deg,#1d2850,#0c1128) padding-box,conic-gradient(#ff6b9a,#ffd166,#6bff9a,#59d4ff,#b48cff,#ff6b9a) border-box!important}
 /* arco de luz que gira em volta do anel */
-:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism):before{
+:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism,.frame-ember,.frame-royal,.frame-prismatic,.frame-neontrail,.frame-bluetrail,.frame-shard):before{
  content:""!important;position:absolute!important;inset:-6px!important;width:auto!important;height:auto!important;border:0!important;border-radius:inherit!important;pointer-events:none;
  padding:2px;background:conic-gradient(from var(--nx-a),transparent 0 68%,var(--f1) 86%,transparent 100%)!important;
  -webkit-mask:linear-gradient(#000 0 0) content-box,linear-gradient(#000 0 0);-webkit-mask-composite:xor;mask:linear-gradient(#000 0 0) content-box exclude,linear-gradient(#000 0 0);mask-composite:exclude;
  box-shadow:none!important;transform:none!important;opacity:1!important;animation:nxFrameSpin 3.6s linear infinite!important}
 /* gema em losango fino */
-:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism):after{
+:is(.player-avatar,.profile-avatar-button):is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism,.frame-ember,.frame-royal,.frame-prismatic,.frame-neontrail,.frame-bluetrail,.frame-shard):after{
  content:""!important;display:block!important;position:absolute!important;top:-.12em!important;right:-.04em!important;left:auto!important;bottom:auto!important;
  width:clamp(8px,.2em,14px)!important;height:clamp(11px,.28em,19px)!important;border:0!important;border-radius:0!important;
  clip-path:polygon(50% 0,100% 38%,50% 100%,0 38%)!important;
@@ -40,17 +40,17 @@
 @keyframes nxFrameSpin{to{--nx-a:360deg}}
 
 /* Avatares pequenos do feed */
-.nxf-avatar:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism),
-.nxf-compose-avatar:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism){
+.nxf-avatar:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism,.frame-ember,.frame-royal,.frame-prismatic,.frame-neontrail,.frame-bluetrail,.frame-shard),
+.nxf-compose-avatar:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism,.frame-ember,.frame-royal,.frame-prismatic,.frame-neontrail,.frame-bluetrail,.frame-shard){
  border:2px solid var(--f2)!important;outline:none;box-shadow:0 0 0 2px #070b1c,0 0 12px color-mix(in srgb,var(--f2) 60%,transparent)!important}
 
 /* Cartão do jogador: contorno duplo neon */
-.player-card-frame:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism){
+.player-card-frame:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism,.frame-ember,.frame-royal,.frame-prismatic,.frame-neontrail,.frame-bluetrail,.frame-shard){
  box-shadow:0 0 0 1px var(--f2),0 0 0 5px #070b1c,0 0 0 6px color-mix(in srgb,var(--f2) 55%,transparent),0 0 36px 6px color-mix(in srgb,var(--f2) 32%,transparent),0 18px 44px #0008!important}
 .player-card-frame.frame-prism{box-shadow:0 0 0 1px #c9a6ff,0 0 0 5px #070b1c,0 0 0 6px #7ee0ff88,0 0 36px 6px #b48cff44!important}
 
 /* Prévias no seletor */
-.card-frame-previews .profile-frame-option:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism) i{
+.card-frame-previews .profile-frame-option:is(.frame-violet,.frame-cyan,.frame-gold,.frame-ruby,.frame-chrome,.frame-neon,.frame-prism,.frame-ember,.frame-royal,.frame-prismatic,.frame-neontrail,.frame-bluetrail,.frame-shard) i{
  border:2px solid var(--f2)!important;box-shadow:0 0 0 2px #070b1c,0 0 0 3px color-mix(in srgb,var(--f2) 55%,transparent),0 0 16px color-mix(in srgb,var(--f2) 55%,transparent)!important}
 .profile-frame-option .frame-thumbnail-avatar{margin:10px auto 4px}
 

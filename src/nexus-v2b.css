@@ -184,3 +184,28 @@
 .nx2-col-item.on button{border-color:rgba(251,113,133,.4);background:rgba(251,113,133,.1)}
 .social-profile-post-tile img,.social-profile-post-tile video{width:100%;height:100%;object-fit:cover!important;background:none!important}
 .social-profile-post-viewer{z-index:2147483000!important}
+
+/* ---------- Molduras exclusivas da loja e do passe (cada uma com visual próprio) ---------- */
+.frame-ember{--f1:#ffd0c2;--f2:#ff4d6d;--f3:#6e0b2a;--r:50% 50% 50% 50%/62% 62% 38% 38%}
+.frame-royal{--f1:#fff6cf;--f2:#ffc84a;--f3:#7a4d00;--r:28% 28% 18% 18%}
+.frame-prismatic{--f1:#ffffff;--f2:#9fe3ff;--f3:#7a4bff;--r:38% 62% 38% 62%/50%}
+.frame-neontrail{--f1:#e6fff8;--f2:#2bf2b0;--f3:#06505e;--r:50% 50% 50% 10%}
+.frame-bluetrail{--f1:#dff0ff;--f2:#4aa8ff;--f3:#16327a;--r:10% 50% 50% 50%}
+.frame-shard{--f1:#ffffff;--f2:#c3a2ff;--f3:#341a7d;--r:16%}
+:is(.player-avatar,.profile-avatar-button).frame-prismatic{background:linear-gradient(150deg,#1d2850,#0c1128) padding-box,conic-gradient(from var(--nx-a,0deg),#7a4bff,#59d4ff,#ffffff,#ff9ad5,#7a4bff) border-box!important}
+:is(.player-avatar,.profile-avatar-button).frame-ember{animation:nx2Ember 2.4s ease-in-out infinite!important}
+@keyframes nx2Ember{0%,100%{box-shadow:0 0 0 1.5px #070b1c,0 0 14px rgba(255,77,109,.5),inset 0 0 10px rgba(255,77,109,.25)}50%{box-shadow:0 0 0 1.5px #070b1c,0 0 26px rgba(255,120,70,.75),inset 0 0 16px rgba(255,120,70,.35)}}
+:is(.player-avatar,.profile-avatar-button).frame-royal{outline:2px double rgba(255,200,74,.8)!important;outline-offset:4px}
+:is(.player-avatar,.profile-avatar-button).frame-shard{outline:1px dashed rgba(195,162,255,.9)!important;outline-offset:4px}
+:is(.player-avatar,.profile-avatar-button).frame-neontrail{box-shadow:0 0 0 1.5px #070b1c,-8px 6px 16px rgba(43,242,176,.45),0 0 14px rgba(43,242,176,.4)!important}
+:is(.player-avatar,.profile-avatar-button).frame-bluetrail{box-shadow:0 0 0 1.5px #070b1c,8px 6px 16px rgba(74,168,255,.45),0 0 14px rgba(74,168,255,.4)!important}
+/* cartões grandes */
+.player-card-frame.frame-ember{box-shadow:0 0 0 1px #ff4d6d,0 0 0 5px #070b1c,0 0 0 6px rgba(255,120,70,.6),0 0 44px 8px rgba(255,77,109,.3),0 18px 44px rgba(0,0,0,.6)!important}
+.player-card-frame.frame-royal{box-shadow:0 0 0 1px #ffc84a,0 0 0 4px #070b1c,0 0 0 6px #ffc84a,0 0 0 9px #070b1c,0 0 40px 6px rgba(255,200,74,.28),0 18px 44px rgba(0,0,0,.6)!important}
+.player-card-frame.frame-prismatic{border:2px solid transparent!important;background:linear-gradient(160deg,#171f45,#0b1022 70%) padding-box,conic-gradient(from var(--nx-a,0deg),#7a4bff,#59d4ff,#fff,#ff9ad5,#7a4bff) border-box!important;box-shadow:0 0 0 4px #070b1c,0 0 34px 4px rgba(122,75,255,.3)!important;animation:nxFrameSpin 9s linear infinite!important}
+.player-card-frame.frame-neontrail{box-shadow:0 0 0 1px #2bf2b0,0 0 0 5px #070b1c,-14px 10px 40px rgba(43,242,176,.3),0 18px 44px rgba(0,0,0,.6)!important}
+.player-card-frame.frame-bluetrail{box-shadow:0 0 0 1px #4aa8ff,0 0 0 5px #070b1c,14px 10px 40px rgba(74,168,255,.3),0 18px 44px rgba(0,0,0,.6)!important}
+.player-card-frame.frame-shard{outline:1px dashed rgba(195,162,255,.9);outline-offset:6px;box-shadow:0 0 0 1px #c3a2ff,0 0 0 5px #070b1c,0 0 36px 6px rgba(195,162,255,.25)!important}
+@media(prefers-reduced-motion:reduce){:is(.player-avatar,.profile-avatar-button).frame-ember,.player-card-frame.frame-prismatic{animation:none!important}}
+/* sem selo de guilda */
+.player-clan-badge{display:none!important}
