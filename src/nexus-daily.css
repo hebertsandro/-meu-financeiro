@@ -1,0 +1,21 @@
+.nxd{max-width:640px;margin:0 auto 16px;padding:16px;border-radius:22px;background:linear-gradient(160deg,#131d3a,#0f1730);border:1px solid rgba(150,170,255,.14);color:#eef2ff;display:grid;gap:10px}
+.nxd-head{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.nxd-league{display:flex;align-items:center;gap:12px}
+.nxd-league i{width:40px;height:46px;background:var(--lc);clip-path:polygon(50% 0,100% 28%,100% 72%,50% 100%,0 72%,0 28%);filter:drop-shadow(0 0 8px var(--lc))}
+.nxd-league small{display:block;font-size:10px;letter-spacing:.16em;color:#93a3c8}
+.nxd-league b{font-size:20px;letter-spacing:-.02em;color:var(--lc)}
+.nxd-streak{display:grid;grid-auto-flow:column;align-items:center;gap:6px;padding:8px 12px;border-radius:999px;background:rgba(251,191,36,.1);border:1px solid rgba(251,191,36,.3);color:#fde7a6}
+.nxd-streak b{font-size:18px;color:#fff}.nxd-streak small{font-size:11px;color:#fde7a6}
+.nxd-league-bar{height:6px;border-radius:99px;background:rgba(150,170,255,.14);overflow:hidden}.nxd-league-bar span{display:block;height:100%;border-radius:inherit;transition:width .4s}
+.nxd-league-note{margin:0;font-size:12px;color:#93a3c8}
+.nxd-title{display:grid;gap:2px;margin-top:6px}.nxd-title b{font-size:16px}.nxd-title span{font-size:12px;color:#93a3c8}
+.nxd-list{display:grid;gap:8px}
+.nxd-q{display:grid;grid-template-columns:40px 1fr auto;align-items:center;gap:12px;padding:12px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(150,170,255,.12)}
+.nxd-q.ready{border-color:rgba(63,217,240,.5);background:rgba(63,217,240,.07)}.nxd-q.got{opacity:.65}
+.nxd-ic{width:40px;height:40px;display:grid;place-items:center;border-radius:12px;background:rgba(139,107,255,.16);color:#c4b5fd}
+.nxd-body{min-width:0;display:grid;gap:2px}.nxd-body b{font-size:14px}.nxd-body small{font-size:12px;color:#93a3c8}
+.nxd-body em{display:block;height:4px;border-radius:99px;background:rgba(150,170,255,.14);overflow:hidden;margin-top:4px}.nxd-body em i{display:block;height:100%;background:linear-gradient(90deg,#8b6bff,#3fd9f0)}
+.nxd-q button{min-height:44px;min-width:76px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;border:0;background:linear-gradient(135deg,#8b6bff,#3fd9f0);color:#06101f;font-weight:700;font-size:14px}
+.nxd-q button:disabled{background:rgba(150,170,255,.12);color:#93a3c8}
+.nxd-done{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#34d399}
+.nxd-err{margin:0;font-size:13px;color:#fb7185}
