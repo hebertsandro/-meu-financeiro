@@ -62,3 +62,7 @@
 .npx-tree-heads{margin-bottom:14px!important}
 .npx-featured{grid-template-columns:132px 1fr!important}
 .npx-featured .npx-prev-title{white-space:nowrap}
+
+/* ícone do jogador na faixa de perfil */
+.npx-player-orb{width:58px!important;height:58px!important;border-radius:50%!important;font-size:30px!important;background:radial-gradient(circle at 35% 30%,#24325c,#0c1430)!important;border:3px solid var(--f1,#8f6bff);box-shadow:0 0 0 2px var(--f2,#4fe3f5) inset,0 0 18px -2px var(--f1,#8f6bff);overflow:hidden}
+.npx-player-orb>span{line-height:1}

@@ -60,7 +60,7 @@ const TITLES={
 const RARITY={'RARO':'#59d4ff','ÉPICO':'#b48cff','LENDÁRIO':'#ffb347'};
 const EMPTY={unlocked_skills:[],owned_cosmetics:[],equipped_title:null,equipped_cosmetic:null};
 
-export default function NexusProgression({userId,gameXp=0,onToast=()=>{}}){
+export default function NexusProgression({userId,gameXp=0,avatar='👾',frame='violet',chromatic=false,onToast=()=>{}}){
  const [tab,setTab]=useState('skills'),[progress,setProgress]=useState(EMPTY),[coins,setCoins]=useState(0),[season,setSeason]=useState(null),[seasonXp,setSeasonXp]=useState(0),[claimedPass,setClaimedPass]=useState([]),[busy,setBusy]=useState(''),[error,setError]=useState(''),[sel,setSel]=useState('extra-heart'),[filter,setFilter]=useState('Todos');
  const trackRef=useRef(null);
  const load=useCallback(async()=>{
@@ -112,7 +112,7 @@ export default function NexusProgression({userId,gameXp=0,onToast=()=>{}}){
    <div className="npx-wallet"><Coins size={19}/><b>{coins.toLocaleString('pt-BR')}</b><small>MOEDAS</small></div>
   </header>
   <div className="npx-player-strip">
-   <div className="npx-player-orb">👾</div>
+   <div className={'npx-player-orb frame-'+(frame||'violet')+(chromatic?' frame-chromatic':'')}><span>{avatar||'👾'}</span></div>
    <div className="npx-player-main"><small>SEU TÍTULO</small><b>{titleName}</b>
     <div className="npx-xp"><i style={{width:levelPct+'%'}}/></div><span>{gameXp.toLocaleString('pt-BR')} XP · faltam {500-(gameXp%500)} para o nível {level+1}</span></div>
    <div className="npx-player-level"><Zap size={15}/><b>NV {level}</b></div>
