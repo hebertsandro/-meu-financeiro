@@ -41,7 +41,7 @@ export default function SpaceNexusGame({onReward,onMatch,onLoot}){
  useEffect(()=>{
   if(!running)return;
   const keyTarget=e=>/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName||'');const onKeyDown=e=>{if(keyTarget(e))return;const k=String(e.key).toLowerCase();if(k==='p'||k==='escape'){togglePause();return}if(k==='q'||k==='e'||k===' '){castNova();e.preventDefault();return}if(k==='f'){castFreeze();return}if(k==='g'){castDrone();return}if(k==='l'){castLaser();return}if(['arrowleft','arrowright','arrowup','arrowdown','a','d','w','s'].includes(k)){keysRef.current[k]=true;if(k.startsWith('arrow'))e.preventDefault()}};const onKeyUp=e=>{keysRef.current[String(e.key).toLowerCase()]=false};window.addEventListener('keydown',onKeyDown);window.addEventListener('keyup',onKeyUp);const onVis=()=>{if(document.hidden&&!pausedRef.current){pausedRef.current=true;setPaused(true)}};document.addEventListener('visibilitychange',onVis);
-  let raf=0,last=0,accumulator=0;const STEP=1000/120;const frame=(timestamp)=>{raf=requestAnimationFrame(frame);if(pausedRef.current){last=timestamp;accumulator=0;return}if(!last)last=timestamp;const elapsed=Math.min(50,Math.max(0,timestamp-last));last=timestamp;accumulator=Math.min(STEP*4,accumulator+elapsed);let steps=0;while(accumulator>=STEP&&steps<4){accumulator-=1000/120;steps++;
+  let syncUi=null;let raf=0,last=0,accumulator=0;const STEP=1000/120;const frame=(timestamp)=>{raf=requestAnimationFrame(frame);if(pausedRef.current){last=timestamp;accumulator=0;return}if(!last)last=timestamp;const elapsed=Math.min(50,Math.max(0,timestamp-last));last=timestamp;accumulator=Math.min(STEP*4,accumulator+elapsed);let steps=0;while(accumulator>=STEP&&steps<4){accumulator-=1000/120;steps++;
    const g=game.current;if(!g||g.phase==='finished')return;
    g.tick++;const n=g.tick,cfg=modes[g.mode],w=g.wave;const fz=n<g.freezeUntil,ov=g.over?1.45:1;
    const kk=keysRef.current;const kx=((kk.arrowright||kk.d)?1:0)-((kk.arrowleft||kk.a)?1:0),ky=((kk.arrowdown||kk.s)?1:0)-((kk.arrowup||kk.w)?1:0);
@@ -158,9 +158,10 @@ export default function SpaceNexusGame({onReward,onMatch,onLoot}){
     if(g.wave>cfg.waves){g.phase='finished';finish(true,g);return}
     setWave(g.wave);setMessage('ONDA '+g.wave+' — a ameaça está evoluindo!');
    }
-   g.fx=g.fx.filter(f=>n<f.ttl);
-   {setCombo(g.combo||0);setNova(Math.floor(g.nova||0));setFx([...g.fx]);setBuffs(b=>{const r=n<g.rapidUntil,dd=n<g.doubleUntil,fr=n<g.freezeUntil,dr=n<g.droneUntil;return b.rapid===r&&b.double===dd&&b.freeze===fr&&b.drone===dr?b:{rapid:r,double:dd,freeze:fr,drone:dr}});setTimeLeft(bossWave?0:Math.ceil(Math.max(0,g.timer)/120));setCds(c=>{const a=Math.max(0,Math.ceil((g.fzReady-n)/120)),d=Math.max(0,Math.ceil((g.drReady-n)/120)),l=Math.max(0,Math.ceil((g.lsReady-n)/120));return c.f===a&&c.d===d&&c.l===l?c:{f:a,d,l}});setShip(s=>s.x===g.ship.x&&s.y===g.ship.y?s:{...g.ship});setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)}
+   g.fx=g.fx.filter(f=>n<f.ttl);if(g.fx.length>36)g.fx=g.fx.slice(-36);
+   syncUi=()=>{setCombo(g.combo||0);setNova(Math.floor(g.nova||0));setFx([...g.fx]);setBuffs(b=>{const r=n<g.rapidUntil,dd=n<g.doubleUntil,fr=n<g.freezeUntil,dr=n<g.droneUntil;return b.rapid===r&&b.double===dd&&b.freeze===fr&&b.drone===dr?b:{rapid:r,double:dd,freeze:fr,drone:dr}});setTimeLeft(bossWave?0:Math.ceil(Math.max(0,g.timer)/120));setCds(c=>{const a=Math.max(0,Math.ceil((g.fzReady-n)/120)),d=Math.max(0,Math.ceil((g.drReady-n)/120)),l=Math.max(0,Math.ceil((g.lsReady-n)/120));return c.f===a&&c.d===d&&c.l===l?c:{f:a,d,l}});setShip(s=>s.x===g.ship.x&&s.y===g.ship.y?s:{...g.ship});setScore(g.score);setLives(g.lives);setShots([...g.shots]);setFoes([...g.foes]);setEnemyShots([...g.enemyShots]);setDrops([...g.drops]);setBoss(g.boss?{...g.boss}:null);setWave(g.wave)};
   }
+  if(syncUi){const f=syncUi;syncUi=null;f()}
   };
   raf=requestAnimationFrame(frame);
   return()=>{cancelAnimationFrame(raf);window.removeEventListener('keydown',onKeyDown);window.removeEventListener('keyup',onKeyUp);document.removeEventListener('visibilitychange',onVis);keysRef.current={};pausedRef.current=false};

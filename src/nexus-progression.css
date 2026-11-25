@@ -71,15 +71,15 @@
 .npx-tier-n:before{content:"";position:absolute;left:0;right:0;top:50%;height:3px;background:#2e3d5e;transform:translateY(-50%)}
 .npx-tier:first-child .npx-tier-n:before{left:50%}.npx-tier:last-child .npx-tier-n:before{right:50%}
 .npx-tier-n span{position:relative;display:grid;place-items:center;width:26px;height:26px;border-radius:50%;background:#111b30;border:2px solid #34456a;font-size:11px;font-weight:900;color:#8f9ec4}
-.npx-tier.claimed .npx-tier-n span{background:#2bbd85;border-color:#2bbd85;color:#06281c}.npx-tier.claimed .npx-tier-n:before{background:#2bbd85}
+.npx-tier.claimed .npx-tier-n span{background:#8f6bff;border-color:#8f6bff;color:#fff}.npx-tier.claimed .npx-tier-n:before{background:linear-gradient(90deg,#8f6bff,#4fe3f5)}
 .npx-tier.ready .npx-tier-n span{background:#ffd166;border-color:#ffd166;color:#3a2a0a;box-shadow:0 0 14px #ffd166}
 .npx-tier-card{display:grid;justify-items:center;gap:5px;width:112px;padding:13px 8px;border:1px solid #2e3e5c;border-radius:16px;background:linear-gradient(160deg,#18243e,#101a2e);text-align:center}
 .npx-tier-card i{font-style:normal;font-size:34px;filter:drop-shadow(0 0 10px #7a5cf066)}.npx-tier-card small{font-size:8px;letter-spacing:1.3px;color:#a79aff}
 .npx-tier-card b{font-size:12px;line-height:1.2;min-height:29px;display:grid;align-items:center}.npx-tier-card em{font-style:normal;font-size:10px;color:#8f9ec4}
-.npx-tier.ready .npx-tier-card{border-color:#ffd166;box-shadow:0 0 20px #ffd16644}.npx-tier.claimed .npx-tier-card{border-color:#2bbd8566}
+.npx-tier.ready .npx-tier-card{border-color:#ffd166;box-shadow:0 0 20px #ffd16644}.npx-tier.claimed .npx-tier-card{border-color:#8f6bff66}
 .npx-tier.locked .npx-tier-card{opacity:.7}
 .npx-tier-card button.go{background:linear-gradient(100deg,#ffb347,#ff7a59);color:#2a1500}
-.npx-claimed{display:flex;align-items:center;gap:4px;color:#4fe3a2;font-size:10px;font-weight:900}.npx-lock{display:flex;align-items:center;gap:4px;color:#7f8fb3;font-size:10px;font-weight:800}
+.npx-claimed{display:flex;align-items:center;gap:4px;color:#7ee8f8;font-size:10px;font-weight:900}.npx-lock{display:flex;align-items:center;gap:4px;color:#7f8fb3;font-size:10px;font-weight:800}
 
 /* Loja */
 .npx-featured{display:grid;grid-template-columns:110px 1fr;gap:14px;align-items:center;padding:16px;border:1px solid var(--rc);border-radius:18px;background:radial-gradient(circle at 0 0,color-mix(in srgb,var(--rc) 28%,transparent),transparent 60%),linear-gradient(145deg,#1a2442,#111a30);box-shadow:0 0 28px color-mix(in srgb,var(--rc) 25%,transparent)}

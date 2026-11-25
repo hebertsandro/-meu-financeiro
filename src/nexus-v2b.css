@@ -216,3 +216,19 @@
 .player-profile-page .game-world-hero .player-info{height:auto!important;min-height:0!important;overflow:visible!important;display:grid!important;gap:4px!important;align-content:start}
 .player-profile-page .game-world-hero .player-title-chip{display:inline-flex!important;align-items:center;width:fit-content;position:static!important;margin:4px 0 0!important}
 .player-profile-page .game-world-hero .player-profile-stats{margin-top:0!important;padding-top:0!important;border-top:0!important}
+
+/* abas da página de jogos */
+.nx-gtabs{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;margin:0 0 14px;border-radius:16px;background:rgba(14,20,40,.8);border:1px solid rgba(150,170,255,.14)}
+.nx-gtabs button{min-height:42px;border:0;border-radius:12px;background:transparent;color:#93a3c8;font-weight:800;font-size:13px;letter-spacing:.3px}
+.nx-gtabs button.on{background:linear-gradient(135deg,rgba(143,107,255,.35),rgba(79,227,245,.22));color:#fff;box-shadow:inset 0 0 0 1px rgba(150,170,255,.3)}
+
+/* contador de XP do passe */
+.npx-pass-hero{gap:12px!important;padding:18px!important;background:radial-gradient(120% 140% at 0% 0%,rgba(143,107,255,.18),transparent 60%),#0f1730!important;border-color:rgba(150,170,255,.18)!important}
+.npx-pass-xp{align-items:flex-end!important;gap:10px!important}
+.npx-pass-xp b{font-size:40px!important;line-height:1;font-weight:900;letter-spacing:-1px;background:linear-gradient(90deg,#c4b5fd,#7ee8f8);-webkit-background-clip:text;background-clip:text;color:transparent}
+.npx-pass-xp small{font-size:10px!important;letter-spacing:1.6px!important;padding-bottom:6px;color:#93a3c8!important}
+.npx-pass-bar{height:6px!important;background:rgba(255,255,255,.07)!important;overflow:visible}
+.npx-pass-bar i{box-shadow:0 0 12px rgba(79,227,245,.45)}
+.npx-pass-bar u{top:50%!important;width:9px!important;height:9px!important;margin:-4.5px 0 0 -4.5px!important;border-radius:50%!important;background:#1a2442!important;border:2px solid #34456a}
+.npx-pass-bar u.on{background:#7ee8f8!important;border-color:#7ee8f8!important}
+.npx-pass-hero>span{font-size:12px!important;color:#a9b6d8!important}
