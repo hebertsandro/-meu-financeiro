@@ -11,6 +11,10 @@ const SHIPS={
  brute:{c:['#ffe3d4','#e8553a','#4a0f12','#ffd36a'],hull:'M50 96 L80 84 L98 56 L92 14 L66 6 L50 14 L34 6 L8 14 L2 56 L20 84Z',inner:'M50 84 L72 74 L84 54 L80 26 L62 20 L50 28 L38 20 L20 26 L16 54 L28 74Z',gun:[[12,44],[88,44],[24,18],[76,18]],eng:[30,50,70]},
  tank:{c:['#fff3c6','#e0a22a','#4a3410','#9ae8ff'],hull:'M50 98 L82 88 L98 60 L96 30 L74 8 L26 8 L4 30 L2 60 L18 88Z',inner:'M50 88 L74 80 L88 58 L86 34 L68 18 L32 18 L14 34 L12 58 L26 80Z',gun:[[8,48],[92,48]],eng:[32,68]},
  phantom:{c:['#d8caff','#5a46c8','#0c0a22','#9a7bff'],hull:'M50 96 L98 62 L90 28 L66 40 L50 8 L34 40 L10 28 L2 62Z',inner:'M50 84 L82 60 L78 40 L62 48 L50 22 L38 48 L22 40 L18 60Z',gun:[[12,44],[88,44]],eng:[50]},
+ splitter:{c:['#fff0c8','#e89a2a','#3a2008','#ffe27a'],hull:'M50 92 L70 98 L96 80 L98 50 L80 24 L58 36 L50 14 L42 36 L20 24 L2 50 L4 80 L30 98Z',inner:'M50 80 L66 84 L82 70 L84 52 L72 40 L56 48 L50 34 L44 48 L28 40 L16 52 L18 70 L34 84Z',gun:[[16,56],[84,56]],eng:[34,66]},
+ sniper:{c:['#e6ffe0','#46d86a','#0a3418','#ff4d6d'],hull:'M50 98 L60 80 L96 90 L72 56 L60 36 L54 4 L50 0 L46 4 L40 36 L28 56 L4 90 L40 80Z',inner:'M50 86 L56 72 L70 70 L58 44 L50 12 L42 44 L30 70 L44 72Z',gun:[[50,-6]],eng:[50]},
+ shielder:{c:['#d8f0ff','#3a8ae8','#0a1c4a','#7dffea'],hull:'M30 6 L70 6 L94 30 L94 70 L70 94 L30 94 L6 70 L6 30Z',inner:'M32 20 L68 20 L82 34 L82 66 L68 80 L32 80 L18 66 L18 34Z',gun:[],eng:[34,66]},
+ mini:{c:['#fff0c8','#f2b84a','#4a2a08','#fff2a0'],hull:'M50 92 L72 70 L90 56 L70 40 L62 10 L50 22 L38 10 L30 40 L10 56 L28 70Z',inner:'M50 80 L64 64 L74 56 L60 46 L50 32 L40 46 L26 56 L36 64Z',gun:[],eng:[50]},
  kamikaze:{c:['#ffd0d6','#e8324a','#3a0a14','#ffd25a'],hull:'M50 100 L66 72 L98 52 L72 44 L66 12 L50 26 L34 12 L28 44 L2 52 L34 72Z',inner:'M50 90 L60 68 L80 54 L62 48 L58 28 L50 38 L42 28 L38 48 L20 54 L40 68Z',gun:[],eng:[50]},
  bomber:{c:['#d8ffe6','#2fb864','#0f3a24','#d6ff7a'],hull:'M50 94 L84 84 L98 54 L92 22 L66 8 L34 8 L8 22 L2 54 L16 84Z',inner:'M50 82 L74 74 L86 54 L82 30 L64 20 L36 20 L18 30 L14 54 L26 74Z',gun:[[8,66],[92,66]],eng:[34,66]}
 };
@@ -49,6 +53,12 @@ const BOSS={
  queen:{c:['#ffc9ea','#e0409a','#4a0f3a','#fff0a0'],name:'queen',
   wing:'M98 30 L4 8 L24 64 L6 112 L96 92Z',extra:'M60 96 L36 134 L84 112Z',
   hull:'M130 6 L156 30 L170 78 L152 124 L130 142 L108 124 L90 78 L104 30Z'},
+ hydra:{c:['#b6fff0','#1fb59a','#07342d','#ff6fd8'],name:'hydra',
+  wing:'M90 36 L30 10 L6 52 L30 90 L84 84Z',extra:'M62 90 L30 130 L80 112Z',
+  hull:'M130 10 Q170 10 192 40 L184 100 Q160 130 130 138 Q100 130 76 100 L68 40 Q90 10 130 10Z'},
+ eclipse:{c:['#d9e4ff','#6a7cf0','#10133a','#ff5dc8'],name:'eclipse',
+  wing:'M96 30 L34 6 L6 46 L40 70 L90 74Z',extra:'M58 80 L30 126 L86 108Z',
+  hull:'M130 8 L172 24 L196 70 L172 118 L130 138 L88 118 L64 70 L88 24Z'},
  omega:{c:['#ffd9a6','#f0742a','#4a1608','#7dffea'],name:'omega',
   wing:'M100 22 L60 4 L30 40 L40 70 L84 72Z',extra:'M58 84 L36 118 L84 104Z',
   hull:'M100 10 L160 10 L206 46 L206 98 L160 134 L100 134 L54 98 L54 46Z'}
@@ -66,6 +76,8 @@ export function BossArt({id='titan'}){
   {id==='devourer'&&<path d="M96 100 L108 130 L130 112 L152 130 L164 100Z" fill="#0b1f0a" stroke={l} strokeWidth="2.4" strokeLinejoin="round"/>}
   {id==='titan'&&[100,130,160].map(x=><g key={x}><rect x={x-8} y="104" width="16" height="40" rx="6" fill={d} stroke={l} strokeWidth="2.4"/><circle cx={x} cy="146" r="5" fill={a}/></g>)}
   {id==='queen'&&<g fill={a} stroke={l} strokeWidth="2"><path d="M110 24 L118 2 L124 22Z"/><path d="M122 20 L130 -2 L138 20Z"/><path d="M136 22 L142 2 L150 24Z"/></g>}
+  {id==='hydra'&&[[92,30],[130,18],[168,30]].map(([x,y],i)=><g key={i}><circle cx={x} cy={y} r="13" fill={d} stroke={l} strokeWidth="2.6"/><circle cx={x} cy={y} r="6" fill={a}/></g>)}
+  {id==='eclipse'&&<><circle cx="130" cy="72" r="46" fill="none" stroke={a} strokeWidth="3" opacity=".85"/><path d="M84 72 A46 46 0 0 1 176 72" fill={d} opacity=".6"/></>}
   {id==='omega'&&[[100,8],[160,8],[210,48],[210,98],[160,138],[100,138],[50,98],[50,48]].map(([x,y],i)=><circle key={i} cx={x} cy={y} r="7" fill={a} stroke={l} strokeWidth="2"/>)}
   <circle cx="130" cy="70" r="24" fill={d} stroke={l} strokeWidth="3.4"/><circle cx="130" cy="70" r="17" fill={'url(#bc'+id+')'}/><circle cx="130" cy="70" r="6" fill="#fff"/>
   <path d="M104 44 Q130 32 156 44" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" opacity=".5"/>

@@ -1,0 +1,29 @@
+/* Space Nexus v3: cronômetro de onda, sobrecarga, habilidades, inimigos novos. Importar por último. */
+.space-wave-timer{display:grid;grid-template-columns:1fr auto;gap:4px 10px;align-items:center;margin:8px 0;padding:9px 12px;border:1px solid var(--nx-border,rgba(150,170,255,.14));border-radius:14px;background:var(--nx-surface,#0f1730);font-size:12px;color:var(--nx-muted,#93a3c8);letter-spacing:.04em}
+.space-wave-timer b{font-size:18px;color:#fff;font-variant-numeric:tabular-nums}
+.space-wave-timer>i{grid-column:1/-1;height:5px;border-radius:6px;background:rgba(150,170,255,.14);overflow:hidden}
+.space-wave-timer>i em{display:block;height:100%;background:linear-gradient(90deg,#8b6bff,#3fd9f0);transition:width .25s linear}
+.space-wave-timer.over{border-color:rgba(251,113,133,.6);background:rgba(251,113,133,.1);color:#fecdd3}
+.space-wave-timer.over>i em{background:#fb7185}
+.space-wave-timer.over b{color:#fb7185;animation:nxs3Blink .7s steps(2) infinite}
+.space-wave-timer.boss>i em{background:#fbbf24}
+.space-nexus-arena.overload{box-shadow:inset 0 0 40px rgba(251,113,133,.45)}
+.space-nexus-arena.frozen{box-shadow:inset 0 0 50px rgba(120,210,255,.5)}
+.space-nexus-arena.frozen .space-enemy{filter:saturate(.4) brightness(1.3) drop-shadow(0 0 10px #8fe3ff)}
+.space-overload-banner{position:absolute;top:14%;left:50%;transform:translateX(-50%);z-index:9;padding:8px 18px;border-radius:12px;background:rgba(251,113,133,.9);color:#fff;font-weight:900;font-size:14px;letter-spacing:.1em;pointer-events:none;animation:nxs3Blink .7s steps(2) infinite}
+.space-enemy.charging .space-art-enemy{filter:drop-shadow(0 0 12px #ff4d6d) brightness(1.4)}
+.space-enemy.protected::after{content:"";position:absolute;inset:-6px;border-radius:50%;border:2px solid #7dffea;box-shadow:0 0 12px #7dffea;pointer-events:none}
+.space-enemy.shielder::before{content:"";position:absolute;inset:-14px;border-radius:50%;border:1px dashed rgba(125,255,234,.55);pointer-events:none}
+.space-enemy.mini{width:28px;height:28px}
+.space-enemy-shot.sniper-shot{width:5px;height:30px;background:linear-gradient(#fff,#ff4d6d);box-shadow:0 0 14px 4px #ff4d6d}
+.space-fx.laser{width:16%;height:100%;border-radius:0;transform:translateX(-50%);top:0;background:linear-gradient(90deg,transparent,rgba(180,250,255,.9),#fff,rgba(180,250,255,.9),transparent);box-shadow:0 0 30px #3fd9f0;animation:nxs3Fade .6s ease-out forwards}
+.space-fx.shockwave.ice{background:radial-gradient(circle,transparent 40%,rgba(143,227,255,.6) 62%,transparent 72%);border:2px solid #8fe3ff}
+.space-drone{position:absolute;width:16px;height:16px;border-radius:50%;transform:translate(-50%,-50%);z-index:5;background:radial-gradient(circle,#fff,#3fd9f0 60%,#8b6bff);box-shadow:0 0 12px #3fd9f0;pointer-events:none}
+.space-skill-bar{display:flex;flex-wrap:wrap;gap:6px;width:100%}
+.space-nexus-controls .space-skill{min-height:44px;opacity:.55}
+.space-nexus-controls .space-skill.ready{opacity:1;color:#fff;border-color:#3fd9f0;background:linear-gradient(100deg,rgba(139,107,255,.45),rgba(63,217,240,.35))}
+.space-nexus-controls .space-skill-bar .space-pause-btn{flex:1 1 40%;min-height:44px}
+.space-wave-banner{pointer-events:none}
+@keyframes nxs3Blink{50%{opacity:.45}}
+@keyframes nxs3Fade{from{opacity:1}to{opacity:0}}
+@media(prefers-reduced-motion:reduce){.space-wave-timer.over b,.space-overload-banner{animation:none}}
