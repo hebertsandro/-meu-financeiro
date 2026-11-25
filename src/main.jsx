@@ -20,6 +20,7 @@ import './nexus-games-v2.css';
 import './nexus-v2.css';
 import './nexus-v2b.css';
 import './nexus-space-v3.css';
+import './nexus-space-perf.css';
 
 window.addEventListener('vite:preloadError', (event) => {
   event.preventDefault();

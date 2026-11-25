@@ -19,3 +19,10 @@
 .nxd-q button:disabled{background:rgba(150,170,255,.12);color:#93a3c8}
 .nxd-done{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#34d399}
 .nxd-err{margin:0;font-size:13px;color:#fb7185}
+.nxd-gem{width:52px;height:58px;filter:drop-shadow(0 0 10px var(--lc));animation:nxdGem 3.5s ease-in-out infinite alternate}
+@keyframes nxdGem{to{filter:drop-shadow(0 0 18px var(--lc)) brightness(1.15)}}
+.nxd-league i{display:none}
+.nxd-perks{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.nxd-perks div{display:grid;gap:2px;padding:10px;border-radius:14px;background:rgba(255,255,255,.04);border:1px solid rgba(150,170,255,.12);text-align:center}
+.nxd-perks b{font-size:17px;color:#7ee8f8}.nxd-perks small{font-size:10.5px;color:#93a3c8;line-height:1.25}
+@media(prefers-reduced-motion:reduce){.nxd-gem{animation:none}}

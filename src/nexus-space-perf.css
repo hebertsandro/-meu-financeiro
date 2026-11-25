@@ -1,0 +1,13 @@
+/* Space Nexus: menos custo de pintura por quadro (filtros e sombras são caros ao mover elementos) */
+.space-nexus-arena{contain:layout paint;transform:translateZ(0)}
+.space-nebula{filter:none!important;opacity:.8}
+.space-stars{filter:none!important}
+.space-player-ship,.space-enemy,.space-enemy.brute,.space-enemy.scout,.space-boss>span,.space-boss-core,.space-boss.phase-two .space-boss-core,.space-boss.phase-two span{filter:none!important}
+.space-enemy,.space-enemy.brute{box-shadow:none}
+.space-player-shot,.space-enemy-shot,.space-enemy-shot.boss-shot,.space-enemy-shot.sniper-shot{box-shadow:none!important}
+.space-player-shot{background:linear-gradient(#fff,#42dfff)!important;width:5px!important}
+.space-enemy-shot{background:linear-gradient(#ffd0dc,#ff3f75)!important;width:6px!important}
+.space-nexus-arena.frozen .space-enemy{filter:none!important;outline:2px solid #8fe3ff;outline-offset:-2px;border-radius:8px}
+.space-enemy.charging .space-art-enemy{filter:none!important;outline:2px solid #ff4d6d;border-radius:8px}
+.space-enemy.scout{animation:none!important}
+.space-enemy,.space-player-shot,.space-enemy-shot,.space-drop,.space-fx,.space-player-ship{will-change:left,top}
