@@ -126,6 +126,7 @@ export default function NexusProgression({userId,gameXp=0,onToast=()=>{}}){
     {[0,1,2].map(row=><div className="npx-tree-row" key={row}>{BRANCHES.map(b=><div className={'npx-cell '+(row<2?'link ':'')+(status(b.ids[row])==='owned'&&row<2?'lit':'')} style={{'--bc':b.color}} key={b.id}><Node id={b.ids[row]}/></div>)}</div>)}
     <div className="npx-capstone-wrap"><div className={'npx-cap-lines '+(['sell-bonus','gem-moves','score-plus'].every(r=>unlocked.includes(r))?'lit':'')}/><Node id="legend"/></div>
    </div>
+   <div className="npx-build"><small>SEU BUILD ATIVO</small>{unlocked.length?<div>{unlocked.map(id=>SKILLS[id]&&<span key={id}>{SKILLS[id].icon} {SKILLS[id].name}</span>)}</div>:<p>Nenhuma habilidade ainda. Escolha um ramo e comece pelo primeiro nó.</p>}<em>Próximo marco: {unlocked.includes('legend')?'build completo!':unlocked.length>=6?'Lenda NEXUS (600 moedas)':`${6-unlocked.length} habilidades para destravar a Lenda`}</em></div>
    <article className={'npx-detail '+selStatus}>
     <div className="npx-detail-ico">{selSkill.icon}</div>
     <div className="npx-detail-copy"><small>{selStatus==='owned'?'DESBLOQUEADA':selStatus==='locked'?'BLOQUEADA':'DISPONÍVEL'}</small><b>{selSkill.name}</b><p>{selSkill.desc}</p>

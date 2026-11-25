@@ -1,0 +1,25 @@
+.nxr{max-width:640px;margin:0 auto;display:grid;gap:12px;color:#eef2ff}
+.nxr-tabs{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;scrollbar-width:none}.nxr-tabs::-webkit-scrollbar{display:none}
+.nxr-tabs button{flex:0 0 auto;min-height:40px;display:inline-flex;align-items:center;gap:5px;padding:0 14px;border-radius:999px;border:1px solid rgba(150,170,255,.16);background:rgba(255,255,255,.04);color:#a9b6d8;font-weight:800;font-size:13px}
+.nxr-tabs button.on{color:#fff;border-color:rgba(150,170,255,.45);background:linear-gradient(135deg,rgba(143,107,255,.38),rgba(79,227,245,.22))}
+.nxr-head{display:flex;justify-content:space-between;align-items:flex-start;gap:10px}.nxr-head span{font-size:10px;letter-spacing:.18em;color:#7ee8f8;font-weight:800}
+.nxr-head h3{margin:2px 0;font-size:22px;letter-spacing:-.02em}.nxr-head small{font-size:12px;color:#93a3c8}
+.nxr-refresh{width:44px;height:44px;border-radius:999px;border:1px solid rgba(150,170,255,.18);background:rgba(255,255,255,.05);color:#eef2ff;display:grid;place-items:center}
+.nxr .spin{animation:nxrSpin .9s linear infinite}@keyframes nxrSpin{to{transform:rotate(360deg)}}
+.nxr-me{display:grid;grid-template-columns:auto 1fr 1fr;align-items:center;gap:14px;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(143,107,255,.22),rgba(79,227,245,.12));border:1px solid rgba(150,170,255,.28)}
+.nxr-me small{display:block;font-size:10px;letter-spacing:.12em;color:#a9b6d8}.nxr-me b{font-size:20px}.nxr-me.empty{grid-template-columns:auto 1fr;background:rgba(255,255,255,.04);border-color:rgba(150,170,255,.14)}.nxr-me.empty b{font-size:15px}
+.nxr-podium{display:grid;grid-template-columns:1fr 1.15fr 1fr;align-items:end;gap:8px}
+.nxr-pod{position:relative;display:grid;justify-items:center;gap:4px;padding:14px 6px 12px;border-radius:18px;background:rgba(255,255,255,.04);border:1px solid rgba(150,170,255,.14);text-align:center;min-width:0}
+.nxr-pod b{font-size:13px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nxr-pod strong{font-size:17px}.nxr-pod strong small{font-size:10px;margin-left:3px;color:#93a3c8;font-weight:700}
+.nxr-pod em{font-style:normal;font-size:11px;color:#93a3c8;font-weight:800}.nxr-medal{position:absolute;top:8px;right:8px}
+.nxr-pod.p1{padding-top:22px;padding-bottom:16px;border-color:rgba(255,200,74,.55);background:linear-gradient(180deg,rgba(255,200,74,.16),rgba(255,255,255,.03));box-shadow:0 0 24px rgba(255,200,74,.14)}.nxr-pod.p1 .nxr-medal{color:#ffc84a}
+.nxr-pod.p2{border-color:rgba(184,196,214,.45)}.nxr-pod.p2 .nxr-medal{color:#b8c4d6}.nxr-pod.p3{border-color:rgba(192,132,87,.5)}.nxr-pod.p3 .nxr-medal{color:#c08457}
+.nxr-pod.me,.nxr-row.me{outline:2px solid rgba(126,232,248,.6);outline-offset:-2px}
+.nxr-list{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.nxr-row{display:grid;grid-template-columns:30px 38px 1fr auto;align-items:center;gap:10px;padding:10px 12px;border-radius:14px;background:rgba(255,255,255,.035);border:1px solid rgba(150,170,255,.1)}
+.nxr-pos{font-size:14px;color:#93a3c8;text-align:center}.nxr-who{min-width:0;display:grid}.nxr-who b{font-size:14px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.nxr-who small{font-size:11px;color:#93a3c8}
+.nxr-val{font-size:16px}.nxr-val small{font-size:10px;margin-left:3px;color:#93a3c8;font-weight:700}
+.nxr-av{width:var(--s);height:var(--s);flex:none;display:grid;place-items:center;border-radius:50%;background:#101a33;border:2px solid var(--f1,#8f6bff);box-shadow:0 0 0 1px var(--f2,#4fe3f5) inset;font-size:calc(var(--s)*.46);font-weight:800;color:#eef2ff;overflow:hidden}
+.nxr-skel{display:grid;gap:8px}.nxr-skel i{height:54px;border-radius:14px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.09),rgba(255,255,255,.04));background-size:200% 100%;animation:nxrSk 1.2s linear infinite}@keyframes nxrSk{to{background-position:-200% 0}}
+.nxr-err{margin:0;color:#fb7185;font-size:13px}.nxr-empty{text-align:center;color:#93a3c8;font-size:14px;padding:18px}
+@media(prefers-reduced-motion:reduce){.nxr .spin,.nxr-skel i{animation:none}}

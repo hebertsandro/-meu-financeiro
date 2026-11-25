@@ -1,0 +1,13 @@
+.nxl{max-width:640px;margin:16px auto 0;padding:16px;border-radius:22px;background:linear-gradient(160deg,#131d3a,#0f1730);border:1px solid rgba(150,170,255,.14);color:#eef2ff;display:grid;gap:12px}
+.nxl header span{font-size:10px;letter-spacing:.18em;color:#7ee8f8;font-weight:800}.nxl header h3{margin:2px 0;font-size:20px}.nxl header small{font-size:12px;color:#93a3c8;line-height:1.4}
+.nxl-list{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.nxl-row{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;padding:12px;border-radius:16px;background:rgba(255,255,255,.035);border:1px solid rgba(150,170,255,.1)}
+.nxl-row.off{opacity:.62}.nxl-row.cur{border-color:var(--lc);background:linear-gradient(135deg,rgba(255,255,255,.06),rgba(255,255,255,.02));box-shadow:0 0 20px -8px var(--lc)}
+.nxl-badge{width:44px;height:50px;display:grid;place-items:center;background:linear-gradient(145deg,#fff8,var(--lc) 40%,#0008);clip-path:polygon(50% 0,100% 25%,100% 75%,50% 100%,0 75%,0 25%)}.nxl-badge b{font-size:17px;color:#fff;text-shadow:0 1px 2px #0008}
+.nxl-main{min-width:0;display:grid;gap:3px}.nxl-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}.nxl-top b{font-size:16px;color:var(--lc)}
+.nxl-top em{font-style:normal;font-size:9px;letter-spacing:.1em;padding:3px 7px;border-radius:99px;background:var(--lc);color:#07101f;font-weight:900}.nxl-top span{display:inline-flex;align-items:center;gap:3px;font-size:11px;color:#93a3c8}
+.nxl-main>small{font-size:11px;color:#93a3c8}
+.nxl-perks{display:flex;flex-wrap:wrap;gap:5px;margin-top:2px}.nxl-perks span{display:inline-flex;align-items:center;gap:4px;padding:3px 8px;border-radius:99px;background:rgba(126,232,248,.08);color:#b9eefa;font-size:10.5px}
+.nxl-bar{height:5px;border-radius:99px;background:rgba(150,170,255,.14);overflow:hidden;margin-top:4px}.nxl-bar i{display:block;height:100%;background:var(--lc);border-radius:inherit}
+.nxl-chest button{min-height:44px;min-width:78px;display:inline-flex;align-items:center;justify-content:center;gap:6px;border-radius:999px;border:0;background:linear-gradient(135deg,#8b6bff,#3fd9f0);color:#06101f;font-weight:800;font-size:14px}
+.nxl-chest button:disabled{opacity:.6}.nxl-chest .done{display:inline-flex;align-items:center;gap:4px;font-size:12px;color:#7ee8f8}.nxl-chest .lock{display:inline-flex;align-items:center;gap:5px;font-size:13px;color:#7f8fb3}.nxl-chest small{color:#7f8fb3}
