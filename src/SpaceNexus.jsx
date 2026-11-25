@@ -4,8 +4,8 @@ import {ShipArt,EnemyArt,BossArt} from './SpaceNexusArt.jsx';
 
 const UNLOCK={nova:8,laser:12,freeze:30,drone:55};
 const waveSecs=(w,t)=>Math.round(Math.max(30,50-w*.9)*t);
-const Foe=React.memo(function Foe({type,x,y,hp,maxHp,chg,prot}){return <div className={'space-enemy '+type+(chg>0?' charging':'')+(prot?' protected':'')} style={{left:x+'%',top:y+'%'}}><EnemyArt type={type}/><i className="space-enemy-hp" style={{width:(hp/maxHp*100)+'%'}}/></div>});
-const Bolt=React.memo(function Bolt({x,y,cls}){return <i className={cls} style={{left:x+'%',top:y+'%'}}/>});
+const Foe=React.memo(function Foe({type,x,y,hp,maxHp,chg,prot}){return <div className={'space-enemy '+type+(chg>0?' charging':'')+(prot?' protected':'')} style={{transform:`translate3d(calc(${x}cqw - 50%),calc(${y}cqh - 50%),0)`}}><EnemyArt type={type}/><i className="space-enemy-hp" style={{width:(hp/maxHp*100)+'%'}}/></div>});
+const Bolt=React.memo(function Bolt({x,y,cls}){return <i className={cls} style={{transform:`translate3d(calc(${x}cqw - 50%),${y}cqh,0)`}}/>});
 export default function SpaceNexusGame({onReward,onMatch,onLoot}){
  const modes={
   easy:{label:'Fácil',waves:10,hp:140,spawn:86,speed:.72,bossHp:1,fire:1.25,time:1.3},
@@ -43,7 +43,7 @@ export default function SpaceNexusGame({onReward,onMatch,onLoot}){
  useEffect(()=>{
   if(!running)return;
   const keyTarget=e=>/^(INPUT|TEXTAREA|SELECT)$/.test(e.target?.tagName||'');const onKeyDown=e=>{if(keyTarget(e))return;const k=String(e.key).toLowerCase();if(k==='p'||k==='escape'){togglePause();return}if(k==='q'||k==='e'||k===' '){castNova();e.preventDefault();return}if(k==='f'){castFreeze();return}if(k==='g'){castDrone();return}if(k==='l'){castLaser();return}if(['arrowleft','arrowright','arrowup','arrowdown','a','d','w','s'].includes(k)){keysRef.current[k]=true;if(k.startsWith('arrow'))e.preventDefault()}};const onKeyUp=e=>{keysRef.current[String(e.key).toLowerCase()]=false};window.addEventListener('keydown',onKeyDown);window.addEventListener('keyup',onKeyUp);const onVis=()=>{if(document.hidden&&!pausedRef.current){pausedRef.current=true;setPaused(true)}};document.addEventListener('visibilitychange',onVis);
-  let syncUi=null;let raf=0,last=0,accumulator=0;const STEP=1000/120;const frame=(timestamp)=>{raf=requestAnimationFrame(frame);if(pausedRef.current){last=timestamp;accumulator=0;return}if(!last)last=timestamp;const elapsed=Math.min(50,Math.max(0,timestamp-last));last=timestamp;accumulator=Math.min(STEP*4,accumulator+elapsed);let steps=0;while(accumulator>=STEP&&steps<4){accumulator-=1000/120;steps++;
+  let syncUi=null;let raf=0,last=0,accumulator=0;const STEP=1000/120;const frame=(timestamp)=>{raf=requestAnimationFrame(frame);if(pausedRef.current){last=timestamp;accumulator=0;return}if(!last)last=timestamp;const elapsed=Math.min(50,Math.max(0,timestamp-last));last=timestamp;accumulator=Math.min(STEP*6,accumulator+elapsed);let steps=0;while(accumulator>=STEP&&steps<6){accumulator-=1000/120;steps++;
    const g=game.current;if(!g||g.phase==='finished')return;
    g.tick++;const n=g.tick,cfg=modes[g.mode],w=g.wave;const fz=n<g.freezeUntil,ov=g.over?1.45:1;
    const kk=keysRef.current;const kx=((kk.arrowright||kk.d)?1:0)-((kk.arrowleft||kk.a)?1:0),ky=((kk.arrowdown||kk.s)?1:0)-((kk.arrowup||kk.w)?1:0);

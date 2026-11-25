@@ -11,3 +11,14 @@
 .space-enemy.charging .space-art-enemy{filter:none!important;outline:2px solid #ff4d6d;border-radius:8px}
 .space-enemy.scout{animation:none!important}
 .space-enemy,.space-player-shot,.space-enemy-shot,.space-drop,.space-fx,.space-player-ship{will-change:left,top}
+
+/* CAUSA PRINCIPAL DA QUEDA DE FPS: spaceDrift animava background-position (repinta a arena inteira todo quadro).
+   Agora a camada de estrelas é maior que a arena e anda por transform (composto na GPU), com o mesmo loop de 190x340px. */
+.space-stars{left:-190px!important;top:-340px!important;right:auto!important;bottom:auto!important;width:calc(100% + 190px)!important;height:calc(100% + 340px)!important;inset:auto!important;animation:nxStarsDrift 18s linear infinite!important;will-change:transform!important;background-position:0 0!important}
+@keyframes nxStarsDrift{from{transform:translate3d(0,0,0)}to{transform:translate3d(190px,340px,0)}}
+.space-nebula{animation:none!important;filter:none!important;will-change:auto!important;transform:none!important}
+@media(prefers-reduced-motion:reduce){.space-stars{animation:none!important}}
+
+/* posições por transform inline (compositor) em vez de left/top (layout + pintura a cada quadro) */
+.space-nexus-arena{container-type:size}
+.space-enemy,.space-enemy.brute,.space-enemy.scout,.space-enemy.kamikaze,.space-player-shot,.space-enemy-shot{left:0!important;top:0!important;animation:none!important;will-change:transform}
