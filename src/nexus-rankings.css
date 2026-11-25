@@ -23,3 +23,13 @@
 .nxr-skel{display:grid;gap:8px}.nxr-skel i{height:54px;border-radius:14px;background:linear-gradient(90deg,rgba(255,255,255,.04),rgba(255,255,255,.09),rgba(255,255,255,.04));background-size:200% 100%;animation:nxrSk 1.2s linear infinite}@keyframes nxrSk{to{background-position:-200% 0}}
 .nxr-err{margin:0;color:#fb7185;font-size:13px}.nxr-empty{text-align:center;color:#93a3c8;font-size:14px;padding:18px}
 @media(prefers-reduced-motion:reduce){.nxr .spin,.nxr-skel i{animation:none}}
+.nxr-period{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.nxr-period>div{display:inline-flex;padding:3px;border-radius:999px;background:rgba(255,255,255,.05);border:1px solid rgba(150,170,255,.14)}
+.nxr-period button{min-height:34px;padding:0 16px;border:0;border-radius:999px;background:transparent;color:#a9b6d8;font-weight:800;font-size:12px}.nxr-period button.on{background:linear-gradient(135deg,#8f6bff,#4fe3f5);color:#06101f}
+.nxr-period>span{display:inline-flex;align-items:center;gap:5px;font-size:11px;color:#93a3c8}
+.nxr-rival{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:12px 14px;border-radius:16px;background:linear-gradient(135deg,rgba(255,107,129,.16),rgba(143,107,255,.1));border:1px solid rgba(255,107,129,.35);color:#ffd0d8}
+.nxr-rival small{display:block;font-size:10px;letter-spacing:.14em;color:#ff9fb0}.nxr-rival b{font-size:15px;color:#fff}.nxr-rival>span{font-size:12px;color:#ffd0d8;text-align:right}.nxr-rival strong{font-size:16px;color:#fff}
+.nxr-rival.king{grid-template-columns:auto 1fr;background:linear-gradient(135deg,rgba(255,200,74,.2),rgba(255,200,74,.05));border-color:rgba(255,200,74,.5);color:#ffe6a3}.nxr-rival.king small{color:#ffc84a}
+.nxr-prize{display:grid;grid-template-columns:auto 1fr auto;align-items:center;gap:12px;padding:14px 16px;border-radius:18px;background:linear-gradient(135deg,rgba(255,200,74,.25),rgba(143,107,255,.18));border:1px solid rgba(255,200,74,.55);color:#ffe6a3;animation:nxrGlow 2.4s ease-in-out infinite alternate}
+.nxr-prize b{display:block;color:#fff;font-size:14px}.nxr-prize small{font-size:11px;color:#ffe6a3}
+.nxr-prize button{min-height:44px;min-width:84px;border:0;border-radius:999px;background:linear-gradient(135deg,#ffc84a,#ff9a3a);color:#2a1800;font-weight:900;font-size:15px}
+@keyframes nxrGlow{to{box-shadow:0 0 22px rgba(255,200,74,.3)}}@media(prefers-reduced-motion:reduce){.nxr-prize{animation:none}}
