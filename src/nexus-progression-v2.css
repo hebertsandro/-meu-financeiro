@@ -1,0 +1,64 @@
+/* Progressão v2: passe, árvore e loja */
+.npx-hub{background:radial-gradient(120% 60% at 0% 0%,rgba(143,107,255,.16),transparent 60%),radial-gradient(90% 50% at 100% 0%,rgba(79,227,245,.1),transparent 60%),#0c1430!important;border:1px solid rgba(150,170,255,.2)!important}
+.npx-tabs{display:grid!important;grid-template-columns:repeat(3,1fr);gap:4px;padding:4px;border-radius:16px;background:rgba(8,13,30,.7);border:1px solid rgba(150,170,255,.14)}
+.npx-tabs button{min-height:44px;border:0!important;border-radius:12px!important;background:transparent!important;color:#93a3c8!important;font-weight:800;display:inline-flex;align-items:center;justify-content:center;gap:6px;position:relative}
+.npx-tabs button.active{background:linear-gradient(135deg,rgba(143,107,255,.4),rgba(79,227,245,.24))!important;color:#fff!important;box-shadow:inset 0 0 0 1px rgba(150,170,255,.35)}
+.npx-section-title h4{font-size:22px;letter-spacing:-.02em}
+
+/* ── PASSE ── */
+.npx-track{padding:16px 2px 12px!important;gap:10px!important;-webkit-mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent);mask-image:linear-gradient(90deg,transparent,#000 14px,#000 calc(100% - 22px),transparent)}
+.npx-tier{width:132px!important}
+.npx-tier-n{height:30px!important}
+.npx-tier-n:before{height:4px!important;background:rgba(150,170,255,.16)!important;border-radius:4px;left:-6px!important;right:-6px!important}
+.npx-tier:first-child .npx-tier-n:before{left:50%!important}.npx-tier:last-child .npx-tier-n:before{right:50%!important}
+.npx-tier-n span{width:30px!important;height:30px!important;font-size:12px!important}
+.npx-tier-card{width:100%!important;box-sizing:border-box;padding:14px 10px 12px!important;border-radius:20px!important;gap:6px!important;background:linear-gradient(170deg,#1a2548,#0e1630)!important;border:1px solid rgba(150,170,255,.2)!important;position:relative;overflow:hidden}
+.npx-tier-card:before{content:"";position:absolute;inset:0 0 auto 0;height:60px;background:radial-gradient(70% 100% at 50% 0,rgba(143,107,255,.35),transparent);pointer-events:none}
+.npx-tier-card i{font-size:38px!important;position:relative;filter:drop-shadow(0 4px 10px rgba(143,107,255,.5))!important}
+.npx-tier-card small{padding:2px 8px;border-radius:99px;background:rgba(143,107,255,.18);color:#d4c9ff!important;position:relative}
+.npx-tier-card b{font-size:13px!important}
+.npx-tier-card button{width:100%;box-sizing:border-box;min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:5px;white-space:nowrap}
+.npx-tier.ready .npx-tier-card{border-color:#ffc84a!important;background:linear-gradient(170deg,#2c2a40,#10172f)!important;box-shadow:0 0 0 1px rgba(255,200,74,.4),0 0 26px rgba(255,200,74,.28)!important;animation:npxReady 1.8s ease-in-out infinite alternate}
+.npx-tier.ready .npx-tier-card:before{background:radial-gradient(70% 100% at 50% 0,rgba(255,200,74,.45),transparent)}
+@keyframes npxReady{to{box-shadow:0 0 0 1px rgba(255,200,74,.6),0 0 38px rgba(255,200,74,.4)}}
+.npx-tier.claimed .npx-tier-card{border-color:rgba(143,107,255,.5)!important}.npx-tier.claimed .npx-tier-card i{opacity:.85}
+.npx-tier.locked .npx-tier-card{opacity:1!important}.npx-tier.locked .npx-tier-card i{filter:grayscale(.85) brightness(.8)!important}
+.npx-tier.locked .npx-tier-card:before{opacity:.35}
+.npx-claimed{padding:8px 0;color:#7ee8f8!important;font-size:11px!important}
+.npx-lock{padding:8px 0}
+.npx-pass-hero{position:relative;overflow:hidden}
+.npx-pass-hero:after{content:"";position:absolute;right:-30px;top:-30px;width:140px;height:140px;border-radius:50%;background:radial-gradient(circle,rgba(79,227,245,.22),transparent 70%);pointer-events:none}
+
+/* ── ÁRVORE ── */
+.npx-tree{position:relative;padding:16px 8px 18px!important;border-radius:22px!important;background:linear-gradient(rgba(150,170,255,.05) 1px,transparent 1px) 0 0/100% 28px,linear-gradient(90deg,rgba(150,170,255,.05) 1px,transparent 1px) 0 0/28px 100%,radial-gradient(80% 50% at 50% 100%,rgba(255,200,74,.08),transparent),#0a1128!important;border:1px solid rgba(150,170,255,.16)!important}
+.npx-tree-heads b{padding:5px 0;border-radius:99px;background:color-mix(in srgb,var(--bc) 16%,transparent);border:1px solid color-mix(in srgb,var(--bc) 45%,transparent);letter-spacing:.14em}
+.npx-node-ico{width:62px!important;height:62px!important;border-width:2px!important;background:radial-gradient(circle at 32% 25%,#3a4d80,#0f1830 75%)!important;box-shadow:inset 0 2px 6px rgba(255,255,255,.12)}
+.npx-node b{font-size:10.5px!important;color:#e6edff}
+.npx-node.locked .npx-node-ico{border-style:dashed!important;border-color:#34456a!important;background:#0c1428!important}
+.npx-cell .npx-node.owned .npx-node-ico{box-shadow:0 0 18px var(--bc),inset 0 0 12px rgba(255,255,255,.25)!important}
+.npx-cell .npx-node.owned:after{content:"✓";position:absolute;top:-2px;right:12px;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;background:var(--bc);color:#08101f;font-size:12px;font-weight:900}
+.npx-capstone-wrap .npx-node-ico{border-radius:24px!important}
+.npx-detail{border-radius:20px!important;background:linear-gradient(145deg,#1a2548,#0e1630)!important;border-color:rgba(150,170,255,.25)!important}
+.npx-detail.owned{border-color:rgba(143,107,255,.7)!important;box-shadow:0 0 22px rgba(143,107,255,.25)!important}
+.npx-detail.available{border-color:#7ee8f8!important;box-shadow:0 0 20px rgba(126,232,248,.15)}
+.npx-owned{color:#c4b5fd!important}
+.npx-detail-act button{min-height:42px;padding:0 18px}
+
+/* ── LOJA ── */
+.npx-featured{position:relative;overflow:hidden;border-radius:22px!important;padding:18px!important;border-width:1px!important;box-shadow:0 0 28px -8px var(--rc)}
+.npx-featured:after{content:"";position:absolute;inset:0;background:linear-gradient(110deg,transparent 40%,rgba(255,255,255,.1) 50%,transparent 60%);transform:translateX(-100%);animation:npxShine 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes npxShine{60%,100%{transform:translateX(100%)}}
+.npx-filters{gap:6px!important;padding:4px;border-radius:999px;background:rgba(8,13,30,.7);border:1px solid rgba(150,170,255,.14);justify-content:space-between}
+.npx-filters button{flex:1;min-height:38px;border:0!important;background:transparent!important;color:#93a3c8!important}
+.npx-filters button.active{background:linear-gradient(135deg,#8f6bff,#4fe3f5)!important;color:#06101f!important}
+.npx-shop-item{position:relative;border-radius:20px!important;background:linear-gradient(170deg,#18234a,#0d152e)!important;transition:transform .2s,box-shadow .2s}
+.npx-shop-item:before{content:"";position:absolute;inset:0 0 auto 0;height:3px;background:var(--rc);box-shadow:0 0 12px var(--rc);z-index:1}
+.npx-shop-item:active{transform:scale(.98)}
+.npx-shop-art{height:108px!important}
+.npx-shop-item.owned:after{content:"NA CONTA";position:absolute;top:10px;right:10px;padding:2px 8px;border-radius:99px;background:rgba(126,232,248,.16);color:#7ee8f8;font-size:8px;font-weight:900;letter-spacing:.1em}
+.npx-shop-item.owned .npx-shop-art>small{display:none}
+.npx-shop-copy button{width:100%;box-sizing:border-box;min-height:40px;display:inline-flex;align-items:center;justify-content:center;gap:5px}
+@media(prefers-reduced-motion:reduce){.npx-tier.ready .npx-tier-card,.npx-featured:after{animation:none}.npx-shop-item{transition:none}}
+.npx-tree-heads{margin-bottom:14px!important}
+.npx-featured{grid-template-columns:132px 1fr!important}
+.npx-featured .npx-prev-title{white-space:nowrap}

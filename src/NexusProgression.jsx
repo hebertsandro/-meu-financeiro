@@ -2,6 +2,7 @@ import React,{useCallback,useEffect,useRef,useState} from 'react';
 import {supabase} from './supabase';
 import {Zap,Coins,Lock,Check,ShoppingBag,Sparkles,Shield,Star,Crown,Gift} from 'lucide-react';
 import './nexus-progression.css';
+import './nexus-progression-v2.css';
 
 // ── Árvore de habilidades ────────────────────────────────────────────────
 const SKILLS={
