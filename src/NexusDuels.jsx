@@ -7,7 +7,8 @@ export const DUEL_GAMES=[
  {key:'space-nexus',label:'Space Nexus',icon:'🚀',app:'space'},
  {key:'piggy-run',label:'Asas da Fortuna',icon:'🐷',app:'flap'},
  {key:'extra-gems',label:'Gem Match',icon:'💎',app:'extra-gems'},
- {key:'extra-defense',label:'Defesa do Cofrinho',icon:'🏰',app:'extra-defense'}
+ {key:'extra-defense',label:'Defesa do Cofrinho',icon:'🏰',app:'extra-defense'},
+ {key:'quiz',label:'Quiz Financeiro',icon:'🧠',app:'quiz'}
 ];
 const gameOf=k=>DUEL_GAMES.find(g=>g.key===k)||{label:k,icon:'🎮'};
 const fmt=n=>Number(n||0).toLocaleString('pt-BR');
