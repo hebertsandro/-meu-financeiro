@@ -6,6 +6,8 @@ import NexusLoot from './NexusLoot';
 import NexusMultiplayer from './NexusMultiplayer';
 
 const games=[{id:'space-nexus',name:'Space Nexus',icon:'🚀'},{id:'piggy-run',name:'Asas da Fortuna',icon:'🐷'},{id:'quiz',name:'Quiz Financeiro',icon:'🧠'},{id:'extra-dungeon',name:'Dungeon Rush',icon:'⚔️'},{id:'extra-gems',name:'Gem Match',icon:'💎'},{id:'extra-race',name:'Corrida do Dinheiro',icon:'🏎️'},{id:'extra-defense',name:'Defesa do Cofrinho',icon:'🏰'}];
+const RETIRED=['extra-dungeon','extra-race'];
+const playableGames=games.filter(g=>!RETIRED.includes(g.id));
 const gameName=id=>games.find(g=>g.id===id)?.name||id;
 const fmtDate=value=>value?new Date(value).toLocaleDateString('pt-BR',{day:'2-digit',month:'short',timeZone:'UTC'}):'—';
 const fmtDateTime=value=>value?new Date(value).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'}):'—';
@@ -91,13 +93,11 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
  const myTournamentRank=tournamentRows.findIndex(x=>x.user_id===userId)+1;
  const myMedals=medals.reduce((n,m)=>n+Number(m.medals_count||0),0)+rankMedals.reduce((n,m)=>n+Number(m.medals_count||0),0);
  const display=p=>p?.display_name||p?.username||'Jogador';
- const mastery=games.map(game=>{const rows=matches.filter(m=>m.game_key===game.id);const wins=rows.filter(m=>m.won).length;const xp=rows.reduce((sum,m)=>sum+Number(m.xp_earned||0),0);const best=rows.reduce((value,m)=>Math.max(value,Number(m.score||0)),0);const points=rows.length+wins*2;return {...game,matches:rows.length,wins,xp,best,level:Math.min(10,1+Math.floor(points/3)),progress:Math.min(100,(points%3)/3*100)}});
+ const mastery=playableGames.map(game=>{const rows=matches.filter(m=>m.game_key===game.id);const wins=rows.filter(m=>m.won).length;const xp=rows.reduce((sum,m)=>sum+Number(m.xp_earned||0),0);const best=rows.reduce((value,m)=>Math.max(value,Number(m.score||0)),0);const points=rows.length+wins*2;return {...game,matches:rows.length,wins,xp,best,level:Math.min(10,1+Math.floor(points/3)),progress:Math.min(100,(points%3)/3*100)}});
  const secretAchievements=[
   {id:'first-clear',name:'Primeiro portal',icon:'🌀',desc:'Conclua sua primeira partida.',progress:Math.min(1,matches.length),target:1},
-  {id:'all-games',name:'Explorador do universo',icon:'🌌',desc:'Jogue os sete títulos do Arcade.',progress:games.filter(g=>matches.some(m=>m.game_key===g.id)).length,target:7},
-  {id:'dungeon-master',name:'Mestre da masmorra',icon:'⚔️',desc:'Vença três partidas de Dungeon Rush.',progress:Math.min(3,matches.filter(m=>m.game_key==='extra-dungeon'&&m.won).length),target:3},
+  {id:'all-games',name:'Explorador do universo',icon:'🌌',desc:'Jogue todos os títulos do Arcade.',progress:playableGames.filter(g=>matches.some(m=>m.game_key===g.id)).length,target:playableGames.length},
   {id:'gem-alchemist',name:'Alquimista de gemas',icon:'💎',desc:'Conclua dez partidas de Gem Match.',progress:Math.min(10,matches.filter(m=>m.game_key==='extra-gems').length),target:10},
-  {id:'street-legend',name:'Lenda das pistas',icon:'🏎️',desc:'Faça 50 pontos em uma corrida.',progress:Math.min(50,matches.filter(m=>m.game_key==='extra-race').reduce((best,m)=>Math.max(best,Number(m.score||0)),0)),target:50},
   {id:'piggy-guardian',name:'Guardião lendário',icon:'🏰',desc:'Vença cinco partidas de Defesa do Cofrinho.',progress:Math.min(5,matches.filter(m=>m.game_key==='extra-defense'&&m.won).length),target:5}
  ];
  const recentMatches=matches.slice(0,5);
@@ -128,7 +128,7 @@ export default function NexusCompetition({session,gameXp=0,onToast=()=>{}}){
    <div className="nc-board-caption">DUELOS ENTRE AMIGOS · PRAZO DE 7 DIAS</div>
    <div className="nc-challenge-form">
     <label>Escolha um amigo<select value={challengeFriend} onChange={e=>setChallengeFriend(e.target.value)}><option value="">Selecione...</option>{friends.map(p=><option key={p.user_id} value={p.user_id}>{display(p)} {p.username?'(@'+p.username+')':''}</option>)}</select></label>
-    <label>Jogo<select value={challengeGame} onChange={e=>{const key=e.target.value;setChallengeGame(key);setChallengeTarget(key==='extra-race'?'40':key==='extra-gems'?'100':key==='extra-dungeon'?'100':key==='extra-defense'?'100':key==='quiz'?'4':key==='piggy-run'?'100':'500')}}>{games.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
+    <label>Jogo<select value={challengeGame} onChange={e=>{const key=e.target.value;setChallengeGame(key);setChallengeTarget(key==='extra-race'?'40':key==='extra-gems'?'1500':key==='extra-dungeon'?'100':key==='extra-defense'?'100':key==='quiz'?'4':key==='piggy-run'?'100':'500')}}>{playableGames.map(g=><option key={g.id} value={g.id}>{g.name}</option>)}</select></label>
     <label>Meta de pontuação<input type="number" min="1" max="1000000" value={challengeTarget} onChange={e=>setChallengeTarget(e.target.value)}/></label>
     <label>Nome do desafio<input maxLength="60" value={challengeTitle} onChange={e=>setChallengeTitle(e.target.value)}/></label>
     <button className="nc-primary" type="button" disabled={!challengeFriend||!challengeTitle.trim()||Number(challengeTarget)<1||challengeBusy} onClick={createChallenge}><Swords size={16}/>{challengeBusy?'Enviando...':'Desafiar amigo'}</button>

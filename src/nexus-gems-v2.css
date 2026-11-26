@@ -1,0 +1,13 @@
+/* Gem Match v2: formas diferentes por cor (jogável sem depender só da cor), brilho e obstáculos mais claros */
+.nax-gem-board{background:radial-gradient(120% 90% at 50% 0,rgba(143,107,255,.22),transparent 60%),linear-gradient(160deg,#101a3a,#0a1128)!important;border-color:rgba(150,170,255,.3)!important;box-shadow:0 0 40px -12px rgba(143,107,255,.5),inset 0 0 30px rgba(0,0,0,.4)}
+.nax-gem-board button[data-g="0"]{border-radius:50%!important}
+.nax-gem-board button[data-g="1"]{border-radius:18%!important;clip-path:polygon(50% 2%,98% 50%,50% 98%,2% 50%)}
+.nax-gem-board button[data-g="2"]{clip-path:polygon(25% 3%,75% 3%,98% 50%,75% 97%,25% 97%,2% 50%)}
+.nax-gem-board button[data-g="3"]{border-radius:30%!important}
+.nax-gem-board button[data-g="4"]{clip-path:polygon(50% 3%,97% 90%,3% 90%)}
+.nax-gem-board button[data-g="4"]:before{inset:18% 28% 52%!important}
+.nax-gem-board button.stone{filter:saturate(.8)}
+.nax-gem-board button.stone.ice{box-shadow:0 0 14px rgba(143,227,255,.7),inset 0 0 12px rgba(255,255,255,.5)}
+.nax-gem-board button.bomb{animation:nxBombPulse 1.1s ease-in-out infinite alternate}
+@keyframes nxBombPulse{to{filter:brightness(1.35) drop-shadow(0 0 8px #ffb347)}}
+@media(prefers-reduced-motion:reduce){.nax-gem-board button.bomb{animation:none!important}}

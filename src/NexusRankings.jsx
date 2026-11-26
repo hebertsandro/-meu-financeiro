@@ -9,8 +9,6 @@ export const RANK_GAMES=[
  {key:'space-nexus',label:'Space Nexus',unit:'pts'},
  {key:'piggy-run',label:'Finance Flap',unit:'pts'},
  {key:'extra-gems',label:'Gemas',unit:'pts'},
- {key:'extra-dungeon',label:'Masmorra',unit:'pts'},
- {key:'extra-race',label:'Corrida',unit:'pts'},
  {key:'extra-defense',label:'Defesa',unit:'pts'},
  {key:'quiz',label:'Quiz',unit:'acertos'}
 ];
