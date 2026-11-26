@@ -1,0 +1,38 @@
+/* Nexus Social — layout estilo Instagram */
+body.nx-ig .page-heading{display:none!important}
+body.nx-ig .nxv-head{display:none!important}
+body.nx-ig .social-hero,body.nx-ig .social-side{display:none!important}
+body.nx-ig .social-layout{display:block!important;grid-template-columns:1fr!important}
+body.nx-ig .social-main{max-width:640px;margin:0 auto}
+.nexus-social{padding-bottom:calc(86px + env(safe-area-inset-bottom,0px))}
+.ig-bar{position:sticky;top:0;z-index:30;display:flex;align-items:center;gap:10px;max-width:640px;margin:0 auto;padding:8px 4px;background:linear-gradient(#070d1af2,#070d1acc);backdrop-filter:blur(14px)}
+.ig-logo{border:0;background:none;font:800 24px/1 inherit;letter-spacing:.5px;background:linear-gradient(90deg,#8fd7ff,#b68cff);-webkit-background-clip:text;background-clip:text;color:transparent;padding:6px 4px;cursor:pointer}
+.ig-title{font-size:18px;color:var(--nx-text,#e8f0ff)}
+.ig-actions{margin-left:auto;display:flex;gap:4px}
+.ig-ico{position:relative;display:grid;place-items:center;width:42px;height:42px;border:0;border-radius:50%;background:transparent;color:var(--nx-text,#e8f0ff);cursor:pointer}
+.ig-ico:active,.ig-ico.on{background:#ffffff14;color:#8fd7ff}
+.ig-dot{position:absolute;top:8px;right:8px;width:9px;height:9px;border-radius:50%;background:#ff4d6d;box-shadow:0 0 0 2px #070d1a}
+.ig-badge{position:absolute;top:2px;right:0;min-width:18px;height:18px;padding:0 4px;border-radius:9px;background:#ff4d6d;color:#fff;font:700 10px/18px inherit;font-style:normal;text-align:center;box-shadow:0 0 0 2px #070d1a}
+.ig-notif{position:relative;max-width:640px;margin:0 auto}
+.ig-notif .nxs-notification-panel{right:0;top:4px}
+.ig-nav{display:none}
+@media(max-width:760px){
+ body.nx-ig .mobile-bottom-nav{display:none!important}
+ .ig-nav{position:fixed;z-index:40;left:0;right:0;bottom:0;display:grid;grid-template-columns:repeat(5,1fr);align-items:center;padding:6px 8px calc(6px + env(safe-area-inset-bottom,0px));background:#070d1af5;border-top:1px solid #7fa4ff2b;backdrop-filter:blur(16px)}
+ .ig-nav button{position:relative;display:grid;place-items:center;height:48px;border:0;background:transparent;color:#9fb2d2;cursor:pointer}
+ .ig-nav button.on{color:#fff}.ig-nav button.on svg{filter:drop-shadow(0 0 6px #66baff88)}
+ .ig-nav .ig-plane svg{transform:rotate(-18deg)}
+ .ig-nav .ig-badge{top:4px;right:calc(50% - 22px)}
+ .ig-me{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#1b2745;border:2px solid #8fd7ff;font-size:15px}
+ .ig-bar{padding-top:calc(8px + env(safe-area-inset-top,0px))}
+}
+@media(min-width:761px){
+ .ig-nav{display:flex;position:fixed;z-index:40;left:50%;bottom:14px;transform:translateX(-50%);gap:6px;padding:6px 10px;border:1px solid #7fa4ff3a;border-radius:999px;background:#0a1222ee;backdrop-filter:blur(16px)}
+ .ig-nav button{position:relative;display:grid;place-items:center;width:48px;height:44px;border:0;border-radius:50%;background:transparent;color:#9fb2d2;cursor:pointer}
+ .ig-nav button.on{color:#fff;background:#ffffff14}
+ .ig-nav .ig-badge{top:2px;right:2px}
+ .ig-me{display:grid;place-items:center;width:28px;height:28px;border-radius:50%;background:#1b2745;border:2px solid #8fd7ff;font-size:15px}
+}
+/* inbox */
+body.nx-ig .social-tabs{display:none}
+body.nx-ig .social-panel{border-radius:16px}
