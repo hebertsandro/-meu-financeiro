@@ -1,12 +1,13 @@
 import React,{useEffect,useState} from 'react';
 import {ChevronRight,Zap,Trophy} from 'lucide-react';
 
-export default function FinanceFlapGame({onReward,onMatch,onLoot}){
+export default function FinanceFlapGame({onReward,onMatch,onLoot,onScore}){
  const modes=[{id:'normal',name:'Normal',speed:2,desc:'Um desafio equilibrado'},{id:'medium',name:'Médio',speed:3,desc:'Exige reflexos e precisão'},{id:'hard',name:'Difícil',speed:4,desc:'Para quem domina o voo'},{id:'infinite',name:'Infinito',speed:2,desc:'Sobreviva: velocidade e pressão aumentam sem parar'}];
  const [mode,setMode]=useState(null),[bestScore,setBestScore]=useState(()=>Number(window.localStorage.getItem('mf_flap_best')||0));
  const [infiniteBest,setInfiniteBest]=useState(()=>Number(window.localStorage.getItem('mf_flap_best_infinite')||0));
  const canvasRef=React.useRef(null),stateRef=React.useRef({pigY:190,velocity:0,obstacles:[],items:[],frame:0,score:0,rewarded:false,spawnTimer:0,shield:0,shieldFlash:0,slow:0,xpEarned:0,passedObstacles:0});
  const [status,setStatus]=useState('choose'),[score,setScore]=useState(0);
+ React.useEffect(()=>{if(onScore)onScore(score)},[score]); // eslint-disable-line react-hooks/exhaustive-deps
  function begin(){const s=stateRef.current;s.pigY=190;s.velocity=0;s.obstacles=[{x:360,gapY:145,passed:false}];s.items=[];s.shield=0;s.shieldFlash=0;s.slow=0;s.magnet=0;s.x2=0;s.parts=[];s.pops=[];s.meteors=[];s.lasers=[];s.ghost=0;s.combo=0;s.cp=10;s.cpT=900;s.cpMax=900;s.sprint=0;s.stage=0;s.banner=0;s.frame=0;s.spawnTimer=0;s.score=0;s.rewarded=false;s.xpEarned=0;s.passedObstacles=0;setScore(0);setStatus('playing')}
  function flap(){if(status==='ready'||status==='over'||status==='won'){begin();return}if(status==='playing')stateRef.current.velocity=-6.2}
  function backToModes(){setStatus('choose');setMode(null)}

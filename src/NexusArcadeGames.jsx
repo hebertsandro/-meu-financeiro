@@ -187,13 +187,14 @@ const STYLE=`
 .nax-game .nax-run-obstacle.type-magnet{width:26px;height:26px;border-radius:50%;background:linear-gradient(145deg,#ffb3ff,#a02ae0);border-color:#fff;box-shadow:0 0 16px #d46bff}.nax-game .nax-run-obstacle.type-magnet:after{display:none}
 .nax-game .nax-td-enemy.flyer{width:26px;height:26px}.nax-game .nax-td-enemy.armored{width:38px;height:38px}.nax-game .nax-td-enemy.regen{width:32px;height:32px}
 `;
-export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{},onLoot=()=>{},skills=[]}){
+export default function NexusArcadeGames({gameKey,onReward=()=>{},onMatch=()=>{},onLoot=()=>{},onScore,skills=[]}){
  const [ownedSkills,setOwnedSkills]=useState(skills);
  useEffect(()=>{let live=true;(async()=>{try{const {data:u}=await supabase.auth.getUser();const id=u?.user?.id;if(!id)return;const {data}=await supabase.from('nexus_player_progress').select('unlocked_skills').eq('user_id',id).maybeSingle();if(live&&data?.unlocked_skills)setOwnedSkills(data.unlocked_skills)}catch{}})();return()=>{live=false}},[gameKey]);
  const has=k=>ownedSkills.includes(k);
  const cfg=CONFIG[gameKey],extraHeart=has('extra-heart'),coinBoost=has('coin-boost');
  const coreMax=12+(has('iron-core')?4:0),scoreMult=1+(has('score-plus')?.08:0)+(has('legend')?.2:0),scoreMultRef=useRef(1);scoreMultRef.current=scoreMult;
  const [started,setStarted]=useState(false),[finished,setFinished]=useState(false),[score,setScore]=useState(0),[elapsed,setElapsed]=useState(0),[result,setResult]=useState('');
+ useEffect(()=>{if(onScore)onScore(score)},[score]); // eslint-disable-line react-hooks/exhaustive-deps
  const [hearts,setHearts]=useState(extraHeart?4:3);
  const [room,setRoom]=useState(1),[enemyHp,setEnemyHp]=useState(3),[enemyMax,setEnemyMax]=useState(3),[guard,setGuard]=useState(false),[dungeonMsg,setDungeonMsg]=useState('Um guardião bloqueia a passagem!'),[heroLane,setHeroLane]=useState(0),[mana,setMana]=useState(100),[dungeonPowerCd,setDungeonPowerCd]=useState(0),[foeKind,setFoeKind]=useState('guardian'),[foeArmor,setFoeArmor]=useState(0),[foeTarget,setFoeTarget]=useState(null),[dTime,setDTime]=useState(40),[streak,setStreak]=useState(0),[healCd,setHealCd]=useState(0);const lastTele=useRef(0);
  const [lane,setLane]=useState(1),[obstacles,setObstacles]=useState([]),[move,setMove]=useState('run'),[distance,setDistance]=useState(0),[runnerBoost,setRunnerBoost]=useState(0),[runnerShield,setRunnerShield]=useState(0),[raceCombo,setRaceCombo]=useState(0),[runnerMagnet,setRunnerMagnet]=useState(0);const magnetRef=useRef(0),laneRef=useRef(1);
