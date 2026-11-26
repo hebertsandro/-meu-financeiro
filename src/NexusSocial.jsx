@@ -170,7 +170,6 @@ export default function NexusSocial({view='conversations',session,playerProfile,
  return <section className="nexus-social">
   <div className="ig-bar">
    {view==='conversations'?<button type="button" className="ig-ico" onClick={()=>onGo('social-feed')} aria-label="Voltar ao feed"><ArrowLeft size={23}/></button>:<button type="button" className="ig-logo" onClick={()=>onGo('overview')} aria-label="Voltar ao início">Nexus</button>}
-   {view==='conversations'&&<b className="ig-title">Mensagens</b>}
    <div className="ig-actions">
     <button type="button" className="ig-ico" aria-label="Notificações" aria-expanded={showSocialNotifications} onClick={()=>{setShowSocialNotifications(v=>!v);if(!showSocialNotifications)loadSocialNotifications();}}><Heart size={22}/>{socialNotifications.some(n=>!n.is_read)&&<i className="ig-dot"/>}</button>
     {view==='feed'?<button type="button" className="ig-ico" aria-label="Mensagens" onClick={()=>onGo('social-conversations')}><Send size={22}/>{dmUnread>0&&<i className="ig-badge">{dmUnread>99?'99+':dmUnread}</i>}</button>:<button type="button" className={'ig-ico'+(tab==='discover'?' on':'')} aria-label="Adicionar amigos" onClick={()=>setTab(t=>t==='discover'?'community':'discover')}><UserPlus size={22}/></button>}

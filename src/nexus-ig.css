@@ -36,3 +36,34 @@ body.nx-ig .social-main{max-width:640px;margin:0 auto}
 /* inbox */
 body.nx-ig .social-tabs{display:none}
 body.nx-ig .social-panel{border-radius:16px}
+
+/* ===== v2: sem topo do app, barra transparente, caixa de entrada Nexus ===== */
+body.nx-ig .topbar{display:none!important}
+body.nx-ig .ig-bar{width:100%;max-width:640px;background:linear-gradient(#070d1aee,#070d1a00)!important;backdrop-filter:none;padding-top:calc(6px + env(safe-area-inset-top,0px))}
+body.nx-ig .ig-logo{font-size:26px;letter-spacing:-.5px}
+body.nx-ig .social-main{width:100%}
+/* inbox: tudo plano */
+body.nx-ig .social-community-tabs,body.nx-ig .social-community>.social-panel>.social-panel-heading{display:none!important}
+body.nx-ig .social-community>.social-panel,body.nx-ig .social-community-grid,body.nx-ig .social-community-list,body.nx-ig .nx2c-list{background:transparent!important;border:0!important;box-shadow:none!important;padding:0!important}
+body.nx-ig .nx2c-inbox-head.nx2c-ig{display:flex;align-items:center;gap:10px;margin:2px 0 12px}
+body.nx-ig .nx2c-ig h3{margin:0;font-size:30px;font-weight:800;letter-spacing:-.8px;color:#f2f6ff}
+body.nx-ig .nx2c-count{min-width:24px;height:24px;padding:0 7px;border-radius:12px;background:linear-gradient(135deg,#7c5cff,#2fd2ff);color:#fff;font:800 12px/24px inherit;text-align:center;box-shadow:0 0 14px #5b8cff77}
+body.nx-ig .nx2c-ig .nx2c-new{margin-left:auto;width:42px;height:42px;border-radius:14px}
+body.nx-ig .nx2c-search{border-radius:16px!important;background:#ffffff0d!important;border:1px solid #ffffff12!important}
+.nx2c-orbs{display:flex;gap:14px;overflow-x:auto;padding:16px 2px 6px;scrollbar-width:none}
+.nx2c-orbs::-webkit-scrollbar{display:none}
+.nx2c-orbs button{flex:0 0 auto;display:grid;justify-items:center;gap:6px;border:0;background:none;color:#aebbd6;cursor:pointer}
+.nx2c-orbs small{font-size:11px;font-weight:600}
+.nx2c-orb{position:relative;display:grid;place-items:center;width:62px;height:62px;border-radius:50%;font-size:30px;background:radial-gradient(circle at 30% 25%,#2a3a66,#111a33);box-shadow:0 0 0 2px #0a1222,0 0 0 4px #6f8cff66,0 0 18px #6f8cff44}
+.nx2c-orbs button:active .nx2c-orb{transform:scale(.94)}
+.nx2c-sec{display:flex;align-items:center;justify-content:space-between;margin:14px 2px 4px}
+.nx2c-sec b{font-size:16px;color:#f2f6ff}
+.nx2c-sec span,.nx2c-sec button{font-size:13px;font-weight:700;color:#8fa2c1;border:0;background:none}
+.nx2c-sec button{color:#8fd7ff;cursor:pointer}
+.nx2c-sec i{font-style:normal;background:#ff4d6d;color:#fff;border-radius:9px;padding:1px 7px;margin-left:4px;font-size:11px}
+body.nx-ig .nx2c-filters{margin:6px 0 4px}
+body.nx-ig .nx2c-row{background:transparent!important;border:0!important;border-radius:0!important;box-shadow:none!important;padding:10px 2px!important}
+body.nx-ig .nx2c-row.selected{background:#ffffff08!important}
+body.nx-ig .nx2c-avatar{width:58px!important;height:58px!important;font-size:28px}
+body.nx-ig .nx2c-row.unread b,body.nx-ig .nx2c-row.unread .nx2c-preview{color:#fff;font-weight:800}
+body.nx-ig .nx2c-row.unread:after{content:"";width:11px;height:11px;border-radius:50%;margin-left:8px;background:linear-gradient(135deg,#7c5cff,#2fd2ff);box-shadow:0 0 10px #5b8cffaa;flex:0 0 auto}
