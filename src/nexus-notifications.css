@@ -1,0 +1,39 @@
+.nxn{display:flex;flex-direction:column;color:#eaf0ff}
+.nxn-head{display:flex;align-items:flex-start;gap:10px;padding:2px 2px 12px}
+.nxn-head h2{margin:0;font-size:28px;font-weight:800;letter-spacing:-.7px}
+.nxn-head p{margin:3px 0 0;font-size:13px;color:#93a7cc}
+.nxn-x{margin-left:auto;display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:#ffffff12;color:#fff;cursor:pointer}
+.nxn-bar{display:flex;align-items:center;gap:8px;margin-bottom:10px}
+.nxn-seg{display:flex;gap:4px;padding:4px;border-radius:999px;background:#ffffff0d}
+.nxn-seg button{display:flex;align-items:center;gap:6px;border:0;border-radius:999px;padding:8px 14px;background:transparent;color:#93a7cc;font-weight:700;font-size:13px;cursor:pointer}
+.nxn-seg button.on{background:linear-gradient(135deg,#7c5cff,#2f9bff);color:#fff;box-shadow:0 4px 14px #4f6dff55}
+.nxn-seg i{font-style:normal;min-width:18px;height:18px;border-radius:9px;background:#ff4d6d;color:#fff;font-size:10px;line-height:18px;text-align:center}
+.nxn-tools{margin-left:auto;display:flex;gap:6px}
+.nxn-tools button{display:grid;place-items:center;width:40px;height:40px;border:0;border-radius:50%;background:#ffffff0d;color:#8fd7ff;cursor:pointer}
+.nxn-tools button:disabled{opacity:.3}
+.nxn-device{margin-bottom:6px;border:1px solid #7fa4ff26;border-radius:16px;background:#ffffff08}
+.nxn-device>button{display:flex;align-items:center;gap:10px;width:100%;padding:11px 12px;border:0;background:none;color:#cfdcff;text-align:left;cursor:pointer}
+.nxn-device>button>span{display:grid;flex:1}.nxn-device b{font-size:13px}.nxn-device small{font-size:11px;color:#8fa2c1}
+.nxn-device svg.up{transform:rotate(180deg)}
+.nxn-device-body{padding:0 10px 10px}.nxn-device-body>div{margin-bottom:0!important}
+.nxn-day{margin:16px 4px 6px;font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:#7f93b8;font-weight:800}
+.nxn-item{position:relative;display:flex;align-items:stretch;margin-bottom:6px;border-radius:18px;background:#ffffff08;border:1px solid transparent;overflow:hidden}
+.nxn-item.unread{background:linear-gradient(90deg,#5b4bd633,#1d4a8a1f);border-color:#7fa4ff30}
+.nxn-main{display:flex;align-items:center;gap:12px;flex:1;min-width:0;padding:12px 8px 12px 12px;border:0;background:none;color:inherit;text-align:left;cursor:pointer;position:relative}
+.nxn-ic{flex:none;display:grid;place-items:center;width:44px;height:44px;border-radius:15px;background:#ffffff10;color:#8fd7ff}
+.k-msg .nxn-ic{background:linear-gradient(135deg,#7c5cff,#2f9bff);color:#fff}
+.k-like .nxn-ic{background:#ff4d6d26;color:#ff7b95}.k-friend .nxn-ic{background:#2fd2ff22;color:#6fe3ff}.k-game .nxn-ic{background:#ffc94d22;color:#ffd36b}
+.nxn-tx{display:grid;gap:2px;min-width:0;flex:1}
+.nxn-tx b{font-size:14px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.nxn-item:not(.unread) .nxn-tx b{font-weight:600;color:#b9c7e3}
+.nxn-tx small{font-size:13px;color:#9db0d3;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
+.nxn-tx em{font-style:normal;font-size:11px;color:#6f84ab}
+.nxn-main time{flex:none;align-self:flex-start;font-size:11px;color:#7f93b8;margin-top:2px}
+.nxn-dot{position:absolute;right:12px;bottom:14px;width:10px;height:10px;border-radius:50%;background:linear-gradient(135deg,#7c5cff,#2fd2ff);box-shadow:0 0 10px #5b8cffaa}
+.nxn-del{flex:none;width:36px;border:0;background:none;color:#5f7299;cursor:pointer}
+.nxn-empty{display:grid;justify-items:center;gap:8px;padding:50px 20px;text-align:center;color:#7f93b8}
+.nxn-empty b{color:#eaf0ff;font-size:16px}.nxn-empty p{margin:0;font-size:13px}
+/* sheet */
+.nxn-backdrop{position:fixed;inset:0;z-index:2147483100;background:#02050dbb;backdrop-filter:blur(6px);display:flex;justify-content:center;align-items:flex-end}
+.nxn-sheet{width:min(560px,100%);max-height:92dvh;overflow-y:auto;overscroll-behavior:contain;padding:18px 14px calc(22px + env(safe-area-inset-bottom,0px));border-radius:26px 26px 0 0;background:#0a1122;border:1px solid #7fa4ff26;border-bottom:0;box-shadow:0 -20px 60px #000a}
+@media(min-width:761px){.nxn-backdrop{align-items:center}.nxn-sheet{border-radius:26px;border-bottom:1px solid #7fa4ff26;max-height:86dvh}}
