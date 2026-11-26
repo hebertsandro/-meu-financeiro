@@ -67,3 +67,28 @@ body.nx-ig .nx2c-row.selected{background:#ffffff08!important}
 body.nx-ig .nx2c-avatar{width:58px!important;height:58px!important;font-size:28px}
 body.nx-ig .nx2c-row.unread b,body.nx-ig .nx2c-row.unread .nx2c-preview{color:#fff;font-weight:800}
 body.nx-ig .nx2c-row.unread:after{content:"";width:11px;height:11px;border-radius:50%;margin-left:8px;background:linear-gradient(135deg,#7c5cff,#2fd2ff);box-shadow:0 0 10px #5b8cffaa;flex:0 0 auto}
+
+/* ===== v3: botão Menu, dica, chat por dentro ===== */
+.ig-menu{display:flex;align-items:center;gap:2px;height:40px;padding:0 12px 0 6px;border:1px solid #7fa4ff40;border-radius:999px;background:#ffffff0f;color:#e8f0ff;cursor:pointer}
+.ig-menu span{display:grid;text-align:left;line-height:1}
+.ig-menu small{font-size:9px;letter-spacing:.6px;text-transform:uppercase;color:#93a7cc}
+.ig-menu b{font-size:15px;background:linear-gradient(90deg,#8fd7ff,#b68cff);-webkit-background-clip:text;background-clip:text;color:transparent}
+.ig-tip{display:flex;align-items:center;gap:10px;max-width:640px;margin:2px auto 10px;padding:10px 12px;border:1px solid #6f8cff55;border-radius:16px;background:linear-gradient(135deg,#2a2160cc,#10305acc);color:#dfe8ff;font-size:13px;line-height:1.35}
+.ig-tip b{color:#fff}.ig-tip svg{flex:none;color:#8fd7ff}
+.ig-tip button{flex:none;border:0;border-radius:999px;padding:7px 12px;background:#fff;color:#0a1222;font-weight:800;font-size:12px;cursor:pointer}
+/* chat: cabeçalho */
+body.nx-ig .nexus-social .social-community .nx2c-head{background:#070d1af2!important;border-bottom:1px solid #ffffff10!important;padding:10px 10px!important;backdrop-filter:blur(14px)}
+body.nx-ig .nx2c-person-copy b{font-size:16px;font-weight:800}
+body.nx-ig .nx2c-avatar.sm{width:42px!important;height:42px!important;font-size:22px}
+/* mensagens */
+body.nx-ig .nexus-social .social-community .nx2c-messages{padding:14px 12px 10px!important;gap:3px;background:radial-gradient(120% 60% at 50% 0,#1a1550aa,transparent 60%),#070d1a!important}
+body.nx-ig .nx2c-bubble{border-radius:22px!important;padding:10px 14px 7px!important}
+body.nx-ig .nx2c-msg.mine .nx2c-bubble{background:linear-gradient(135deg,#7c5cff,#2f9bff 70%,#2fd2ff)!important;color:#fff!important;border:0!important;box-shadow:0 6px 20px #4f6dff44}
+body.nx-ig .nx2c-msg.theirs .nx2c-bubble{background:#1a2340!important;color:#eaf0ff!important;border:1px solid #ffffff10!important}
+body.nx-ig .nx2c-msg.mine.last .nx2c-bubble{border-bottom-right-radius:6px!important}
+body.nx-ig .nx2c-msg.theirs.last .nx2c-bubble{border-bottom-left-radius:6px!important}
+/* composer */
+body.nx-ig .nx2c-compose-wrap{background:#070d1a}
+body.nx-ig .nexus-social .nx2c-compose{background:#141c36!important;border:1px solid #7fa4ff30!important;border-radius:28px!important;padding:5px!important}
+body.nx-ig .nexus-social .nx2c-send{background:linear-gradient(135deg,#7c5cff,#2fd2ff)!important;color:#fff!important;box-shadow:0 0 16px #5b8cff77}
+body.nx-ig .nexus-social .nx2c-send:disabled{box-shadow:none;background:#26304f!important}

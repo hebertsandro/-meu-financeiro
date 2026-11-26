@@ -6,7 +6,7 @@ import './nexus-social-premium.css';
 import './nexus-social-polish.css';
 import './nexus-player-profile.css';
 import './nexus-ig.css';
-import {Search,Users,UserPlus,Check,X,RefreshCw,ShieldCheck,UserRound,AtSign,Lock,Eye,CalendarClock,Trophy,Zap,Star,Flame,MessageCircle,Bell,CheckCheck,Pencil,Grid3X3,Heart,MessageCircleMore,Send,Home,Gamepad2,ArrowLeft} from 'lucide-react';
+import {Search,Users,UserPlus,Check,X,RefreshCw,ShieldCheck,UserRound,AtSign,Lock,Eye,CalendarClock,Trophy,Zap,Star,Flame,MessageCircle,Bell,CheckCheck,Pencil,Grid3X3,Heart,MessageCircleMore,Send,Home,Gamepad2,ArrowLeft,ChevronLeft} from 'lucide-react';
 import {supabase} from './supabase';
 import NexusCommunity from './NexusCommunity';
 import NexusFeed from './NexusFeed';
@@ -74,7 +74,7 @@ export default function NexusSocial({view='conversations',session,playerProfile,
  const [busy,setBusy]=useState(false),[loading,setLoading]=useState(true),[error,setError]=useState(''),[tab,setTab]=useState('community'),[viewPerson,setViewPerson]=useState(null);
  const [editingProfile,setEditingProfile]=useState(false),[editName,setEditName]=useState(''),[editBio,setEditBio]=useState(''),[editUsername,setEditUsername]=useState('');
  const [socialNotifications,setSocialNotifications]=useState([]),[showSocialNotifications,setShowSocialNotifications]=useState(false),[notificationsLoading,setNotificationsLoading]=useState(false);
- const [dmUnread,setDmUnread]=useState(0);
+ const [dmUnread,setDmUnread]=useState(0),[tipOpen,setTipOpen]=useState(()=>{try{return localStorage.getItem('nx-ig-tip')!=='1'}catch{return true}});
  useEffect(()=>{document.body.classList.add('nx-ig');return()=>document.body.classList.remove('nx-ig')},[]);
  const loadDmUnread=useCallback(async()=>{if(!userId)return;const {count,error:e}=await supabase.from('social_messages').select('id',{count:'exact',head:true}).neq('sender_id',userId).is('read_at',null);if(!e)setDmUnread(count||0)},[userId]);
  useEffect(()=>{loadDmUnread();if(!userId)return;const ch=supabase.channel('nexus-ig-dm-'+userId).on('postgres_changes',{event:'*',schema:'public',table:'social_messages'},()=>loadDmUnread()).subscribe();const t=setInterval(loadDmUnread,45000);return()=>{clearInterval(t);supabase.removeChannel(ch)}},[userId,loadDmUnread,view]);
@@ -169,18 +169,19 @@ export default function NexusSocial({view='conversations',session,playerProfile,
  if(!userId)return <section className="social-empty"><Lock/><h3>Entre na sua conta</h3><p>O NEXUS Social funciona com uma conta autenticada.</p></section>;
  return <section className="nexus-social">
   <div className="ig-bar">
-   {view==='conversations'?<button type="button" className="ig-ico" onClick={()=>onGo('social-feed')} aria-label="Voltar ao feed"><ArrowLeft size={23}/></button>:<button type="button" className="ig-logo" onClick={()=>onGo('overview')} aria-label="Voltar ao início">Nexus</button>}
+   {view==='conversations'?<button type="button" className="ig-ico" onClick={()=>onGo('social-feed')} aria-label="Voltar ao feed"><ArrowLeft size={23}/></button>:<button type="button" className="ig-menu" onClick={()=>onGo('overview')} aria-label="Voltar ao menu principal"><ChevronLeft size={20}/><span><small>Voltar ao</small><b>Menu</b></span></button>}
    <div className="ig-actions">
     <button type="button" className="ig-ico" aria-label="Notificações" aria-expanded={showSocialNotifications} onClick={()=>{setShowSocialNotifications(v=>!v);if(!showSocialNotifications)loadSocialNotifications();}}><Heart size={22}/>{socialNotifications.some(n=>!n.is_read)&&<i className="ig-dot"/>}</button>
     {view==='feed'?<button type="button" className="ig-ico" aria-label="Mensagens" onClick={()=>onGo('social-conversations')}><Send size={22}/>{dmUnread>0&&<i className="ig-badge">{dmUnread>99?'99+':dmUnread}</i>}</button>:<button type="button" className={'ig-ico'+(tab==='discover'?' on':'')} aria-label="Adicionar amigos" onClick={()=>setTab(t=>t==='discover'?'community':'discover')}><UserPlus size={22}/></button>}
    </div>
   </div>
+  {view==='feed'&&tipOpen&&<div className="ig-tip" role="note"><ChevronLeft size={18}/><span>Toque em <b>‹ Menu</b> para voltar às suas finanças. O <b>avião</b> abre suas mensagens.</span><button type="button" aria-label="Entendi" onClick={()=>{setTipOpen(false);try{localStorage.setItem('nx-ig-tip','1')}catch{}}}>Entendi</button></div>}
   <div className="ig-notif">{showSocialNotifications&&<section className="nxs-notification-panel" aria-label="Central de notificações"><NexusPushSettings userId={userId}/><header><div><b>Central de notificações</b><small>Mensagens, interações e novidades do NEXUS</small></div><button type="button" onClick={()=>setShowSocialNotifications(false)} aria-label="Fechar notificações"><X size={17}/></button></header><div className="nxs-notification-actions"><span>{socialNotifications.filter(n=>!n.is_read).length} não lidas</span><button type="button" onClick={markAllSocialNotificationsRead} disabled={!socialNotifications.some(n=>!n.is_read)}><CheckCheck size={14}/> Marcar todas como lidas</button></div><div className="nxs-notification-list">{notificationsLoading?<div className="nxs-notification-empty">Carregando notificações…</div>:socialNotifications.length?socialNotifications.map(n=><button type="button" key={n.id} className={'nxs-notification-item '+(!n.is_read?'unread':'')} onClick={()=>markSocialNotificationRead(n.id)}><span className="nxs-notification-dot"/><span><b>{n.title||'Atualização do NEXUS'}</b><small>{n.message||'Você tem uma nova atualização.'}</small><time>{new Date(n.created_at).toLocaleString('pt-BR',{dateStyle:'short',timeStyle:'short'})}</time></span></button>):<div className="nxs-notification-empty"><Bell size={24}/><b>Tudo em dia!</b><span>Suas notificações aparecerão aqui.</span></div>}</div></section>}</div>
   {error&&<div className="social-error" role="alert">{error}</div>}
   <div className="social-layout">
    <div className="social-main">
     {view==='conversations'&&<div className="social-tabs"><button className={tab==='community'?'active':''} onClick={()=>setTab('community')}><Users size={16}/> Conversas {incoming.length>0&&<b>{incoming.length}</b>}</button><button className={tab==='discover'?'active':''} onClick={()=>setTab('discover')}><UserPlus size={16}/> Adicionar amigos</button></div>}
-    {loading?<div className="social-loading"><span className="spinner"/> Carregando comunidade...</div>:<>
+    {loading&&view!=='feed'?<div className="social-loading"><span className="spinner"/> Carregando comunidade...</div>:<>
      
      {view==='feed'&&<NexusFeed userId={userId} playerProfile={playerProfile} friends={friends} onToast={onToast} onOpenProfile={openPerson}/>}
 
@@ -190,13 +191,13 @@ export default function NexusSocial({view='conversations',session,playerProfile,
     {view==='conversations'&&tab==='community'&&<NexusCommunity mode="chat" userId={userId} playerProfile={playerProfile} friends={friends} incoming={incoming} outgoing={outgoing} onAnswerFriendRequest={answerRequest} onToast={onToast} onOpenProfile={openPerson} onOpenFeed={onOpenFeed} onClanChange={clan=>onPlayerProfileChange(p=>({...p,clan}))}/>}
    </div>
   </div>
-  <nav className="ig-nav" aria-label="Navegação social">
+  {createPortal(<nav className="ig-nav" aria-label="Navegação social">
    <button type="button" className={view==='feed'?'on':''} onClick={()=>onGo('social-feed')} aria-label="Feed"><Home size={24}/></button>
    <button type="button" onClick={()=>onGo('games')} aria-label="Jogos"><Gamepad2 size={24}/></button>
    <button type="button" className={'ig-plane'+(view==='conversations'&&tab!=='discover'?' on':'')} onClick={()=>{setTab('community');onGo('social-conversations')}} aria-label="Mensagens"><Send size={24}/>{dmUnread>0&&<i className="ig-badge">{dmUnread>99?'99+':dmUnread}</i>}</button>
    <button type="button" className={view==='conversations'&&tab==='discover'?'on':''} onClick={()=>{setTab('discover');onGo('social-conversations')}} aria-label="Buscar pessoas"><Search size={24}/></button>
    <button type="button" onClick={onOpenPlayerHub} aria-label="Meu perfil"><span className="ig-me">{playerProfile?.avatar||'👾'}</span></button>
-  </nav>
+  </nav>,document.body)}
   {editingProfile&&<div className="social-profile-modal-backdrop" onMouseDown={e=>{if(e.target===e.currentTarget)setEditingProfile(false)}}><form className="social-profile-edit-modal" onSubmit={async e=>{e.preventDefault();const cleanName=editName.trim().replace(/\\s+/g,' ').slice(0,40),cleanBio=editBio.trim().slice(0,160),cleanUser=editUsername.trim().toLowerCase();if(cleanName.length<2){setError('Informe um nome com pelo menos 2 caracteres.');return;}if(!/^[a-z0-9_]{3,20}$/.test(cleanUser)){setError('O @ deve ter de 3 a 20 caracteres: letras, números ou _.');return;}if(cleanUser!==profile?.username&&daysLeft>0){setError('Você poderá alterar seu @ novamente em '+daysLeft+' dia(s).');return;}setBusy(true);setError('');const {data,error:e1}=await supabase.from('social_profiles').update({display_name:cleanName,bio:cleanBio,username:cleanUser,username_changed_at:cleanUser!==profile?.username?new Date().toISOString():profile?.username_changed_at,updated_at:new Date().toISOString()}).eq('user_id',userId).select('*').single();if(e1){setError(e1.code==='23505'?'Esse @ já está em uso.':e1.message);setBusy(false);return;}const {error:authError}=await supabase.auth.updateUser({data:{name:cleanName}});if(authError)console.warn('Não foi possível sincronizar o nome da conta:',authError.message);setProfile(data);setUsername(data.username);setBio(data.bio||'');onPlayerProfileChange(p=>({...p,name:cleanName,username:data.username,bio:data.bio||''}));setEditingProfile(false);onToast('Perfil atualizado!');setBusy(false);}}><header><div><span>SEU ESPAÇO</span><h2>Editar perfil</h2><p>Atualize as informações que aparecem para outras pessoas.</p></div><button type="button" onClick={()=>setEditingProfile(false)} aria-label="Fechar"><X size={19}/></button></header><label>Nome<input value={editName} onChange={e=>setEditName(e.target.value)} maxLength={40} required/></label><label>Nome de usuário (@)<input value={editUsername} onChange={e=>setEditUsername(e.target.value.replace(/^@/,''))} maxLength={20} required/><small>{daysLeft>0?'Você poderá alterar o @ em '+daysLeft+' dia(s).':'Você pode alterar o @ uma vez a cada 30 dias.'}</small></label><label>Biografia<textarea value={editBio} onChange={e=>setEditBio(e.target.value)} maxLength={160} rows={4} placeholder="Conte um pouco sobre você…"/></label><footer><button type="button" onClick={()=>setEditingProfile(false)}>Cancelar</button><button type="submit" disabled={busy}>{busy?'Salvando…':'Salvar alterações'}</button></footer></form></div>}
   {viewPerson&&<PublicPlayerProfile person={{...viewPerson,viewerEmail:session?.user?.email||""}} onClose={()=>setViewPerson(null)} onFollowToggle={toggleFollow} onEdit={person=>{setEditName(person.display_name||'');setEditBio(person.bio||'');setEditUsername(person.username||'');setViewPerson(null);setEditingProfile(true);}}/>}
  </section>;
