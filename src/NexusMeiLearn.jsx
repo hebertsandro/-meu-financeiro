@@ -23,10 +23,10 @@ function Viz({v}){
 }
 
 function Player({lesson,next,onClose,onDone,onNext}){
- const sc=lesson.scenes,[i,setI]=useState(0),[started,setStarted]=useState(false),[playing,setPlaying]=useState(false),[speaking,setSpeaking]=useState(false),[voiceOn,setVoiceOn]=useState(()=>store.get('nx-mei-voice',true)),[fin,setFin]=useState(false),[pos,setPos]=useState(0);
+ const sc=lesson.scenes,[i,setI]=useState(0),[started,setStarted]=useState(false),[playing,setPlaying]=useState(false),[speaking,setSpeaking]=useState(false),[voiceOn,setVoiceOn]=useState(()=>store.get('nx-mei-voice',true)),[fin,setFin]=useState(false),[pos,setPos]=useState(0),[vErr,setVErr]=useState(false),[tested,setTested]=useState('');
  const R=useRef({i:0,playing:false,voice:voiceOn,timer:null,tick:null,hasB:false}),hasTts=canTts();
  R.current.voice=voiceOn;
- const clear=()=>{clearTimeout(R.current.timer);clearInterval(R.current.tick);if(hasTts)window.speechSynthesis.cancel();setSpeaking(false)};
+ const clear=()=>{clearTimeout(R.current.timer);clearTimeout(R.current.wd);clearInterval(R.current.tick);if(hasTts&&(window.speechSynthesis.speaking||window.speechSynthesis.pending))window.speechSynthesis.cancel();setSpeaking(false)};
  const go=useCallback((n,autoplay=true)=>{
   clear();
   if(n>=sc.length){setPlaying(false);R.current.playing=false;setFin(true);onDone(lesson.id);return}
@@ -37,17 +37,20 @@ function Player({lesson,next,onClose,onDone,onNext}){
   const after=()=>{if(R.current.playing&&R.current.i===n)R.current.timer=setTimeout(()=>go(n+1),1100)};
   const est=()=>{const t0=Date.now();R.current.hasB=false;R.current.tick=setInterval(()=>{if(!R.current.hasB)setPos(Math.min(len,Math.floor((Date.now()-t0)/1000*14*rate)))},120)};
   if(R.current.voice&&hasTts){
-   R.current.started=false;const u=new SpeechSynthesisUtterance(text);const v=pickVoice();if(v)u.voice=v;u.lang='pt-BR';u.rate=rate;u.pitch=1;
-   u.onstart=()=>{R.current.started=true;setSpeaking(true);est()};
+   const busy=window.speechSynthesis.speaking||window.speechSynthesis.pending;
+   const u=new SpeechSynthesisUtterance(text);const v=pickVoice();if(v)u.voice=v;u.lang=v?.lang||'pt-BR';u.rate=rate;u.pitch=1;u.volume=1;R.current.started=false;
+   u.onstart=()=>{R.current.started=true;setVErr(false);setSpeaking(true);est()};
    u.onboundary=e=>{if(typeof e.charIndex==='number'){R.current.hasB=true;setPos(e.charIndex)}};
-   u.onend=()=>{clearInterval(R.current.tick);setSpeaking(false);setPos(len);after()};
-   u.onerror=()=>{clearInterval(R.current.tick);setSpeaking(false);setPos(len);after()};
-   window.speechSynthesis.speak(u);
-   R.current.timer=setTimeout(()=>{if(!R.current.started&&R.current.i===n&&R.current.playing){est();R.current.timer=setTimeout(()=>{setPos(len);after()},Math.max(4000,len*70))}},1500);
+   u.onend=()=>{clearInterval(R.current.tick);setSpeaking(false);setPos(len);if(R.current.playing&&R.current.i===n)go(n+1)};
+   u.onerror=e=>{clearInterval(R.current.tick);setSpeaking(false);if(e?.error==='interrupted'||e?.error==='canceled')return;setVErr(true);setPos(len);after()};
+   const doSpeak=()=>{try{window.speechSynthesis.resume();window.speechSynthesis.speak(u)}catch{setVErr(true);after()}};
+   if(busy){window.speechSynthesis.cancel();R.current.timer=setTimeout(doSpeak,150)}else doSpeak();
+   R.current.wd=setTimeout(()=>{if(!R.current.started&&R.current.i===n&&R.current.playing){setVErr(true);est();R.current.timer=setTimeout(()=>{setPos(len);after()},Math.max(4500,len*75))}},3500);
   }else{est();R.current.timer=setTimeout(()=>{clearInterval(R.current.tick);setPos(len);after()},Math.max(4500,len*75))}
  },[sc,lesson.id,onDone,hasTts]);// eslint-disable-line
  useEffect(()=>{if(hasTts)window.speechSynthesis.getVoices();return()=>{R.current.playing=false;clear()}},[]);// eslint-disable-line
  const start=()=>{setStarted(true);go(0)};
+ const testVoice=()=>{if(!hasTts){setTested('Seu aparelho não tem voz.');return}setTested('Tocando…');const u=new SpeechSynthesisUtterance('Olá! Esta é a voz das aulas do Nexus.');const v=pickVoice();if(v)u.voice=v;u.lang=v?.lang||'pt-BR';u.onend=()=>setTested('Se você ouviu, é só começar a aula.');u.onerror=()=>setTested('Não saiu som. Verifique o volume e o modo silencioso do aparelho.');if(window.speechSynthesis.speaking)window.speechSynthesis.cancel();window.speechSynthesis.speak(u);setTimeout(()=>setTested(t=>t==='Tocando…'?'Sem retorno de áudio. Verifique o volume e o modo silencioso (iPhone: botão lateral).':t),4000)};
  const toggle=()=>{if(R.current.playing){R.current.playing=false;setPlaying(false);clear()}else go(R.current.i)};
  const nav=d=>{const was=R.current.playing;go(R.current.i+d,was)};
  const text=sc[i].say,words=[];let c=0;text.split(/(\s+)/).forEach(w=>{words.push([w,c]);c+=w.length});
@@ -55,9 +58,9 @@ function Player({lesson,next,onClose,onDone,onNext}){
   <div className="aur"><i/><i/><i/></div>
   <header><div className="segs">{sc.map((_,k)=><span key={k} className={k<i||fin?'done':k===i?'on':''}/>)}</div>
    <div className="bar"><span className="ttl">{lesson.emoji} {lesson.title}</span>{hasTts&&<button type="button" onClick={()=>{const v=!voiceOn;setVoiceOn(v);store.set('nx-mei-voice',v);if(!v&&hasTts){window.speechSynthesis.cancel();setSpeaking(false)}}} aria-label={voiceOn?'Desligar voz':'Ligar voz'}>{voiceOn?<Volume2 size={20}/>:<VolumeX size={20}/>}</button>}<button type="button" onClick={()=>{R.current.playing=false;clear();onClose()}} aria-label="Fechar"><X size={22}/></button></div></header>
-  {!started?<div className="intro"><div className="orb big"><span>{lesson.emoji}</span></div><h2>{lesson.title}</h2><p>{sc.length} cenas · {lesson.min} min · com narração</p><button type="button" className="go" onClick={start}><Play size={22}/> Começar aula</button>{!hasTts&&<small>Seu aparelho não tem voz. A aula roda com legendas.</small>}</div>
+  {!started?<div className="intro"><div className="orb big"><span>{lesson.emoji}</span></div><h2>{lesson.title}</h2><p>{sc.length} cenas · {lesson.min} min · com narração</p><button type="button" className="go" onClick={start}><Play size={22}/> Começar aula</button>{hasTts?<button type="button" className="ghost" onClick={testVoice}><Volume2 size={16}/> Testar voz</button>:<small>Seu aparelho não tem voz. A aula roda com legendas.</small>}{tested&&<small>{tested}</small>}</div>
   :fin?<div className="intro fin"><div className="confetti">{Array.from({length:18},(_,k)=><i key={k} style={{left:(k*5.5+2)+'%',animationDelay:(k%6)*.18+'s',background:['#7c5cff','#2fd2ff','#1fcf8a','#ffb34d','#ff7b95'][k%5]}}/>)}</div><div className="orb big"><span>🎉</span></div><h2>Aula concluída!</h2><p>Você terminou “{lesson.title}”.</p>{next&&<button type="button" className="go" onClick={onNext}>Próxima aula <ChevronRight size={20}/></button>}<button type="button" className="ghost" onClick={()=>{setFin(false);go(0)}}><RotateCcw size={16}/> Ver de novo</button></div>
-  :<><div className="tapL" onClick={()=>nav(-1)}/><div className="tapR" onClick={()=>nav(1)}/>
+  :<>{vErr&&voiceOn&&<div className="verr" role="status">🔇 Sem som? Aumente o volume e desative o modo silencioso do aparelho. A aula segue com legendas.</div>}<div className="tapL" onClick={()=>nav(-1)}/><div className="tapR" onClick={()=>nav(1)}/>
    <main key={i}><div className={'orb'+(speaking?' talk':'')}><span>{lesson.emoji}</span><b/><b/>{speaking&&<div className="wave"><i/><i/><i/><i/><i/></div>}</div><h3>{sc[i].t}</h3><Viz v={sc[i].viz}/></main>
    <footer><p className="cap">{words.map(([w,s],k)=><span key={k} className={s+w.length<=pos?'said':s<=pos?'now':''}>{w}</span>)}</p><div className="ctl"><button type="button" onClick={()=>nav(-1)} aria-label="Cena anterior" disabled={i===0}>‹</button><button type="button" className="play" onClick={toggle} aria-label={playing?'Pausar':'Continuar'}>{playing?<Pause size={26}/>:<Play size={26}/>}</button><button type="button" onClick={()=>nav(1)} aria-label="Próxima cena">›</button></div></footer></>}
  </div>,document.body);

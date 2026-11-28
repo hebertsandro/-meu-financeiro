@@ -125,3 +125,4 @@
 .mei-cine .confetti{position:absolute;inset:0;overflow:hidden;pointer-events:none}.mei-cine .confetti i{position:absolute;top:-20px;width:9px;height:14px;border-radius:2px;animation:fall 2.6s linear infinite}
 @keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
 @media(prefers-reduced-motion:reduce){.mei-cine *{animation-duration:.01ms!important;animation-iteration-count:1!important}}
+.mei-cine .verr{position:absolute;z-index:4;left:14px;right:14px;top:calc(76px + env(safe-area-inset-top,0px));padding:10px 12px;border-radius:14px;background:#ff4d6d33;border:1px solid #ff4d6d77;font-size:12px;line-height:1.35;text-align:center}
