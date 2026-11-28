@@ -6,16 +6,18 @@ import {EBOOKS,LESSONS} from './mei-content';
 const store={get(k,d){try{return JSON.parse(localStorage.getItem(k))??d}catch{return d}},set(k,v){try{localStorage.setItem(k,JSON.stringify(v))}catch{}}};
 const toMd=b=>`# ${b.title}\n_${b.sub}_\n\n`+b.chapters.map((c,i)=>`## ${i+1}. ${c.h}\n\n${c.p.join('\n\n')}`).join('\n\n')+'\n\nMaterial educativo do Meu Financeiro. Não substitui contador nem recomendação de investimento.\n';
 const canTts=()=>typeof window!=='undefined'&&'speechSynthesis'in window;
-const FEM=['Luciana','Francisca','Google português','Google Português','Thalita','Maria','Fernanda','Vitória','Camila'],MAS=['Felipe','Antonio','Antônio','Daniel','Ricardo','Jorge','Eddy'];
+const FEM=['Luciana','Francisca','Google português','Google Português','Thalita','Maria','Fernanda','Vitória','Camila'],MAS=['Felipe','Antonio','Antônio','Daniel','Ricardo','Jorge','Eddy','Reed','Rocko','Grandpa','Donato','Marcos'];
+const ptVoices=()=>canTts()?window.speechSynthesis.getVoices().filter(x=>/pt[-_]BR/i.test(x.lang)||/portugu/i.test(x.name)):[];
 function pickVoice(g='f'){
  if(!canTts())return {v:null,pitch:1};
- const all=window.speechSynthesis.getVoices().filter(x=>/pt[-_]BR/i.test(x.lang)||/portugu/i.test(x.name));
+ const all=ptVoices();
+ const pref=store.get('nx-mei-vname','');const chosen=pref&&all.find(v=>v.name===pref);if(chosen)return {v:chosen,pitch:1};
  const rank=v=>/enhanced|premium|aprimorad|natural|neural/i.test(v.name)?0:1;
  const want=g==='m'?MAS:FEM,other=g==='m'?FEM:MAS;
  const named=all.filter(v=>want.some(n=>v.name.includes(n))).sort((x,y)=>rank(x)-rank(y));
  if(named[0])return {v:named[0],pitch:1};
  const neutral=all.filter(v=>!other.some(n=>v.name.includes(n))).sort((x,y)=>rank(x)-rank(y));
- return {v:neutral[0]||all[0]||null,pitch:g==='m'?.78:1.05};
+ return {v:neutral[0]||all[0]||null,pitch:g==='m'?.7:1.04};
 }
 
 function Viz({v}){
@@ -28,7 +30,7 @@ function Viz({v}){
 }
 
 function Player({lesson,next,onClose,onDone,onNext}){
- const sc=lesson.scenes,[i,setI]=useState(0),[started,setStarted]=useState(false),[playing,setPlaying]=useState(false),[speaking,setSpeaking]=useState(false),[voiceOn,setVoiceOn]=useState(()=>store.get('nx-mei-voice',true)),[fin,setFin]=useState(false),[pos,setPos]=useState(0),[vErr,setVErr]=useState(false),[tested,setTested]=useState(''),[vg,setVg]=useState(()=>store.get('nx-mei-vg','f')),[rate,setRate]=useState(()=>store.get('nx-mei-rate',1)),[panel,setPanel]=useState(false);
+ const sc=lesson.scenes,[i,setI]=useState(0),[started,setStarted]=useState(false),[playing,setPlaying]=useState(false),[speaking,setSpeaking]=useState(false),[voiceOn,setVoiceOn]=useState(()=>store.get('nx-mei-voice',true)),[fin,setFin]=useState(false),[pos,setPos]=useState(0),[vErr,setVErr]=useState(false),[tested,setTested]=useState(''),[vg,setVg]=useState(()=>store.get('nx-mei-vg','f')),[rate,setRate]=useState(()=>store.get('nx-mei-rate',1)),[panel,setPanel]=useState(false),[vlist,setVlist]=useState(()=>ptVoices()),[vname,setVname]=useState(()=>store.get('nx-mei-vname',''));
  const R=useRef({i:0,playing:false,voice:voiceOn,timer:null,tick:null,hasB:false}),hasTts=canTts(),aud=useRef(null),standalone=typeof window!=='undefined'&&(window.navigator.standalone===true||window.matchMedia?.('(display-mode: standalone)').matches);
  if(!aud.current&&typeof Audio!=='undefined')aud.current=new Audio();
  R.current.voice=voiceOn;R.current.g=vg;R.current.rate=rate;
@@ -46,7 +48,7 @@ function Player({lesson,next,onClose,onDone,onNext}){
   const speakTts=()=>{
   if(R.current.voice&&hasTts){
    const busy=window.speechSynthesis.speaking||window.speechSynthesis.pending;
-   const u=new SpeechSynthesisUtterance(text);const pk=pickVoice(g),v=pk.v;if(v)u.voice=v;u.lang=v?.lang||'pt-BR';u.rate=Math.min(1.3,rate*.97);u.pitch=pk.pitch;u.volume=1;R.current.started=false;
+   const u=new SpeechSynthesisUtterance(text);const pk=pickVoice(g),v=pk.v;if(v)u.voice=v;u.lang=v?.lang||'pt-BR';u.rate=Math.min(1.3,rate*.92);u.pitch=pk.pitch;u.volume=1;R.current.started=false;
    u.onstart=()=>{R.current.started=true;setVErr(false);setSpeaking(true);est()};
    u.onboundary=e=>{if(typeof e.charIndex==='number'){R.current.hasB=true;setPos(e.charIndex)}};
    u.onend=()=>{clearInterval(R.current.tick);setSpeaking(false);setPos(len);if(R.current.playing&&R.current.i===n)go(n+1)};
@@ -64,11 +66,11 @@ function Player({lesson,next,onClose,onDone,onNext}){
    const pr=A.play();if(pr&&pr.catch)pr.catch(fall);
   }else speakTts();
  },[sc,lesson.id,onDone,hasTts]);// eslint-disable-line
- useEffect(()=>{if(hasTts)window.speechSynthesis.getVoices();return()=>{R.current.playing=false;clear()}},[]);// eslint-disable-line
+ useEffect(()=>{let f;if(hasTts){window.speechSynthesis.getVoices();f=()=>setVlist(ptVoices());window.speechSynthesis.addEventListener?.('voiceschanged',f);setTimeout(f,600)}return()=>{R.current.playing=false;clear();if(f)window.speechSynthesis.removeEventListener?.('voiceschanged',f)}},[]);// eslint-disable-line
  const start=()=>{setStarted(true);go(0)};
- const chooseG=g=>{setVg(g);store.set('nx-mei-vg',g)};const chooseRate=r=>{setRate(r);store.set('nx-mei-rate',r);if(aud.current)aud.current.playbackRate=r};
- const vpanel=<div className="vpanel"><b>Voz da aula</b><div className="chips"><button type="button" className={vg==='f'?'on':''} onClick={()=>chooseG('f')}>👩 Feminina</button><button type="button" className={vg==='m'?'on':''} onClick={()=>chooseG('m')}>👨 Masculina</button></div><b>Velocidade</b><div className="chips">{[.9,1,1.15].map(r=><button type="button" key={r} className={rate===r?'on':''} onClick={()=>chooseRate(r)}>{r===1?'Normal':r+'x'}</button>)}</div><small>Mudanças valem a partir da próxima cena. Para uma voz mais natural no iPhone: Ajustes › Acessibilidade › Conteúdo Falado › Vozes › Português e baixe uma voz “Aprimorada”.</small></div>;
- const testVoice=()=>{if(!hasTts){setTested('Seu aparelho não tem voz.');return}setTested('Tocando…');const u=new SpeechSynthesisUtterance('Olá! Esta é a voz das aulas do Nexus.');const pk=pickVoice(vg),v=pk.v;if(v)u.voice=v;u.lang=v?.lang||'pt-BR';u.pitch=pk.pitch;u.rate=rate*.97;u.onend=()=>setTested('Se você ouviu, é só começar a aula.');u.onerror=()=>setTested('Não saiu som. Verifique o volume e o modo silencioso do aparelho.');if(window.speechSynthesis.speaking)window.speechSynthesis.cancel();window.speechSynthesis.speak(u);setTimeout(()=>setTested(t=>t==='Tocando…'?'Sem retorno de áudio. Verifique o volume e o modo silencioso (iPhone: botão lateral).':t),4000)};
+ const chooseG=g=>{setVg(g);store.set('nx-mei-vg',g);setVname('');store.set('nx-mei-vname','')};const chooseV=n=>{setVname(n);store.set('nx-mei-vname',n)};const chooseRate=r=>{setRate(r);store.set('nx-mei-rate',r);if(aud.current)aud.current.playbackRate=r};
+ const vpanel=<div className="vpanel"><b>Voz da aula</b><div className="chips"><button type="button" className={vg==='f'?'on':''} onClick={()=>chooseG('f')}>👩 Feminina</button><button type="button" className={vg==='m'?'on':''} onClick={()=>chooseG('m')}>👨 Masculina</button></div>{vlist.length>0&&<><b>Voz do aparelho</b><select className="vsel" value={vname} onChange={e=>chooseV(e.target.value)}><option value="">Automática ({vg==='m'?'masculina':'feminina'})</option>{vlist.map(v=><option key={v.name+v.lang} value={v.name}>{v.name}{/enhanced|premium|aprimorad|natural|neural/i.test(v.name)?' ★ natural':''}</option>)}</select></>}<b>Velocidade</b><div className="chips">{[.9,1,1.15].map(r=><button type="button" key={r} className={rate===r?'on':''} onClick={()=>chooseRate(r)}>{r===1?'Normal':r+'x'}</button>)}</div><small>{vg==='m'&&!vlist.some(v=>MAS.some(n=>v.name.includes(n)))&&vlist.length>0?'Seu aparelho não tem voz masculina instalada; usei a feminina em tom grave. ':''}Para soar bem mais natural no iPhone: Ajustes › Acessibilidade › Conteúdo Falado › Vozes › Português (Brasil) e baixe “Felipe” e “Luciana” na versão Aprimorada. Depois escolha a voz aqui.</small></div>;
+ const testVoice=()=>{if(!hasTts){setTested('Seu aparelho não tem voz.');return}setTested('Tocando…');const u=new SpeechSynthesisUtterance('Olá! Esta é a voz das aulas do Nexus.');const pk=pickVoice(vg),v=pk.v;if(v)u.voice=v;u.lang=v?.lang||'pt-BR';u.pitch=pk.pitch;u.rate=rate*.92;u.onend=()=>setTested('Se você ouviu, é só começar a aula.');u.onerror=()=>setTested('Não saiu som. Verifique o volume e o modo silencioso do aparelho.');if(window.speechSynthesis.speaking)window.speechSynthesis.cancel();window.speechSynthesis.speak(u);setTimeout(()=>setTested(t=>t==='Tocando…'?'Sem retorno de áudio. Verifique o volume e o modo silencioso (iPhone: botão lateral).':t),4000)};
  const toggle=()=>{if(R.current.playing){R.current.playing=false;setPlaying(false);clear()}else go(R.current.i)};
  const nav=d=>{const was=R.current.playing;go(R.current.i+d,was)};
  const text=sc[i].say,words=[];let c=0;text.split(/(\s+)/).forEach(w=>{words.push([w,c]);c+=w.length});

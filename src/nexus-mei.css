@@ -130,3 +130,6 @@
 .mei-cine .vpanel b{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:#bcd0ff}.mei-cine .vpanel small{font-size:11px;color:#93a7cc;line-height:1.4}
 .mei-cine .vpanel .chips{display:flex;gap:6px}.mei-cine .vpanel .chips button{flex:1;padding:10px 6px;border:1px solid #ffffff33;border-radius:12px;background:transparent;color:#fff;font-weight:700;font-size:13px;cursor:pointer}.mei-cine .vpanel .chips button.on{background:linear-gradient(135deg,#7c5cff,#2fd2ff);border-color:transparent}
 .mei-cine .vpop{position:absolute;z-index:5;right:14px;top:calc(60px + env(safe-area-inset-top,0px));width:min(340px,calc(100% - 28px));background:#0b1226f2;border-radius:20px;box-shadow:0 20px 60px #000a}
+
+.mei-cine .vpanel .vsel{width:100%;margin:4px 0 8px;padding:9px 10px;border-radius:10px;background:rgba(255,255,255,.08);color:#fff;border:1px solid rgba(255,255,255,.18);font-size:13px}
+.mei-cine .vpanel .vsel option{color:#111}
