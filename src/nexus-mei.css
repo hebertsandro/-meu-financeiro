@@ -126,3 +126,7 @@
 @keyframes fall{to{transform:translateY(105vh) rotate(540deg)}}
 @media(prefers-reduced-motion:reduce){.mei-cine *{animation-duration:.01ms!important;animation-iteration-count:1!important}}
 .mei-cine .verr{position:absolute;z-index:4;left:14px;right:14px;top:calc(76px + env(safe-area-inset-top,0px));padding:10px 12px;border-radius:14px;background:#ff4d6d33;border:1px solid #ff4d6d77;font-size:12px;line-height:1.35;text-align:center}
+.mei-cine .vpanel{display:grid;gap:8px;width:100%;max-width:340px;padding:14px;border-radius:18px;background:#ffffff14;border:1px solid #ffffff26;text-align:left}
+.mei-cine .vpanel b{font-size:12px;letter-spacing:.8px;text-transform:uppercase;color:#bcd0ff}.mei-cine .vpanel small{font-size:11px;color:#93a7cc;line-height:1.4}
+.mei-cine .vpanel .chips{display:flex;gap:6px}.mei-cine .vpanel .chips button{flex:1;padding:10px 6px;border:1px solid #ffffff33;border-radius:12px;background:transparent;color:#fff;font-weight:700;font-size:13px;cursor:pointer}.mei-cine .vpanel .chips button.on{background:linear-gradient(135deg,#7c5cff,#2fd2ff);border-color:transparent}
+.mei-cine .vpop{position:absolute;z-index:5;right:14px;top:calc(60px + env(safe-area-inset-top,0px));width:min(340px,calc(100% - 28px));background:#0b1226f2;border-radius:20px;box-shadow:0 20px 60px #000a}
